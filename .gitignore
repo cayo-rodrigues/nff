@@ -3,5 +3,5 @@ __pycache__
 *.spec
 build
 dist
-src/data.xlsx
+db.xlsx
 *.log
