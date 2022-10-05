@@ -10,7 +10,7 @@ class Siare(Browser):
     def __init__(self) -> None:
         super().__init__(Constants.SIARE_URL)
 
-    def login(self, sender: Entity):
+    def login(self, sender: Entity) -> None:
         xpath = Constants.XPaths.LOGIN_USER_TYPE_SELECT_INPUT
         element = self._browser.find_element(By.XPATH, xpath)
 

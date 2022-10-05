@@ -25,8 +25,8 @@ class DataBase:
             Constants.DB_PATH, Constants.SheetNames.INVOICES_PRODUCTS, dtype="object"
         )
 
-    def get_rows(self, df: pd.DataFrame, by_col: str, where):
+    def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
 
-    def get_row(self, df: pd.DataFrame, by_col: str, where):
+    def get_row(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return self.get_rows(df, by_col, where).head(1)
