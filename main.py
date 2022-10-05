@@ -1,15 +1,13 @@
 from models.entity import Entity
-from modules.browser import Browser
 from modules.database import DataBase
 from modules.siare import Siare
-from utils.constants import Constants
 
 
 def main():
     db = DataBase()
     entities, invoices, invoices_products = db.read_all()
 
-    browser = Browser(url=Constants.SIARE_URL)
+    siare = Siare()
 
     for index, row in invoices.iterrows():
         # create new Invoice instance here
@@ -24,7 +22,6 @@ def main():
         sender = Entity(data=sender_data, password=password)
         recipient = Entity(data=recipient_data)
 
-        siare = Siare(browser)
         siare.login(sender)
 
 

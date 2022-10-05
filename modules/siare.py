@@ -6,9 +6,9 @@ from utils.constants import Constants
 from .browser import Browser
 
 
-class Siare:
-    def __init__(self, browser: Browser) -> None:
-        self._browser = browser._browser
+class Siare(Browser):
+    def __init__(self) -> None:
+        super().__init__(Constants.SIARE_URL)
 
     def login(self, sender: Entity):
         xpath = Constants.XPaths.LOGIN_USER_TYPE_SELECT_INPUT
