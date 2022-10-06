@@ -18,6 +18,7 @@ def main():
         invoice.sender.password = gui.get_user_password()
 
         siare.login(invoice.sender)
+        siare.close_first_pop_up()
 
 
 if __name__ == "__main__":

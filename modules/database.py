@@ -1,5 +1,5 @@
 import pandas as pd
-from utils.constants import Constants
+from utils.constants import DB_PATH, SheetNames
 
 
 class DataBase:
@@ -11,19 +11,13 @@ class DataBase:
         )
 
     def read_entities(self) -> pd.DataFrame:
-        return pd.read_excel(
-            Constants.DB_PATH, Constants.SheetNames.ENTITIES, dtype="object"
-        )
+        return pd.read_excel(DB_PATH, SheetNames.ENTITIES, dtype="object")
 
     def read_invoices(self) -> pd.DataFrame:
-        return pd.read_excel(
-            Constants.DB_PATH, Constants.SheetNames.INVOICES, dtype="object"
-        )
+        return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype="object")
 
     def read_invoices_products(self) -> pd.DataFrame:
-        return pd.read_excel(
-            Constants.DB_PATH, Constants.SheetNames.INVOICES_PRODUCTS, dtype="object"
-        )
+        return pd.read_excel(DB_PATH, SheetNames.INVOICES_PRODUCTS, dtype="object")
 
     def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
