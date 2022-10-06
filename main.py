@@ -1,6 +1,6 @@
-from models.entity import Entity
 from models.invoice import Invoice
 from modules.database import DataBase
+from modules.gui import GUI
 from modules.siare import Siare
 
 
@@ -13,8 +13,10 @@ def main():
     for index, invoice_data in invoices.iterrows():
         invoice = Invoice(data=invoice_data, nf_index=index + 1)
 
-        password = input("Senha do remetente: ")  # use GUI
-        invoice.sender.password = password
+        gui = GUI()
+
+        invoice.sender.password = gui.get_user_password()
+
         siare.login(invoice.sender)
 
 
