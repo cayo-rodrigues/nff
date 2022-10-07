@@ -27,6 +27,24 @@ class GUI:
         self.root.destroy()
         self.is_opened = False
 
+    def get_user_password(self) -> str:
+        while True:
+            if not self.is_opened:
+                self.__init__()
+
+            try:
+                self._ask_user_password_widget()
+            except TclError:
+                self.is_opened = False
+                continue
+
+            self.mainframe.mainloop()
+            password = self.user_password.get()
+            if password:
+                break
+
+        return password
+
     def _apply_padding(self) -> None:
         for child in self.mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
@@ -47,21 +65,3 @@ class GUI:
         )
 
         self._apply_padding()
-
-    def get_user_password(self) -> str:
-        while True:
-            if not self.is_opened:
-                self.__init__()
-
-            try:
-                self._ask_user_password_widget()
-            except TclError:
-                self.is_opened = False
-                continue
-
-            self.mainframe.mainloop()
-            password = self.user_password.get()
-            if password:
-                break
-
-        return password
