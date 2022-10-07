@@ -1,3 +1,5 @@
+from datetime import date
+
 from models.entity import Entity
 from models.invoice import Invoice
 from selenium.webdriver.common.by import By
@@ -26,39 +28,59 @@ class Siare(Browser):
                 break
 
         xpath = XPaths.LOGIN_NUMBER_INPUT
-        self._browser.find_element(By.XPATH, xpath).send_keys(sender.number)
+        self.type_into_element(xpath, sender.number)
 
         xpath = XPaths.LOGIN_CPF_INPUT
-        self._browser.find_element(By.XPATH, xpath).send_keys(sender.cpf_cnpj)
+        self.type_into_element(xpath, sender.cpf_cnpj)
 
         xpath = XPaths.LOGIN_PASSWORD_INPUT
-        self._browser.find_element(By.XPATH, xpath).send_keys(
-            sender.password + Keys.RETURN
-        )
+        self.type_into_element(xpath, sender.password + Keys.RETURN)
 
     @wait_for_it
     def close_first_pop_up(self) -> None:
         xpath = XPaths.POP_UP_CLOSE_BUTTON
-        self._browser.find_element(By.XPATH, xpath).click()
+        self.click_element(xpath)
 
     def open_require_invoice_page(self) -> None:
         self.get_page(url=Urls.REQUIRE_INVOICE_URL)
 
+    @wait_for_it
     def fill_invoice_basic_data(self, invoice: Invoice) -> None:
-        xpath = XPaths.INVOICE_INITIAL_DATA_OPERATION_SELECT_INPUT
-        self._browser.find_element(By.XPATH, xpath).click()
+        xpath = XPaths.INVOICE_BASIC_DATA_OPERATION_SELECT_INPUT
+        self.click_element(xpath)
 
-        xpath = XPaths.INVOICE_INITIAL_DATA_OPERATION_BOX
+        xpath = XPaths.INVOICE_BASIC_DATA_OPERATION_BOX
         element = self._browser.find_element(By.XPATH, xpath)
 
-        operation_types = element.find_elements(By.TAG_NAME, "span")
+        operations_box = element.find_elements(By.TAG_NAME, "span")
 
-        for operation in operation_types:
+        for operation in operations_box:
             operation_text = operation.get_attribute("innerHTML").lower()
 
             if invoice.operation.lower() == operation_text:
                 operation.click()
                 break
 
-        xpath = XPaths.INVOICE_INITIAL_DATA_CONFIRMATION_BUTTON
-        self._browser.find_element(By.XPATH, xpath).click()
+        xpath = XPaths.INVOICE_BASIC_DATA_CONFIRMATION_BUTTON
+        self.click_element(xpath)
+
+    @wait_for_it
+    def fill_invoice_initial_data(self, invoice: Invoice) -> None:
+        xpath = XPaths.INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT
+        self.click_element(xpath)
+
+        xpath = XPaths.INVOICE_INITIAL_DATA_CFOP_BOX
+        element = self._browser.find_element(By.XPATH, xpath)
+
+        cfops_box = element.find_elements(By.TAG_NAME, "span")
+
+        for cfop in cfops_box:
+            cfop_number = cfop.get_attribute("innerHTML").split(" -")[0]
+
+            if invoice.cfop == cfop_number:
+                cfop.click()
+                break
+
+        today_date = date.today().strftime("%d/%m/%Y")
+        xpath = XPaths.INVOICE_INITIAL_DATA_DATE_INPUT
+        self.type_into_element(xpath, today_date)

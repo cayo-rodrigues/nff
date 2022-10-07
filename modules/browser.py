@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 
 class Browser:
@@ -15,3 +16,9 @@ class Browser:
 
     def get_page(self, url: str) -> None:
         self._browser.get(url)
+
+    def click_element(self, xpath: str) -> None:
+        self._browser.find_element(By.XPATH, xpath).click()
+
+    def type_into_element(self, xpath: str, value: str) -> None:
+        self._browser.find_element(By.XPATH, xpath).send_keys(value)
