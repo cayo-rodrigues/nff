@@ -3,7 +3,6 @@ from time import sleep
 
 from models.entity import Entity
 from models.invoice import Invoice
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from utils.constants import Urls, XPaths
@@ -131,8 +130,5 @@ class Siare(Browser):
                 icms.click()
                 break
 
-        try:
-            xpath = XPaths.INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION
-            self.click_element(xpath)
-        except NoSuchElementException:
-            pass
+        xpath = XPaths.INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION
+        self.click_if_exists(xpath)
