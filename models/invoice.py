@@ -1,28 +1,32 @@
 from modules.database import DataBase
 from pandas import Series
+from utils.helpers import decode_icms_contributor_status, normalize_text, str_to_boolean
 
 from models.entity import Entity
 
 
 class InvoiceProductOrService:
     def __init__(self, data: Series) -> None:
-        self.group: str = data["grupo"]
-        self.ncm: str = data["ncm"]
-        self.description: str = data["descrição"]
-        self.origin: str = data["origem"]
-        self.unity_of_measurement: str = data["unidade de medida"]
+        self.group: str = normalize_text(data["grupo"])
+        self.ncm: str = normalize_text(data["ncm"], numeric=True)
+        self.description: str = normalize_text(data["descrição"])
+        self.origin: str = normalize_text(data["origem"])
+        self.unity_of_measurement: str = normalize_text(data["unidade de medida"])
         self.quantity: int = int(data["quantidade"])
         self.value_per_unity: float = float(data["valor unitário"])
 
 
 class Invoice:
     def __init__(self, data: Series, nf_index: int) -> None:
-        self.operation: str = data["natureza da operação"]
-        self.gta: str = data["gta"]
-        self.cfop: str = data["cfop"]
+        self.operation: str = normalize_text(data["natureza da operação"])
+        self.gta: str = normalize_text(data["gta"])
+        self.cfop: str = normalize_text(data["cfop"], numeric=True)
         self.shipping: float = float(data["frete"])
-        self.add_shipping_to_total_value: str = data["adicionar frete ao total"]
-        self.is_final_customer: str = data["consumidor final"]
+        self.is_final_customer: bool = str_to_boolean(data["consumidor final"])
+        self.add_shipping_to_total_value: bool = str_to_boolean(
+            data["adicionar frete ao total"]
+        )
+        self.icms: str = decode_icms_contributor_status(data["contribuinte icms"])
 
         self.sender: Entity = data["remetente"]
         self.recipient: Entity = data["destinatário"]

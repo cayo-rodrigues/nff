@@ -1,11 +1,14 @@
 from datetime import date
+from time import sleep
 
 from models.entity import Entity
 from models.invoice import Invoice
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from utils.constants import Urls, XPaths
 from utils.decorators import wait_for_it
+from utils.helpers import normalize_text
 
 from .browser import Browser
 
@@ -36,13 +39,17 @@ class Siare(Browser):
         xpath = XPaths.LOGIN_PASSWORD_INPUT
         self.type_into_element(xpath, sender.password + Keys.RETURN)
 
+    def open_require_invoice_page(self) -> None:
+        self.get_page(url=Urls.REQUIRE_INVOICE_URL)
+
+    def open_sender_recipient_tab(self) -> None:
+        xpath = XPaths.INVOICE_SENDER_RECIPIENT_TAB
+        self.click_element(xpath)
+
     @wait_for_it
     def close_first_pop_up(self) -> None:
         xpath = XPaths.POP_UP_CLOSE_BUTTON
         self.click_element(xpath)
-
-    def open_require_invoice_page(self) -> None:
-        self.get_page(url=Urls.REQUIRE_INVOICE_URL)
 
     @wait_for_it
     def fill_invoice_basic_data(self, invoice: Invoice) -> None:
@@ -55,9 +62,9 @@ class Siare(Browser):
         operations_box = element.find_elements(By.TAG_NAME, "span")
 
         for operation in operations_box:
-            operation_text = operation.get_attribute("innerHTML").lower()
+            operation_text = normalize_text(operation.get_attribute("innerHTML"))
 
-            if invoice.operation.lower() == operation_text:
+            if invoice.operation == operation_text:
                 operation.click()
                 break
 
@@ -84,3 +91,48 @@ class Siare(Browser):
         today_date = date.today().strftime("%d/%m/%Y")
         xpath = XPaths.INVOICE_INITIAL_DATA_DATE_INPUT
         self.type_into_element(xpath, today_date)
+
+    @wait_for_it
+    def fill_invoice_recipient_sender_data(self, invoice: Invoice) -> None:
+        xpath = XPaths.INVOICE_SENDER_EMAIL_INPUT
+        self.type_into_element(xpath, invoice.sender.email)
+
+        xpath = XPaths.INVOICE_RECIPIENT_NUMBER_INPUT
+        self.type_into_element(xpath, invoice.recipient.number)
+
+        xpath = XPaths.INVOICE_RECIPIENT_SEARCH_BUTTON
+        self.click_element(xpath)
+
+        while True:
+            sleep(1)
+            xpath = XPaths.INVOICE_RECIPIENT_NAME_SPAN
+            if self._browser.find_element(By.XPATH, xpath).get_attribute("innerHTML"):
+                break
+
+        if invoice.is_final_customer:
+            xpath = XPaths.INVOICE_IS_FINAL_CUSTOMER_INPUT_TRUE
+            self.click_element(xpath)
+        else:
+            xpath = XPaths.INVOICE_IS_FINAL_CUSTOMER_INPUT_FALSE
+            self.click_element(xpath)
+
+        xpath = XPaths.INVOICE_ICMS_SELECT_INPUT
+        self.click_element(xpath)
+
+        xpath = XPaths.INVOICE_ICMS_OPTIONS_BOX
+        element = self._browser.find_element(By.XPATH, xpath)
+
+        icms_box = element.find_elements(By.TAG_NAME, "span")
+
+        for icms in icms_box:
+            icms_number = icms.get_attribute("rel")
+
+            if invoice.icms == icms_number:
+                icms.click()
+                break
+
+        try:
+            xpath = XPaths.INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION
+            self.click_element(xpath)
+        except NoSuchElementException:
+            pass
