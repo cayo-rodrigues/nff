@@ -11,13 +11,13 @@ class DataBase:
         )
 
     def read_entities(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.ENTITIES, dtype="object")
+        return pd.read_excel(DB_PATH, SheetNames.ENTITIES, dtype=str)
 
     def read_invoices(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype="object")
+        return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str)
 
     def read_invoices_products(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.INVOICES_PRODUCTS, dtype="object")
+        return pd.read_excel(DB_PATH, SheetNames.INVOICES_PRODUCTS, dtype=str)
 
     def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]

@@ -19,8 +19,15 @@ def main():
 
         siare.login(invoice.sender)
         siare.close_first_pop_up()
+
         siare.open_require_invoice_page()
+
         siare.fill_invoice_basic_data(invoice)
+        siare.fill_invoice_initial_data(invoice)
+
+        siare.open_sender_recipient_tab()
+
+        siare.fill_invoice_recipient_sender_data(invoice)
 
 
 if __name__ == "__main__":

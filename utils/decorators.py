@@ -12,7 +12,7 @@ def wait_for_it(f):
             try:
                 f(*args, **kwargs)
             except (NoSuchElementException, ElementNotInteractableException):
-                sleep(3)
+                sleep(1)
             else:
                 break
 
