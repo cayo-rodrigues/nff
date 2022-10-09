@@ -35,10 +35,6 @@ class XPaths:
         "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[9]/td[2]/input"
     )
 
-    INVOICE_SENDER_RECIPIENT_TAB = (
-        "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[5]/a"
-    )
-
     INVOICE_SENDER_EMAIL_INPUT = (
         "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td[2]/input"
     )
@@ -63,4 +59,15 @@ class XPaths:
 
     INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION = (
         "/html/body/div[3]/div[2]/div/div[3]/div/form/table[7]/tbody/tr[4]/td[3]/input"
+    )
+
+    INVOICE_SENDER_RECIPIENT_TAB = (
+        "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[5]/a"
+    )
+    INVOICE_PRODUCTS_DATA_TAB = (
+        "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[8]/a"
+    )
+
+    INVOICE_INCLUDE_ITEMS_TABLE_BUTTON = (
+        "/html/body/div[3]/div[2]/div/div[3]/div/form/table[4]/tbody/tr/td[2]/a[1]"
     )

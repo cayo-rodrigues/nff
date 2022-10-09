@@ -45,6 +45,15 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_SENDER_RECIPIENT_TAB
         self.click_element(xpath)
 
+    def open_products_data_tab(self) -> None:
+        xpath = XPaths.INVOICE_PRODUCTS_DATA_TAB
+        self.click_element(xpath)
+
+    @wait_for_it
+    def open_include_items_table(self) -> None:
+        xpath = XPaths.INVOICE_INCLUDE_ITEMS_TABLE_BUTTON
+        self.click_element(xpath)
+
     @wait_for_it
     def close_first_pop_up(self) -> None:
         xpath = XPaths.POP_UP_CLOSE_BUTTON
