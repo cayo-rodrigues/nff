@@ -1,6 +1,7 @@
 from time import sleep
 
 from selenium.common.exceptions import (
+    ElementClickInterceptedException,
     ElementNotInteractableException,
     NoSuchElementException,
 )
@@ -11,7 +12,11 @@ def wait_for_it(f):
         while True:
             try:
                 f(*args, **kwargs)
-            except (NoSuchElementException, ElementNotInteractableException):
+            except (
+                NoSuchElementException,
+                ElementNotInteractableException,
+                ElementClickInterceptedException,
+            ):
                 sleep(1)
             else:
                 break

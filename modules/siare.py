@@ -2,7 +2,7 @@ from datetime import date
 from time import sleep
 
 from models.entity import Entity
-from models.invoice import Invoice
+from models.invoice import Invoice, InvoiceItem
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from utils.constants import Urls, XPaths
@@ -45,8 +45,8 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_SENDER_RECIPIENT_TAB
         self.click_element(xpath)
 
-    def open_products_data_tab(self) -> None:
-        xpath = XPaths.INVOICE_PRODUCTS_DATA_TAB
+    def open_items_data_tab(self) -> None:
+        xpath = XPaths.INVOICE_ITEMS_DATA_TAB
         self.click_element(xpath)
 
     @wait_for_it
@@ -141,3 +141,11 @@ class Siare(Browser):
 
         xpath = XPaths.INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION
         self.click_if_exists(xpath)
+
+    @wait_for_it
+    def fill_invoice_items_data(self, invoice_items: list[InvoiceItem]):
+        ...
+
+    @wait_for_it
+    def fill_invoice_shipping_data(self, invoice: Invoice):
+        ...

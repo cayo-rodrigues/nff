@@ -64,7 +64,7 @@ class XPaths:
     INVOICE_SENDER_RECIPIENT_TAB = (
         "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[5]/a"
     )
-    INVOICE_PRODUCTS_DATA_TAB = (
+    INVOICE_ITEMS_DATA_TAB = (
         "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[8]/a"
     )
 

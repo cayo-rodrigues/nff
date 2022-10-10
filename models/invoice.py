@@ -5,7 +5,7 @@ from utils.helpers import decode_icms_contributor_status, normalize_text, str_to
 from models.entity import Entity
 
 
-class InvoiceProductOrService:
+class InvoiceItem:
     def __init__(self, data: Series) -> None:
         self.group: str = normalize_text(data["grupo"])
         self.ncm: str = normalize_text(data["ncm"], numeric=True)
@@ -34,7 +34,7 @@ class Invoice:
         self.nf_index: int = nf_index
 
         self._get_sender_and_recipient()
-        self._get_products_services()
+        self._get_items()
 
     def _get_sender_and_recipient(self) -> None:
         db = DataBase()
@@ -46,14 +46,12 @@ class Invoice:
         self.sender = Entity(data=sender_data)
         self.recipient = Entity(data=recipient_data)
 
-    def _get_products_services(self) -> None:
+    def _get_items(self) -> None:
         db = DataBase()
-        products_services = db.read_invoices_products()
+        items = db.read_invoices_products()
 
-        products_services_data = db.get_rows(
-            products_services, by_col="NF", where=self.nf_index
-        )
+        items_data = db.get_rows(items, by_col="NF", where=self.nf_index)
 
-        self.products_services: list[InvoiceProductOrService] = []
-        for _, row in products_services_data.iterrows():
-            self.products_services.append(InvoiceProductOrService(data=row))
+        self.items: list[InvoiceItem] = []
+        for _, row in items_data.iterrows():
+            self.items.append(InvoiceItem(data=row))
