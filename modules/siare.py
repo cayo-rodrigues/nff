@@ -16,6 +16,7 @@ class Siare(Browser):
     def __init__(self) -> None:
         super().__init__(url=Urls.SIARE_URL)
 
+    @wait_for_it
     def login(self, sender: Entity) -> None:
         xpath = XPaths.LOGIN_USER_TYPE_SELECT_INPUT
         element = self._browser.find_element(By.XPATH, xpath)
@@ -41,10 +42,12 @@ class Siare(Browser):
     def open_require_invoice_page(self) -> None:
         self.get_page(url=Urls.REQUIRE_INVOICE_URL)
 
+    @wait_for_it
     def open_sender_recipient_tab(self) -> None:
         xpath = XPaths.INVOICE_SENDER_RECIPIENT_TAB
         self.click_element(xpath)
 
+    @wait_for_it
     def open_items_data_tab(self) -> None:
         xpath = XPaths.INVOICE_ITEMS_DATA_TAB
         self.click_element(xpath)
