@@ -40,8 +40,8 @@ class Invoice:
         db = DataBase()
         entities = db.read_entities()
 
-        sender_data = db.get_row(entities, by_col="número", where=self.sender)
-        recipient_data = db.get_row(entities, by_col="número", where=self.recipient)
+        sender_data = db.get_row(entities, by_col="cpf/cnpj", where=self.sender)
+        recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
 
         self.sender = Entity(data=sender_data)
         self.recipient = Entity(data=recipient_data)
