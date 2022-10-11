@@ -14,6 +14,9 @@ def decode_icms_contributor_status(value: str) -> int:
 
 
 def normalize_text(value: str, numeric: bool = False) -> str:
+    if not value:
+        return ""
+
     text = value.strip().lower()
 
     if not numeric:

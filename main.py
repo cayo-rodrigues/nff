@@ -1,5 +1,3 @@
-from re import S
-
 from models.invoice import Invoice
 from modules.database import DataBase
 from modules.gui import GUI
