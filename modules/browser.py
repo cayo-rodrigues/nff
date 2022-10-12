@@ -4,6 +4,7 @@ from selenium.common.exceptions import (
     NoSuchElementException,
 )
 from selenium.webdriver.common.by import By
+from utils.decorators import wait_for_it
 
 
 class Browser:
@@ -11,6 +12,9 @@ class Browser:
         self.open()
         if url:
             self.get_page(url)
+
+    def _get_lookup_root(self, root):
+        return root or self._browser
 
     def open(self) -> None:
         self._browser = webdriver.Firefox()
@@ -21,14 +25,24 @@ class Browser:
     def get_page(self, url: str) -> None:
         self._browser.get(url)
 
-    def click_element(self, xpath: str) -> None:
-        self._browser.find_element(By.XPATH, xpath).click()
+    @wait_for_it
+    def get_element(self, xpath: str, root=None):
+        return self._get_lookup_root(root).find_element(By.XPATH, xpath)
 
-    def type_into_element(self, xpath: str, value: str) -> None:
-        self._browser.find_element(By.XPATH, xpath).send_keys(value)
+    @wait_for_it
+    def filter_elements(self, by: str, where: str, root=None):
+        return self._get_lookup_root(root).find_elements(by, where)
 
-    def click_if_exists(self, xpath: str) -> None:
+    @wait_for_it
+    def click_element(self, xpath: str, root=None) -> None:
+        self.get_element(xpath, root).click()
+
+    @wait_for_it
+    def type_into_element(self, xpath: str, value: str, root=None) -> None:
+        self.get_element(xpath, root).send_keys(value)
+
+    def click_if_exists(self, xpath: str, root=None) -> None:
         try:
-            self.click_element(xpath)
+            self.click_element(xpath, root)
         except (NoSuchElementException, ElementNotInteractableException):
             pass
