@@ -129,57 +129,56 @@ class Siare(Browser):
         self.click_if_exists(xpath)
 
     def fill_invoice_items_data(self, invoice_items: list[InvoiceItem]):
-        ...
-        # import ipdb
+        while True:
+            sleep(1)
+            xpath = XPaths.INVOICE_ITEMS_TABLE
+            table = self.get_element(xpath)
 
-        # print("AQUI 1")
-        # xpath = XPaths.INVOICE_ITEMS_TABLE
-        # table = self._browser.find_element(By.XPATH, xpath)
-        # # ipdb.set_trace()
+            table_rows = self.filter_elements(By.TAG_NAME, "tr", table)[2:-2]
+            table_rows = table_rows[:1] + table_rows[2:]
+            if table_rows:
+                break
 
-        # table_rows = table.find_elements(By.TAG_NAME, "tr")[2:-2]
-        # for i, row in enumerate(table_rows):
-        #     print("AQUI 2")
-        #     try:
-        #         item = invoice_items[i]
-        #     except IndexError:
-        #         break
+        for i, row in enumerate(table_rows):
+            try:
+                item = invoice_items[i]
+            except IndexError:
+                break
 
-        #     row_values = [
-        #         item.group,
-        #         item.ncm,
-        #         item.description,
-        #         item.origin,
-        #         item.unity_of_measurement,
-        #         item.quantity,
-        #         item.value_per_unity,
-        #     ]
+            row_values = [
+                item.group,
+                item.ncm,
+                item.description,
+                item.origin,
+                item.unity_of_measurement,
+                item.quantity,
+                item.value_per_unity,
+            ]
 
-        #     cols = row.find_elements(By.TAG_NAME, "td")[:-1]
-        #     cols = cols[:2] + cols[4:]
-        #     for j, col in enumerate(cols):
-        #         print("AQUI 3")
-        #         try:
-        #             css_selector = "div[class*=jquery-selectbox]"
-        #             element = col.find_element(By.CSS_SELECTOR, css_selector)
-        #             element.click()
+            cols = self.filter_elements(By.CLASS_NAME, "ctnbdy", row)[:-1]
+            for j, col in enumerate(cols):
+                try:
+                    css_selector = "div[class*=jquery-selectbox]"
+                    element = col.find_element(By.CSS_SELECTOR, css_selector)
+                except NoSuchElementException:
+                    element = col.find_element(By.CSS_SELECTOR, "input[type=text]")
+                    element.send_keys(row_values[j])
+                else:
+                    element.click()
 
-        #             css_selector = "div[class*=jquery-selectbox-list]"
-        #             element = element.find_element(By.CSS_SELECTOR, css_selector)
+                    css_selector = "div[class*=jquery-selectbox-list]"
+                    element = element.find_element(By.CSS_SELECTOR, css_selector)
 
-        #             element_box = element.find_elements(By.TAG_NAME, "span")
-        #             for element in element_box:
-        #                 if row_values[j] == normalize_text(
-        #                     element.get_attribute("innerHTML")
-        #                 ):
-        #                     element.click()
-        #                     break
-        #         except NoSuchElementException:
-        #             element = col.find_element(By.CSS_SELECTOR, "input[type=text]")
-        #             element.send_keys(row_values[j])
+                    element_box = element.find_elements(By.TAG_NAME, "span")
+                    for element in element_box:
+                        if row_values[j] == normalize_text(
+                            element.get_attribute("innerHTML")
+                        ):
+                            element.click()
+                            break
 
-        # xpath = XPaths.INVOICE_ITEMS_TABLE_CONFIRM_BUTTON
-        # self.click_element(xpath)
+        xpath = XPaths.INVOICE_ITEMS_TABLE_CONFIRM_BUTTON
+        self.click_element(xpath)
 
     def fill_invoice_shipping_data(self, invoice: Invoice):
         ...
