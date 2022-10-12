@@ -5,3 +5,4 @@ build
 dist
 db.xlsx
 *.log
+.vscode
