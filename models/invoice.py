@@ -31,7 +31,7 @@ class Invoice:
         self.sender: Entity = data["remetente"]
         self.recipient: Entity = data["destinatário"]
 
-        self.nf_index: int = nf_index
+        self.nf_index: str = str(nf_index)
 
         self._get_sender_and_recipient()
         self._get_items()
