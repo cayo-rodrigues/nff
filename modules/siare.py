@@ -108,10 +108,9 @@ class Siare(Browser):
 
         if invoice.is_final_customer:
             xpath = XPaths.INVOICE_IS_FINAL_CUSTOMER_INPUT_TRUE
-            self.click_element(xpath)
         else:
             xpath = XPaths.INVOICE_IS_FINAL_CUSTOMER_INPUT_FALSE
-            self.click_element(xpath)
+        self.click_element(xpath)
 
         xpath = XPaths.INVOICE_ICMS_SELECT_INPUT
         self.click_element(xpath)
@@ -181,4 +180,20 @@ class Siare(Browser):
         self.click_element(xpath)
 
     def fill_invoice_shipping_data(self, invoice: Invoice):
-        ...
+        xpath = XPaths.INVOICE_SHIPPING_VALUE_INPUT
+        self.type_into_element(xpath, invoice.shipping)
+
+        # the click below will trigger a page refresh
+        xpath = XPaths.INVOICE_SHIPPING_VALUE_LABEL
+        self.click_element(xpath)
+
+        self.wait_until_document_is_ready()
+
+        if invoice.add_shipping_to_total_value:
+            xpath = XPaths.INVOICE_ADD_SHIPPING_RADIO_INPUT_TRUE
+        else:
+            xpath = XPaths.INVOICE_ADD_SHIPPING_RADIO_INPUT_FALSE
+        # so will this one
+        self.click_element(xpath)
+
+        self.wait_until_document_is_ready()
