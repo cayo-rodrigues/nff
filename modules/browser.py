@@ -1,9 +1,13 @@
+from time import sleep
+
 from selenium import webdriver
 from selenium.common.exceptions import (
     ElementNotInteractableException,
     NoSuchElementException,
 )
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 from utils.decorators import wait_for_it
 
 
@@ -13,7 +17,7 @@ class Browser:
         if url:
             self.get_page(url)
 
-    def _get_lookup_root(self, root):
+    def _get_lookup_root(self, root: WebElement) -> WebDriver | WebElement:
         return root or self._browser
 
     def open(self) -> None:
@@ -26,11 +30,11 @@ class Browser:
         self._browser.get(url)
 
     @wait_for_it
-    def get_element(self, xpath: str, root=None):
+    def get_element(self, xpath: str, root=None) -> WebElement:
         return self._get_lookup_root(root).find_element(By.XPATH, xpath)
 
     @wait_for_it
-    def filter_elements(self, by: str, where: str, root=None):
+    def filter_elements(self, by: str, where: str, root=None) -> WebElement:
         return self._get_lookup_root(root).find_elements(by, where)
 
     @wait_for_it
@@ -41,8 +45,21 @@ class Browser:
     def type_into_element(self, xpath: str, value: str, root=None) -> None:
         self.get_element(xpath, root).send_keys(value)
 
-    def click_if_exists(self, xpath: str, root=None) -> None:
+    def click_if_exists(self, xpath: str, root=None) -> bool:
         try:
-            self.click_element(xpath, root)
+            self.get_element(xpath, root).click()
+            return True
         except (NoSuchElementException, ElementNotInteractableException):
-            pass
+            return False
+
+    def is_element_focused(self, element: WebElement) -> bool:
+        return element == self._browser.switch_to.active_element
+
+    def is_document_ready(self) -> bool:
+        return self._browser.execute_script("return document.readyState") == "complete"
+
+    def wait_until_document_is_ready(self) -> None:
+        while True:
+            sleep(1)
+            if self.is_document_ready():
+                break

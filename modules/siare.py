@@ -53,6 +53,14 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_INCLUDE_ITEMS_TABLE_BUTTON
         self.click_element(xpath)
 
+    def open_transport_tab(self) -> bool:
+        xpath = XPaths.INVOICE_TRANSPORT_TAB
+        return self.click_if_exists(xpath)
+
+    def open_aditional_data_tab(self) -> None:
+        xpath = XPaths.INVOICE_ADITIONAL_DATA_TAB
+        self.click_element(xpath)
+
     def close_first_pop_up(self) -> None:
         xpath = XPaths.POP_UP_CLOSE_BUTTON
         self.click_element(xpath)
@@ -108,10 +116,9 @@ class Siare(Browser):
 
         if invoice.is_final_customer:
             xpath = XPaths.INVOICE_IS_FINAL_CUSTOMER_INPUT_TRUE
-            self.click_element(xpath)
         else:
             xpath = XPaths.INVOICE_IS_FINAL_CUSTOMER_INPUT_FALSE
-            self.click_element(xpath)
+        self.click_element(xpath)
 
         xpath = XPaths.INVOICE_ICMS_SELECT_INPUT
         self.click_element(xpath)
@@ -181,4 +188,36 @@ class Siare(Browser):
         self.click_element(xpath)
 
     def fill_invoice_shipping_data(self, invoice: Invoice):
-        ...
+        xpath = XPaths.INVOICE_SHIPPING_VALUE_INPUT
+        self.type_into_element(xpath, invoice.shipping)
+
+        # the click below will trigger a page refresh
+        xpath = XPaths.INVOICE_SHIPPING_VALUE_LABEL
+        self.click_element(xpath)
+
+        self.wait_until_document_is_ready()
+
+        if invoice.add_shipping_to_total_value:
+            xpath = XPaths.INVOICE_ADD_SHIPPING_RADIO_INPUT_TRUE
+        else:
+            xpath = XPaths.INVOICE_ADD_SHIPPING_RADIO_INPUT_FALSE
+        # so will this one
+        self.click_element(xpath)
+
+        self.wait_until_document_is_ready()
+
+    def fill_invoice_transport_data(self):
+        xpath = XPaths.INVOICE_TRANSPORT_THIRD_PARTY_RADIO_INPUT
+        self.click_element(xpath)
+
+        xpath = XPaths.INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE
+        self.click_element(xpath)
+
+        xpath = XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_SENDER_RADIO_INPUT
+        self.click_element(xpath)
+
+        self.wait_until_document_is_ready()
+
+    def fill_invoice_aditional_data(self, invoice: Invoice):
+        xpath = XPaths.INVOICE_ADITIONAL_DATA_GTA_INPUT
+        self.type_into_element(xpath, invoice.gta)
