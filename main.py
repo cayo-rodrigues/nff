@@ -33,6 +33,12 @@ def main():
         siare.fill_invoice_items_data(invoice.items)
         siare.fill_invoice_shipping_data(invoice)
 
+        if siare.open_transport_tab():
+            siare.fill_invoice_transport_data()
+
+        siare.open_aditional_data_tab()
+        siare.fill_invoice_aditional_data(invoice)
+
 
 if __name__ == "__main__":
     main()

@@ -45,11 +45,12 @@ class Browser:
     def type_into_element(self, xpath: str, value: str, root=None) -> None:
         self.get_element(xpath, root).send_keys(value)
 
-    def click_if_exists(self, xpath: str, root=None) -> None:
+    def click_if_exists(self, xpath: str, root=None) -> bool:
         try:
-            self.click_element(xpath, root)
+            self.get_element(xpath, root).click()
+            return True
         except (NoSuchElementException, ElementNotInteractableException):
-            pass
+            return False
 
     def is_element_focused(self, element: WebElement) -> bool:
         return element == self._browser.switch_to.active_element
