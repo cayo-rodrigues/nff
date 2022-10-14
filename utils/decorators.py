@@ -6,6 +6,8 @@ from selenium.common.exceptions import (
     NoSuchElementException,
 )
 
+from utils.constants import STANDARD_SLEEP_TIME
+
 
 def wait_for_it(f):
     def wrapper(*args, **kwargs):
@@ -17,6 +19,6 @@ def wait_for_it(f):
                 ElementNotInteractableException,
                 ElementClickInterceptedException,
             ):
-                sleep(1)
+                sleep(STANDARD_SLEEP_TIME)
 
     return wrapper
