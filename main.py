@@ -29,8 +29,18 @@ def main():
         siare.fill_invoice_recipient_sender_data(invoice)
 
         siare.open_items_data_tab()
-        siare.open_include_items_table()
-        siare.fill_invoice_items_data(invoice.items)
+
+        # fill invoice items table 10 items at a time
+        i = 0
+        while True:
+            invoice_items = invoice.items[i : i + 10]
+            if len(invoice_items) > 0:
+                siare.open_include_items_table()
+                siare.fill_invoice_items_data(invoice_items)
+                i += 10
+            else:
+                break
+
         siare.fill_invoice_shipping_data(invoice)
 
         if siare.open_transport_tab():

@@ -6,7 +6,7 @@ from models.invoice import Invoice, InvoiceItem
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from utils.constants import Urls, XPaths
+from utils.constants import STANDARD_SLEEP_TIME, Urls, XPaths
 from utils.helpers import normalize_text
 
 from .browser import Browser
@@ -109,7 +109,7 @@ class Siare(Browser):
         self.click_element(xpath)
 
         while True:
-            sleep(1)
+            sleep(STANDARD_SLEEP_TIME)
             xpath = XPaths.INVOICE_RECIPIENT_NAME_SPAN
             if self.get_element(xpath).get_attribute("innerHTML"):
                 break
@@ -137,18 +137,19 @@ class Siare(Browser):
 
     def fill_invoice_items_data(self, invoice_items: list[InvoiceItem]):
         while True:
-            sleep(1)
+            sleep(STANDARD_SLEEP_TIME)
             xpath = XPaths.INVOICE_ITEMS_TABLE
             table = self.get_element(xpath)
 
             table_rows = self.filter_elements(By.TAG_NAME, "tr", table)[2:-2]
-            table_rows = table_rows[:1] + table_rows[2:]
             if table_rows:
                 break
 
         for i, row in enumerate(table_rows):
+            if i % 2 != 0:
+                continue
             try:
-                item = invoice_items[i]
+                item = invoice_items[i // 2]
             except IndexError:
                 break
 

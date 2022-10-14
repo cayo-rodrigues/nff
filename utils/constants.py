@@ -3,6 +3,8 @@ DB_PATH = "./db.xlsx"
 TRUTHY_STRS = ["sim", "sin", "si", "s", "1"]
 FALSY_STRS = ["não", "nao", "na", "n", "0"]
 
+STANDARD_SLEEP_TIME = 0.25
+
 
 class Urls:
     SIARE_URL = "https://www2.fazenda.mg.gov.br/sol/"

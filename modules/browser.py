@@ -8,6 +8,7 @@ from selenium.common.exceptions import (
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from utils.constants import STANDARD_SLEEP_TIME
 from utils.decorators import wait_for_it
 
 
@@ -60,6 +61,6 @@ class Browser:
 
     def wait_until_document_is_ready(self) -> None:
         while True:
-            sleep(1)
+            sleep(STANDARD_SLEEP_TIME)
             if self.is_document_ready():
                 break
