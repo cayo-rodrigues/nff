@@ -1,22 +1,18 @@
-# type
-# password
-#
-# para login, e no caso de destinatário esses são necessários:
-#   number
-#   cpf/cnpj
-#
-# no momento de preencher o remetente, esses são necessários:
-#   email
-
 from pandas import Series
-from utils.helpers import normalize_text
+from utils.helpers import handle_empty_cell, normalize_text
 
 
 class Entity:
     def __init__(self, data: Series, password: str = None) -> None:
-        self.name: str = normalize_text(data["nome"].iloc[0])
-        self.email: str = normalize_text(data["email"].iloc[0])
-        self.user_type: str = normalize_text(data["tipo"].iloc[0])
-        self.number: str = normalize_text(data["número"].iloc[0], numeric=True)
-        self.cpf_cnpj: str = normalize_text(data["cpf/cnpj"].iloc[0], numeric=True)
+        name = handle_empty_cell(data["nome"].iloc[0], required=False)
+        email = handle_empty_cell(data["email"].iloc[0])
+        user_type = handle_empty_cell(data["tipo"].iloc[0])
+        number = handle_empty_cell(data["número"].iloc[0], numeric=True)
+        cpf_cnpj = handle_empty_cell(data["cpf/cnpj"].iloc[0], numeric=True)
+
+        self.name: str = normalize_text(name)
+        self.email: str = normalize_text(email)
+        self.user_type: str = normalize_text(user_type)
+        self.number: str = normalize_text(number, numeric=True)
+        self.cpf_cnpj: str = normalize_text(cpf_cnpj, numeric=True)
         self.password: str = password

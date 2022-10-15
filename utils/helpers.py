@@ -1,3 +1,5 @@
+from pandas import isna
+
 from utils.constants import FALSY_STRS, TRUTHY_STRS
 
 
@@ -6,10 +8,13 @@ def str_to_boolean(value: str) -> bool:
 
 
 def decode_icms_contributor_status(value: str) -> int:
-    if value in TRUTHY_STRS:
+    normalized_value = normalize_text(value)
+
+    if normalized_value in TRUTHY_STRS:
         return "1"
-    if value in FALSY_STRS:
+    if normalized_value in FALSY_STRS:
         return "2"
+
     return "9"
 
 
@@ -23,3 +28,16 @@ def normalize_text(value: str, numeric: bool = False) -> str:
         text = text.lower()
 
     return text
+
+
+def handle_empty_cell(
+    value, numeric: bool = False, required: bool = True, msg: str = ""
+):
+    is_empty = isna(value)
+    if is_empty:
+        if required:
+            # display error with tkinter
+            ...
+        return None if not numeric else "0"
+
+    return value
