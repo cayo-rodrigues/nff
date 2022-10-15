@@ -33,8 +33,7 @@ def normalize_text(value: str, numeric: bool = False) -> str:
 def handle_empty_cell(
     value, numeric: bool = False, required: bool = True, msg: str = ""
 ):
-    is_empty = isna(value)
-    if is_empty:
+    if isna(value):
         if required:
             # display error with tkinter
             ...
