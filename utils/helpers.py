@@ -22,7 +22,7 @@ def normalize_text(value: str, numeric: bool = False) -> str:
     if not value:
         return ""
 
-    text = value.strip().lower()
+    text = value.strip()
 
     if not numeric:
         text = text.lower()
