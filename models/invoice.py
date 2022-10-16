@@ -5,6 +5,7 @@ from utils.helpers import (
     handle_empty_cell,
     normalize_text,
     str_to_boolean,
+    to_BRL,
 )
 
 from models.entity import Entity
@@ -26,7 +27,7 @@ class InvoiceItem:
         self.origin: str = normalize_text(origin)
         self.unity_of_measurement: str = normalize_text(unity_of_measurement)
         self.quantity: int = int(quantity)
-        self.value_per_unity: float = float(value_per_unity)
+        self.value_per_unity: str = to_BRL(float(value_per_unity))
 
 
 class Invoice:
@@ -45,9 +46,9 @@ class Invoice:
         self.operation: str = normalize_text(operation)
         self.gta: str = normalize_text(gta)
         self.cfop: str = normalize_text(cfop, numeric=True)
-        self.shipping: float = float(shipping)
         self.is_final_customer: bool = str_to_boolean(is_final_customer)
         self.icms: str = decode_icms_contributor_status(icms)
+        self.shipping: str = to_BRL(float(shipping))
         self.add_shipping_to_total_value: bool = str_to_boolean(
             add_shipping_to_total_value
         )
