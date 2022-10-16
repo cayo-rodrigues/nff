@@ -1,3 +1,5 @@
+import locale
+
 from pandas import isna
 
 from utils.constants import FALSY_STRS, TRUTHY_STRS
@@ -22,7 +24,7 @@ def normalize_text(value: str, numeric: bool = False) -> str:
     if not value:
         return ""
 
-    text = value.strip().lower()
+    text = value.strip()
 
     if not numeric:
         text = text.lower()
@@ -40,3 +42,8 @@ def handle_empty_cell(
         return None if not numeric else "0"
 
     return value
+
+
+def to_BRL(value: int | float) -> str:
+    locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
+    return locale.currency(value, grouping=True, symbol=None)
