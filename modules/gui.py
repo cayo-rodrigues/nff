@@ -1,11 +1,13 @@
 from tkinter import *
 from tkinter import ttk
 
+from PIL import Image, ImageTk
+from utils.constants import ERROR_IMG_PATH
+
 
 class GUI:
     def __init__(self, open_now: bool = True) -> None:
         self.root = Tk()
-        self.user_password = StringVar()
 
         self.root.title("NFA")
         self.root.bind("<Return>", self.close)
@@ -28,6 +30,8 @@ class GUI:
         self.is_opened = False
 
     def get_user_password(self) -> str:
+        self.user_password = StringVar()
+
         while True:
             if not self.is_opened:
                 self.__init__()
@@ -44,6 +48,28 @@ class GUI:
                 break
 
         return password
+
+    def display_error_msg(self, msg: str, warning: bool = False) -> None:
+        if not self.is_opened:
+            self.open()
+
+        self._error_msg_widget(msg, warning)
+
+        self.mainframe.mainloop()
+
+    def _error_msg_widget(self, msg: str, warning: bool) -> None:
+        text = ttk.Label(self.mainframe, text="ERRO" if not warning else "AVISO")
+        text.config(font=("Helvetica bold", 20))
+        text.grid(column=1, row=1)
+
+        img = ImageTk.PhotoImage(Image.open(ERROR_IMG_PATH).resize((80, 80)))
+        img_label = ttk.Label(self.mainframe, image=img)
+        img_label.image = img
+        img_label.grid(column=2, row=1)
+
+        ttk.Label(self.mainframe, text=msg).grid(column=1, columnspan=2, row=2)
+
+        self._apply_padding()
 
     def _apply_padding(self) -> None:
         for child in self.mainframe.winfo_children():

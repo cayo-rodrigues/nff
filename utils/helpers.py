@@ -1,5 +1,6 @@
 import locale
 
+from modules.gui import GUI
 from pandas import isna
 
 from utils.constants import FALSY_STRS, TRUTHY_STRS
@@ -37,8 +38,7 @@ def handle_empty_cell(
 ):
     if isna(value):
         if required:
-            # display error with tkinter
-            ...
+            GUI().display_error_msg(msg)
         return None if not numeric else "0"
 
     return value
