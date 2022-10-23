@@ -58,12 +58,8 @@ class Invoice:
         self.sender = normalize_text(sender, numeric=True)
         self.recipient = normalize_text(recipient, numeric=True)
 
-        # self._get_sender_and_recipient(sender_num, recipient_num)
-        # self._get_items()
-
     def get_sender_and_recipient(self, entities: DataFrame) -> None:
         db = DataBase()
-        # entities = db.read_entities()
 
         sender_data = db.get_row(entities, by_col="cpf/cnpj", where=self.sender)
         recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
@@ -75,7 +71,6 @@ class Invoice:
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()
-        # items = db.read_invoices_products()
 
         items_data = db.get_rows(items, by_col="NF", where=self.nf_index)
 
