@@ -1,6 +1,5 @@
 import locale
 
-from modules.gui import GUI
 from pandas import isna
 
 from utils.constants import FALSY_STRS, TRUTHY_STRS
@@ -33,14 +32,9 @@ def normalize_text(value: str, numeric: bool = False) -> str:
     return text
 
 
-def handle_empty_cell(
-    value, numeric: bool = False, required: bool = True, msg: str = ""
-):
+def handle_empty_cell(value, numeric: bool = False):
     if isna(value):
-        if required:
-            GUI().display_error_msg(msg)
         return None if not numeric else "0"
-
     return value
 
 

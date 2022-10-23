@@ -33,7 +33,7 @@ class InvoiceItem:
 class Invoice:
     def __init__(self, data: Series, nf_index: int) -> None:
         operation = handle_empty_cell(data["natureza da operação"])
-        gta = handle_empty_cell(data["gta"], required=False)
+        gta = handle_empty_cell(data["gta"])
         cfop = handle_empty_cell(data["cfop"], numeric=True)
         shipping = handle_empty_cell(data["frete"], numeric=True)
         is_final_customer = handle_empty_cell(data["consumidor final"])
