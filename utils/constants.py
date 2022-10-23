@@ -10,6 +10,34 @@ FALSY_STRS = ["não", "nao", "na", "n", "0"]
 
 STANDARD_SLEEP_TIME = 0.25
 
+class MandatoryFields:
+    INVOICE = [
+        "natureza da operação",
+        "cfop",
+        "frete",
+        "adicionar frete ao total",
+        "consumidor final",
+        "contribuinte icms",
+        "remetente",
+        "destinatário",
+    ]
+
+    INVOICE_ITEM = [
+        "grupo",
+        "ncm",
+        "descrição",
+        "origem",
+        "unidade de medida",
+        "quantidade",
+        "valor unitário",
+        "NF",
+    ]
+
+    ENTITY = [
+        "número",
+        "cpf/cnpj",
+    ]
+
 
 class Urls:
     SIARE_URL = "https://www2.fazenda.mg.gov.br/sol/"

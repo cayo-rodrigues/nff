@@ -1,5 +1,6 @@
 import pandas as pd
 from utils.constants import DB_PATH, SheetNames
+from utils.exceptions import MissingFieldsError
 
 
 class DataBase:
@@ -24,3 +25,14 @@ class DataBase:
 
     def get_row(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return self.get_rows(df, by_col, where).head(1)
+
+    def check_mandatory_fields(self, df: pd.DataFrame, fields: list[str]) -> None:
+        error_msg = ""
+        for field in fields:
+            rows_with_empty_cells = df[pd.isna(df[field])]
+            if not rows_with_empty_cells.empty:
+                row_index = rows_with_empty_cells.index[0] + 2
+                error_msg += f"A coluna {field} está faltando ser preenchida na linha {row_index}.\n"
+        if error_msg:
+            error_tip = "Verifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
+            raise MissingFieldsError(error_msg + f"\n{error_tip}")
