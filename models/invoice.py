@@ -1,5 +1,5 @@
 from modules.database import DataBase
-from pandas import Series
+from pandas import DataFrame, Series
 from utils.helpers import (
     decode_icms_contributor_status,
     handle_empty_cell,
@@ -40,8 +40,8 @@ class Invoice:
         icms = handle_empty_cell(data["contribuinte icms"])
         add_shipping_to_total_value = handle_empty_cell(data["adicionar frete ao total"])
 
-        sender_num = handle_empty_cell(data["remetente"], numeric=True)
-        recipient_num = handle_empty_cell(data["destinatário"], numeric=True)
+        sender = handle_empty_cell(data["remetente"], numeric=True)
+        recipient = handle_empty_cell(data["destinatário"], numeric=True)
 
         self.operation: str = normalize_text(operation)
         self.gta: str = normalize_text(gta)
@@ -55,24 +55,27 @@ class Invoice:
 
         self.nf_index: str = str(nf_index)
 
-        self._get_sender_and_recipient(sender_num, recipient_num)
-        self._get_items()
+        self.sender = normalize_text(sender, numeric=True)
+        self.recipient = normalize_text(recipient, numeric=True)
 
-    def _get_sender_and_recipient(self, sender_num: str, recipient_num: str) -> None:
+        # self._get_sender_and_recipient(sender_num, recipient_num)
+        # self._get_items()
+
+    def get_sender_and_recipient(self, entities: DataFrame) -> None:
         db = DataBase()
-        entities = db.read_entities()
+        # entities = db.read_entities()
 
-        sender_data = db.get_row(entities, by_col="cpf/cnpj", where=sender_num)
-        recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=recipient_num)
+        sender_data = db.get_row(entities, by_col="cpf/cnpj", where=self.sender)
+        recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
 
         # if missing sender or recipient show error with tkinter
 
         self.sender = Entity(data=sender_data)
         self.recipient = Entity(data=recipient_data)
 
-    def _get_items(self) -> None:
+    def get_items(self, items: DataFrame) -> None:
         db = DataBase()
-        items = db.read_invoices_products()
+        # items = db.read_invoices_products()
 
         items_data = db.get_rows(items, by_col="NF", where=self.nf_index)
 

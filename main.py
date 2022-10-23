@@ -1,21 +1,33 @@
+from sys import exit
+
 from models.invoice import Invoice
 from modules.database import DataBase
 from modules.gui import GUI
 from modules.siare import Siare
+from utils.constants import MandatoryFields
+from utils.exceptions import MissingFieldsError
 
 
 def main():
     db = DataBase()
-    invoices = db.read_invoices()
+    entities, invoices, invoices_items = db.read_all()
+
+    try:
+        db.check_mandatory_fields(entities, MandatoryFields.ENTITY)
+        db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
+        db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
+    except MissingFieldsError as e:
+        GUI().display_error_msg(msg=e.message)
+        exit()
 
     siare = Siare()
 
     for index, invoice_data in invoices.iterrows():
         invoice = Invoice(data=invoice_data, nf_index=index + 1)
+        invoice.get_sender_and_recipient(entities)
+        invoice.get_items(invoices_items)
 
-        gui = GUI()
-
-        invoice.sender.password = gui.get_user_password()
+        invoice.sender.password = GUI().get_user_password()
 
         siare.login(invoice.sender)
 
