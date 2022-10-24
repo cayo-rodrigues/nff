@@ -25,6 +25,22 @@ class ErrorMessages:
             "não possui nenhum item relacionado à ela.\nPor isso, essa "
             "nota fiscal será ignorada nesta execução.\n"
         )
+    
+    @classmethod
+    def missing_entity_error(cls, nf_index: int, sender: bool, recipient: bool) -> str | None:
+        if not sender and not recipient:
+            return
+
+        missing_fields = "remetente e destinatário"
+        if not sender:
+            missing_fields = "destinatário"
+        if not recipient:
+            missing_fields = "remetente"
+
+        return (
+            f"Os dados de {missing_fields} da nota fiscal número "
+            f"{nf_index}, na linha {nf_index + 1} são inválidos.\n"
+        )
 
 class MandatoryFields:
     INVOICE = [

@@ -10,3 +10,7 @@ class MissingFieldsError(NFABaseException):
 
 class InvoiceWithNoItemsError(NFABaseException):
     ...
+
+
+class InvalidEntityError(NFABaseException):
+    ...

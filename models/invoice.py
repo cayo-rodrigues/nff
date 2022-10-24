@@ -1,7 +1,7 @@
 from modules.database import DataBase
 from pandas import DataFrame, Series
 from utils.constants import ErrorMessages
-from utils.exceptions import InvoiceWithNoItemsError
+from utils.exceptions import InvalidEntityError, InvoiceWithNoItemsError
 from utils.helpers import (
     decode_icms_contributor_status,
     handle_empty_cell,
@@ -66,7 +66,14 @@ class Invoice:
         sender_data = db.get_row(entities, by_col="cpf/cnpj", where=self.sender)
         recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
 
-        # if missing sender or recipient show error with tkinter
+        # if missing sender or recipient warn the user and skip this invoice
+        error_msg = ErrorMessages.missing_entity_error(
+            nf_index=int(self.nf_index),
+            sender=sender_data.empty,
+            recipient=recipient_data.empty,
+        )
+        if error_msg:
+            raise InvalidEntityError(error_msg + ErrorMessages.DB_DATA_ERROR_TIP)
 
         self.sender: Entity = Entity(data=sender_data)
         self.recipient: Entity = Entity(data=recipient_data)
