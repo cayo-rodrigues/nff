@@ -12,12 +12,19 @@ STANDARD_SLEEP_TIME = 0.25
 
 
 class ErrorMessages:
+    DB_DATA_ERROR_TIP = "\nVerifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
+
     @classmethod
     def missing_mandatory_field(cls, column: str, line_number: int):
         return f"A coluna {column} está faltando ser preenchida na linha {line_number}.\n"
     
-    DB_DATA_ERROR_TIP = "Verifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
-
+    @classmethod
+    def invoice_with_no_items(cls, nf_index: int):
+        return (
+            f"A nota fiscal número {nf_index}, na linha {nf_index + 1}"
+            "não possui nenhum item relacionado à ela.\nPor isso, Essa"
+            "nota fiscal será ignorada nesta execução.\n"
+        )
 
 class MandatoryFields:
     INVOICE = [

@@ -37,4 +37,4 @@ class DataBase:
                 )
         if error_msg:
             error_tip = ErrorMessages.DB_DATA_ERROR_TIP
-            raise MissingFieldsError(error_msg + f"\n{error_tip}")
+            raise MissingFieldsError(error_msg + error_tip)

@@ -1,5 +1,7 @@
 from modules.database import DataBase
 from pandas import DataFrame, Series
+from utils.constants import ErrorMessages
+from utils.exceptions import InvoiceWithNoItemsError
 from utils.helpers import (
     decode_icms_contributor_status,
     handle_empty_cell,
@@ -66,8 +68,8 @@ class Invoice:
 
         # if missing sender or recipient show error with tkinter
 
-        self.sender = Entity(data=sender_data)
-        self.recipient = Entity(data=recipient_data)
+        self.sender: Entity = Entity(data=sender_data)
+        self.recipient: Entity = Entity(data=recipient_data)
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()
@@ -79,3 +81,7 @@ class Invoice:
             self.items.append(InvoiceItem(data=row))
 
         # if there are no items, warn the user and skip this invoice
+        if not self.items:
+            error_msg = ErrorMessages.invoice_with_no_items(nf_index=self.nf_index)
+            error_tip = ErrorMessages.DB_DATA_ERROR_TIP
+            raise InvoiceWithNoItemsError(error_msg + error_tip)
