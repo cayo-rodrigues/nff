@@ -10,6 +10,15 @@ FALSY_STRS = ["não", "nao", "na", "n", "0"]
 
 STANDARD_SLEEP_TIME = 0.25
 
+
+class ErrorMessages:
+    @classmethod
+    def missing_mandatory_field(cls, column: str, line_number: int):
+        return f"A coluna {column} está faltando ser preenchida na linha {line_number}.\n"
+    
+    DB_DATA_ERROR_TIP = "Verifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
+
+
 class MandatoryFields:
     INVOICE = [
         "natureza da operação",
@@ -47,7 +56,7 @@ class Urls:
 class SheetNames:
     ENTITIES = "Entidades"
     INVOICES = "Nota Fiscal"
-    INVOICES_PRODUCTS = "Dados de Produtos e Serviços NF"
+    INVOICES_ITEMS = "Dados de Produtos e Serviços NF"
 
 
 class XPaths:
