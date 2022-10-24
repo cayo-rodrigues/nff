@@ -21,8 +21,8 @@ class ErrorMessages:
     @classmethod
     def invoice_with_no_items(cls, nf_index: int):
         return (
-            f"A nota fiscal número {nf_index}, na linha {nf_index + 1}"
-            "não possui nenhum item relacionado à ela.\nPor isso, Essa"
+            f"A nota fiscal número {nf_index}, na linha {nf_index + 1} "
+            "não possui nenhum item relacionado à ela.\nPor isso, essa "
             "nota fiscal será ignorada nesta execução.\n"
         )
 

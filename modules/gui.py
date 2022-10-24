@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from PIL import Image, ImageTk
-from utils.constants import ERROR_IMG_PATH
+from utils.constants import ERROR_IMG_PATH, WARNING_IMG_PATH
 
 
 class GUI:
@@ -58,11 +58,18 @@ class GUI:
         self.mainframe.mainloop()
 
     def _error_msg_widget(self, msg: str, warning: bool) -> None:
-        text = ttk.Label(self.mainframe, text="ERRO" if not warning else "AVISO")
+        if not warning:
+            heading_text = "ERRO"
+            img_path = ERROR_IMG_PATH
+        else:
+            heading_text = "AVISO"
+            img_path = WARNING_IMG_PATH
+
+        text = ttk.Label(self.mainframe, text=heading_text)
         text.config(font=("Helvetica bold", 20))
         text.grid(column=1, row=1)
 
-        img = ImageTk.PhotoImage(Image.open(ERROR_IMG_PATH).resize((80, 80)))
+        img = ImageTk.PhotoImage(Image.open(img_path).resize((80, 80)))
         img_label = ttk.Label(self.mainframe, image=img)
         img_label.image = img
         img_label.grid(column=2, row=1)

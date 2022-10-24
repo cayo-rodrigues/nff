@@ -76,12 +76,12 @@ class Invoice:
 
         items_data = db.get_rows(items, by_col="NF", where=self.nf_index)
 
+        # if there are no items, warn the user and skip this invoice
+        if items_data.empty:
+            error_msg = ErrorMessages.invoice_with_no_items(nf_index=int(self.nf_index))
+            error_tip = ErrorMessages.DB_DATA_ERROR_TIP
+            raise InvoiceWithNoItemsError(error_msg + error_tip)
+
         self.items: list[InvoiceItem] = []
         for _, row in items_data.iterrows():
             self.items.append(InvoiceItem(data=row))
-
-        # if there are no items, warn the user and skip this invoice
-        if not self.items:
-            error_msg = ErrorMessages.invoice_with_no_items(nf_index=self.nf_index)
-            error_tip = ErrorMessages.DB_DATA_ERROR_TIP
-            raise InvoiceWithNoItemsError(error_msg + error_tip)
