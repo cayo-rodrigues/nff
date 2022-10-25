@@ -1,5 +1,5 @@
 import pandas as pd
-from utils.constants import DB_PATH, SheetNames
+from utils.constants import DB_PATH, ErrorMessages, SheetNames
 from utils.exceptions import MissingFieldsError
 
 
@@ -18,7 +18,7 @@ class DataBase:
         return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str)
 
     def read_invoices_products(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.INVOICES_PRODUCTS, dtype=str)
+        return pd.read_excel(DB_PATH, SheetNames.INVOICES_ITEMS, dtype=str)
 
     def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
@@ -32,7 +32,9 @@ class DataBase:
             rows_with_empty_cells = df[pd.isna(df[field])]
             if not rows_with_empty_cells.empty:
                 row_index = rows_with_empty_cells.index[0] + 2
-                error_msg += f"A coluna {field} está faltando ser preenchida na linha {row_index}.\n"
+                error_msg += ErrorMessages.missing_mandatory_field(
+                    column=field, line_number=row_index
+                )
         if error_msg:
-            error_tip = "Verifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
-            raise MissingFieldsError(error_msg + f"\n{error_tip}")
+            error_tip = ErrorMessages.DB_DATA_ERROR_TIP
+            raise MissingFieldsError(error_msg + error_tip)

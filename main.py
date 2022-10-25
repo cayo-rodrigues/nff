@@ -5,7 +5,11 @@ from modules.database import DataBase
 from modules.gui import GUI
 from modules.siare import Siare
 from utils.constants import MandatoryFields
-from utils.exceptions import MissingFieldsError
+from utils.exceptions import (
+    InvalidEntityError,
+    InvoiceWithNoItemsError,
+    MissingFieldsError,
+)
 
 
 def main():
@@ -24,8 +28,13 @@ def main():
 
     for index, invoice_data in invoices.iterrows():
         invoice = Invoice(data=invoice_data, nf_index=index + 1)
-        invoice.get_sender_and_recipient(entities)
-        invoice.get_items(invoices_items)
+
+        try:
+            invoice.get_sender_and_recipient(entities)
+            invoice.get_items(invoices_items)
+        except (InvoiceWithNoItemsError, InvalidEntityError) as e:
+            GUI().display_error_msg(msg=e.message, warning=True)
+            continue
 
         invoice.sender.password = GUI().get_user_password()
 

@@ -1,5 +1,7 @@
 from modules.database import DataBase
 from pandas import DataFrame, Series
+from utils.constants import ErrorMessages
+from utils.exceptions import InvalidEntityError, InvoiceWithNoItemsError
 from utils.helpers import (
     decode_icms_contributor_status,
     handle_empty_cell,
@@ -33,7 +35,7 @@ class InvoiceItem:
 class Invoice:
     def __init__(self, data: Series, nf_index: int) -> None:
         operation = handle_empty_cell(data["natureza da operação"])
-        gta = handle_empty_cell(data["gta"], required=False)
+        gta = handle_empty_cell(data["gta"])
         cfop = handle_empty_cell(data["cfop"], numeric=True)
         shipping = handle_empty_cell(data["frete"], numeric=True)
         is_final_customer = handle_empty_cell(data["consumidor final"])
@@ -64,18 +66,29 @@ class Invoice:
         sender_data = db.get_row(entities, by_col="cpf/cnpj", where=self.sender)
         recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
 
-        # if missing sender or recipient show error with tkinter
+        # if missing sender or recipient warn the user and skip this invoice
+        error_msg = ErrorMessages.missing_entity_error(
+            nf_index=int(self.nf_index),
+            sender=sender_data.empty,
+            recipient=recipient_data.empty,
+        )
+        if error_msg:
+            raise InvalidEntityError(error_msg + ErrorMessages.DB_DATA_ERROR_TIP)
 
-        self.sender = Entity(data=sender_data)
-        self.recipient = Entity(data=recipient_data)
+        self.sender: Entity = Entity(data=sender_data)
+        self.recipient: Entity = Entity(data=recipient_data)
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()
 
         items_data = db.get_rows(items, by_col="NF", where=self.nf_index)
 
+        # if there are no items, warn the user and skip this invoice
+        if items_data.empty:
+            error_msg = ErrorMessages.invoice_with_no_items(nf_index=int(self.nf_index))
+            error_tip = ErrorMessages.DB_DATA_ERROR_TIP
+            raise InvoiceWithNoItemsError(error_msg + error_tip)
+
         self.items: list[InvoiceItem] = []
         for _, row in items_data.iterrows():
             self.items.append(InvoiceItem(data=row))
-
-        # if there are no items, warn the user and skip this invoice
