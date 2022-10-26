@@ -9,6 +9,7 @@ from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
     MissingFieldsError,
+    MissingSenderDataError,
 )
 
 
@@ -32,7 +33,11 @@ def main():
         try:
             invoice.get_sender_and_recipient(entities)
             invoice.get_items(invoices_items)
-        except (InvoiceWithNoItemsError, InvalidEntityError) as e:
+        except (
+            InvoiceWithNoItemsError,
+            InvalidEntityError,
+            MissingSenderDataError,
+        ) as e:
             GUI().display_error_msg(msg=e.message, warning=True)
             continue
 

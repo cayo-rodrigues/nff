@@ -13,21 +13,25 @@ STANDARD_SLEEP_TIME = 0.25
 
 class ErrorMessages:
     DB_DATA_ERROR_TIP = "\nVerifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
+    INVOICE_IGNORE_WARNING = "\nPor isso, essa nota fiscal será ignorada nesta execução."
 
     @classmethod
     def missing_mandatory_field(cls, column: str, line_number: int):
-        return f"A coluna {column} está faltando ser preenchida na linha {line_number}.\n"
+        return (
+            f"A coluna \"{column}\" está faltando ser preenchida na linha {line_number}.\n"
+            f"{cls.DB_DATA_ERROR_TIP}"
+        )
     
     @classmethod
     def invoice_with_no_items(cls, nf_index: int):
         return (
             f"A nota fiscal número {nf_index}, na linha {nf_index + 1} "
-            "não possui nenhum item relacionado à ela.\nPor isso, essa "
-            "nota fiscal será ignorada nesta execução.\n"
+            "não possui nenhum item relacionado à ela.\n"
+            f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
         )
     
     @classmethod
-    def missing_entity_error(cls, nf_index: int, sender: bool, recipient: bool) -> str | None:
+    def missing_entity(cls, nf_index: int, sender: bool, recipient: bool) -> str | None:
         if not sender and not recipient:
             return
 
@@ -40,34 +44,49 @@ class ErrorMessages:
         return (
             f"Os dados de {missing_fields} da nota fiscal número "
             f"{nf_index}, na linha {nf_index + 1} são inválidos.\n"
+            f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
         )
+    
+    @classmethod
+    def invalid_sender_error(cls, missing_data: str, cpf_cnpj: str):
+        return (
+            f"Os dados da(s) coluna(s) {missing_data}, referentes ao\n"
+            f"remetente cujo cpf/cnpj é {cpf_cnpj}, estão faltando ser preenchidos.\n"
+            f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
+        )
+
 
 class MandatoryFields:
     INVOICE = [
-        "natureza da operação",
-        "cfop",
-        "frete",
-        "adicionar frete ao total",
-        "consumidor final",
-        "contribuinte icms",
-        "remetente",
-        "destinatário",
+        ("operation", "natureza da operação"),
+        ("cfop", "cfop"),
+        ("shipping", "frete"),
+        ("add_shipping_to_total_value", "adicionar frete ao total"),
+        ("is_final_customer", "consumidor final"),
+        ("icms", "contribuinte icms"),
+        ("sender", "remetente"),
+        ("recipient", "destinatário"),
     ]
 
     INVOICE_ITEM = [
-        "grupo",
-        "ncm",
-        "descrição",
-        "origem",
-        "unidade de medida",
-        "quantidade",
-        "valor unitário",
-        "NF",
+        ("group", "grupo"),
+        ("ncm", "ncm"),
+        ("description", "descrição"),
+        ("origin", "origem"),
+        ("unity_of_measurement", "unidade de medida"),
+        ("quantity", "quantidade"),
+        ("value_per_unity", "valor unitário"),
+        ("nf_index", "NF"),
     ]
 
     ENTITY = [
-        "número",
-        "cpf/cnpj",
+        ("number", "número"),
+        ("cpf_cnpj", "cpf/cnpj"),
+    ]
+
+    SENDER_ENTITY = [
+        ("user_type", "tipo"),
+        ("email", "email"),
     ]
 
 

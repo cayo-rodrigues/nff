@@ -1,7 +1,11 @@
 from modules.database import DataBase
 from pandas import DataFrame, Series
 from utils.constants import ErrorMessages
-from utils.exceptions import InvalidEntityError, InvoiceWithNoItemsError
+from utils.exceptions import (
+    InvalidEntityError,
+    InvoiceWithNoItemsError,
+    MissingSenderDataError,
+)
 from utils.helpers import (
     decode_icms_contributor_status,
     handle_empty_cell,
@@ -67,16 +71,22 @@ class Invoice:
         recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
 
         # if missing sender or recipient warn the user and skip this invoice
-        error_msg = ErrorMessages.missing_entity_error(
+        error_msg = ErrorMessages.missing_entity(
             nf_index=int(self.nf_index),
             sender=sender_data.empty,
             recipient=recipient_data.empty,
         )
         if error_msg:
-            raise InvalidEntityError(error_msg + ErrorMessages.DB_DATA_ERROR_TIP)
+            raise InvalidEntityError(error_msg)
 
-        self.sender: Entity = Entity(data=sender_data)
+        self.sender: Entity = Entity(data=sender_data, is_sender=True)
         self.recipient: Entity = Entity(data=recipient_data)
+
+        if not self.sender.is_valid_sender():
+            error_msg = ErrorMessages.invalid_sender_error(
+                missing_data=self.sender.errors, cpf_cnpj=self.sender.cpf_cnpj
+            )
+            raise MissingSenderDataError(error_msg)
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()
@@ -86,8 +96,7 @@ class Invoice:
         # if there are no items, warn the user and skip this invoice
         if items_data.empty:
             error_msg = ErrorMessages.invoice_with_no_items(nf_index=int(self.nf_index))
-            error_tip = ErrorMessages.DB_DATA_ERROR_TIP
-            raise InvoiceWithNoItemsError(error_msg + error_tip)
+            raise InvoiceWithNoItemsError(error_msg)
 
         self.items: list[InvoiceItem] = []
         for _, row in items_data.iterrows():

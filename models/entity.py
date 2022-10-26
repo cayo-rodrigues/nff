@@ -1,9 +1,10 @@
 from pandas import Series
+from utils.constants import MandatoryFields
 from utils.helpers import handle_empty_cell, normalize_text
 
 
 class Entity:
-    def __init__(self, data: Series, password: str = None) -> None:
+    def __init__(self, data: Series, is_sender: bool = False) -> None:
         name = handle_empty_cell(data["nome"].iloc[0])
         email = handle_empty_cell(data["email"].iloc[0])
         user_type = handle_empty_cell(data["tipo"].iloc[0])
@@ -15,4 +16,17 @@ class Entity:
         self.user_type: str = normalize_text(user_type)
         self.number: str = normalize_text(number, numeric=True)
         self.cpf_cnpj: str = normalize_text(cpf_cnpj, numeric=True)
-        self.password: str = password
+
+        self.password: str
+
+        self.is_sender: bool = is_sender
+
+    def is_valid_sender(self):
+        self.errors = " e ".join(
+            [
+                f'"{field}"'
+                for key, field in MandatoryFields.SENDER_ENTITY
+                if not getattr(self, key)
+            ]
+        )
+        return bool(not self.errors)
