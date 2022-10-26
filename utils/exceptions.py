@@ -14,3 +14,7 @@ class InvoiceWithNoItemsError(NFABaseException):
 
 class InvalidEntityError(NFABaseException):
     ...
+
+
+class MissingSenderDataError(NFABaseException):
+    ...
