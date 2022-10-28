@@ -17,12 +17,14 @@ def main():
     db = DataBase()
     entities, invoices, invoices_items = db.read_all()
 
+    gui = GUI()
+
     try:
         db.check_mandatory_fields(entities, MandatoryFields.ENTITY)
         db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
         db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
     except MissingFieldsError as e:
-        GUI().display_error_msg(msg=e.message)
+        gui.display_error_msg(msg=e.message)
         exit()
 
     siare = Siare()
@@ -38,10 +40,10 @@ def main():
             InvalidEntityError,
             MissingSenderDataError,
         ) as e:
-            GUI().display_error_msg(msg=e.message, warning=True)
+            gui.display_error_msg(msg=e.message, warning=True)
             continue
 
-        invoice.sender.password = GUI().get_user_password()
+        invoice.sender.password = gui.get_user_password()
 
         siare.login(invoice.sender)
 

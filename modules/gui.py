@@ -6,40 +6,32 @@ from utils.constants import ERROR_IMG_PATH, WARNING_IMG_PATH
 
 
 class GUI:
-    def __init__(self, open_now: bool = True) -> None:
+    def setup(self) -> None:
         self.root = Tk()
 
         self.root.title("NFA")
         self.root.bind("<Return>", self.close)
 
-        if open_now:
-            self.open()
-        else:
-            self.is_opened = False
-
-    def open(self) -> None:
         self.mainframe = ttk.Frame(self.root, padding="12")
         self.mainframe.grid(column=0, row=0, sticky=[N, W, E, S])
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
 
-        self.is_opened = True
+    def set_vars(self, **vars) -> None:
+        for key, value in vars.items():
+            setattr(self, key, value)
 
     def close(self, *_) -> None:
         self.root.destroy()
-        self.is_opened = False
 
     def get_user_password(self) -> str:
-        self.user_password = StringVar()
-
         while True:
-            if not self.is_opened:
-                self.__init__()
+            self.setup()
+            self.set_vars(user_password=StringVar())
 
             try:
                 self._ask_user_password_widget()
             except TclError:
-                self.is_opened = False
                 continue
 
             self.mainframe.mainloop()
@@ -50,12 +42,26 @@ class GUI:
         return password
 
     def display_error_msg(self, msg: str, warning: bool = False) -> None:
-        if not self.is_opened:
-            self.open()
-
+        self.setup()
         self._error_msg_widget(msg, warning)
-
         self.mainframe.mainloop()
+
+    def _ask_user_password_widget(self) -> None:
+        ttk.Label(self.mainframe, text="Senha para acessar o site do Siare").grid(
+            column=1, row=1, sticky=[W, E]
+        )
+
+        password_input = ttk.Entry(
+            self.mainframe, width=32, textvariable=self.user_password, show="*"
+        )
+        password_input.grid(column=1, row=2, sticky=[W, E])
+        password_input.focus()
+
+        ttk.Button(self.mainframe, text="Confirmar", command=self.close).grid(
+            column=1, row=3, sticky=[W, E]
+        )
+
+        self._apply_padding()
 
     def _error_msg_widget(self, msg: str, warning: bool) -> None:
         if not warning:
@@ -81,20 +87,3 @@ class GUI:
     def _apply_padding(self) -> None:
         for child in self.mainframe.winfo_children():
             child.grid_configure(padx=5, pady=5)
-
-    def _ask_user_password_widget(self) -> None:
-        ttk.Label(self.mainframe, text="Senha para acessar o site do Siare").grid(
-            column=1, row=1, sticky=[W, E]
-        )
-
-        password_input = ttk.Entry(
-            self.mainframe, width=32, textvariable=self.user_password, show="*"
-        )
-        password_input.grid(column=1, row=2, sticky=[W, E])
-        password_input.focus()
-
-        ttk.Button(self.mainframe, text="Confirmar", command=self.close).grid(
-            column=1, row=3, sticky=[W, E]
-        )
-
-        self._apply_padding()

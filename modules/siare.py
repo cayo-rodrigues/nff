@@ -222,3 +222,6 @@ class Siare(Browser):
     def fill_invoice_aditional_data(self, invoice: Invoice):
         xpath = XPaths.INVOICE_ADITIONAL_DATA_GTA_INPUT
         self.type_into_element(xpath, invoice.gta)
+
+        # xpath = XPaths.FINISH_INVOICE_BUTTON
+        # self.click_element(xpath)

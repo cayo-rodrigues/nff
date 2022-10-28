@@ -31,7 +31,7 @@ class Browser:
         self._browser.get(url)
 
     @wait_for_it
-    def get_element(self, xpath: str, root=None) -> WebElement:
+    def get_element(self, xpath: str, root: WebElement = None) -> WebElement:
         return self._get_lookup_root(root).find_element(By.XPATH, xpath)
 
     @wait_for_it
@@ -39,14 +39,14 @@ class Browser:
         return self._get_lookup_root(root).find_elements(by, where)
 
     @wait_for_it
-    def click_element(self, xpath: str, root=None) -> None:
+    def click_element(self, xpath: str, root: WebElement = None) -> None:
         self.get_element(xpath, root).click()
 
     @wait_for_it
-    def type_into_element(self, xpath: str, value: str, root=None) -> None:
+    def type_into_element(self, xpath: str, value: str, root: WebElement = None) -> None:
         self.get_element(xpath, root).send_keys(value)
 
-    def click_if_exists(self, xpath: str, root=None) -> bool:
+    def click_if_exists(self, xpath: str, root: WebElement = None) -> bool:
         try:
             self.get_element(xpath, root).click()
             return True
