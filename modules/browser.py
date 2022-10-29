@@ -30,9 +30,12 @@ class Browser:
     def get_page(self, url: str) -> None:
         self._browser.get(url)
 
+    def _find_element(self, xpath: str, root: WebElement = None) -> WebElement:
+        return self._get_lookup_root(root).find_element(By.XPATH, xpath)
+
     @wait_for_it
     def get_element(self, xpath: str, root: WebElement = None) -> WebElement:
-        return self._get_lookup_root(root).find_element(By.XPATH, xpath)
+        return self._find_element(xpath, root)
 
     @wait_for_it
     def filter_elements(self, by: str, where: str, root=None) -> WebElement:
@@ -48,7 +51,7 @@ class Browser:
 
     def click_if_exists(self, xpath: str, root: WebElement = None) -> bool:
         try:
-            self.get_element(xpath, root).click()
+            self._find_element(xpath, root).click()
             return True
         except (NoSuchElementException, ElementNotInteractableException):
             return False
