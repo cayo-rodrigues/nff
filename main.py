@@ -4,7 +4,7 @@ from models.invoice import Invoice
 from modules.database import DataBase
 from modules.gui import GUI
 from modules.siare import Siare
-from utils.constants import MandatoryFields
+from utils.constants import InvoiceFields, MandatoryFields
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -26,6 +26,8 @@ def main():
     except MissingFieldsError as e:
         gui.display_error_msg(msg=e.message)
         exit()
+
+    all_senders_are_equal = db.are_all_the_same(invoices, InvoiceFields.SENDER[1])
 
     siare = Siare()
 

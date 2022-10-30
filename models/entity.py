@@ -1,15 +1,17 @@
 from pandas import Series
-from utils.constants import MandatoryFields
+from utils.constants import EntityFields, MandatoryFields
 from utils.helpers import handle_empty_cell, normalize_text
 
 
 class Entity:
     def __init__(self, data: Series, is_sender: bool = False) -> None:
-        name = handle_empty_cell(data["nome"].iloc[0])
-        email = handle_empty_cell(data["email"].iloc[0])
-        user_type = handle_empty_cell(data["tipo"].iloc[0])
-        number = handle_empty_cell(data["número"].iloc[0], numeric=True)
-        cpf_cnpj = handle_empty_cell(data["cpf/cnpj"].iloc[0], numeric=True)
+        name = handle_empty_cell(data[EntityFields.NAME[1]].iloc[0])
+        email = handle_empty_cell(data[EntityFields.EMAIL[1]].iloc[0])
+        user_type = handle_empty_cell(data[EntityFields.USER_TYPE[1]].iloc[0])
+        number = handle_empty_cell(data[EntityFields.NUMBER[1]].iloc[0], numeric=True)
+        cpf_cnpj = handle_empty_cell(
+            data[EntityFields.CPF_CNPJ[1]].iloc[0], numeric=True
+        )
 
         self.name: str = normalize_text(name)
         self.email: str = normalize_text(email)
