@@ -56,37 +56,68 @@ class ErrorMessages:
         )
 
 
+class InvoiceFields:
+    OPERATION = ("operation", "natureza da operação")
+    GTA = ("gta", "gta")
+    CFOP = ("cfop", "cfop")
+    SHIPPING = ("shipping", "frete")
+    ADD_SHIPPING_TO_TOTAL_VALUE = ("add_shipping_to_total_value", "adicionar frete ao total")
+    IS_FINAL_CUSTOMER = ("is_final_customer", "consumidor final")
+    ICMS = ("icms", "contribuinte icms")
+    SENDER = ("sender", "remetente")
+    RECIPIENT = ("recipient", "destinatário")
+
+
+class InvoiceItemFields:
+    GROUP = ("group", "grupo")
+    NCM = ("ncm", "ncm")
+    DESCRIPTION = ("description", "descrição")
+    ORIGIN = ("origin", "origem")
+    UNITY_OF_MEASUREMENT = ("unity_of_measurement", "unidade de medida")
+    QUANTITY = ("quantity", "quantidade")
+    VALUE_PER_UNITY = ("value_per_unity", "valor unitário")
+    NF_INDEX = ("nf_index", "NF")
+
+
+class EntityFields:
+    NAME = ("name", "nome")
+    EMAIL = ("email", "email")
+    USER_TYPE = ("user_type", "tipo")
+    NUMBER = ("number", "número")
+    CPF_CNPJ = ("cpf_cnpj", "cpf/cnpj")
+
+
 class MandatoryFields:
     INVOICE = [
-        ("operation", "natureza da operação"),
-        ("cfop", "cfop"),
-        ("shipping", "frete"),
-        ("add_shipping_to_total_value", "adicionar frete ao total"),
-        ("is_final_customer", "consumidor final"),
-        ("icms", "contribuinte icms"),
-        ("sender", "remetente"),
-        ("recipient", "destinatário"),
+        InvoiceFields.OPERATION,
+        InvoiceFields.CFOP,
+        InvoiceFields.SHIPPING,
+        InvoiceFields.ADD_SHIPPING_TO_TOTAL_VALUE,
+        InvoiceFields.IS_FINAL_CUSTOMER,
+        InvoiceFields.ICMS,
+        InvoiceFields.SENDER,
+        InvoiceFields.RECIPIENT,
     ]
 
     INVOICE_ITEM = [
-        ("group", "grupo"),
-        ("ncm", "ncm"),
-        ("description", "descrição"),
-        ("origin", "origem"),
-        ("unity_of_measurement", "unidade de medida"),
-        ("quantity", "quantidade"),
-        ("value_per_unity", "valor unitário"),
-        ("nf_index", "NF"),
+        InvoiceItemFields.GROUP,
+        InvoiceItemFields.NCM,
+        InvoiceItemFields.DESCRIPTION,
+        InvoiceItemFields.ORIGIN,
+        InvoiceItemFields.UNITY_OF_MEASUREMENT,
+        InvoiceItemFields.QUANTITY,
+        InvoiceItemFields.VALUE_PER_UNITY,
+        InvoiceItemFields.NF_INDEX,
     ]
 
     ENTITY = [
-        ("number", "número"),
-        ("cpf_cnpj", "cpf/cnpj"),
+        EntityFields.NUMBER,
+        EntityFields.CPF_CNPJ,
     ]
 
     SENDER_ENTITY = [
-        ("user_type", "tipo"),
-        ("email", "email"),
+        EntityFields.USER_TYPE,
+        EntityFields.EMAIL,
     ]
 
 

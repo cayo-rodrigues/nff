@@ -1,6 +1,6 @@
 from modules.database import DataBase
 from pandas import DataFrame, Series
-from utils.constants import ErrorMessages
+from utils.constants import ErrorMessages, InvoiceFields, InvoiceItemFields
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -19,13 +19,17 @@ from models.entity import Entity
 
 class InvoiceItem:
     def __init__(self, data: Series) -> None:
-        group = handle_empty_cell(data["grupo"])
-        ncm = handle_empty_cell(data["ncm"])
-        description = handle_empty_cell(data["descrição"])
-        origin = handle_empty_cell(data["origem"])
-        unity_of_measurement = handle_empty_cell(data["unidade de medida"])
-        quantity = handle_empty_cell(data["quantidade"], numeric=True)
-        value_per_unity = handle_empty_cell(data["valor unitário"], numeric=True)
+        group = handle_empty_cell(data[InvoiceItemFields.GROUP[1]])
+        ncm = handle_empty_cell(data[InvoiceItemFields.NCM[1]])
+        description = handle_empty_cell(data[InvoiceItemFields.DESCRIPTION[1]])
+        origin = handle_empty_cell(data[InvoiceItemFields.ORIGIN[1]])
+        unity_of_measurement = handle_empty_cell(
+            data[InvoiceItemFields.UNITY_OF_MEASUREMENT[1]]
+        )
+        quantity = handle_empty_cell(data[InvoiceItemFields.QUANTITY[1]], numeric=True)
+        value_per_unity = handle_empty_cell(
+            data[InvoiceItemFields.VALUE_PER_UNITY[1]], numeric=True
+        )
 
         self.group: str = normalize_text(group)
         self.ncm: str = normalize_text(ncm, numeric=True)
@@ -38,16 +42,18 @@ class InvoiceItem:
 
 class Invoice:
     def __init__(self, data: Series, nf_index: int) -> None:
-        operation = handle_empty_cell(data["natureza da operação"])
-        gta = handle_empty_cell(data["gta"])
-        cfop = handle_empty_cell(data["cfop"], numeric=True)
-        shipping = handle_empty_cell(data["frete"], numeric=True)
-        is_final_customer = handle_empty_cell(data["consumidor final"])
-        icms = handle_empty_cell(data["contribuinte icms"])
-        add_shipping_to_total_value = handle_empty_cell(data["adicionar frete ao total"])
+        operation = handle_empty_cell(data[InvoiceFields.OPERATION[1]])
+        gta = handle_empty_cell(data[InvoiceFields.GTA[1]])
+        cfop = handle_empty_cell(data[InvoiceFields.CFOP[1]], numeric=True)
+        shipping = handle_empty_cell(data[InvoiceFields.SHIPPING[1]], numeric=True)
+        is_final_customer = handle_empty_cell(data[InvoiceFields.IS_FINAL_CUSTOMER[1]])
+        icms = handle_empty_cell(data[InvoiceFields.ICMS[1]])
+        add_shipping_to_total_value = handle_empty_cell(
+            data[InvoiceFields.ADD_SHIPPING_TO_TOTAL_VALUE[1]]
+        )
 
-        sender = handle_empty_cell(data["remetente"], numeric=True)
-        recipient = handle_empty_cell(data["destinatário"], numeric=True)
+        sender = handle_empty_cell(data[InvoiceFields.SENDER[1]], numeric=True)
+        recipient = handle_empty_cell(data[InvoiceFields.RECIPIENT[1]], numeric=True)
 
         self.operation: str = normalize_text(operation)
         self.gta: str = normalize_text(gta)

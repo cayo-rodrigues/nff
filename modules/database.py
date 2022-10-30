@@ -47,3 +47,6 @@ class DataBase:
 
         if error_msg:
             raise MissingFieldsError(error_msg)
+
+    def are_all_the_same(self, df: pd.DataFrame, col_name: str) -> bool:
+        return (df[col_name] == df[col_name][0]).all()
