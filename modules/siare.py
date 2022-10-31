@@ -13,8 +13,11 @@ from .browser import Browser
 
 
 class Siare(Browser):
-    def __init__(self) -> None:
-        super().__init__(url=Urls.SIARE_URL)
+    def __init__(self, open_now: bool = False) -> None:
+        super().__init__(url=Urls.SIARE_URL if open_now else None)
+
+    def open_website(self) -> None:
+        self.get_page(url=Urls.SIARE_URL)
 
     def login(self, sender: Entity) -> None:
         xpath = XPaths.LOGIN_USER_TYPE_SELECT_INPUT
