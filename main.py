@@ -5,8 +5,12 @@ from modules.database import DataBase
 from modules.gui import GUI
 from modules.siare import Siare
 from utils.constants import InvoiceFields, MandatoryFields
-from utils.exceptions import (InvalidEntityError, InvoiceWithNoItemsError,
-                              MissingFieldsError, MissingSenderDataError)
+from utils.exceptions import (
+    InvalidEntityError,
+    InvoiceWithNoItemsError,
+    MissingFieldsError,
+    MissingSenderDataError,
+)
 
 
 def main():
@@ -42,7 +46,9 @@ def main():
             continue
 
         if not all_senders_are_equal or index == 0:
-            invoice.sender.password = gui.get_user_password()
+            if invoice.sender.password is None:
+                invoice.sender.password = gui.get_user_password()
+
             siare.open_website()
             siare.login(invoice.sender)
             siare.close_first_pop_up()
