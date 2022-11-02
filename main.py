@@ -4,7 +4,7 @@ from models.invoice import Invoice
 from modules.database import DataBase
 from modules.gui import GUI
 from modules.siare import Siare
-from utils.constants import InvoiceFields, MandatoryFields
+from utils.constants import MandatoryFields
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -27,7 +27,7 @@ def main():
         gui.display_error_msg(msg=e.message)
         exit()
 
-    all_senders_are_equal = db.are_all_the_same(invoices, InvoiceFields.SENDER[1])
+    prev_sender = None
 
     siare = Siare()
 
@@ -45,13 +45,15 @@ def main():
             gui.display_error_msg(msg=e.message, warning=True)
             continue
 
-        if not all_senders_are_equal or index == 0:
+        if prev_sender != invoice.sender.cpf_cnpj or index == 0:
             if invoice.sender.password is None:
                 invoice.sender.password = gui.get_user_password()
 
             siare.open_website()
             siare.login(invoice.sender)
             siare.close_first_pop_up()
+
+            prev_sender = invoice.sender.cpf_cnpj
 
         siare.open_require_invoice_page()
         siare.fill_invoice_basic_data(invoice)

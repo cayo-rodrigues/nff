@@ -1,7 +1,7 @@
 import warnings
 
 import pandas as pd
-from utils.constants import DB_PATH, ErrorMessages, SheetNames
+from utils.constants import DB_PATH, ErrorMessages, InvoiceFields, SheetNames
 from utils.exceptions import MissingFieldsError
 
 
@@ -20,7 +20,9 @@ class DataBase:
         return pd.read_excel(DB_PATH, SheetNames.ENTITIES, dtype=str)
 
     def read_invoices(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str)
+        return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str).sort_values(
+            by=[InvoiceFields.SENDER[1]]
+        )
 
     def read_invoices_products(self) -> pd.DataFrame:
         return pd.read_excel(DB_PATH, SheetNames.INVOICES_ITEMS, dtype=str)
@@ -47,6 +49,3 @@ class DataBase:
 
         if error_msg:
             raise MissingFieldsError(error_msg)
-
-    def are_all_the_same(self, df: pd.DataFrame, col_name: str) -> bool:
-        return (df[col_name] == df[col_name][0]).all()
