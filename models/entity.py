@@ -19,7 +19,7 @@ class Entity:
         self.number: str = normalize_text(number, numeric=True)
         self.cpf_cnpj: str = normalize_text(cpf_cnpj, numeric=True)
 
-        self.password: str
+        self.password: str = handle_empty_cell(data[EntityFields.PASSWORD[1]].iloc[0])
 
         self.is_sender: bool = is_sender
 

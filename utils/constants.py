@@ -85,6 +85,7 @@ class EntityFields:
     USER_TYPE = ("user_type", "tipo")
     NUMBER = ("number", "número")
     CPF_CNPJ = ("cpf_cnpj", "cpf/cnpj")
+    PASSWORD = ("password", "senha")
 
 
 class MandatoryFields:
