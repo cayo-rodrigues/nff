@@ -80,7 +80,11 @@ class GUI:
         img_label.image = img
         img_label.grid(column=2, row=1)
 
-        ttk.Label(self.mainframe, text=msg).grid(column=1, columnspan=2, row=2)
+        ttk.Label(self.mainframe, text=msg).grid(column=1, row=2, columnspan=2)
+
+        ttk.Button(self.mainframe, text="Ok", command=self.close).grid(
+            column=1, row=3, columnspan=2, sticky=[W, E]
+        )
 
         self._apply_padding()
 
