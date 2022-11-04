@@ -38,7 +38,9 @@ class Browser:
         return self._find_element(xpath, root)
 
     @wait_for_it
-    def filter_elements(self, by: str, where: str, root=None) -> WebElement:
+    def filter_elements(
+        self, by: str, where: str, root: WebElement = None
+    ) -> list[WebElement]:
         return self._get_lookup_root(root).find_elements(by, where)
 
     @wait_for_it
