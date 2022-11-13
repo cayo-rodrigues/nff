@@ -1,11 +1,12 @@
 from datetime import date
 from time import sleep
 
-from models.entity import Entity
-from models.invoice import Invoice, InvoiceItem
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+
+from models.entity import Entity
+from models.invoice import Invoice, InvoiceItem
 from utils.constants import STANDARD_SLEEP_TIME, Urls, XPaths
 from utils.helpers import normalize_text
 

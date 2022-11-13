@@ -1,4 +1,5 @@
 from pandas import Series
+
 from utils.constants import EntityFields, MandatoryFields
 from utils.helpers import handle_empty_cell, normalize_text
 

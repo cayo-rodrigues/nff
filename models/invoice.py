@@ -1,6 +1,8 @@
-from modules.database import DataBase
 from pandas import DataFrame, Series
-from utils.constants import ErrorMessages, InvoiceFields, InvoiceItemFields
+
+from models.entity import Entity
+from modules.database import DataBase
+from utils.constants import EntityFields, ErrorMessages, InvoiceFields, InvoiceItemFields
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -13,8 +15,6 @@ from utils.helpers import (
     str_to_boolean,
     to_BRL,
 )
-
-from models.entity import Entity
 
 
 class InvoiceItem:
@@ -73,8 +73,12 @@ class Invoice:
     def get_sender_and_recipient(self, entities: DataFrame) -> None:
         db = DataBase()
 
-        sender_data = db.get_row(entities, by_col="cpf/cnpj", where=self.sender)
-        recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
+        sender_data = db.get_row(
+            entities, by_col=EntityFields.CPF_CNPJ[1], where=self.sender
+        )
+        recipient_data = db.get_row(
+            entities, by_col=EntityFields.CPF_CNPJ[1], where=self.recipient
+        )
 
         # if missing sender or recipient warn the user and skip this invoice
         error_msg = ErrorMessages.missing_entity(
