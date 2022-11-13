@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 
 from PIL import Image, ImageTk
+
 from utils.constants import ERROR_IMG_PATH, WARNING_IMG_PATH
 
 

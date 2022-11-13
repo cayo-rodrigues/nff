@@ -1,6 +1,8 @@
-from modules.database import DataBase
 from pandas import DataFrame, Series
-from utils.constants import ErrorMessages, InvoiceFields, InvoiceItemFields
+
+from models.entity import Entity
+from modules.database import DataBase
+from utils.constants import EntityFields, ErrorMessages, InvoiceFields, InvoiceItemFields
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -13,8 +15,6 @@ from utils.helpers import (
     str_to_boolean,
     to_BRL,
 )
-
-from models.entity import Entity
 
 
 class InvoiceItem:
