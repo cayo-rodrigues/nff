@@ -73,8 +73,12 @@ class Invoice:
     def get_sender_and_recipient(self, entities: DataFrame) -> None:
         db = DataBase()
 
-        sender_data = db.get_row(entities, by_col="cpf/cnpj", where=self.sender)
-        recipient_data = db.get_row(entities, by_col="cpf/cnpj", where=self.recipient)
+        sender_data = db.get_row(
+            entities, by_col=EntityFields.CPF_CNPJ[1], where=self.sender
+        )
+        recipient_data = db.get_row(
+            entities, by_col=EntityFields.CPF_CNPJ[1], where=self.recipient
+        )
 
         # if missing sender or recipient warn the user and skip this invoice
         error_msg = ErrorMessages.missing_entity(
