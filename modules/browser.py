@@ -70,3 +70,18 @@ class Browser:
             sleep(STANDARD_SLEEP_TIME)
             if self.is_document_ready():
                 break
+
+    def get_current_window_id(self) -> str:
+        return self._browser.current_window_handle
+
+    def get_windows_ids(self) -> list[str]:
+        return self._browser.window_handles
+
+    def get_last_window_id(self) -> str:
+        return self.get_windows_ids()[-1]
+
+    def focus_on_window(self, window_id: str) -> None:
+        self._browser.switch_to.window(window_id)
+
+    def focus_on_last_window(self) -> None:
+        self.focus_on_window(window_id=self.get_last_window_id())
