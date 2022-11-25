@@ -32,4 +32,4 @@ class Entity:
                 if not getattr(self, key)
             ]
         )
-        return bool(not self.errors)
+        return not bool(self.errors)
