@@ -2,7 +2,7 @@ from pandas import DataFrame, Series
 
 from models.entity import Entity
 from modules.database import DataBase
-from utils.constants import EntityFields, ErrorMessages, InvoiceFields, InvoiceItemFields
+from utils.constants import DBColumns, ErrorMessages
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -19,16 +19,16 @@ from utils.helpers import (
 
 class InvoiceItem:
     def __init__(self, data: Series) -> None:
-        group = handle_empty_cell(data[InvoiceItemFields.GROUP[1]])
-        ncm = handle_empty_cell(data[InvoiceItemFields.NCM[1]])
-        description = handle_empty_cell(data[InvoiceItemFields.DESCRIPTION[1]])
-        origin = handle_empty_cell(data[InvoiceItemFields.ORIGIN[1]])
+        group = handle_empty_cell(data[DBColumns.InvoiceItem.GROUP])
+        ncm = handle_empty_cell(data[DBColumns.InvoiceItem.NCM])
+        description = handle_empty_cell(data[DBColumns.InvoiceItem.DESCRIPTION])
+        origin = handle_empty_cell(data[DBColumns.InvoiceItem.ORIGIN])
         unity_of_measurement = handle_empty_cell(
-            data[InvoiceItemFields.UNITY_OF_MEASUREMENT[1]]
+            data[DBColumns.InvoiceItem.UNITY_OF_MEASUREMENT]
         )
-        quantity = handle_empty_cell(data[InvoiceItemFields.QUANTITY[1]], numeric=True)
+        quantity = handle_empty_cell(data[DBColumns.InvoiceItem.QUANTITY], numeric=True)
         value_per_unity = handle_empty_cell(
-            data[InvoiceItemFields.VALUE_PER_UNITY[1]], numeric=True
+            data[DBColumns.InvoiceItem.VALUE_PER_UNITY], numeric=True
         )
 
         self.group: str = normalize_text(group)
@@ -42,18 +42,18 @@ class InvoiceItem:
 
 class Invoice:
     def __init__(self, data: Series, nf_index: int) -> None:
-        operation = handle_empty_cell(data[InvoiceFields.OPERATION[1]])
-        gta = handle_empty_cell(data[InvoiceFields.GTA[1]])
-        cfop = handle_empty_cell(data[InvoiceFields.CFOP[1]], numeric=True)
-        shipping = handle_empty_cell(data[InvoiceFields.SHIPPING[1]], numeric=True)
-        is_final_customer = handle_empty_cell(data[InvoiceFields.IS_FINAL_CUSTOMER[1]])
-        icms = handle_empty_cell(data[InvoiceFields.ICMS[1]])
+        operation = handle_empty_cell(data[DBColumns.Invoice.OPERATION])
+        gta = handle_empty_cell(data[DBColumns.Invoice.GTA])
+        cfop = handle_empty_cell(data[DBColumns.Invoice.CFOP], numeric=True)
+        shipping = handle_empty_cell(data[DBColumns.Invoice.SHIPPING], numeric=True)
+        is_final_customer = handle_empty_cell(data[DBColumns.Invoice.IS_FINAL_CUSTOMER])
+        icms = handle_empty_cell(data[DBColumns.Invoice.ICMS])
         add_shipping_to_total_value = handle_empty_cell(
-            data[InvoiceFields.ADD_SHIPPING_TO_TOTAL_VALUE[1]]
+            data[DBColumns.Invoice.ADD_SHIPPING_TO_TOTAL_VALUE]
         )
 
-        sender = handle_empty_cell(data[InvoiceFields.SENDER[1]], numeric=True)
-        recipient = handle_empty_cell(data[InvoiceFields.RECIPIENT[1]], numeric=True)
+        sender = handle_empty_cell(data[DBColumns.Invoice.SENDER], numeric=True)
+        recipient = handle_empty_cell(data[DBColumns.Invoice.RECIPIENT], numeric=True)
 
         self.operation: str = normalize_text(operation)
         self.gta: str = normalize_text(gta)
@@ -74,10 +74,10 @@ class Invoice:
         db = DataBase()
 
         sender_data = db.get_row(
-            entities, by_col=EntityFields.CPF_CNPJ[1], where=self.sender
+            entities, by_col=DBColumns.Entity.CPF_CNPJ, where=self.sender
         )
         recipient_data = db.get_row(
-            entities, by_col=EntityFields.CPF_CNPJ[1], where=self.recipient
+            entities, by_col=DBColumns.Entity.CPF_CNPJ, where=self.recipient
         )
 
         # if missing sender or recipient warn the user and skip this invoice
