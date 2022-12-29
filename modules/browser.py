@@ -24,6 +24,9 @@ class Browser:
     def _get_lookup_root(self, root: WebElement) -> WebDriver | WebElement:
         return root or self._browser
 
+    def _find_element(self, xpath: str, root: WebElement = None) -> WebElement:
+        return self._get_lookup_root(root).find_element(By.XPATH, xpath)
+
     def open(self) -> None:
         profile = webdriver.FirefoxProfile()
         profile.set_preference("browser.download.folderList", 2)
@@ -46,9 +49,6 @@ class Browser:
     def get_page(self, url: str) -> None:
         self._browser.get(url)
 
-    def _find_element(self, xpath: str, root: WebElement = None) -> WebElement:
-        return self._get_lookup_root(root).find_element(By.XPATH, xpath)
-
     @wait_for_it
     def get_element(self, xpath: str, root: WebElement = None) -> WebElement:
         return self._find_element(xpath, root)
@@ -67,6 +67,9 @@ class Browser:
     def type_into_element(self, xpath: str, value: str, root: WebElement = None) -> None:
         self.get_element(xpath, root).send_keys(value)
 
+    @wait_for_it
+    def get_element_attr(self, xpath: str, attr: str, root: WebElement = None) -> str:
+        return self.get_element(xpath, root).get_attribute(attr)
     def click_if_exists(self, xpath: str, root: WebElement = None) -> bool:
         try:
             self._find_element(xpath, root).click()
