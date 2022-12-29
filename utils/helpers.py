@@ -40,4 +40,7 @@ def handle_empty_cell(value, numeric: bool = False):
 
 def to_BRL(value: int | float) -> str:
     locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
+    return locale.currency(value, symbol=None)
+
+
     return locale.currency(value, grouping=True, symbol=None)
