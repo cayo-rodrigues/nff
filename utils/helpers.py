@@ -1,8 +1,9 @@
 import locale
+from datetime import date
 
 from pandas import isna
 
-from utils.constants import FALSY_STRS, TRUTHY_STRS
+from utils.constants import BRAZILIAN_DATE_FORMAT, FALSY_STRS, TRUTHY_STRS
 
 
 def str_to_boolean(value: str) -> bool:
@@ -40,4 +41,8 @@ def handle_empty_cell(value, numeric: bool = False):
 
 def to_BRL(value: int | float) -> str:
     locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
-    return locale.currency(value, grouping=True, symbol=None)
+    return locale.currency(value, symbol=None)
+
+
+def get_today_date() -> str:
+    return date.today().strftime(BRAZILIAN_DATE_FORMAT)

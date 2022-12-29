@@ -3,7 +3,9 @@ from time import sleep
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     ElementNotInteractableException,
+    NoAlertPresentException,
     NoSuchElementException,
+    StaleElementReferenceException,
 )
 
 from utils.constants import STANDARD_SLEEP_TIME
@@ -18,6 +20,8 @@ def wait_for_it(f):
                 NoSuchElementException,
                 ElementNotInteractableException,
                 ElementClickInterceptedException,
+                NoAlertPresentException,
+                StaleElementReferenceException,
             ):
                 sleep(STANDARD_SLEEP_TIME)
 

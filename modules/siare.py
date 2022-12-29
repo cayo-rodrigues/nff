@@ -112,11 +112,8 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_RECIPIENT_SEARCH_BUTTON
         self.click_element(xpath)
 
-        while True:
-            sleep(STANDARD_SLEEP_TIME)
-            xpath = XPaths.INVOICE_RECIPIENT_NAME_SPAN
-            if self.get_element(xpath).get_attribute("innerHTML"):
-                break
+        xpath = XPaths.INVOICE_RECIPIENT_NAME_SPAN
+        self.get_element_attr(xpath, "innerHTML")
 
         if invoice.is_final_customer:
             xpath = XPaths.INVOICE_IS_FINAL_CUSTOMER_INPUT_TRUE
@@ -227,5 +224,13 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_ADITIONAL_DATA_GTA_INPUT
         self.type_into_element(xpath, invoice.gta)
 
-        # xpath = XPaths.FINISH_INVOICE_BUTTON
-        # self.click_element(xpath)
+        xpath = XPaths.FINISH_INVOICE_BUTTON
+        self.click_element(xpath)
+
+    def download_invoice(self):
+        xpath = XPaths.PRINT_INVOICE_LINK
+        self.click_element(xpath)
+
+        self.accept_alert()
+
+        self.wait_for_download()

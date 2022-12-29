@@ -2,7 +2,7 @@ import warnings
 
 import pandas as pd
 
-from utils.constants import DB_PATH, ErrorMessages, InvoiceFields, SheetNames
+from utils.constants import DB_PATH, DBColumns, ErrorMessages, SheetNames
 from utils.exceptions import MissingFieldsError
 
 
@@ -22,7 +22,7 @@ class DataBase:
 
     def read_invoices(self) -> pd.DataFrame:
         return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str).sort_values(
-            by=[InvoiceFields.SENDER[1]]
+            by=[DBColumns.Invoice.SENDER]
         )
 
     def read_invoices_products(self) -> pd.DataFrame:

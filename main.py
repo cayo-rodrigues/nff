@@ -45,7 +45,8 @@ def main():
             gui.display_error_msg(msg=e.message, warning=True)
             continue
 
-        if prev_sender != invoice.sender.cpf_cnpj or index == 0:
+        should_login = prev_sender != invoice.sender.cpf_cnpj or index == 0
+        if should_login:
             if invoice.sender.password is None:
                 invoice.sender.password = gui.get_user_password()
 
@@ -82,6 +83,10 @@ def main():
 
         siare.open_aditional_data_tab()
         siare.fill_invoice_aditional_data(invoice)
+
+        siare.download_invoice()
+
+        siare.close_unfocused_windows()
 
 
 if __name__ == "__main__":

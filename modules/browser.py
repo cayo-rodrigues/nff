@@ -5,11 +5,15 @@ from selenium.common.exceptions import (
     ElementNotInteractableException,
     NoSuchElementException,
 )
+from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from webdriver_manager.firefox import GeckoDriverManager
 
-from utils.constants import STANDARD_SLEEP_TIME
+from modules.file_manager import FileManager
+from utils.constants import INVOICES_DIR_PATH, STANDARD_SLEEP_TIME
 from utils.decorators import wait_for_it
 
 
@@ -22,17 +26,31 @@ class Browser:
     def _get_lookup_root(self, root: WebElement) -> WebDriver | WebElement:
         return root or self._browser
 
+    def _find_element(self, xpath: str, root: WebElement = None) -> WebElement:
+        return self._get_lookup_root(root).find_element(By.XPATH, xpath)
+
     def open(self) -> None:
-        self._browser = webdriver.Firefox()
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference("browser.download.folderList", 2)
+        profile.set_preference("browser.download.dir", INVOICES_DIR_PATH)
+        profile.set_preference("browser.download.manager.showWhenStarting", True)
+        profile.set_preference(
+            "browser.helperApps.neverAsk.saveToDisk", "application/pdf"
+        )
+        profile.set_preference("pdfjs.disabled", True)
+        profile.set_preference("plugin.scan.Acrobat", "99.0")
+        profile.set_preference("plugin.scan.plid.all", False)
+
+        service = FirefoxService(executable_path=GeckoDriverManager().install())
+
+        self._browser = webdriver.Firefox(firefox_profile=profile, service=service)
+        self.prev_num_files = FileManager.count_files(INVOICES_DIR_PATH)
 
     def close(self) -> None:
         self._browser.close()
 
     def get_page(self, url: str) -> None:
         self._browser.get(url)
-
-    def _find_element(self, xpath: str, root: WebElement = None) -> WebElement:
-        return self._get_lookup_root(root).find_element(By.XPATH, xpath)
 
     @wait_for_it
     def get_element(self, xpath: str, root: WebElement = None) -> WebElement:
@@ -52,6 +70,26 @@ class Browser:
     def type_into_element(self, xpath: str, value: str, root: WebElement = None) -> None:
         self.get_element(xpath, root).send_keys(value)
 
+    @wait_for_it
+    def get_element_attr(self, xpath: str, attr: str, root: WebElement = None) -> str:
+        return self.get_element(xpath, root).get_attribute(attr)
+
+    @wait_for_it
+    def accept_alert(self) -> None:
+        Alert(self._browser).accept()
+
+    def wait_for_download(self) -> None:
+        while True:
+            sleep(STANDARD_SLEEP_TIME)
+
+            num_files = FileManager.count_files(INVOICES_DIR_PATH)
+            while abs(num_files - self.prev_num_files) > 1:
+                num_files -= 1
+
+            if num_files > self.prev_num_files:
+                self.prev_num_files = num_files
+                return
+
     def click_if_exists(self, xpath: str, root: WebElement = None) -> bool:
         try:
             self._find_element(xpath, root).click()
@@ -70,3 +108,27 @@ class Browser:
             sleep(STANDARD_SLEEP_TIME)
             if self.is_document_ready():
                 break
+
+    def get_current_window_id(self) -> str:
+        return self._browser.current_window_handle
+
+    def get_windows_ids(self) -> list[str]:
+        return self._browser.window_handles
+
+    def get_last_window_id(self) -> str:
+        return self.get_windows_ids()[-1]
+
+    def focus_on_window(self, window_id: str) -> None:
+        self._browser.switch_to.window(window_id)
+
+    def focus_on_last_window(self) -> None:
+        self.focus_on_window(window_id=self.get_last_window_id())
+
+    def close_unfocused_windows(self) -> None:
+        main_window = self.get_current_window_id()
+        windows = self.get_windows_ids()
+        for window in windows:
+            self.focus_on_window(window)
+            if self.get_current_window_id() != main_window:
+                self.close()
+        self.focus_on_window(main_window)
