@@ -6,3 +6,4 @@ dist
 db.xlsx
 *.log
 .vscode
+docs

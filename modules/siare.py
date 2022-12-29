@@ -224,5 +224,13 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_ADITIONAL_DATA_GTA_INPUT
         self.type_into_element(xpath, invoice.gta)
 
-        # xpath = XPaths.FINISH_INVOICE_BUTTON
-        # self.click_element(xpath)
+        xpath = XPaths.FINISH_INVOICE_BUTTON
+        self.click_element(xpath)
+
+    def download_invoice(self):
+        xpath = XPaths.PRINT_INVOICE_LINK
+        self.click_element(xpath)
+
+        self.accept_alert()
+
+        self.wait_for_download()

@@ -11,6 +11,8 @@ FALSY_STRS = ["não", "nao", "na", "n", "0"]
 
 STANDARD_SLEEP_TIME = 0.25
 
+BRAZILIAN_DATE_FORMAT = '%d/%m/%Y'
+
 
 class ErrorMessages:
     DB_DATA_ERROR_TIP = "\nVerifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
@@ -230,3 +232,8 @@ class XPaths:
     INVOICE_ADITIONAL_DATA_GTA_INPUT = "/html/body/div[1]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[2]/td[2]/input"
 
     FINISH_INVOICE_BUTTON = "/html/body/div[1]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[3]/a"
+
+    # in the finish invoice tab
+    PRINT_INVOICE_LINK = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td/a[2]"
+    DOWNLOAD_INVOICE_BUTTON = '//*[@id="download"]'
+    
