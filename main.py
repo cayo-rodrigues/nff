@@ -45,7 +45,9 @@ def main():
             gui.display_error_msg(msg=e.message, warning=True)
             continue
 
-        if prev_sender != invoice.sender.cpf_cnpj or index == 0:
+        should_login = prev_sender != invoice.sender.cpf_cnpj or index == 0
+
+        if should_login:
             if invoice.sender.password is None:
                 invoice.sender.password = gui.get_user_password()
 
