@@ -4,6 +4,7 @@ DB_PATH = "./db.xlsx"
 PROJECT_ABS_PATH = getcwd()
 ERROR_IMG_PATH = PROJECT_ABS_PATH + "\\assets\\error.png"
 WARNING_IMG_PATH = PROJECT_ABS_PATH + "\\assets\\warning.png"
+INVOICES_DIR_PATH = PROJECT_ABS_PATH + "\\docs"
 
 TRUTHY_STRS = ["sim", "sin", "si", "s", "1"]
 FALSY_STRS = ["não", "nao", "na", "n", "0"]

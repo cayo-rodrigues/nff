@@ -6,10 +6,12 @@ from selenium.common.exceptions import (
     NoSuchElementException,
 )
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from webdriver_manager.firefox import GeckoDriverManager
 
-from utils.constants import STANDARD_SLEEP_TIME
+from utils.constants import INVOICES_DIR_PATH, STANDARD_SLEEP_TIME
 from utils.decorators import wait_for_it
 
 
@@ -23,7 +25,20 @@ class Browser:
         return root or self._browser
 
     def open(self) -> None:
-        self._browser = webdriver.Firefox()
+        profile = webdriver.FirefoxProfile()
+        profile.set_preference("browser.download.folderList", 2)
+        profile.set_preference("browser.download.dir", INVOICES_DIR_PATH)
+        profile.set_preference("browser.download.manager.showWhenStarting", True)
+        profile.set_preference(
+            "browser.helperApps.neverAsk.saveToDisk", "application/pdf"
+        )
+        profile.set_preference("pdfjs.disabled", True)
+        profile.set_preference("plugin.scan.Acrobat", "99.0")
+        profile.set_preference("plugin.scan.plid.all", False)
+
+        service = FirefoxService(executable_path=GeckoDriverManager().install())
+
+        self._browser = webdriver.Firefox(firefox_profile=profile, service=service)
 
     def close(self) -> None:
         self._browser.close()
