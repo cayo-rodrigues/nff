@@ -2,13 +2,16 @@ import warnings
 
 import pandas as pd
 
+from modules.file_manager import FileManager
 from utils.constants import DB_PATH, DBColumns, ErrorMessages, SheetNames
-from utils.exceptions import MissingFieldsError
+from utils.exceptions import MissingDBError, MissingFieldsError
 
 
 class DataBase:
     def __init__(self) -> None:
         warnings.simplefilter(action="ignore", category=UserWarning)
+        if not FileManager.file_exists(DB_PATH):
+            raise MissingDBError(ErrorMessages.MISSING_DB_ERROR)
 
     def read_all(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         return (

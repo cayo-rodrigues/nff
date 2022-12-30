@@ -3,8 +3,12 @@ import os
 
 class FileManager:
     @classmethod
+    def file_exists(self, path: str) -> bool:
+        return os.path.isfile(path)
+
+    @classmethod
     def dir_exists(self, path: str) -> bool:
-        return os.path.exists(path)
+        return os.path.isdir(path)
 
     @classmethod
     def get_or_create_dir(self, path: str) -> str:

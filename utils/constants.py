@@ -17,6 +17,11 @@ BRAZILIAN_DATE_FORMAT = '%d/%m/%Y'
 class ErrorMessages:
     DB_DATA_ERROR_TIP = "\nVerifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
     INVOICE_IGNORE_WARNING = "\nPor isso, essa nota fiscal será ignorada nesta execução."
+    MISSING_DB_ERROR = (
+        "Base de dados não encontrada.\n"
+        "Por favor, certifique-se de criar um arquivo \"db.xlsx\" dentro desta mesma pasta.\n"
+        "Lembre-se também de seguir o modelo deixado no arquivo \"db.example.xlsx\"."
+    )
 
     @classmethod
     def missing_mandatory_field(cls, column: str, line_number: int):
