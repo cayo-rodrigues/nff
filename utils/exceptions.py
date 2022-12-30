@@ -1,20 +1,24 @@
-class NFABaseException(Exception):
+class NFFBaseException(Exception):
     def __init__(self, message: str, *args, **kwargs) -> None:
         self.message = message
         super().__init__(*args, **kwargs)
 
 
-class MissingFieldsError(NFABaseException):
+class MissingFieldsError(NFFBaseException):
     ...
 
 
-class InvoiceWithNoItemsError(NFABaseException):
+class InvoiceWithNoItemsError(NFFBaseException):
     ...
 
 
-class InvalidEntityError(NFABaseException):
+class InvalidEntityError(NFFBaseException):
     ...
 
 
-class MissingSenderDataError(NFABaseException):
+class MissingSenderDataError(NFFBaseException):
+    ...
+
+
+class MissingDBError(NFFBaseException):
     ...

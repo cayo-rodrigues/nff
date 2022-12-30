@@ -8,16 +8,21 @@ from utils.constants import MandatoryFields
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
+    MissingDBError,
     MissingFieldsError,
     MissingSenderDataError,
 )
 
 
 def main():
-    db = DataBase()
-    entities, invoices, invoices_items = db.read_all()
-
     gui = GUI()
+
+    try:
+        db = DataBase()
+        entities, invoices, invoices_items = db.read_all()
+    except MissingDBError as e:
+        gui.display_error_msg(msg=e.message)
+        exit()
 
     try:
         db.check_mandatory_fields(entities, MandatoryFields.ENTITY)
