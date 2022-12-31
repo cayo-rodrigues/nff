@@ -1,0 +1,78 @@
+*********************************************
+
+          NFF - Nota Fiscal Fácil            
+
+*********************************************
+
+
+============================
+
+         COMO USAR?
+
+============================
+
+* O primeiro passo é preencher a base de dados, que é o arquivo "db.xlsx" (por favor, note que o nome desse arquivo
+  
+  não deve mudar).
+
+
+* Para preencher ele corretamente, siga o exemplo mostrado no arquivo "db.example.xlsx".
+
+
+* Na aba de "Nota Fiscal" dentro do arquivo excel ("db.xlsx"), cada linha representa uma nota fiscal que será emitida
+  
+  na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
+
+
+* Na aba "Dados de Produtos e Serviços NF" dentro do arquivo excel ("db.xlsx"), o campo "NF" serve para indicar a qual
+  
+  nota fiscal que aquele produto pertence. Por exemplo, se eu colocar "1", isso significa que aquele produto se refere
+  
+  à primeira nota fiscal da aba "Nota Fiscal".
+
+
+============================
+
+       COMO FUNCIONA?
+
+============================
+
+* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do Siare
+  
+  e emitir todas as notas fiscais que estiverem no arquivo excel ("db.xlsx").
+
+
+* As notas fiscais baixadas serão salvas em uma pasta chamada "docs" dentro deste mesmo diretório.
+
+
+* Caso o campo "senha" no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma
+  
+  janelinha onde você pode digitar a senha.
+
+
+============================
+
+         IMPORTANTE
+
+============================
+
+* Não altere a aba "Dados das listas" da base de dados ("db.xlsx") sem ter consciência do que está fazendo. As
+
+  informações contidas ali servem para popular os campos de seleção que existem nas outras abas.
+
+
+* Sempre lembre de salvar suas alterações na base de dados antes de iniciar o programa.
+
+
+* Se você decidir usar o campo "senha" no excel, garanta que ninguém mais tenha acesso à ele.
+
+
+============================
+
+     LIMITAÇÕES ATUAIS
+
+============================
+
+* Não é possível emitir notas fiscais em casos onde alguma entidade não possui inscrição estadual.
+
+* Também não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
