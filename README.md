@@ -55,7 +55,7 @@ As principais tecnologias utilizadas foram:
 
 ## Limitações Atuais
 
-* Não é possível emitir notas fiscais em casos onde alguma entidade não possui inscrição municipal.
+* Não é possível emitir notas fiscais em casos onde alguma entidade não possui inscrição estadual.
 
 * Também não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
 
@@ -64,4 +64,4 @@ As principais tecnologias utilizadas foram:
 - [ ] Lidar com casos de destinatário sem inscrição municipal
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
-- [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"número"`(inscrição municipal)
+- [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"número"`(inscrição estadual)
