@@ -4,14 +4,8 @@ from models.invoice import Invoice
 from modules.database import DataBase
 from modules.gui import GUI
 from modules.siare import Siare
+from utils import exceptions
 from utils.constants import MandatoryFields
-from utils.exceptions import (
-    InvalidEntityError,
-    InvoiceWithNoItemsError,
-    MissingDBError,
-    MissingFieldsError,
-    MissingSenderDataError,
-)
 
 
 def main():
@@ -20,7 +14,7 @@ def main():
     try:
         db = DataBase()
         entities, invoices, invoices_items = db.read_all()
-    except MissingDBError as e:
+    except exceptions.MissingDBError as e:
         gui.display_error_msg(msg=e.message)
         exit()
 
@@ -28,7 +22,7 @@ def main():
         db.check_mandatory_fields(entities, MandatoryFields.ENTITY)
         db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
         db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
-    except MissingFieldsError as e:
+    except (exceptions.MissingFieldsError, exceptions.EmptySheetError) as e:
         gui.display_error_msg(msg=e.message)
         exit()
 
@@ -43,9 +37,9 @@ def main():
             invoice.get_sender_and_recipient(entities)
             invoice.get_items(invoices_items)
         except (
-            InvoiceWithNoItemsError,
-            InvalidEntityError,
-            MissingSenderDataError,
+            exceptions.InvoiceWithNoItemsError,
+            exceptions.InvalidEntityError,
+            exceptions.MissingSenderDataError,
         ) as e:
             gui.display_error_msg(msg=e.message, warning=True)
             continue

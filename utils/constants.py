@@ -1,9 +1,13 @@
 from os import getcwd
 
+PROJECT_NAME = "NFF"
+PROJECT_FULL_NAME = "NFF - Nota Fiscal Fácil"
+
 DB_PATH = "./db.xlsx"
 PROJECT_ABS_PATH = getcwd()
 ERROR_IMG_PATH = PROJECT_ABS_PATH + "\\assets\\error.png"
 WARNING_IMG_PATH = PROJECT_ABS_PATH + "\\assets\\warning.png"
+PROJECT_ICON_PATH = PROJECT_ABS_PATH + "\\icon.ico"
 INVOICES_DIR_PATH = PROJECT_ABS_PATH + "\\docs"
 
 TRUTHY_STRS = ["sim", "sin", "si", "s", "1"]
@@ -25,10 +29,8 @@ class ErrorMessages:
 
     @classmethod
     def missing_mandatory_field(cls, column: str, line_number: int):
-        return (
-            f"A coluna \"{column}\" está faltando ser preenchida na linha {line_number}.\n"
-            f"{cls.DB_DATA_ERROR_TIP}"
-        )
+        return f"A coluna \"{column}\" está faltando ser preenchida na linha {line_number}.\n"
+        
     
     @classmethod
     def invoice_with_no_items(cls, nf_index: int):
@@ -61,6 +63,13 @@ class ErrorMessages:
             f"Os dados da(s) coluna(s) {missing_data}, referentes ao\n"
             f"remetente cujo cpf/cnpj é {cpf_cnpj}, estão faltando ser preenchidos.\n"
             f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
+        )
+    
+    @classmethod
+    def empty_sheet_error(cls, sheet_name: str):
+        return (
+            f"A página {sheet_name} da base de dados está vazia.\n"
+            f"{cls.DB_DATA_ERROR_TIP}"
         )
 
 class DBColumns:

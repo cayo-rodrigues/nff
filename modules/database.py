@@ -4,7 +4,7 @@ import pandas as pd
 
 from modules.file_manager import FileManager
 from utils.constants import DB_PATH, DBColumns, ErrorMessages, SheetNames
-from utils.exceptions import MissingDBError, MissingFieldsError
+from utils.exceptions import EmptySheetError, MissingDBError, MissingFieldsError
 
 
 class DataBase:
@@ -21,15 +21,21 @@ class DataBase:
         )
 
     def read_entities(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.ENTITIES, dtype=str)
+        df = pd.read_excel(DB_PATH, SheetNames.ENTITIES, dtype=str)
+        df.sheet_name = SheetNames.ENTITIES
+        return df
 
     def read_invoices(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str).sort_values(
+        df = pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str).sort_values(
             by=[DBColumns.Invoice.SENDER]
         )
+        df.sheet_name = SheetNames.INVOICES
+        return df
 
     def read_invoices_products(self) -> pd.DataFrame:
-        return pd.read_excel(DB_PATH, SheetNames.INVOICES_ITEMS, dtype=str)
+        df = pd.read_excel(DB_PATH, SheetNames.INVOICES_ITEMS, dtype=str)
+        df.sheet_name = SheetNames.INVOICES_ITEMS
+        return df
 
     def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
@@ -40,10 +46,15 @@ class DataBase:
     def check_mandatory_fields(
         self, df: pd.DataFrame, fields: list[tuple[str, str]]
     ) -> None:
+        if df.empty:
+            raise EmptySheetError(
+                ErrorMessages.empty_sheet_error(sheet_name=df.sheet_name)
+            )
+
         error_msg = ""
 
         for _, field in fields:
-            rows_with_empty_cells = df[pd.isna(df[field])]
+            rows_with_empty_cells = df[df[field].isna()]
 
             if not rows_with_empty_cells.empty:
                 row_index = rows_with_empty_cells.index[0] + 2
@@ -52,4 +63,4 @@ class DataBase:
                 )
 
         if error_msg:
-            raise MissingFieldsError(error_msg)
+            raise MissingFieldsError(error_msg + ErrorMessages.DB_DATA_ERROR_TIP)
