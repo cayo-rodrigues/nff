@@ -3,14 +3,20 @@ from tkinter import ttk
 
 from PIL import Image, ImageTk
 
-from utils.constants import ERROR_IMG_PATH, WARNING_IMG_PATH
+from utils.constants import (
+    ERROR_IMG_PATH,
+    PROJECT_ICON_PATH,
+    PROJECT_NAME,
+    WARNING_IMG_PATH,
+)
 
 
 class GUI:
     def setup(self) -> None:
         self.root = Tk()
 
-        self.root.title("NFA")
+        self.root.title(PROJECT_NAME)
+        self.root.wm_iconphoto(True, ImageTk.PhotoImage(Image.open(PROJECT_ICON_PATH)))
         self.root.bind("<Return>", self.close)
 
         self.mainframe = ttk.Frame(self.root, padding="12")

@@ -22,3 +22,7 @@ class MissingSenderDataError(NFFBaseException):
 
 class MissingDBError(NFFBaseException):
     ...
+
+
+class EmptySheetError(NFFBaseException):
+    ...
