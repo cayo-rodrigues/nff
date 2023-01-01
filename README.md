@@ -2,6 +2,10 @@
 
 Este programa automatiza processos repetitivos que funcionários públicos que trabalham no SIAT fazem para gerar notas fiscais no site do Siare para produtores rurais.
 
+## Download
+
+Clique [aqui](https://drive.google.com/file/d/1so-2FLdHQxLCb8YIMhBXDHJMtxAYycwF/view?usp=share_link) para baixar o programa. Ele vem compactado no formato `.rar`. Basta extrair os arquivos normalmente. Não existe nenhum processo de instalação. As instruções de como usar estão logo abaixo.
+
 ## Público alvo
 
 O NFF é destinado à funcionários públicos, que possuem o mínimo de experiência com excel, que trabalham no setor do SIAT. Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado que fazem. E é a esses funcionários que geralmente recorrem. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o trabalho que fazem.
