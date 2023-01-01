@@ -31,7 +31,7 @@ As principais tecnologias utilizadas foram:
 
 * Na aba de **"Nota Fiscal"** dentro do arquivo excel, cada linha representa uma nota fiscal que será emitida na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
 
-* Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo **"NF"** serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar **_"1"_**, isso significa que aquele produto **_se refere à primeira nota fiscal da aba "Nota Fiscal"_**.
+* Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo **"NF"** serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar `1`, isso significa que aquele produto **_se refere à primeira nota fiscal da aba "Nota Fiscal"_**.
 
 ## Como funciona?
 
