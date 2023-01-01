@@ -1,8 +1,11 @@
 from sys import exit
 
+from selenium.common.exceptions import WebDriverException
+
 from models.invoice import Invoice
 from modules.database import DataBase
 from modules.gui import GUI
+from modules.logger import Logger
 from modules.siare import Siare
 from utils import exceptions
 from utils.constants import MandatoryFields
@@ -11,6 +14,7 @@ from utils.constants import MandatoryFields
 def main():
     gui = GUI()
 
+    Logger.reading_db()
     try:
         db = DataBase()
         entities, invoices, invoices_items = db.read_all()
@@ -18,6 +22,7 @@ def main():
         gui.display_error_msg(msg=e.message)
         exit()
 
+    Logger.validating_db_fields()
     try:
         db.check_mandatory_fields(entities, MandatoryFields.ENTITY)
         db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
@@ -28,10 +33,14 @@ def main():
 
     prev_sender = None
 
+    Logger.opening_browser()
     siare = Siare()
 
     for index, invoice_data in invoices.iterrows():
-        invoice = Invoice(data=invoice_data, nf_index=index + 1)
+        nf_index = index + 1
+
+        Logger.working_on_invoice(nf_index)
+        invoice = Invoice(data=invoice_data, nf_index=nf_index)
 
         try:
             invoice.get_sender_and_recipient(entities)
@@ -83,10 +92,17 @@ def main():
         siare.open_aditional_data_tab()
         siare.fill_invoice_aditional_data(invoice)
 
+        Logger.downloading_invoice(nf_index)
+
         siare.download_invoice()
+
+        Logger.finished_invoice(nf_index)
 
         siare.close_unfocused_windows()
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (KeyboardInterrupt, WebDriverException):
+        Logger.unexpected_exit()
