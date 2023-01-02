@@ -31,23 +31,27 @@ As principais tecnologias utilizadas foram:
 
 * Na aba de **"Nota Fiscal"** dentro do arquivo excel, cada linha representa uma nota fiscal que será emitida na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
 
-* Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo **"NF"** serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar **_"1"_**, isso significa que aquele produto **_se refere à primeira nota fiscal da aba "Nota Fiscal"_**.
+* Ainda dentro da aba **"Nota Fiscal"**, os campos `"remetente"` e `"destinatário"` devem ser preenchidos com o `"cpf/cnpj"` das entidades correspondentes.
+
+* Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo `"NF"` serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar `1`, isso significa que aquele produto se refere à **_primeira nota fiscal da aba "Nota Fiscal"_**.
+
+* Para iniciar, dê dois cliques no arquivo `NFF.exe`.
 
 ## Como funciona?
 
-* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_ e emitir todas as notas fiscais que estiverem no excel (`"db.xlsx"`).
+* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_ e emitir todas as notas fiscais que estiverem no excel.
 
 * As notas fiscais baixadas serão salvas em uma pasta chamada `"docs"` dentro do mesmo diretório do programa.
 
-* Caso o campo **"senha"** no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma janelinha onde você pode digitar a senha.
+* Caso o campo `"senha"` no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma janelinha onde você pode digitar a senha.
 
 ## IMPORTANTE
 
-* Não altere a aba **"Dados das listas"** da base de dados (`"db.xlsx"`) sem ter consciência do que está fazendo. As informações contidas ali servem para popular os campos de seleção que existem nas outras abas.
+* Não altere a aba **"Dados das listas"** da base de dados sem ter consciência do que está fazendo. As informações contidas ali servem para popular os campos de seleção que existem nas outras abas.
 
 * Sempre lembre de salvar suas alterações na base de dados antes de iniciar o programa.
 
-* **Se você decidir usar o campo "senha" no excel, garanta que ninguém mais tenha acesso à ele**.
+* **Se você decidir usar o campo `"senha"` no excel, garanta que ninguém mais tenha acesso à ele**.
 
 ## Limitações Atuais
 
@@ -60,3 +64,4 @@ As principais tecnologias utilizadas foram:
 - [ ] Lidar com casos de destinatário sem inscrição municipal
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
+- [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"número"`(inscrição estadual)
