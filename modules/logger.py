@@ -25,4 +25,4 @@ class Logger:
 
     @classmethod
     def unexpected_exit(self):
-        print("O programa foi interrompida inesperadamente ;-;")
+        print("O programa foi interrompido inesperadamente ;-;")
