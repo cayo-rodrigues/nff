@@ -1,3 +1,5 @@
+<img src="./icon.ico" width="10%" align="left" alt="NFF main icon">
+
 # NFF - Nota Fiscal Fácil
 
 Este programa automatiza processos repetitivos que funcionários públicos que trabalham no SIAT fazem para gerar notas fiscais no site do Siare para produtores rurais.
@@ -61,7 +63,7 @@ As principais tecnologias utilizadas foram:
 
 ## Planos para o futuro
 
-- [ ] Lidar com casos de destinatário sem inscrição municipal
+- [ ] Lidar com casos de destinatário sem inscrição estadual
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"número"`(inscrição estadual)
