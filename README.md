@@ -65,3 +65,7 @@ As principais tecnologias utilizadas foram:
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"número"`(inscrição estadual)
+
+## Considerações finais
+
+Acredito que tenha ficado um projeto bem massinha. Obviamente existem pontos a ser melhorados, e também é muito provável que haja uma forma melhor de se automatizar esse processo, caso seja possível se comunicar com a API do governo, ao invés de ter que depender do front deles. Mas no momento isso tudo já é incrível, e a ideia é continuar evoluindo.
