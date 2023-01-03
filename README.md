@@ -43,7 +43,7 @@ As principais tecnologias utilizadas foram:
 
 ## Como funciona?
 
-* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_ e emitir todas as notas fiscais que estiverem no excel.
+* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_, fazer login na conta do `"remetente"` e emitir todas as notas fiscais que estiverem no excel.
 
 * As notas fiscais baixadas serão salvas em uma pasta chamada `"docs"` dentro do mesmo diretório do programa.
 
