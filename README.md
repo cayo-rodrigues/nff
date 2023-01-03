@@ -2,7 +2,7 @@
 
 # NFF - Nota Fiscal Fácil
 
-Este programa automatiza processos repetitivos que funcionários públicos que trabalham no SIAT fazem para gerar notas fiscais no site do Siare para produtores rurais.
+Este programa automatiza processos repetitivos que funcionários públicos que trabalham no SIAT (ou qualquer pessoa na verdade) fazem para gerar notas fiscais no site do Siare para produtores rurais.
 
 ## Download
 
@@ -10,7 +10,9 @@ Clique [aqui](https://drive.google.com/file/d/1so-2FLdHQxLCb8YIMhBXDHJMtxAYycwF/
 
 ## Público alvo
 
-O NFF é destinado à funcionários públicos, que possuem o mínimo de experiência com excel, que trabalham no setor do SIAT. Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado que fazem. E é a esses funcionários que geralmente recorrem. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o trabalho que fazem.
+O NFF é destinado principalmente à funcionários públicos, que possuem o mínimo de experiência com excel, que trabalham no setor do SIAT. Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. E é a esses funcionários que geralmente recorrem. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
+
+Mas serve perfeitamente para qualquer pessoa, afinal, esses funcionários públicos apenas realizam login na conta dos prórpios produtores para emitir notas fiscais.
 
 Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e assim se deu.
 
@@ -41,7 +43,7 @@ As principais tecnologias utilizadas foram:
 
 ## Como funciona?
 
-* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_ e emitir todas as notas fiscais que estiverem no excel.
+* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_, fazer login na conta do `"remetente"` e emitir todas as notas fiscais que estiverem no excel.
 
 * As notas fiscais baixadas serão salvas em uma pasta chamada `"docs"` dentro do mesmo diretório do programa.
 
