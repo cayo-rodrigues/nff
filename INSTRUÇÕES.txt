@@ -22,6 +22,11 @@
 * Na aba de "Nota Fiscal" dentro do arquivo excel ("db.xlsx"), cada linha representa uma nota fiscal que será emitida
   
   na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
+ 
+ 
+* Ainda dentro da aba "Nota Fiscal", os campos "remetente" e "destinatário" devem ser preenchidos com o "cpf/cnpj"
+  
+  das entidades correspondentes.
 
 
 * Na aba "Dados de Produtos e Serviços NF" dentro do arquivo excel ("db.xlsx"), o campo "NF" serve para indicar a qual
@@ -29,6 +34,9 @@
   nota fiscal que aquele produto pertence. Por exemplo, se eu colocar "1", isso significa que aquele produto se refere
   
   à primeira nota fiscal da aba "Nota Fiscal".
+  
+  
+* Para iniciar, dê dois cliques no arquivo NFF.exe.
 
 
 ============================
@@ -37,9 +45,9 @@
 
 ============================
 
-* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do Siare
+* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do Siare,
   
-  e emitir todas as notas fiscais que estiverem no arquivo excel ("db.xlsx").
+  fazer login na conta do remetente e emitir todas as notas fiscais que estiverem no arquivo excel ("db.xlsx").
 
 
 * As notas fiscais baixadas serão salvas em uma pasta chamada "docs" dentro deste mesmo diretório.
@@ -76,3 +84,8 @@
 * Não é possível emitir notas fiscais em casos onde alguma entidade não possui inscrição estadual.
 
 * Também não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
+
+
+------------------------------------------------------------------------------------------------------------
+
+Para visitar a página do projeto, acesse https://github.com/cayo-rodrigues/nff
