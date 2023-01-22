@@ -44,5 +44,9 @@ def to_BRL(value: int | float) -> str:
     return locale.currency(value, symbol=None)
 
 
+def to_br_float(number: float | str) -> str:
+    return str(number).replace(".", ",")
+
+
 def get_today_date() -> str:
     return date.today().strftime(BRAZILIAN_DATE_FORMAT)
