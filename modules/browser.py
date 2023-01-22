@@ -5,12 +5,12 @@ from selenium.common.exceptions import (
     ElementNotInteractableException,
     NoSuchElementException,
 )
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
-from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.chrome import ChromeDriverManager
 
 from modules.file_manager import FileManager
 from utils.constants import INVOICES_DIR_PATH, STANDARD_SLEEP_TIME
@@ -30,20 +30,22 @@ class Browser:
         return self._get_lookup_root(root).find_element(By.XPATH, xpath)
 
     def open(self) -> None:
-        profile = webdriver.FirefoxProfile()
-        profile.set_preference("browser.download.folderList", 2)
-        profile.set_preference("browser.download.dir", INVOICES_DIR_PATH)
-        profile.set_preference("browser.download.manager.showWhenStarting", True)
-        profile.set_preference(
-            "browser.helperApps.neverAsk.saveToDisk", "application/pdf"
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option(
+            "prefs",
+            {
+                "download.default_directory": INVOICES_DIR_PATH,
+                "download.prompt_for_download": False,
+                "download.directory_upgrade": True,
+                "plugins.always_open_pdf_externally": True,
+            },
         )
-        profile.set_preference("pdfjs.disabled", True)
-        profile.set_preference("plugin.scan.Acrobat", "99.0")
-        profile.set_preference("plugin.scan.plid.all", False)
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-        service = FirefoxService(executable_path=GeckoDriverManager().install())
-
-        self._browser = webdriver.Firefox(firefox_profile=profile, service=service)
+        self._browser = webdriver.Chrome(
+            chrome_options=options,
+            service=ChromeService(executable_path=ChromeDriverManager().install()),
+        )
         self.prev_num_files = FileManager.count_files(INVOICES_DIR_PATH)
 
     def close(self) -> None:

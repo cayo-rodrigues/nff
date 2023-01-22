@@ -13,6 +13,7 @@ from utils.helpers import (
     handle_empty_cell,
     normalize_text,
     str_to_boolean,
+    to_br_float,
     to_BRL,
 )
 
@@ -36,7 +37,7 @@ class InvoiceItem:
         self.description: str = normalize_text(description)
         self.origin: str = normalize_text(origin)
         self.unity_of_measurement: str = normalize_text(unity_of_measurement)
-        self.quantity: int = int(quantity)
+        self.quantity: str = to_br_float(quantity)
         self.value_per_unity: str = to_BRL(float(value_per_unity))
 
 
