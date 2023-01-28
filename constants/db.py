@@ -1,0 +1,101 @@
+class SheetNames:
+    ENTITIES = "Entidades"
+    INVOICES = "Nota Fiscal"
+    INVOICES_ITEMS = "Dados de Produtos e Serviços NF"
+
+class DBColumns:
+    class Invoice:
+        OPERATION = "natureza da operação"
+        GTA = "gta"
+        CFOP = "cfop"
+        SHIPPING = "frete"
+        ADD_SHIPPING_TO_TOTAL_VALUE = "adicionar frete ao total"    
+        IS_FINAL_CUSTOMER = "consumidor final"
+        ICMS = "contribuinte icms"
+        SENDER = "remetente"
+        RECIPIENT = "destinatário"
+    
+    class InvoiceItem:
+        GROUP = "grupo"
+        NCM = "ncm"
+        DESCRIPTION = "descrição"
+        ORIGIN = "origem"
+        UNITY_OF_MEASUREMENT = "unidade de medida"
+        QUANTITY = "quantidade"
+        VALUE_PER_UNITY = "valor unitário"
+        NF_INDEX = "NF"
+    
+    class Entity:
+        NAME = "nome"
+        EMAIL = "email"
+        USER_TYPE = "tipo"
+        NUMBER = "número"
+        CPF_CNPJ = "cpf/cnpj"
+        PASSWORD = "senha"
+
+
+class ModelFields:
+    class Invoice:
+        OPERATION = "operation"
+        GTA = "gta"
+        CFOP = "cfop"
+        SHIPPING = "shipping"
+        ADD_SHIPPING_TO_TOTAL_VALUE = "add_shipping_to_total_value"
+        IS_FINAL_CUSTOMER = "is_final_customer"
+        ICMS = "icms"
+        SENDER = "sender"
+        RECIPIENT = "recipient"
+
+
+    class InvoiceItem:
+        GROUP = "group"
+        NCM = "ncm"
+        DESCRIPTION = "description"
+        ORIGIN = "origin"
+        UNITY_OF_MEASUREMENT = "unity_of_measurement"
+        QUANTITY = "quantity"
+        VALUE_PER_UNITY = "value_per_unity"
+        NF_INDEX = "nf_index"
+
+
+    class Entity:
+        NAME = "name"
+        EMAIL = "email"
+        USER_TYPE = "user_type"
+        NUMBER = "number"
+        CPF_CNPJ = "cpf_cnpj"
+        PASSWORD = "password"
+
+
+class MandatoryFields:
+    INVOICE = [
+        (ModelFields.Invoice.OPERATION, DBColumns.Invoice.OPERATION),
+        (ModelFields.Invoice.CFOP, DBColumns.Invoice.CFOP),
+        (ModelFields.Invoice.SHIPPING, DBColumns.Invoice.SHIPPING),
+        (ModelFields.Invoice.ADD_SHIPPING_TO_TOTAL_VALUE, DBColumns.Invoice.ADD_SHIPPING_TO_TOTAL_VALUE),
+        (ModelFields.Invoice.IS_FINAL_CUSTOMER, DBColumns.Invoice.IS_FINAL_CUSTOMER),
+        (ModelFields.Invoice.ICMS, DBColumns.Invoice.ICMS),
+        (ModelFields.Invoice.SENDER, DBColumns.Invoice.SENDER),
+        (ModelFields.Invoice.RECIPIENT, DBColumns.Invoice.RECIPIENT),
+    ]
+
+    INVOICE_ITEM = [
+        (ModelFields.InvoiceItem.GROUP, DBColumns.InvoiceItem.GROUP),
+        (ModelFields.InvoiceItem.NCM, DBColumns.InvoiceItem.NCM),
+        (ModelFields.InvoiceItem.DESCRIPTION, DBColumns.InvoiceItem.DESCRIPTION),
+        (ModelFields.InvoiceItem.ORIGIN, DBColumns.InvoiceItem.ORIGIN),
+        (ModelFields.InvoiceItem.UNITY_OF_MEASUREMENT, DBColumns.InvoiceItem.UNITY_OF_MEASUREMENT),
+        (ModelFields.InvoiceItem.QUANTITY, DBColumns.InvoiceItem.QUANTITY),
+        (ModelFields.InvoiceItem.VALUE_PER_UNITY, DBColumns.InvoiceItem.VALUE_PER_UNITY),
+        (ModelFields.InvoiceItem.NF_INDEX, DBColumns.InvoiceItem.NF_INDEX),
+    ]
+
+    ENTITY = [
+        (ModelFields.Entity.NUMBER, DBColumns.Entity.NUMBER),
+        (ModelFields.Entity.CPF_CNPJ, DBColumns.Entity.CPF_CNPJ),
+    ]
+
+    SENDER_ENTITY = [
+        (ModelFields.Entity.USER_TYPE, DBColumns.Entity.USER_TYPE),
+        (ModelFields.Entity.EMAIL, DBColumns.Entity.EMAIL),
+    ]

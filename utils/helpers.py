@@ -3,7 +3,7 @@ from datetime import date
 
 from pandas import isna
 
-from utils.constants import BRAZILIAN_DATE_FORMAT, FALSY_STRS, TRUTHY_STRS
+from constants.standards import BRAZILIAN_DATE_FORMAT, FALSY_STRS, TRUTHY_STRS
 
 
 def str_to_boolean(value: str) -> bool:

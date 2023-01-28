@@ -1,6 +1,6 @@
 from pandas import Series
 
-from utils.constants import DBColumns, MandatoryFields
+from constants.db import DBColumns, MandatoryFields
 from utils.helpers import handle_empty_cell, normalize_text
 
 

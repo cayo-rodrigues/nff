@@ -3,12 +3,8 @@ from tkinter import ttk
 
 from PIL import Image, ImageTk
 
-from utils.constants import (
-    ERROR_IMG_PATH,
-    PROJECT_ICON_PATH,
-    PROJECT_NAME,
-    WARNING_IMG_PATH,
-)
+from constants.paths import ERROR_IMG_PATH, PROJECT_ICON_PATH, WARNING_IMG_PATH
+from constants.standards import PROJECT_NAME
 
 
 class GUI:

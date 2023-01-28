@@ -12,8 +12,9 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 
+from constants.paths import INVOICES_DIR_PATH
+from constants.standards import STANDARD_SLEEP_TIME
 from modules.file_manager import FileManager
-from utils.constants import INVOICES_DIR_PATH, STANDARD_SLEEP_TIME
 from utils.decorators import wait_for_it
 
 
