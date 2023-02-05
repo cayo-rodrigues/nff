@@ -1,16 +1,20 @@
 from os import getcwd
+from platform import system
 
-PROJECT_ABS_PATH = getcwd()
+CURRENT_OS = system()
+PATH_SEP = "\\" if CURRENT_OS == "Windows" else "/"
 
-DB_PATH = PROJECT_ABS_PATH + "\\db.xlsx"
+PROJECT_DIR_PATH = getcwd() + PATH_SEP
 
-ASSETS_DIR_PATH = PROJECT_ABS_PATH + "\\assets"
-INVOICES_DIR_PATH = PROJECT_ABS_PATH + "\\docs"
+ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + PATH_SEP
+INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + PATH_SEP
 
-PROJECT_ICON_PATH = ASSETS_DIR_PATH + "\\icon.ico"
+DB_FILE_PATH = PROJECT_DIR_PATH + "db.xlsx"
 
-ERROR_IMG_PATH = ASSETS_DIR_PATH + "\\error.png"
-WARNING_IMG_PATH = ASSETS_DIR_PATH + "\\warning.png"
+PROJECT_ICON_PATH = ASSETS_DIR_PATH + "icon.ico"
+
+ERROR_IMG_PATH = ASSETS_DIR_PATH + "error.png"
+WARNING_IMG_PATH = ASSETS_DIR_PATH + "warning.png"
 
 
 class Urls:

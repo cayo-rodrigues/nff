@@ -99,3 +99,7 @@ class MandatoryFields:
         (ModelFields.Entity.USER_TYPE, DBColumns.Entity.USER_TYPE),
         (ModelFields.Entity.EMAIL, DBColumns.Entity.EMAIL),
     ]
+    
+    RECIPIENT_ENTITY = [
+        (ModelFields.Entity, DBColumns.Entity)
+    ]
