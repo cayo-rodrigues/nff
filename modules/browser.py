@@ -42,6 +42,7 @@ class Browser:
             },
         )
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
+        options.add_experimental_option("detach", True)
 
         self._browser = webdriver.Chrome(
             chrome_options=options,
