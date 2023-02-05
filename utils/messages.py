@@ -38,10 +38,11 @@ class ErrorMessages:
         )
     
     @classmethod
-    def invalid_sender_error(cls, missing_data: str, cpf_cnpj: str):
+    def invalid_entity_error(cls, missing_data: str, cpf_cnpj: str, is_sender: bool, name: str = None):
         return (
             f"Os dados da(s) coluna(s) {missing_data}, referentes ao\n"
-            f"remetente cujo cpf/cnpj é {cpf_cnpj}, estão faltando ser preenchidos.\n"
+            f"{'remetente' if is_sender else 'destinatário'} cujo cpf/cnpj "
+            f"é {cpf_cnpj}, {f'de nome {name}' if name else ''} estão faltando ser preenchidos.\n"
             f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
         )
     

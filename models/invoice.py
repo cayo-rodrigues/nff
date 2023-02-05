@@ -6,7 +6,7 @@ from modules.database import DataBase
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
-    MissingSenderDataError,
+    MissingEntityDataError,
 )
 from utils.helpers import (
     decode_icms_contributor_status,
@@ -46,7 +46,7 @@ class Invoice:
     def __init__(self, data: Series, nf_index: int) -> None:
         operation = handle_empty_cell(data[DBColumns.Invoice.OPERATION])
         gta = handle_empty_cell(data[DBColumns.Invoice.GTA])
-        cfop = handle_empty_cell(data[DBColumns.Invoice.CFOP], numeric=True)
+        cfop = handle_empty_cell(data[DBColumns.Invoice.CFOP])
         shipping = handle_empty_cell(data[DBColumns.Invoice.SHIPPING], numeric=True)
         is_final_customer = handle_empty_cell(data[DBColumns.Invoice.IS_FINAL_CUSTOMER])
         icms = handle_empty_cell(data[DBColumns.Invoice.ICMS])
@@ -54,8 +54,8 @@ class Invoice:
             data[DBColumns.Invoice.ADD_SHIPPING_TO_TOTAL_VALUE]
         )
 
-        sender = handle_empty_cell(data[DBColumns.Invoice.SENDER], numeric=True)
-        recipient = handle_empty_cell(data[DBColumns.Invoice.RECIPIENT], numeric=True)
+        sender = handle_empty_cell(data[DBColumns.Invoice.SENDER])
+        recipient = handle_empty_cell(data[DBColumns.Invoice.RECIPIENT])
 
         self.operation: str = normalize_text(operation)
         self.gta: str = normalize_text(gta)
@@ -95,10 +95,22 @@ class Invoice:
         self.recipient: Entity = Entity(data=recipient_data)
 
         if not self.sender.is_valid_sender():
-            error_msg = ErrorMessages.invalid_sender_error(
-                missing_data=self.sender.errors, cpf_cnpj=self.sender.cpf_cnpj
+            error_msg = ErrorMessages.invalid_entity_error(
+                missing_data=self.sender.errors,
+                cpf_cnpj=self.sender.cpf_cnpj,
+                is_sender=True,
+                name=self.sender.name,
             )
-            raise MissingSenderDataError(error_msg)
+            raise MissingEntityDataError(error_msg)
+
+        if not self.recipient.is_valid_recipient():
+            error_msg = ErrorMessages.invalid_entity_error(
+                missing_data=self.recipient.errors,
+                cpf_cnpj=self.recipient.cpf_cnpj,
+                is_sender=False,
+                name=self.recipient.name,
+            )
+            raise MissingEntityDataError(error_msg)
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()

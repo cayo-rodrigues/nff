@@ -34,8 +34,8 @@ class Siare(Browser):
                 option.click()
                 break
 
-        xpath = XPaths.LOGIN_NUMBER_INPUT
-        self.type_into_element(xpath, sender.number)
+        xpath = XPaths.LOGIN_IE_INPUT
+        self.type_into_element(xpath, sender.ie)
 
         xpath = XPaths.LOGIN_CPF_INPUT
         self.type_into_element(xpath, sender.cpf_cnpj)
@@ -107,8 +107,8 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_SENDER_EMAIL_INPUT
         self.type_into_element(xpath, invoice.sender.email)
 
-        xpath = XPaths.INVOICE_RECIPIENT_NUMBER_INPUT
-        self.type_into_element(xpath, invoice.recipient.number)
+        xpath = XPaths.INVOICE_RECIPIENT_IE_INPUT
+        self.type_into_element(xpath, invoice.recipient.ie)
 
         xpath = XPaths.INVOICE_RECIPIENT_SEARCH_BUTTON
         self.click_element(xpath)

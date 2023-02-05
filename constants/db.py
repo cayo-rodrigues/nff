@@ -29,9 +29,14 @@ class DBColumns:
         NAME = "nome"
         EMAIL = "email"
         USER_TYPE = "tipo"
-        NUMBER = "número"
+        IE = "inscrição estadual"
         CPF_CNPJ = "cpf/cnpj"
         PASSWORD = "senha"
+        POSTAL_CODE = "cep"
+        NEIGHBORHOOD = "bairro"
+        STREET_TYPE = "logradouro (tipo)"
+        STREET_NAME = "logradouro (nome)"
+        NUMBER = "número"
 
 
 class ModelFields:
@@ -62,9 +67,14 @@ class ModelFields:
         NAME = "name"
         EMAIL = "email"
         USER_TYPE = "user_type"
-        NUMBER = "number"
+        IE = "ie"
         CPF_CNPJ = "cpf_cnpj"
         PASSWORD = "password"
+        POSTAL_CODE = "postal_code"
+        NEIGHBORHOOD = "neighborhood"
+        STREET_TYPE = "street_type"
+        STREET_NAME = "street_name"
+        NUMBER = "number"
 
 
 class MandatoryFields:
@@ -91,7 +101,6 @@ class MandatoryFields:
     ]
 
     ENTITY = [
-        (ModelFields.Entity.NUMBER, DBColumns.Entity.NUMBER),
         (ModelFields.Entity.CPF_CNPJ, DBColumns.Entity.CPF_CNPJ),
     ]
 
@@ -101,5 +110,12 @@ class MandatoryFields:
     ]
     
     RECIPIENT_ENTITY = [
-        (ModelFields.Entity, DBColumns.Entity)
+        (ModelFields.Entity.IE, DBColumns.Entity.IE),
+    ]
+    
+    RECIPIENT_ENTITY_ALT = [
+        (ModelFields.Entity.POSTAL_CODE, DBColumns.Entity.POSTAL_CODE),
+        (ModelFields.Entity.NEIGHBORHOOD, DBColumns.Entity.NEIGHBORHOOD),
+        (ModelFields.Entity.STREET_TYPE, DBColumns.Entity.STREET_TYPE),
+        (ModelFields.Entity.STREET_NAME, DBColumns.Entity.STREET_NAME),
     ]

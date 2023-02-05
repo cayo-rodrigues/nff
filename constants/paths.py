@@ -25,7 +25,7 @@ class Urls:
 class XPaths:
     # login page
     LOGIN_USER_TYPE_SELECT_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[1]/div/div[1]/select"
-    LOGIN_NUMBER_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[2]/div[2]/div[1]/input"
+    LOGIN_IE_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[2]/div[2]/div[1]/input"
     LOGIN_CPF_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[3]/div/div[1]/input"
     LOGIN_PASSWORD_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[5]/div/div[1]/input"
 
@@ -42,14 +42,24 @@ class XPaths:
     INVOICE_INITIAL_DATA_CFOP_BOX = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[2]"
     INVOICE_INITIAL_DATA_DATE_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[9]/td[2]/input"
 
-    # under invoice sender recipient tab
+    # under invoice sender/recipient tab
     INVOICE_SENDER_RECIPIENT_TAB = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[5]/a"
 
     INVOICE_SENDER_EMAIL_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td[2]/input"
 
-    INVOICE_RECIPIENT_NUMBER_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[4]/input"
+    INVOICE_RECIPIENT_IE_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[4]/input"
     INVOICE_RECIPIENT_SEARCH_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[5]/a"
     INVOICE_RECIPIENT_NAME_SPAN = '//*[@id="destinatario.nome"]'
+    
+    INVOICE_RECIPIENT_OPEN_ADDRESS_WINDOW = '//*[@id="containerConteudoPrincipal"]/div/form/table[6]/tbody/tr[1]/td[2]/a'
+    
+    INVOICE_RECIPIENT_ADDRESS_CEP_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[2]/tbody/tr[2]/td[2]/input"
+    INVOICE_RECIPIENT_ADDRESS_SEARCH_CEP_BUTTON = "/html/body/form/table[1]/tbody/tr/td/table[2]/tbody/tr[2]/td[3]/a"
+    INVOICE_RECIPIENT_ADDRESS_NEIGHBORHOOD_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[3]/td[2]/input"
+    INVOICE_RECIPIENT_ADDRESS_STREET_TYPE_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[4]/td[2]/div[1]"
+    INVOICE_RECIPIENT_ADDRESS_STREET_TYPE_LIST = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[4]/td[2]/div[1]/div[2]"
+    INVOICE_RECIPIENT_ADDRESS_STREET_NAME_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[4]/td[2]/input"
+    INVOICE_RECIPIENT_ADDRESS_NUMBER_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[5]/td[2]/input"
 
     INVOICE_IS_FINAL_CUSTOMER_INPUT_TRUE = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[7]/tbody/tr[2]/td[2]/input"
     INVOICE_IS_FINAL_CUSTOMER_INPUT_FALSE = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[7]/tbody/tr[2]/td[3]/input"

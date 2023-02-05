@@ -48,7 +48,7 @@ def main():
         except (
             exceptions.InvoiceWithNoItemsError,
             exceptions.InvalidEntityError,
-            exceptions.MissingSenderDataError,
+            exceptions.MissingEntityDataError,
         ) as e:
             gui.display_error_msg(msg=e.message, warning=True)
             continue
