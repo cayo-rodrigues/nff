@@ -21,13 +21,13 @@ def decode_icms_contributor_status(value: str) -> int:
     return "9"
 
 
-def normalize_text(value: str, numeric: bool = False) -> str:
+def normalize_text(value: str, keep_case: bool = False) -> str:
     if not value:
         return ""
 
     text = value.strip()
 
-    if not numeric:
+    if not keep_case:
         text = text.lower()
 
     return text

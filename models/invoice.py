@@ -34,7 +34,7 @@ class InvoiceItem:
         )
 
         self.group: str = normalize_text(group)
-        self.ncm: str = normalize_text(ncm, numeric=True)
+        self.ncm: str = normalize_text(ncm, keep_case=True)
         self.description: str = normalize_text(description)
         self.origin: str = normalize_text(origin)
         self.unity_of_measurement: str = normalize_text(unity_of_measurement)
@@ -59,7 +59,7 @@ class Invoice:
 
         self.operation: str = normalize_text(operation)
         self.gta: str = normalize_text(gta)
-        self.cfop: str = normalize_text(cfop, numeric=True)
+        self.cfop: str = normalize_text(cfop, keep_case=True)
         self.is_final_customer: bool = str_to_boolean(is_final_customer)
         self.icms: str = decode_icms_contributor_status(icms)
         self.shipping: str = to_BRL(float(shipping))
@@ -69,8 +69,8 @@ class Invoice:
 
         self.nf_index: str = str(nf_index)
 
-        self.sender = normalize_text(sender, numeric=True)
-        self.recipient = normalize_text(recipient, numeric=True)
+        self.sender = normalize_text(sender, keep_case=True)
+        self.recipient = normalize_text(recipient, keep_case=True)
 
     def get_sender_and_recipient(self, entities: DataFrame) -> None:
         db = DataBase()

@@ -12,11 +12,11 @@ class Entity:
         ie = handle_empty_cell(data[DBColumns.Entity.IE].iloc[0])
         cpf_cnpj = handle_empty_cell(data[DBColumns.Entity.CPF_CNPJ].iloc[0])
 
-        self.name: str = normalize_text(name)
+        self.name: str = normalize_text(name, keep_case=True)
         self.email: str = normalize_text(email)
         self.user_type: str = normalize_text(user_type)
-        self.ie: str = normalize_text(ie, numeric=True)
-        self.cpf_cnpj: str = normalize_text(cpf_cnpj, numeric=True)
+        self.ie: str = normalize_text(ie, keep_case=True)
+        self.cpf_cnpj: str = normalize_text(cpf_cnpj, keep_case=True)
 
         self.password: str = handle_empty_cell(data[DBColumns.Entity.PASSWORD].iloc[0])
 
@@ -29,7 +29,7 @@ class Entity:
             street_name = handle_empty_cell(data[DBColumns.Entity.STREET_NAME].iloc[0])
             number = handle_empty_cell(data[DBColumns.Entity.NUMBER].iloc[0])
 
-            self.postal_code = normalize_text(postal_code, numeric=True)
+            self.postal_code = normalize_text(postal_code, keep_case=True)
             self.neighborhood = normalize_text(neighborhood)
             self.street_type = normalize_text(street_type)
             self.street_name = normalize_text(street_name)
