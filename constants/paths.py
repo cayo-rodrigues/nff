@@ -48,6 +48,7 @@ class XPaths:
     INVOICE_SENDER_EMAIL_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td[2]/input"
 
     INVOICE_RECIPIENT_IE_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[4]/input"
+    INVOICE_RECIPIENT_CPF_CNPJ_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[5]/tbody/tr[2]/td[2]/input'
     INVOICE_RECIPIENT_SEARCH_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[5]/a"
     INVOICE_RECIPIENT_NAME_SPAN = '//*[@id="destinatario.nome"]'
     
@@ -60,6 +61,7 @@ class XPaths:
     INVOICE_RECIPIENT_ADDRESS_STREET_TYPE_LIST = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[4]/td[2]/div[1]/div[2]"
     INVOICE_RECIPIENT_ADDRESS_STREET_NAME_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[4]/td[2]/input"
     INVOICE_RECIPIENT_ADDRESS_NUMBER_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[5]/td[2]/input"
+    INVOICE_RECIPIENT_ADDRESS_FINISH_BUTTON = "/html/body/form/table[2]/tbody/tr/td/a[1]"
 
     INVOICE_IS_FINAL_CUSTOMER_INPUT_TRUE = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[7]/tbody/tr[2]/td[2]/input"
     INVOICE_IS_FINAL_CUSTOMER_INPUT_FALSE = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[7]/tbody/tr[2]/td[3]/input"

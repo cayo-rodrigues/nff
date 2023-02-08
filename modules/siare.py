@@ -107,8 +107,23 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_SENDER_EMAIL_INPUT
         self.type_into_element(xpath, invoice.sender.email)
 
-        xpath = XPaths.INVOICE_RECIPIENT_IE_INPUT
-        self.type_into_element(xpath, invoice.recipient.ie)
+        if invoice.recipient.ie:
+            xpath = XPaths.INVOICE_RECIPIENT_IE_INPUT
+            self.type_into_element(xpath, invoice.recipient.ie)
+        else:
+            xpath = XPaths.INVOICE_RECIPIENT_OPEN_ADDRESS_WINDOW
+            self.click_element(xpath)
+
+            self.focus_on_last_window()
+
+            self.fill_invoice_recipient_address_data(invoice.recipient)
+
+            self.focus_on_last_window()  # that is, the only one left open
+
+            self.wait_until_document_is_ready()
+
+            xpath = XPaths.INVOICE_RECIPIENT_CPF_CNPJ_INPUT
+            self.type_into_element(xpath, invoice.recipient.cpf_cnpj)
 
         xpath = XPaths.INVOICE_RECIPIENT_SEARCH_BUTTON
         self.click_element(xpath)
@@ -136,6 +151,39 @@ class Siare(Browser):
 
         xpath = XPaths.INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION
         self.click_if_exists(xpath)
+
+    def fill_invoice_recipient_address_data(self, recipient: Entity) -> None:
+        xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_CEP_INPUT
+        self.type_into_element(xpath, recipient.postal_code)
+
+        xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_SEARCH_CEP_BUTTON
+        self.click_element(xpath)
+
+        xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_NEIGHBORHOOD_INPUT
+        self.type_into_element(xpath, recipient.neighborhood)
+
+        xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_STREET_TYPE_INPUT
+        self.click_element(xpath)
+
+        xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_STREET_TYPE_LIST
+        street_types_list = self.get_element(xpath)
+        street_types = self.filter_elements(By.TAG_NAME, "span", street_types_list)
+        for element in street_types:
+            if recipient.street_type == normalize_text(
+                element.get_attribute("innerHTML")
+            ):
+                element.click()
+                break
+
+        xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_STREET_NAME_INPUT
+        self.type_into_element(xpath, recipient.street_name)
+
+        if recipient.number:
+            xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_NUMBER_INPUT
+            self.type_into_element(xpath, recipient.number)
+
+        xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_FINISH_BUTTON
+        self.click_element(xpath)
 
     def fill_invoice_items_data(self, invoice_items: list[InvoiceItem]):
         while True:
