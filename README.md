@@ -63,9 +63,9 @@ As principais tecnologias utilizadas foram:
 
 * Também não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
 
-## Planos para o futuro
+## Próximos passos
 
-- [ ] Lidar com casos de destinatário sem inscrição estadual
+- [x] Lidar com casos de destinatário sem inscrição estadual
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
