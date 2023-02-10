@@ -67,8 +67,12 @@ class Browser:
         return self._get_lookup_root(root).find_elements(by, where)
 
     @wait_for_it
-    def click_element(self, xpath: str, root: WebElement = None) -> None:
+    def get_and_click(self, xpath: str, root: WebElement = None) -> None:
         self.get_element(xpath, root).click()
+
+    @wait_for_it
+    def click_element(self, element: WebElement) -> None:
+        element.click()
 
     @wait_for_it
     def type_into_element(self, xpath: str, value: str, root: WebElement = None) -> None:
