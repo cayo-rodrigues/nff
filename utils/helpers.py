@@ -4,7 +4,7 @@ from datetime import date
 from pandas import isna
 from selenium.webdriver.remote.webelement import WebElement
 
-from constants.standards import BRAZILIAN_DATE_FORMAT, FALSY_STRS, TRUTHY_STRS
+from constants.standards import FALSY_STRS, TRUTHY_STRS
 
 
 def str_to_boolean(value: str) -> bool:
@@ -47,10 +47,6 @@ def to_BRL(value: int | float) -> str:
 
 def to_br_float(number: float | str) -> str:
     return str(number).replace(".", ",")
-
-
-def get_today_date() -> str:
-    return date.today().strftime(BRAZILIAN_DATE_FORMAT)
 
 
 def binary_search_html(

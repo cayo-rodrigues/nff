@@ -14,6 +14,7 @@ class DBColumns:
         ICMS = "contribuinte icms"
         SENDER = "remetente"
         RECIPIENT = "destinatário"
+        EXTRA_NOTES = "informações complementares"
     
     class InvoiceItem:
         GROUP = "grupo"
@@ -50,6 +51,7 @@ class ModelFields:
         ICMS = "icms"
         SENDER = "sender"
         RECIPIENT = "recipient"
+        EXTRA_NOTES = "extra_notes"
 
 
     class InvoiceItem:

@@ -53,6 +53,7 @@ class Invoice:
         add_shipping_to_total_value = handle_empty_cell(
             data[DBColumns.Invoice.ADD_SHIPPING_TO_TOTAL_VALUE]
         )
+        extra_notes = handle_empty_cell(data[DBColumns.Invoice.EXTRA_NOTES])
 
         sender = handle_empty_cell(data[DBColumns.Invoice.SENDER])
         recipient = handle_empty_cell(data[DBColumns.Invoice.RECIPIENT])
@@ -66,6 +67,7 @@ class Invoice:
         self.add_shipping_to_total_value: bool = str_to_boolean(
             add_shipping_to_total_value
         )
+        self.extra_notes: str = normalize_text(extra_notes)
 
         self.nf_index: str = str(nf_index)
 
