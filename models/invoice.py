@@ -1,6 +1,6 @@
 from pandas import DataFrame, Series
 
-from constants.db import DBColumns
+from constants.db import DBColumns, DefaultValues
 from models.entity import Entity
 from modules.database import DataBase
 from utils.exceptions import (
@@ -22,7 +22,10 @@ from utils.messages import ErrorMessages
 class InvoiceItem:
     def __init__(self, data: Series) -> None:
         group = handle_empty_cell(data[DBColumns.InvoiceItem.GROUP])
-        ncm = handle_empty_cell(data[DBColumns.InvoiceItem.NCM])
+        ncm = (
+            handle_empty_cell(data[DBColumns.InvoiceItem.NCM])
+            or DefaultValues.InvoiceItem.NCM
+        )
         description = handle_empty_cell(data[DBColumns.InvoiceItem.DESCRIPTION])
         origin = handle_empty_cell(data[DBColumns.InvoiceItem.ORIGIN])
         unity_of_measurement = handle_empty_cell(

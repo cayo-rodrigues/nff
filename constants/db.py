@@ -2,6 +2,10 @@ class SheetNames:
     ENTITIES = "Entidades"
     INVOICES = "Nota Fiscal"
     INVOICES_ITEMS = "Dados de Produtos e Serviços NF"
+    
+class DefaultValues:
+    class InvoiceItem:
+        NCM = "94019900"
 
 class DBColumns:
     class Invoice:
@@ -93,7 +97,6 @@ class MandatoryFields:
 
     INVOICE_ITEM = [
         (ModelFields.InvoiceItem.GROUP, DBColumns.InvoiceItem.GROUP),
-        (ModelFields.InvoiceItem.NCM, DBColumns.InvoiceItem.NCM),
         (ModelFields.InvoiceItem.DESCRIPTION, DBColumns.InvoiceItem.DESCRIPTION),
         (ModelFields.InvoiceItem.ORIGIN, DBColumns.InvoiceItem.ORIGIN),
         (ModelFields.InvoiceItem.UNITY_OF_MEASUREMENT, DBColumns.InvoiceItem.UNITY_OF_MEASUREMENT),
