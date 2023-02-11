@@ -2,7 +2,7 @@
 
 # NFF - Nota Fiscal Fácil
 
-Este programa automatiza processos repetitivos que funcionários públicos que trabalham no SIAT (ou qualquer pessoa na verdade) fazem para gerar notas fiscais no site do Siare para produtores rurais.
+Este programa automatiza processos repetitivos que funcionários públicos (ou qualquer pessoa na verdade) fazem para gerar notas fiscais no site do [Siare](https://www2.fazenda.mg.gov.br/sol/) para produtores rurais.
 
 ## Download
 
@@ -10,7 +10,7 @@ Clique [aqui](https://drive.google.com/file/d/1so-2FLdHQxLCb8YIMhBXDHJMtxAYycwF/
 
 ## Público alvo
 
-O NFF é destinado principalmente à funcionários públicos, que possuem o mínimo de experiência com excel, que trabalham no setor do SIAT. Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. E é a esses funcionários que geralmente recorrem. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
+O NFF é destinado à pessoas que possuem o mínimo de experiência com excel, que trabalham no setor do SIAT. Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. Geralmente eles recorrem à funcionários públicos para isso. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
 
 Mas serve perfeitamente para qualquer pessoa, afinal, esses funcionários públicos apenas realizam login na conta dos prórpios produtores para emitir notas fiscais.
 
@@ -22,9 +22,7 @@ As principais tecnologias utilizadas foram:
 
 * `python`
 * `selenium`
-* `pyinstaller` (para gerar o executável)
 * `pandas`
-* `webdriver-manager` (para evitar ter que baixar manualmente o driver do navegador)
 * `excel` (utilizado como base de dados)
 
 ## Como usar?
@@ -59,9 +57,7 @@ As principais tecnologias utilizadas foram:
 
 ## Limitações Atuais
 
-* Não é possível emitir notas fiscais em casos onde alguma entidade não possui inscrição estadual.
-
-* Também não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
+* Não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
 
 ## Próximos passos
 
