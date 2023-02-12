@@ -8,7 +8,7 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
 
-from utils.constants import STANDARD_SLEEP_TIME
+from constants.standards import STANDARD_SLEEP_TIME
 
 
 def wait_for_it(f):

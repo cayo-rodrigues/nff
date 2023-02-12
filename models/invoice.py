@@ -1,12 +1,12 @@
 from pandas import DataFrame, Series
 
+from constants.db import DBColumns, DefaultValues
 from models.entity import Entity
 from modules.database import DataBase
-from utils.constants import DBColumns, ErrorMessages
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
-    MissingSenderDataError,
+    MissingEntityDataError,
 )
 from utils.helpers import (
     decode_icms_contributor_status,
@@ -16,12 +16,16 @@ from utils.helpers import (
     to_br_float,
     to_BRL,
 )
+from utils.messages import ErrorMessages
 
 
 class InvoiceItem:
     def __init__(self, data: Series) -> None:
         group = handle_empty_cell(data[DBColumns.InvoiceItem.GROUP])
-        ncm = handle_empty_cell(data[DBColumns.InvoiceItem.NCM])
+        ncm = (
+            handle_empty_cell(data[DBColumns.InvoiceItem.NCM])
+            or DefaultValues.InvoiceItem.NCM
+        )
         description = handle_empty_cell(data[DBColumns.InvoiceItem.DESCRIPTION])
         origin = handle_empty_cell(data[DBColumns.InvoiceItem.ORIGIN])
         unity_of_measurement = handle_empty_cell(
@@ -33,7 +37,7 @@ class InvoiceItem:
         )
 
         self.group: str = normalize_text(group)
-        self.ncm: str = normalize_text(ncm, numeric=True)
+        self.ncm: str = normalize_text(ncm, keep_case=True)
         self.description: str = normalize_text(description)
         self.origin: str = normalize_text(origin)
         self.unity_of_measurement: str = normalize_text(unity_of_measurement)
@@ -45,31 +49,33 @@ class Invoice:
     def __init__(self, data: Series, nf_index: int) -> None:
         operation = handle_empty_cell(data[DBColumns.Invoice.OPERATION])
         gta = handle_empty_cell(data[DBColumns.Invoice.GTA])
-        cfop = handle_empty_cell(data[DBColumns.Invoice.CFOP], numeric=True)
+        cfop = handle_empty_cell(data[DBColumns.Invoice.CFOP])
         shipping = handle_empty_cell(data[DBColumns.Invoice.SHIPPING], numeric=True)
         is_final_customer = handle_empty_cell(data[DBColumns.Invoice.IS_FINAL_CUSTOMER])
         icms = handle_empty_cell(data[DBColumns.Invoice.ICMS])
         add_shipping_to_total_value = handle_empty_cell(
             data[DBColumns.Invoice.ADD_SHIPPING_TO_TOTAL_VALUE]
         )
+        extra_notes = handle_empty_cell(data[DBColumns.Invoice.EXTRA_NOTES])
 
-        sender = handle_empty_cell(data[DBColumns.Invoice.SENDER], numeric=True)
-        recipient = handle_empty_cell(data[DBColumns.Invoice.RECIPIENT], numeric=True)
+        sender = handle_empty_cell(data[DBColumns.Invoice.SENDER])
+        recipient = handle_empty_cell(data[DBColumns.Invoice.RECIPIENT])
 
         self.operation: str = normalize_text(operation)
         self.gta: str = normalize_text(gta)
-        self.cfop: str = normalize_text(cfop, numeric=True)
+        self.cfop: str = normalize_text(cfop, keep_case=True)
         self.is_final_customer: bool = str_to_boolean(is_final_customer)
         self.icms: str = decode_icms_contributor_status(icms)
         self.shipping: str = to_BRL(float(shipping))
         self.add_shipping_to_total_value: bool = str_to_boolean(
             add_shipping_to_total_value
         )
+        self.extra_notes: str = normalize_text(extra_notes)
 
         self.nf_index: str = str(nf_index)
 
-        self.sender = normalize_text(sender, numeric=True)
-        self.recipient = normalize_text(recipient, numeric=True)
+        self.sender = normalize_text(sender, keep_case=True)
+        self.recipient = normalize_text(recipient, keep_case=True)
 
     def get_sender_and_recipient(self, entities: DataFrame) -> None:
         db = DataBase()
@@ -94,10 +100,22 @@ class Invoice:
         self.recipient: Entity = Entity(data=recipient_data)
 
         if not self.sender.is_valid_sender():
-            error_msg = ErrorMessages.invalid_sender_error(
-                missing_data=self.sender.errors, cpf_cnpj=self.sender.cpf_cnpj
+            error_msg = ErrorMessages.invalid_entity_error(
+                missing_data=self.sender.errors,
+                cpf_cnpj=self.sender.cpf_cnpj,
+                is_sender=True,
+                name=self.sender.name,
             )
-            raise MissingSenderDataError(error_msg)
+            raise MissingEntityDataError(error_msg)
+
+        if not self.recipient.is_valid_recipient():
+            error_msg = ErrorMessages.invalid_entity_error(
+                missing_data=self.recipient.errors,
+                cpf_cnpj=self.recipient.cpf_cnpj,
+                is_sender=False,
+                name=self.recipient.name,
+            )
+            raise MissingEntityDataError(error_msg)
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()

@@ -2,15 +2,17 @@ import warnings
 
 import pandas as pd
 
+from constants.db import DBColumns, SheetNames
+from constants.paths import DB_FILE_PATH
 from modules.file_manager import FileManager
-from utils.constants import DB_PATH, DBColumns, ErrorMessages, SheetNames
 from utils.exceptions import EmptySheetError, MissingDBError, MissingFieldsError
+from utils.messages import ErrorMessages
 
 
 class DataBase:
     def __init__(self) -> None:
         warnings.simplefilter(action="ignore", category=UserWarning)
-        if not FileManager.file_exists(DB_PATH):
+        if not FileManager.file_exists(DB_FILE_PATH):
             raise MissingDBError(ErrorMessages.MISSING_DB_ERROR)
 
     def read_all(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -21,19 +23,19 @@ class DataBase:
         )
 
     def read_entities(self) -> pd.DataFrame:
-        df = pd.read_excel(DB_PATH, SheetNames.ENTITIES, dtype=str)
+        df = pd.read_excel(DB_FILE_PATH, SheetNames.ENTITIES, dtype=str)
         df.sheet_name = SheetNames.ENTITIES
         return df
 
     def read_invoices(self) -> pd.DataFrame:
-        df = pd.read_excel(DB_PATH, SheetNames.INVOICES, dtype=str).sort_values(
+        df = pd.read_excel(DB_FILE_PATH, SheetNames.INVOICES, dtype=str).sort_values(
             by=[DBColumns.Invoice.SENDER]
         )
         df.sheet_name = SheetNames.INVOICES
         return df
 
     def read_invoices_products(self) -> pd.DataFrame:
-        df = pd.read_excel(DB_PATH, SheetNames.INVOICES_ITEMS, dtype=str)
+        df = pd.read_excel(DB_FILE_PATH, SheetNames.INVOICES_ITEMS, dtype=str)
         df.sheet_name = SheetNames.INVOICES_ITEMS
         return df
 

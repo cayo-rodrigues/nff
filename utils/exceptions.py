@@ -16,7 +16,7 @@ class InvalidEntityError(NFFBaseException):
     ...
 
 
-class MissingSenderDataError(NFFBaseException):
+class MissingEntityDataError(NFFBaseException):
     ...
 
 

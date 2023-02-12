@@ -81,9 +81,7 @@
 
 ============================
 
-* Não é possível emitir notas fiscais em casos onde alguma entidade não possui inscrição estadual.
-
-* Também não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
+* Não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
 
 
 ------------------------------------------------------------------------------------------------------------

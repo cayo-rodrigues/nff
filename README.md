@@ -2,17 +2,17 @@
 
 # NFF - Nota Fiscal Fácil
 
-Este programa automatiza processos repetitivos que funcionários públicos que trabalham no SIAT (ou qualquer pessoa na verdade) fazem para gerar notas fiscais no site do Siare para produtores rurais.
+Este programa automatiza processos repetitivos que funcionários públicos (ou qualquer pessoa na verdade) fazem para gerar notas fiscais no site do [Siare](https://www2.fazenda.mg.gov.br/sol/) para produtores rurais.
 
 ## Download
 
 Clique [aqui](https://drive.google.com/file/d/1so-2FLdHQxLCb8YIMhBXDHJMtxAYycwF/view?usp=share_link) para baixar o programa. Ele vem compactado no formato `.rar`. Basta extrair os arquivos normalmente. Não existe nenhum processo de instalação. As instruções de como usar estão logo abaixo.
 
-## Público alvo
+## Sobre
 
-O NFF é destinado principalmente à funcionários públicos, que possuem o mínimo de experiência com excel, que trabalham no setor do SIAT. Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. E é a esses funcionários que geralmente recorrem. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
+Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. Geralmente eles recorrem à funcionários públicos para isso. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
 
-Mas serve perfeitamente para qualquer pessoa, afinal, esses funcionários públicos apenas realizam login na conta dos prórpios produtores para emitir notas fiscais.
+Mas serve perfeitamente para qualquer pessoa que tenha o mínimo de afinidade com excel, afinal, esses funcionários públicos apenas realizam login na conta dos prórpios produtores para emitir notas fiscais.
 
 Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e assim se deu.
 
@@ -22,9 +22,7 @@ As principais tecnologias utilizadas foram:
 
 * `python`
 * `selenium`
-* `pyinstaller` (para gerar o executável)
 * `pandas`
-* `webdriver-manager` (para evitar ter que baixar manualmente o driver do navegador)
 * `excel` (utilizado como base de dados)
 
 ## Como usar?
@@ -59,16 +57,14 @@ As principais tecnologias utilizadas foram:
 
 ## Limitações Atuais
 
-* Não é possível emitir notas fiscais em casos onde alguma entidade não possui inscrição estadual.
+* Não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
 
-* Também não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
+## Próximos passos
 
-## Planos para o futuro
-
-- [ ] Lidar com casos de destinatário sem inscrição estadual
+- [x] Lidar com casos de destinatário sem inscrição estadual
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
-- [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"número"`(inscrição estadual)
+- [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
 
 ## Considerações finais
 

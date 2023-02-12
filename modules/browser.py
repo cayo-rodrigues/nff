@@ -12,8 +12,9 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
 
+from constants.paths import INVOICES_DIR_PATH
+from constants.standards import STANDARD_SLEEP_TIME
 from modules.file_manager import FileManager
-from utils.constants import INVOICES_DIR_PATH, STANDARD_SLEEP_TIME
 from utils.decorators import wait_for_it
 
 
@@ -41,6 +42,7 @@ class Browser:
             },
         )
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
+        options.add_experimental_option("detach", True)
 
         self._browser = webdriver.Chrome(
             chrome_options=options,
@@ -65,8 +67,12 @@ class Browser:
         return self._get_lookup_root(root).find_elements(by, where)
 
     @wait_for_it
-    def click_element(self, xpath: str, root: WebElement = None) -> None:
+    def get_and_click(self, xpath: str, root: WebElement = None) -> None:
         self.get_element(xpath, root).click()
+
+    @wait_for_it
+    def click_element(self, element: WebElement) -> None:
+        element.click()
 
     @wait_for_it
     def type_into_element(self, xpath: str, value: str, root: WebElement = None) -> None:

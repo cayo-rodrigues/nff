@@ -2,8 +2,9 @@ import locale
 from datetime import date
 
 from pandas import isna
+from selenium.webdriver.remote.webelement import WebElement
 
-from utils.constants import BRAZILIAN_DATE_FORMAT, FALSY_STRS, TRUTHY_STRS
+from constants.standards import FALSY_STRS, TRUTHY_STRS
 
 
 def str_to_boolean(value: str) -> bool:
@@ -21,13 +22,13 @@ def decode_icms_contributor_status(value: str) -> int:
     return "9"
 
 
-def normalize_text(value: str, numeric: bool = False) -> str:
+def normalize_text(value: str, keep_case: bool = False) -> str:
     if not value:
         return ""
 
     text = value.strip()
 
-    if not numeric:
+    if not keep_case:
         text = text.lower()
 
     return text
@@ -48,5 +49,39 @@ def to_br_float(number: float | str) -> str:
     return str(number).replace(".", ",")
 
 
-def get_today_date() -> str:
-    return date.today().strftime(BRAZILIAN_DATE_FORMAT)
+def binary_search_html(
+    look_for: str,
+    items: list[WebElement],
+    attr_name: str = "innerHTML",
+    normalize: bool = True,
+) -> WebElement | None:
+    if len(items) == 0:
+        return None
+
+    middle = len(items) // 2
+    left = items[:middle]
+    right = items[middle:]
+
+    element = items[middle]
+    value = element.get_attribute(attr_name)
+    value = normalize_text(value) if normalize else value
+
+    if look_for < value:
+        return binary_search_html(look_for, left, attr_name, normalize)
+    elif look_for > value:
+        return binary_search_html(look_for, right, attr_name, normalize)
+    else:
+        return element
+
+
+def linear_search_html(
+    look_for: str,
+    items: list[WebElement],
+    attr_name: str = "innerHTML",
+    normalize: bool = True,
+) -> WebElement | None:
+    for element in items:
+        value = element.get_attribute(attr_name)
+        value = normalize_text(value) if normalize else value
+        if look_for == value:
+            return element

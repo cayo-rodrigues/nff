@@ -2,13 +2,13 @@ from sys import exit
 
 from selenium.common.exceptions import WebDriverException
 
+from constants.db import MandatoryFields
 from models.invoice import Invoice
 from modules.database import DataBase
 from modules.gui import GUI
 from modules.logger import Logger
 from modules.siare import Siare
 from utils import exceptions
-from utils.constants import MandatoryFields
 
 
 def main():
@@ -48,7 +48,7 @@ def main():
         except (
             exceptions.InvoiceWithNoItemsError,
             exceptions.InvalidEntityError,
-            exceptions.MissingSenderDataError,
+            exceptions.MissingEntityDataError,
         ) as e:
             gui.display_error_msg(msg=e.message, warning=True)
             continue
