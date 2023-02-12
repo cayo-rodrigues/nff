@@ -8,11 +8,11 @@ Este programa automatiza processos repetitivos que funcionários públicos (ou q
 
 Clique [aqui](https://drive.google.com/file/d/1so-2FLdHQxLCb8YIMhBXDHJMtxAYycwF/view?usp=share_link) para baixar o programa. Ele vem compactado no formato `.rar`. Basta extrair os arquivos normalmente. Não existe nenhum processo de instalação. As instruções de como usar estão logo abaixo.
 
-## Público alvo
+## Sobre
 
-O NFF é destinado à pessoas que possuem o mínimo de experiência com excel, que trabalham no setor do SIAT. Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. Geralmente eles recorrem à funcionários públicos para isso. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
+Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. Geralmente eles recorrem à funcionários públicos para isso. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
 
-Mas serve perfeitamente para qualquer pessoa, afinal, esses funcionários públicos apenas realizam login na conta dos prórpios produtores para emitir notas fiscais.
+Mas serve perfeitamente para qualquer pessoa que tenha o mínimo de afinidade com excel, afinal, esses funcionários públicos apenas realizam login na conta dos prórpios produtores para emitir notas fiscais.
 
 Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e assim se deu.
 
