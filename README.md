@@ -1,4 +1,4 @@
-<img src="./icon.ico" width="10%" align="left" alt="NFF main icon">
+<img src="./assets/icon.ico" width="10%" align="left" alt="NFF main icon">
 
 # NFF - Nota Fiscal Fácil
 
