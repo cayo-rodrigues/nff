@@ -110,6 +110,7 @@ class MandatoryFields:
     ]
 
     SENDER_ENTITY = [
+        (ModelFields.Entity.IE, DBColumns.Entity.IE),
         (ModelFields.Entity.USER_TYPE, DBColumns.Entity.USER_TYPE),
         (ModelFields.Entity.EMAIL, DBColumns.Entity.EMAIL),
     ]
