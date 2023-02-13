@@ -6,7 +6,7 @@ Este programa automatiza processos repetitivos que funcionários públicos (ou q
 
 ## Download
 
-Clique [aqui](https://drive.google.com/file/d/1so-2FLdHQxLCb8YIMhBXDHJMtxAYycwF/view?usp=share_link) para baixar o programa. Ele vem compactado no formato `.rar`. Basta extrair os arquivos normalmente. Não existe nenhum processo de instalação. As instruções de como usar estão logo abaixo.
+Clique [aqui](https://drive.google.com/drive/folders/180rHhnaaYthR6vMIpC66EyzB6u8MQlhP?usp=share_link) para baixar o programa. Ele vem compactado no formato `.rar` na versão para Windows, e `.zip` na versão para Linux. Basta extrair os arquivos normalmente. Não existe nenhum processo de instalação. As instruções de como usar estão logo abaixo.
 
 ## Sobre
 
@@ -39,7 +39,7 @@ As principais tecnologias utilizadas foram:
 
 * Ainda na aba **"Dados de Produtos e Serviços NF"**, vale ressaltar que caso o campo `"ncm"` não seja preenchido, então será usado como padrão o valor `94019900`, que é uma numeração genérica para se referir a qualquer coisa.
 
-* Para iniciar, dê dois cliques no arquivo `NFF.exe`.
+* Para iniciar, dê dois cliques no arquivo `NFF.exe`, ou então, se estiver no Linux, basta rodar o executável com `./NFF`.
 
 ## Como funciona?
 

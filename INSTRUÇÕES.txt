@@ -41,7 +41,7 @@
   usado como padrão o valor "94019900", que é uma numeração genérica para se referir a qualquer coisa.
   
   
-* Para iniciar, dê dois cliques no arquivo NFF.exe.
+* Para iniciar, dê dois cliques no arquivo NFF.exe, ou então, se estiver no Linux, basta rodar o executável com `./NFF`.
 
 
 ============================
