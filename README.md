@@ -37,6 +37,8 @@ As principais tecnologias utilizadas foram:
 
 * Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo `"NF"` serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar `1`, isso significa que aquele produto se refere à **_primeira nota fiscal da aba "Nota Fiscal"_**.
 
+* Ainda na aba **"Dados de Produtos e Serviços NF"**, vale ressaltar que caso o campo `"ncm"` não seja preenchido, então será usado como padrão o valor `94019900`, que é uma numeração genérica para se referir a qualquer coisa.
+
 * Para iniciar, dê dois cliques no arquivo `NFF.exe`.
 
 ## Como funciona?
