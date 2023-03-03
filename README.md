@@ -10,7 +10,10 @@ Clique [aqui](https://drive.google.com/drive/folders/180rHhnaaYthR6vMIpC66EyzB6u
 
 ## Demonstração
 
-[![Demonstração do programa em execução](https://img.youtube.com/vi/p6Dp8wcghAA/0.jpg)](https://www.youtube.com/watch?v=p6Dp8wcghAA)
+> A nota fiscal emitida no vídeo é apenas para fins demonstrativos
+
+https://user-images.githubusercontent.com/87717182/222856710-af0801b3-294c-43a8-8b9b-b5f0760a2e14.mp4
+
 
 ## Sobre
 
