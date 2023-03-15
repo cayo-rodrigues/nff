@@ -11,15 +11,15 @@
 
 ============================
 
-* O primeiro passo é preencher a base de dados, que é o arquivo "db.xlsx" (por favor, note que o nome desse arquivo
+* O primeiro passo é preencher a base de dados, que é o arquivo "db" (por favor, note que o nome desse arquivo
   
   não deve mudar).
 
 
-* Para preencher ele corretamente, siga o exemplo mostrado no arquivo "db.example.xlsx".
+* Para preencher ele corretamente, siga o exemplo mostrado no arquivo "db.example".
 
 
-* Na aba de "Nota Fiscal" dentro do arquivo excel ("db.xlsx"), cada linha representa uma nota fiscal que será emitida
+* Na aba de "Nota Fiscal" dentro do arquivo excel, cada linha representa uma nota fiscal que será emitida
   
   na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
  
@@ -29,7 +29,7 @@
   das entidades correspondentes.
 
 
-* Na aba "Dados de Produtos e Serviços NF" dentro do arquivo excel ("db.xlsx"), o campo "NF" serve para indicar a qual
+* Na aba "Dados de Produtos e Serviços NF" dentro do arquivo excel, o campo "NF" serve para indicar a qual
   
   nota fiscal que aquele produto pertence. Por exemplo, se eu colocar "1", isso significa que aquele produto se refere
   
@@ -52,7 +52,7 @@
 
 * Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do Siare,
   
-  fazer login na conta do remetente e emitir todas as notas fiscais que estiverem no arquivo excel ("db.xlsx").
+  fazer login na conta do remetente e emitir todas as notas fiscais que estiverem no arquivo excel.
 
 
 * As notas fiscais baixadas serão salvas em uma pasta chamada "docs" dentro deste mesmo diretório.
@@ -69,7 +69,7 @@
 
 ============================
 
-* Não altere a aba "Dados das listas" da base de dados ("db.xlsx") sem ter consciência do que está fazendo. As
+* Não altere a aba "Dados das listas" da base de dados sem ter consciência do que está fazendo. As
 
   informações contidas ali servem para popular os campos de seleção que existem nas outras abas.
 

@@ -3,8 +3,8 @@ class ErrorMessages:
     INVOICE_IGNORE_WARNING = "\nPor isso, essa nota fiscal será ignorada nesta execução."
     MISSING_DB_ERROR = (
         "Base de dados não encontrada.\n"
-        "Por favor, certifique-se de criar um arquivo \"db.xlsx\" dentro desta mesma pasta.\n"
-        "Lembre-se também de seguir o modelo deixado no arquivo \"db.example.xlsx\"."
+        "Por favor, certifique-se de criar um arquivo excel chamado \"db\" dentro desta mesma pasta.\n"
+        "Lembre-se também de seguir o modelo deixado no arquivo \"db.example\"."
     )
 
     @classmethod
