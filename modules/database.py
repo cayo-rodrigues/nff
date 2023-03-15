@@ -45,6 +45,13 @@ class DataBase:
     def get_row(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return self.get_rows(df, by_col, where).head(1)
 
+    def get_entity(self, entities_df: pd.DataFrame, entity_id: str):
+        for col in [DBColumns.Entity.CPF_CNPJ, DBColumns.Entity.IE]:
+            entity_data = self.get_row(entities_df, by_col=col, where=entity_id)
+            if not entity_data.empty:
+                return entity_data
+        return None
+
     def check_mandatory_fields(
         self, df: pd.DataFrame, fields: list[tuple[str, str]]
     ) -> None:

@@ -21,15 +21,15 @@ class ErrorMessages:
         )
     
     @classmethod
-    def missing_entity(cls, nf_index: int, sender: bool, recipient: bool) -> str | None:
-        if not sender and not recipient:
+    def missing_entity(cls, nf_index: int, sender_is_missing: bool, recipient_is_missing: bool) -> str | None:
+        if not sender_is_missing and not recipient_is_missing:
             return
 
         missing_fields = "remetente e destinatário"
-        if not sender:
-            missing_fields = "destinatário"
-        if not recipient:
+        if sender_is_missing:
             missing_fields = "remetente"
+        if recipient_is_missing:
+            missing_fields = "destinatário"
 
         return (
             f"Os dados de {missing_fields} da nota fiscal número "

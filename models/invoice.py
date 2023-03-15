@@ -77,21 +77,16 @@ class Invoice:
         self.sender = normalize_text(sender, keep_case=True)
         self.recipient = normalize_text(recipient, keep_case=True)
 
-    def get_sender_and_recipient(self, entities: DataFrame) -> None:
+    def get_sender_and_recipient(self, entities: DataFrame) -> None:        
         db = DataBase()
-
-        sender_data = db.get_row(
-            entities, by_col=DBColumns.Entity.CPF_CNPJ, where=self.sender
-        )
-        recipient_data = db.get_row(
-            entities, by_col=DBColumns.Entity.CPF_CNPJ, where=self.recipient
-        )
+        sender_data = db.get_entity(entities, entity_id=self.sender)
+        recipient_data = db.get_entity(entities, entity_id=self.recipient)
 
         # if missing sender or recipient warn the user and skip this invoice
         error_msg = ErrorMessages.missing_entity(
             nf_index=int(self.nf_index),
-            sender=sender_data.empty,
-            recipient=recipient_data.empty,
+            sender_is_missing=getattr(sender_data, "empty", None),
+            recipient_is_missing=getattr(recipient_data, "empty", None),
         )
         if error_msg:
             raise InvalidEntityError(error_msg)
