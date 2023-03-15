@@ -2,11 +2,18 @@
 
 # NFF - Nota Fiscal Fácil
 
-Este programa automatiza processos repetitivos que funcionários públicos (ou qualquer pessoa na verdade) fazem para gerar notas fiscais no site do [Siare](https://www2.fazenda.mg.gov.br/sol/) para produtores rurais.
+Este programa automatiza processos repetitivos que funcionários públicos (ou qualquer pessoa na verdade) fazem para gerar notas fiscais estaduais em um site do governo chamado [Siare](https://www2.fazenda.mg.gov.br/sol/) para produtores rurais.
 
 ## Download
 
 Clique [aqui](https://drive.google.com/drive/folders/180rHhnaaYthR6vMIpC66EyzB6u8MQlhP?usp=share_link) para baixar o programa. Ele vem compactado no formato `.rar` na versão para Windows, e `.zip` na versão para Linux. Basta extrair os arquivos normalmente. Não existe nenhum processo de instalação. As instruções de como usar estão logo abaixo.
+
+## Demonstração
+
+> A nota fiscal emitida no vídeo é apenas para fins demonstrativos
+
+https://user-images.githubusercontent.com/87717182/222856710-af0801b3-294c-43a8-8b9b-b5f0760a2e14.mp4
+
 
 ## Sobre
 
