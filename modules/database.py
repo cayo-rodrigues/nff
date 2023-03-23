@@ -49,8 +49,8 @@ class DataBase:
         for col in [DBColumns.Entity.CPF_CNPJ, DBColumns.Entity.IE]:
             entity_data = self.get_row(entities_df, by_col=col, where=entity_id)
             if not entity_data.empty:
-                return entity_data
-        return None
+                break
+        return entity_data
 
     def check_mandatory_fields(
         self, df: pd.DataFrame, fields: list[tuple[str, str]]

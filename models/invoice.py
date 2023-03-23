@@ -85,8 +85,8 @@ class Invoice:
         # if missing sender or recipient warn the user and skip this invoice
         error_msg = ErrorMessages.missing_entity(
             nf_index=int(self.nf_index),
-            sender_is_missing=getattr(sender_data, "empty", None),
-            recipient_is_missing=getattr(recipient_data, "empty", None),
+            sender_is_missing=sender_data.empty,
+            recipient_is_missing=recipient_data.empty,
         )
         if error_msg:
             raise InvalidEntityError(error_msg)
