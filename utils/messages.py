@@ -3,8 +3,8 @@ class ErrorMessages:
     INVOICE_IGNORE_WARNING = "\nPor isso, essa nota fiscal será ignorada nesta execução."
     MISSING_DB_ERROR = (
         "Base de dados não encontrada.\n"
-        "Por favor, certifique-se de criar um arquivo \"db.xlsx\" dentro desta mesma pasta.\n"
-        "Lembre-se também de seguir o modelo deixado no arquivo \"db.example.xlsx\"."
+        "Por favor, certifique-se de criar um arquivo excel chamado \"db\" dentro desta mesma pasta.\n"
+        "Lembre-se também de seguir o modelo deixado no arquivo \"db.example\"."
     )
 
     @classmethod
@@ -21,15 +21,15 @@ class ErrorMessages:
         )
     
     @classmethod
-    def missing_entity(cls, nf_index: int, sender: bool, recipient: bool) -> str | None:
-        if not sender and not recipient:
+    def missing_entity(cls, nf_index: int, sender_is_missing: bool, recipient_is_missing: bool) -> str | None:
+        if not sender_is_missing and not recipient_is_missing:
             return
 
         missing_fields = "remetente e destinatário"
-        if not sender:
-            missing_fields = "destinatário"
-        if not recipient:
+        if sender_is_missing:
             missing_fields = "remetente"
+        if recipient_is_missing:
+            missing_fields = "destinatário"
 
         return (
             f"Os dados de {missing_fields} da nota fiscal número "

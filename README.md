@@ -34,9 +34,9 @@ As principais tecnologias utilizadas foram:
 
 ## Como usar?
 
-* O primeiro passo é preencher a base de dados, que é o arquivo `"db.xlsx"` (por favor, note que o nome desse arquivo não deve mudar).
+* O primeiro passo é preencher a base de dados, que é o arquivo `"db"` (por favor, note que o nome desse arquivo não deve mudar).
 
-* Para preencher ele corretamente, siga o exemplo mostrado no arquivo `"db.example.xlsx"`.
+* Para preencher ele corretamente, siga o exemplo mostrado no arquivo `"db.example"`.
 
 * Na aba de **"Nota Fiscal"** dentro do arquivo excel, cada linha representa uma nota fiscal que será emitida na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
 
@@ -73,7 +73,7 @@ As principais tecnologias utilizadas foram:
 - [x] Lidar com casos de destinatário sem inscrição estadual
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
-- [ ] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
+- [x] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
 
 ## Considerações finais
 

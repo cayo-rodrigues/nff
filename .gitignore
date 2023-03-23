@@ -4,6 +4,7 @@ __pycache__
 build
 dist
 db.xlsx
+db.ods
 *.log
 .vscode
 docs
