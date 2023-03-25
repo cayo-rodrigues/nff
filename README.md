@@ -40,7 +40,7 @@ As principais tecnologias utilizadas foram:
 
 * Na aba de **"Nota Fiscal"** dentro do arquivo excel, cada linha representa uma nota fiscal que será emitida na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
 
-* Ainda dentro da aba **"Nota Fiscal"**, os campos `"remetente"` e `"destinatário"` devem ser preenchidos com o `"cpf/cnpj"` das entidades correspondentes.
+* Ainda dentro da aba **"Nota Fiscal"**, os campos `"remetente"` e `"destinatário"` devem ser preenchidos com o `"cpf/cnpj"` ou com a `"inscrição estadual"` das entidades correspondentes.
 
 * Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo `"NF"` serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar `1`, isso significa que aquele produto se refere à **_primeira nota fiscal da aba "Nota Fiscal"_**.
 
