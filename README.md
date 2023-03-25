@@ -19,7 +19,7 @@ https://user-images.githubusercontent.com/87717182/222856710-af0801b3-294c-43a8-
 
 Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. Geralmente eles recorrem à funcionários públicos para isso. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
 
-Mas serve perfeitamente para qualquer pessoa que tenha o mínimo de afinidade com excel, afinal, esses funcionários públicos apenas realizam login na conta dos prórpios produtores para emitir notas fiscais.
+Mas serve perfeitamente para qualquer pessoa que tenha o mínimo de afinidade com excel, afinal, esses funcionários públicos apenas realizam login na conta dos próprios produtores para emitir notas fiscais.
 
 Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e assim se deu.
 
