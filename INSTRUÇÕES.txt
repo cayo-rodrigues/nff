@@ -26,7 +26,7 @@
  
 * Ainda dentro da aba "Nota Fiscal", os campos "remetente" e "destinatário" devem ser preenchidos com o "cpf/cnpj"
   
-  das entidades correspondentes.
+  ou com a "inscrição estadual" das entidades correspondentes.
 
 
 * Na aba "Dados de Produtos e Serviços NF" dentro do arquivo excel, o campo "NF" serve para indicar a qual
