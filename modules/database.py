@@ -7,13 +7,19 @@ from constants.paths import DB_FILE_PATH
 from modules.file_manager import FileManager
 from utils.exceptions import EmptySheetError, MissingDBError, MissingFieldsError
 from utils.messages import ErrorMessages
+from utils.mixins import UseSingleton
 
 
-class DataBase:
+class DataBase(UseSingleton):
     def __init__(self) -> None:
+        if self._instances_count > 1:
+            return
+
         warnings.simplefilter(action="ignore", category=UserWarning)
         if not FileManager.file_exists(DB_FILE_PATH):
             raise MissingDBError(ErrorMessages.MISSING_DB_ERROR)
+
+        self.data = pd.read_excel(DB_FILE_PATH, sheet_name=None, dtype=str)
 
     def read_all(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         return (
@@ -23,21 +29,16 @@ class DataBase:
         )
 
     def read_entities(self) -> pd.DataFrame:
-        df = pd.read_excel(DB_FILE_PATH, SheetNames.ENTITIES, dtype=str)
-        df.sheet_name = SheetNames.ENTITIES
-        return df
+        self.data[SheetNames.ENTITIES].sheet_name = SheetNames.ENTITIES
+        return self.data[SheetNames.ENTITIES]
 
     def read_invoices(self) -> pd.DataFrame:
-        df = pd.read_excel(DB_FILE_PATH, SheetNames.INVOICES, dtype=str).sort_values(
-            by=[DBColumns.Invoice.SENDER]
-        )
-        df.sheet_name = SheetNames.INVOICES
-        return df
+        self.data[SheetNames.INVOICES].sheet_name = SheetNames.INVOICES
+        return self.data[SheetNames.INVOICES].sort_values(by=[DBColumns.Invoice.SENDER])
 
     def read_invoices_products(self) -> pd.DataFrame:
-        df = pd.read_excel(DB_FILE_PATH, SheetNames.INVOICES_ITEMS, dtype=str)
-        df.sheet_name = SheetNames.INVOICES_ITEMS
-        return df
+        self.data[SheetNames.INVOICES_ITEMS].sheet_name = SheetNames.INVOICES_ITEMS
+        return self.data[SheetNames.INVOICES_ITEMS]
 
     def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
