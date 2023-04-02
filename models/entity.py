@@ -48,4 +48,5 @@ class Entity:
         self.errors = self.get_missing_fields(MandatoryFields.RECIPIENT_ENTITY)
         if self.errors:
             self.errors = self.get_missing_fields(MandatoryFields.RECIPIENT_ENTITY_ALT)
-        return not bool(self.errors)
+        has_no_errors = not bool(self.errors)
+        return has_no_errors

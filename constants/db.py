@@ -19,6 +19,7 @@ class DBColumns:
         SENDER = "remetente"
         RECIPIENT = "destinatário"
         EXTRA_NOTES = "informações complementares"
+        FILENAME_PREFIX = "prefixo do nome do arquivo"
     
     class InvoiceItem:
         GROUP = "grupo"
@@ -56,6 +57,7 @@ class ModelFields:
         SENDER = "sender"
         RECIPIENT = "recipient"
         EXTRA_NOTES = "extra_notes"
+        FILENAME_PREFIX = "filename_prefix"
 
 
     class InvoiceItem:
@@ -103,10 +105,6 @@ class MandatoryFields:
         (ModelFields.InvoiceItem.QUANTITY, DBColumns.InvoiceItem.QUANTITY),
         (ModelFields.InvoiceItem.VALUE_PER_UNITY, DBColumns.InvoiceItem.VALUE_PER_UNITY),
         (ModelFields.InvoiceItem.NF_INDEX, DBColumns.InvoiceItem.NF_INDEX),
-    ]
-
-    ENTITY = [
-        (ModelFields.Entity.CPF_CNPJ, DBColumns.Entity.CPF_CNPJ),
     ]
 
     SENDER_ENTITY = [

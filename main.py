@@ -24,7 +24,6 @@ def main():
 
     Logger.validating_db_fields()
     try:
-        db.check_mandatory_fields(entities, MandatoryFields.ENTITY)
         db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
         db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
     except (exceptions.MissingFieldsError, exceptions.EmptySheetError) as e:
