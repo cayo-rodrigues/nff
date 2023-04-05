@@ -24,7 +24,6 @@ def main():
 
     Logger.validating_db_fields()
     try:
-        db.check_mandatory_fields(entities, MandatoryFields.ENTITY)
         db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
         db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
     except (exceptions.MissingFieldsError, exceptions.EmptySheetError) as e:
@@ -95,6 +94,9 @@ def main():
         Logger.downloading_invoice(nf_index)
 
         siare.download_invoice()
+
+        if invoice.custom_file_name:
+            invoice.use_custom_file_name()
 
         Logger.finished_invoice(nf_index)
 

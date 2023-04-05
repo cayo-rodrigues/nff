@@ -23,14 +23,13 @@ Mas serve perfeitamente para qualquer pessoa que tenha o mínimo de afinidade co
 
 Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e assim se deu.
 
-## Detalhes Técnicos
+## O que o programa faz?
 
-As principais tecnologias utilizadas foram:
+* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_, fazer login na conta do `"remetente"` e emitir todas as notas fiscais que estiverem no excel.
 
-* `python`
-* `selenium`
-* `pandas`
-* `excel` (utilizado como base de dados)
+* As notas fiscais baixadas serão salvas em uma pasta chamada `"docs"` dentro do mesmo diretório do programa.
+
+* Caso o campo `"senha"` no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma janelinha onde você pode digitar a senha.
 
 ## Como usar?
 
@@ -42,19 +41,13 @@ As principais tecnologias utilizadas foram:
 
 * Ainda dentro da aba **"Nota Fiscal"**, os campos `"remetente"` e `"destinatário"` devem ser preenchidos com o `"cpf/cnpj"` ou com a `"inscrição estadual"` das entidades correspondentes.
 
+* Caso queira, poderá dar um nome diferente para o arquivo da nota fiscal que for baixado. Para isso, use a coluna `"nome do arquivo"` na aba de **"Nota Fiscal"**. O nome será mudado, mas o número da nota, no formato _"NFA-xxx.xxx.xxx"_ ainda estará presente no final do nome do arquivo.
+
 * Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo `"NF"` serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar `1`, isso significa que aquele produto se refere à **_primeira nota fiscal da aba "Nota Fiscal"_**.
 
 * Ainda na aba **"Dados de Produtos e Serviços NF"**, vale ressaltar que caso o campo `"ncm"` não seja preenchido, então será usado como padrão o valor `94019900`, que é uma numeração genérica para se referir a qualquer coisa.
 
 * Para iniciar, dê dois cliques no arquivo `NFF.exe`, ou então, se estiver no Linux, basta rodar o executável com `./NFF`.
-
-## Como funciona?
-
-* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_, fazer login na conta do `"remetente"` e emitir todas as notas fiscais que estiverem no excel.
-
-* As notas fiscais baixadas serão salvas em uma pasta chamada `"docs"` dentro do mesmo diretório do programa.
-
-* Caso o campo `"senha"` no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma janelinha onde você pode digitar a senha.
 
 ## IMPORTANTE
 
@@ -64,16 +57,21 @@ As principais tecnologias utilizadas foram:
 
 * **Se você decidir usar o campo `"senha"` no excel, garanta que ninguém mais tenha acesso à ele**.
 
-## Limitações Atuais
-
-* Não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
-
 ## Próximos passos
 
 - [x] Lidar com casos de destinatário sem inscrição estadual
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
-- [ ] Ter um modo de mudar o nome do arquivo da nota fiscal
+- [x] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [x] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
+
+## Detalhes Técnicos
+
+As principais tecnologias utilizadas foram:
+
+* `python`
+* `selenium`
+* `pandas`
+* `excel`
 
 ## Considerações finais
 

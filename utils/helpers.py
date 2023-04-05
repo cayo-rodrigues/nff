@@ -22,7 +22,7 @@ def decode_icms_contributor_status(value: str) -> int:
     return "9"
 
 
-def normalize_text(value: str, keep_case: bool = False) -> str:
+def normalize_text(value: str, keep_case: bool = False, remove: list[str] = []) -> str:
     if not value:
         return ""
 
@@ -30,6 +30,9 @@ def normalize_text(value: str, keep_case: bool = False) -> str:
 
     if not keep_case:
         text = text.lower()
+
+    for pattern in remove:
+        text = text.replace(pattern, "")
 
     return text
 

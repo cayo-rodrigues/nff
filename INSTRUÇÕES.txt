@@ -7,6 +7,25 @@
 
 ============================
 
+    O QUE O PROGRAMA FAZ?
+
+============================
+
+* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do Siare,
+  
+  fazer login na conta do remetente e emitir todas as notas fiscais que estiverem no arquivo excel.
+
+
+* As notas fiscais baixadas serão salvas em uma pasta chamada "docs" dentro deste mesmo diretório.
+
+
+* Caso o campo "senha" no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma
+  
+  janelinha onde você pode digitar a senha.
+
+
+============================
+
          COMO USAR?
 
 ============================
@@ -29,6 +48,13 @@
   ou com a "inscrição estadual" das entidades correspondentes.
 
 
+* Caso queira, poderá dar um nome diferente para o arquivo da nota fiscal que for baixado. Para isso, use a coluna
+
+  "nome do arquivo" na aba de "Nota Fiscal". O nome será mudado, mas o número da nota, no formato "NFA-xxx.xxx.xxx"
+
+  ainda estará presente no final do nome do arquivo.
+
+
 * Na aba "Dados de Produtos e Serviços NF" dentro do arquivo excel, o campo "NF" serve para indicar a qual
   
   nota fiscal que aquele produto pertence. Por exemplo, se eu colocar "1", isso significa que aquele produto se refere
@@ -46,25 +72,6 @@
 
 ============================
 
-       COMO FUNCIONA?
-
-============================
-
-* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do Siare,
-  
-  fazer login na conta do remetente e emitir todas as notas fiscais que estiverem no arquivo excel.
-
-
-* As notas fiscais baixadas serão salvas em uma pasta chamada "docs" dentro deste mesmo diretório.
-
-
-* Caso o campo "senha" no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma
-  
-  janelinha onde você pode digitar a senha.
-
-
-============================
-
          IMPORTANTE
 
 ============================
@@ -78,15 +85,6 @@
 
 
 * Se você decidir usar o campo "senha" no excel, garanta que ninguém mais tenha acesso à ele.
-
-
-============================
-
-     LIMITAÇÕES ATUAIS
-
-============================
-
-* Não é possível escolher com qual nome o arquivo da nota fiscal será salvo.
 
 
 ------------------------------------------------------------------------------------------------------------

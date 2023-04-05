@@ -2,10 +2,12 @@ class SheetNames:
     ENTITIES = "Entidades"
     INVOICES = "Nota Fiscal"
     INVOICES_ITEMS = "Dados de Produtos e Serviços NF"
-    
+
+
 class DefaultValues:
     class InvoiceItem:
         NCM = "94019900"
+
 
 class DBColumns:
     class Invoice:
@@ -13,13 +15,14 @@ class DBColumns:
         GTA = "gta"
         CFOP = "cfop"
         SHIPPING = "frete"
-        ADD_SHIPPING_TO_TOTAL_VALUE = "adicionar frete ao total"    
+        ADD_SHIPPING_TO_TOTAL_VALUE = "adicionar frete ao total"
         IS_FINAL_CUSTOMER = "consumidor final"
         ICMS = "contribuinte icms"
         SENDER = "remetente"
         RECIPIENT = "destinatário"
         EXTRA_NOTES = "informações complementares"
-    
+        CUSTOM_FILE_NAME = "nome do arquivo"
+
     class InvoiceItem:
         GROUP = "grupo"
         NCM = "ncm"
@@ -29,7 +32,7 @@ class DBColumns:
         QUANTITY = "quantidade"
         VALUE_PER_UNITY = "valor unitário"
         NF_INDEX = "NF"
-    
+
     class Entity:
         NAME = "nome"
         EMAIL = "email"
@@ -56,7 +59,7 @@ class ModelFields:
         SENDER = "sender"
         RECIPIENT = "recipient"
         EXTRA_NOTES = "extra_notes"
-
+        CUSTOM_FILE_NAME = "custom_file_name"
 
     class InvoiceItem:
         GROUP = "group"
@@ -67,7 +70,6 @@ class ModelFields:
         QUANTITY = "quantity"
         VALUE_PER_UNITY = "value_per_unity"
         NF_INDEX = "nf_index"
-
 
     class Entity:
         NAME = "name"
@@ -105,20 +107,16 @@ class MandatoryFields:
         (ModelFields.InvoiceItem.NF_INDEX, DBColumns.InvoiceItem.NF_INDEX),
     ]
 
-    ENTITY = [
-        (ModelFields.Entity.CPF_CNPJ, DBColumns.Entity.CPF_CNPJ),
-    ]
-
     SENDER_ENTITY = [
         (ModelFields.Entity.IE, DBColumns.Entity.IE),
         (ModelFields.Entity.USER_TYPE, DBColumns.Entity.USER_TYPE),
         (ModelFields.Entity.EMAIL, DBColumns.Entity.EMAIL),
     ]
-    
+
     RECIPIENT_ENTITY = [
         (ModelFields.Entity.IE, DBColumns.Entity.IE),
     ]
-    
+
     RECIPIENT_ENTITY_ALT = [
         (ModelFields.Entity.POSTAL_CODE, DBColumns.Entity.POSTAL_CODE),
         (ModelFields.Entity.NEIGHBORHOOD, DBColumns.Entity.NEIGHBORHOOD),

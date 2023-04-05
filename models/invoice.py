@@ -1,8 +1,10 @@
 from pandas import DataFrame, Series
 
 from constants.db import DBColumns, DefaultValues
+from constants.paths import INVOICES_DIR_PATH
 from models.entity import Entity
 from modules.database import DataBase
+from modules.file_manager import FileManager
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -57,6 +59,7 @@ class Invoice:
             data[DBColumns.Invoice.ADD_SHIPPING_TO_TOTAL_VALUE]
         )
         extra_notes = handle_empty_cell(data[DBColumns.Invoice.EXTRA_NOTES])
+        custom_file_name = handle_empty_cell(data[DBColumns.Invoice.CUSTOM_FILE_NAME])
 
         sender = handle_empty_cell(data[DBColumns.Invoice.SENDER])
         recipient = handle_empty_cell(data[DBColumns.Invoice.RECIPIENT])
@@ -71,13 +74,16 @@ class Invoice:
             add_shipping_to_total_value
         )
         self.extra_notes: str = normalize_text(extra_notes)
+        self.custom_file_name: str = normalize_text(
+            custom_file_name, keep_case=True, remove=["/", "\\"]
+        )
 
         self.nf_index: str = str(nf_index)
 
         self.sender = normalize_text(sender, keep_case=True)
         self.recipient = normalize_text(recipient, keep_case=True)
 
-    def get_sender_and_recipient(self, entities: DataFrame) -> None:        
+    def get_sender_and_recipient(self, entities: DataFrame) -> None:
         db = DataBase()
         sender_data = db.get_entity(entities, entity_id=self.sender)
         recipient_data = db.get_entity(entities, entity_id=self.recipient)
@@ -125,3 +131,14 @@ class Invoice:
         self.items: list[InvoiceItem] = []
         for _, row in items_data.iterrows():
             self.items.append(InvoiceItem(data=row))
+
+    def use_custom_file_name(self):
+        invoice_file_name = FileManager.get_latest_file_name(INVOICES_DIR_PATH)
+        invoice_id = FileManager.get_file_name_from_path(invoice_file_name).removesuffix(
+            ".pdf"
+        )
+        new_file_name = (
+            INVOICES_DIR_PATH + self.custom_file_name + f" ({invoice_id})" + ".pdf"
+        )
+
+        FileManager.rename_file(old_name=invoice_file_name, new_name=new_file_name)
