@@ -23,3 +23,8 @@ class FileManager:
     @classmethod
     def count_files(self, dir_path: str) -> int:
         return len(self.list_file_names(dir_path))
+
+    @classmethod
+    def rename_file(self, old_name: str, new_name: str) -> None:
+        if self.file_exists(old_name):
+            os.rename(src=old_name, dst=new_name)

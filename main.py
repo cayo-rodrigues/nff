@@ -95,6 +95,9 @@ def main():
 
         siare.download_invoice()
 
+        if invoice.custom_file_name:
+            invoice.use_custom_file_name()
+
         Logger.finished_invoice(nf_index)
 
         siare.close_unfocused_windows()
