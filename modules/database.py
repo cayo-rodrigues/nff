@@ -20,25 +20,21 @@ class DataBase(UseSingleton):
             raise MissingDBError(ErrorMessages.MISSING_DB_ERROR)
 
         self.data = pd.read_excel(DB_FILE_PATH, sheet_name=None, dtype=str)
+        self.sheet_names = [
+            SheetNames.ENTITIES,
+            SheetNames.INVOICES,
+            SheetNames.INVOICES_ITEMS,
+        ]
 
-    def read_all(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-        return (
-            self.read_entities(),
-            self.read_invoices(),
-            self.read_invoices_products(),
-        )
+    def get_all_sheets(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        return (self.data[sheet_name] for sheet_name in self.sheet_names)
 
-    def read_entities(self) -> pd.DataFrame:
-        self.data[SheetNames.ENTITIES].sheet_name = SheetNames.ENTITIES
-        return self.data[SheetNames.ENTITIES]
-
-    def read_invoices(self) -> pd.DataFrame:
-        self.data[SheetNames.INVOICES].sheet_name = SheetNames.INVOICES
-        return self.data[SheetNames.INVOICES].sort_values(by=[DBColumns.Invoice.SENDER])
-
-    def read_invoices_products(self) -> pd.DataFrame:
-        self.data[SheetNames.INVOICES_ITEMS].sheet_name = SheetNames.INVOICES_ITEMS
-        return self.data[SheetNames.INVOICES_ITEMS]
+    def look_for_empty_sheets(self) -> None:
+        for sheet_name in self.sheet_names:
+            if self.data[sheet_name].empty:
+                raise EmptySheetError(
+                    ErrorMessages.empty_sheet_error(sheet_name=sheet_name)
+                )
 
     def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
@@ -56,11 +52,6 @@ class DataBase(UseSingleton):
     def check_mandatory_fields(
         self, df: pd.DataFrame, fields: list[tuple[str, str]]
     ) -> None:
-        if df.empty:
-            raise EmptySheetError(
-                ErrorMessages.empty_sheet_error(sheet_name=df.sheet_name)
-            )
-
         error_msg = ""
 
         for _, field in fields:

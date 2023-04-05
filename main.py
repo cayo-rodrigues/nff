@@ -17,8 +17,9 @@ def main():
     Logger.reading_db()
     try:
         db = DataBase()
-        entities, invoices, invoices_items = db.read_all()
-    except exceptions.MissingDBError as e:
+        db.look_for_empty_sheets()
+        entities, invoices, invoices_items = db.get_all_sheets()
+    except (exceptions.MissingDBError, exceptions.EmptySheetError) as e:
         gui.display_error_msg(msg=e.message)
         exit()
 
@@ -26,7 +27,7 @@ def main():
     try:
         db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
         db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
-    except (exceptions.MissingFieldsError, exceptions.EmptySheetError) as e:
+    except exceptions.MissingFieldsError as e:
         gui.display_error_msg(msg=e.message)
         exit()
 
