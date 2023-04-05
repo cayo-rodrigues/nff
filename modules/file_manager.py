@@ -28,3 +28,14 @@ class FileManager:
     def rename_file(self, old_name: str, new_name: str) -> None:
         if self.file_exists(old_name):
             os.rename(src=old_name, dst=new_name)
+
+    @classmethod
+    def get_latest_file_name(self, dir_path: str) -> str:
+        return max(
+            [dir_path + name for name in self.list_file_names(dir_path)],
+            key=os.path.getctime,
+        )
+
+    @classmethod
+    def get_file_name_from_path(self, path: str) -> str:
+        return os.path.basename(path)

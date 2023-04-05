@@ -133,8 +133,12 @@ class Invoice:
             self.items.append(InvoiceItem(data=row))
 
     def use_custom_file_name(self):
-        old_file_name = (
-            INVOICES_DIR_PATH + FileManager.list_file_names(INVOICES_DIR_PATH)[-1]
+        invoice_file_name = FileManager.get_latest_file_name(INVOICES_DIR_PATH)
+        invoice_id = FileManager.get_file_name_from_path(invoice_file_name).removesuffix(
+            ".pdf"
         )
-        new_file_name = INVOICES_DIR_PATH + self.custom_file_name + ".pdf"
-        FileManager.rename_file(old_name=old_file_name, new_name=new_file_name)
+        new_file_name = (
+            INVOICES_DIR_PATH + self.custom_file_name + f" ({invoice_id})" + ".pdf"
+        )
+
+        FileManager.rename_file(old_name=invoice_file_name, new_name=new_file_name)
