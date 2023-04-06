@@ -24,6 +24,7 @@ WARNING_IMG_PATH = ASSETS_DIR_PATH + "warning.png"
 class Urls:
     SIARE_URL = "https://www2.fazenda.mg.gov.br/sol/"
     REQUIRE_INVOICE_URL = SIARE_URL + "ctrl/SOL/NFAE/SERVICO_070?ACAO=NOVO"
+    REQUIRE_INVOICE_CANCELING_URL = SIARE_URL + "ctrl/SOL/NFAE/SERVICO_011?ACAO=NOVO"
 
 
 class XPaths:
@@ -108,3 +109,9 @@ class XPaths:
     # in the finish invoice tab
     PRINT_INVOICE_LINK = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td/a[2]"
     DOWNLOAD_INVOICE_BUTTON = '//*[@id="download"]'
+
+    # at invoice cancelling page
+    INVOICE_CANCELING_DOC_TYPE_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[2]/td[2]/nobr[2]/input'
+    INVOICE_CANCELING_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[4]/td[2]/input'
+    INVOICE_CANCELING_YEAR_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[5]/td[2]/input'
+    INVOICE_CANCELING_JUSTIFICATION_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[6]/td[2]/textarea'

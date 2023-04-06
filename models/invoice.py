@@ -1,8 +1,9 @@
 from pandas import DataFrame, Series
 
-from constants.db import DBColumns, DefaultValues
+from constants.db import DBColumns
 from constants.paths import INVOICES_DIR_PATH
 from models.entity import Entity
+from models.invoice_item import InvoiceItem
 from modules.database import DataBase
 from modules.file_manager import FileManager
 from utils.exceptions import (
@@ -15,36 +16,9 @@ from utils.helpers import (
     handle_empty_cell,
     normalize_text,
     str_to_boolean,
-    to_br_float,
     to_BRL,
 )
 from utils.messages import ErrorMessages
-
-
-class InvoiceItem:
-    def __init__(self, data: Series) -> None:
-        group = handle_empty_cell(data[DBColumns.InvoiceItem.GROUP])
-        ncm = (
-            handle_empty_cell(data[DBColumns.InvoiceItem.NCM])
-            or DefaultValues.InvoiceItem.NCM
-        )
-        description = handle_empty_cell(data[DBColumns.InvoiceItem.DESCRIPTION])
-        origin = handle_empty_cell(data[DBColumns.InvoiceItem.ORIGIN])
-        unity_of_measurement = handle_empty_cell(
-            data[DBColumns.InvoiceItem.UNITY_OF_MEASUREMENT]
-        )
-        quantity = handle_empty_cell(data[DBColumns.InvoiceItem.QUANTITY], numeric=True)
-        value_per_unity = handle_empty_cell(
-            data[DBColumns.InvoiceItem.VALUE_PER_UNITY], numeric=True
-        )
-
-        self.group: str = normalize_text(group)
-        self.ncm: str = normalize_text(ncm, keep_case=True)
-        self.description: str = normalize_text(description)
-        self.origin: str = normalize_text(origin)
-        self.unity_of_measurement: str = normalize_text(unity_of_measurement)
-        self.quantity: str = to_br_float(quantity)
-        self.value_per_unity: str = to_BRL(float(value_per_unity))
 
 
 class Invoice:
