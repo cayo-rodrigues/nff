@@ -63,6 +63,7 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [x] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [x] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
+- [ ] Possibilitar **cancelamento** de notas fiscais
 
 ## Detalhes Técnicos
 
