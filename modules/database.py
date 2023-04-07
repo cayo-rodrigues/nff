@@ -20,21 +20,34 @@ class DataBase(UseSingleton):
             raise MissingDBError(ErrorMessages.MISSING_DB_ERROR)
 
         self.data = pd.read_excel(DB_FILE_PATH, sheet_name=None, dtype=str)
-        self.sheet_names = [
-            SheetNames.ENTITIES,
-            SheetNames.INVOICES,
-            SheetNames.INVOICES_ITEMS,
-        ]
 
-    def get_all_sheets(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-        return (self.data[sheet_name] for sheet_name in self.sheet_names)
+    def get_all_sheets(
+        self,
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        return (
+            self.get_entities(),
+            self.get_invoices(),
+            self.get_invoices_products(),
+            self.get_invoices_cancelings(),
+        )
 
-    def look_for_empty_sheets(self) -> None:
-        for sheet_name in self.sheet_names:
-            if self.data[sheet_name].empty:
-                raise EmptySheetError(
-                    ErrorMessages.empty_sheet_error(sheet_name=sheet_name)
-                )
+    def get_sheet(self, sheet_name: str) -> pd.DataFrame:
+        self.data[sheet_name].sheet_name = sheet_name
+        return self.data[sheet_name]
+
+    def get_entities(self) -> pd.DataFrame:
+        return self.get_sheet(SheetNames.ENTITIES)
+
+    def get_invoices(self) -> pd.DataFrame:
+        return self.get_sheet(SheetNames.INVOICES).sort_values(
+            by=[DBColumns.Invoice.SENDER]
+        )
+
+    def get_invoices_products(self) -> pd.DataFrame:
+        return self.get_sheet(SheetNames.INVOICES_ITEMS)
+
+    def get_invoices_cancelings(self) -> pd.DataFrame:
+        return self.get_sheet(SheetNames.INVOICES_CANCELINGS)
 
     def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
@@ -50,8 +63,13 @@ class DataBase(UseSingleton):
         return entity_data
 
     def check_mandatory_fields(
-        self, df: pd.DataFrame, fields: list[tuple[str, str]]
+        self, df: pd.DataFrame, fields: list[tuple[str, str]] = []
     ) -> None:
+        if df.empty:
+            raise EmptySheetError(
+                ErrorMessages.empty_sheet_error(sheet_name=df.sheet_name)
+            )
+
         error_msg = ""
 
         for _, field in fields:

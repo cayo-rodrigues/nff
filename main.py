@@ -17,17 +17,25 @@ def main():
     Logger.reading_db()
     try:
         db = DataBase()
-        db.look_for_empty_sheets()
-        entities, invoices, invoices_items = db.get_all_sheets()
-    except (exceptions.MissingDBError, exceptions.EmptySheetError) as e:
+    except exceptions.MissingDBError as e:
         gui.display_error_msg(msg=e.message)
         exit()
 
+    entities, invoices, invoices_items, invoices_cancelings = db.get_all_sheets()
+
+    if not invoices_cancelings.empty:
+        # should ask user what they want to do
+        ...
+        # if user wants to cancel, then:
+        #   cancel
+        #   exit()
+
     Logger.validating_db_fields()
     try:
+        db.check_mandatory_fields(entities)
         db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
         db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
-    except exceptions.MissingFieldsError as e:
+    except (exceptions.MissingFieldsError, exceptions.EmptySheetError) as e:
         gui.display_error_msg(msg=e.message)
         exit()
 

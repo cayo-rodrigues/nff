@@ -5,6 +5,7 @@ class SheetNames:
     ENTITIES = "Entidades"
     INVOICES = "Nota Fiscal"
     INVOICES_ITEMS = "Dados de Produtos e Serviços NF"
+    INVOICES_CANCELINGS = "Dados para Cancelamento de NF"
 
 
 class DefaultValues:
