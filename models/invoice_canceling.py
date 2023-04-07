@@ -1,8 +1,8 @@
 from pandas import DataFrame, Series
 
+from apis.database import DataBase
 from constants.db import DBColumns, DefaultValues
 from models.entity import Entity
-from modules.database import DataBase
 from utils.exceptions import InvalidEntityError, MissingEntityDataError
 from utils.helpers import handle_empty_cell, normalize_text
 from utils.messages import ErrorMessages

@@ -2,12 +2,12 @@ from sys import exit
 
 from selenium.common.exceptions import WebDriverException
 
+from apis.database import DataBase
+from apis.gui import GUI
+from apis.logger import Logger
+from apis.siare import Siare
 from constants.db import MandatoryFields
 from models.invoice import Invoice
-from modules.database import DataBase
-from modules.gui import GUI
-from modules.logger import Logger
-from modules.siare import Siare
 from utils import exceptions
 
 
