@@ -19,6 +19,7 @@ PROJECT_ICON_PATH = ASSETS_DIR_PATH + "icon.ico"
 
 ERROR_IMG_PATH = ASSETS_DIR_PATH + "error.png"
 WARNING_IMG_PATH = ASSETS_DIR_PATH + "warning.png"
+INFO_IMG_PATH = ASSETS_DIR_PATH + "info.png"
 
 
 class Urls:

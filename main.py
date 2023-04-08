@@ -22,11 +22,9 @@ def main():
     entities, invoices, invoices_items, invoices_cancelings = db.get_all_sheets()
 
     if not invoices_cancelings.empty:
-
-        # ask user what they want to do
-        # if user wants to cancel, then:
-        cancel_invoices(entities, invoices_cancelings)
-        exit()
+        if gui.should_cancel_invoices():
+            cancel_invoices(entities, invoices_cancelings)
+            exit()
 
     make_invoices(entities, invoices, invoices_items)
 

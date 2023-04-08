@@ -1,17 +1,20 @@
 class ErrorMessages:
-    DB_DATA_ERROR_TIP = "\nVerifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
+    DB_DATA_ERROR_TIP = (
+        "\nVerifique novamente os dados e lembre-se sempre de salvar o arquivo excel."
+    )
     INVOICE_IGNORE_WARNING = "\nPor isso, essa nota fiscal será ignorada nesta execução."
     MISSING_DB_ERROR = (
         "Base de dados não encontrada.\n"
-        "Por favor, certifique-se de criar um arquivo excel chamado \"db\" dentro desta mesma pasta.\n"
-        "Lembre-se também de seguir o modelo deixado no arquivo \"db.example\"."
+        'Por favor, certifique-se de criar um arquivo excel chamado "db" dentro desta mesma pasta.\n'
+        'Lembre-se também de seguir o modelo deixado no arquivo "db.example".'
     )
 
     @classmethod
     def missing_mandatory_field(cls, column: str, line_number: int):
-        return f"A coluna \"{column}\" está faltando ser preenchida na linha {line_number}.\n"
-        
-    
+        return (
+            f'A coluna "{column}" está faltando ser preenchida na linha {line_number}.\n'
+        )
+
     @classmethod
     def invoice_with_no_items(cls, nf_index: int):
         return (
@@ -19,9 +22,11 @@ class ErrorMessages:
             "não possui nenhum item relacionado à ela.\n"
             f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
         )
-    
+
     @classmethod
-    def missing_entity(cls, nf_index: int, sender_is_missing: bool, recipient_is_missing: bool) -> str | None:
+    def missing_entity(
+        cls, nf_index: int, sender_is_missing: bool, recipient_is_missing: bool
+    ) -> str | None:
         if not sender_is_missing and not recipient_is_missing:
             return
 
@@ -36,19 +41,36 @@ class ErrorMessages:
             f"{nf_index}, na linha {nf_index + 1} são inválidos.\n"
             f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
         )
-    
+
     @classmethod
-    def invalid_entity_error(cls, missing_data: str, cpf_cnpj: str, is_sender: bool, name: str = None):
+    def invalid_entity_error(
+        cls, missing_data: str, cpf_cnpj: str, is_sender: bool, name: str = None
+    ) -> str:
         return (
             f"Os dados da(s) coluna(s) {missing_data}, referentes ao\n"
             f"{'remetente' if is_sender else 'destinatário'} cujo cpf/cnpj "
             f"é {cpf_cnpj}, {f'de nome {name}' if name else ''} estão faltando ser preenchidos.\n"
             f"{cls.INVOICE_IGNORE_WARNING + cls.DB_DATA_ERROR_TIP}"
         )
-    
+
     @classmethod
-    def empty_sheet_error(cls, sheet_name: str):
+    def empty_sheet_error(cls, sheet_name: str) -> str:
         return (
             f"A página {sheet_name} da base de dados está vazia.\n"
             f"{cls.DB_DATA_ERROR_TIP}"
         )
+
+
+class UserMessages:
+    ASK_SIARE_PASSWORD = "Senha para acessar o site do Siare"
+    CONFIRM = "Confirmar"
+    OK = "Ok"
+    ERROR = "ERRO"
+    WARNING = "AVISO"
+    YES = "Sim"
+    NO = "Não"
+    INVOICE_CANCELING_TITLE = "Cancelamento de\nNota Fiscal"
+    INVOICE_CANCELING_QUESTION = (
+        'Foram detectados registros na aba "Dados para Cancelamento de NF".'
+        "\nDeseja cancelar as notas fiscais contidas nessa aba?"
+    )
