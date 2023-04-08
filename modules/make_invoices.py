@@ -1,22 +1,19 @@
 from sys import exit
 
-from pandas import DataFrame
-
-from apis import GUI, DataBase, Logger, Siare
-from constants.db import MandatoryFields
+from apis import GUI, DataBase, Logger, NFFDataFrame, Siare
 from models import Invoice
 from utils import exceptions
 
 
-def make_invoices(entities: DataFrame, invoices: DataFrame, invoices_items: DataFrame):
+def make_invoices(
+    entities: NFFDataFrame, invoices: NFFDataFrame, invoices_items: NFFDataFrame
+):
     db = DataBase()
     gui = GUI()
 
     Logger.validating_db_fields()
     try:
-        db.check_mandatory_fields(entities)
-        db.check_mandatory_fields(invoices, MandatoryFields.INVOICE)
-        db.check_mandatory_fields(invoices_items, MandatoryFields.INVOICE_ITEM)
+        db.check_mandatory_fields(entities, invoices, invoices_items)
     except (exceptions.MissingFieldsError, exceptions.EmptySheetError) as e:
         gui.display_error_msg(msg=e.message)
         exit()

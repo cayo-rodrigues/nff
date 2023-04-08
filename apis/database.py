@@ -2,13 +2,18 @@ import warnings
 
 import pandas as pd
 
-from constants.db import DBColumns, SheetNames
+from constants.db import DBColumns, MandatoryFields, SheetNames
 from constants.paths import DB_FILE_PATH
 from utils.exceptions import EmptySheetError, MissingDBError, MissingFieldsError
 from utils.messages import ErrorMessages
 from utils.mixins import UseSingleton
 
 from .file_manager import FileManager
+
+
+class NFFDataFrame(pd.DataFrame):
+    sheet_name: str = ""
+    mandatory_fields: list[tuple[str, str]] = []
 
 
 class DataBase(UseSingleton):
@@ -24,7 +29,7 @@ class DataBase(UseSingleton):
 
     def get_all_sheets(
         self,
-    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[NFFDataFrame, NFFDataFrame, NFFDataFrame, NFFDataFrame]:
         return (
             self.get_entities(),
             self.get_invoices(),
@@ -32,55 +37,59 @@ class DataBase(UseSingleton):
             self.get_invoices_cancelings(),
         )
 
-    def get_sheet(self, sheet_name: str) -> pd.DataFrame:
+    def get_sheet(
+        self, sheet_name: str, mandatory_fields: list[tuple[str, str]] = []
+    ) -> NFFDataFrame:
         self.data[sheet_name].sheet_name = sheet_name
+        self.data[sheet_name].mandatory_fields = mandatory_fields
         return self.data[sheet_name]
 
-    def get_entities(self) -> pd.DataFrame:
+    def get_entities(self) -> NFFDataFrame:
         return self.get_sheet(SheetNames.ENTITIES)
 
-    def get_invoices(self) -> pd.DataFrame:
-        return self.get_sheet(SheetNames.INVOICES).sort_values(
+    def get_invoices(self) -> NFFDataFrame:
+        return self.get_sheet(SheetNames.INVOICES, MandatoryFields.INVOICE).sort_values(
             by=[DBColumns.Invoice.SENDER]
         )
 
-    def get_invoices_products(self) -> pd.DataFrame:
-        return self.get_sheet(SheetNames.INVOICES_ITEMS)
+    def get_invoices_products(self) -> NFFDataFrame:
+        return self.get_sheet(SheetNames.INVOICES_ITEMS, MandatoryFields.INVOICE_ITEM)
 
-    def get_invoices_cancelings(self) -> pd.DataFrame:
-        return self.get_sheet(SheetNames.INVOICES_CANCELINGS)
+    def get_invoices_cancelings(self) -> NFFDataFrame:
+        return self.get_sheet(
+            SheetNames.INVOICES_CANCELINGS, MandatoryFields.INVOICE_CANCELING
+        )
 
-    def get_rows(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
+    def get_rows(self, df: NFFDataFrame, by_col: str, where) -> pd.Series:
         return df[df[by_col] == where]
 
-    def get_row(self, df: pd.DataFrame, by_col: str, where) -> pd.Series:
+    def get_row(self, df: NFFDataFrame, by_col: str, where) -> pd.Series:
         return self.get_rows(df, by_col, where).head(1)
 
-    def get_entity(self, entities_df: pd.DataFrame, entity_id: str):
+    def get_entity(self, entities_df: NFFDataFrame, entity_id: str):
         for col in [DBColumns.Entity.CPF_CNPJ, DBColumns.Entity.IE]:
             entity_data = self.get_row(entities_df, by_col=col, where=entity_id)
             if not entity_data.empty:
                 break
         return entity_data
 
-    def check_mandatory_fields(
-        self, df: pd.DataFrame, fields: list[tuple[str, str]] = []
-    ) -> None:
-        if df.empty:
-            raise EmptySheetError(
-                ErrorMessages.empty_sheet_error(sheet_name=df.sheet_name)
-            )
-
-        error_msg = ""
-
-        for _, field in fields:
-            rows_with_empty_cells = df[df[field].isna()]
-
-            if not rows_with_empty_cells.empty:
-                row_index = rows_with_empty_cells.index[0] + 2
-                error_msg += ErrorMessages.missing_mandatory_field(
-                    column=field, line_number=row_index
+    def check_mandatory_fields(self, *dataframes: NFFDataFrame) -> None:
+        for df in dataframes:
+            if df.empty:
+                raise EmptySheetError(
+                    ErrorMessages.empty_sheet_error(sheet_name=df.sheet_name)
                 )
 
-        if error_msg:
-            raise MissingFieldsError(error_msg + ErrorMessages.DB_DATA_ERROR_TIP)
+            error_msg = ""
+
+            for _, field in df.mandatory_fields:
+                rows_with_empty_cells = df[df[field].isna()]
+
+                if not rows_with_empty_cells.empty:
+                    row_index = rows_with_empty_cells.index[0] + 2
+                    error_msg += ErrorMessages.missing_mandatory_field(
+                        column=field, line_number=row_index
+                    )
+
+            if error_msg:
+                raise MissingFieldsError(error_msg + ErrorMessages.DB_DATA_ERROR_TIP)
