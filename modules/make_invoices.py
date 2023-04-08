@@ -2,12 +2,9 @@ from sys import exit
 
 from pandas import DataFrame
 
-from apis.database import DataBase
-from apis.gui import GUI
-from apis.logger import Logger
-from apis.siare import Siare
+from apis import GUI, DataBase, Logger, Siare
 from constants.db import MandatoryFields
-from models.invoice import Invoice
+from models import Invoice
 from utils import exceptions
 
 

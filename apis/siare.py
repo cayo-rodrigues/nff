@@ -7,8 +7,7 @@ from selenium.webdriver.common.keys import Keys
 
 from constants.paths import Urls, XPaths
 from constants.standards import STANDARD_SLEEP_TIME
-from models.entity import Entity
-from models.invoice import Invoice, InvoiceItem
+from models import Entity, Invoice, InvoiceItem
 from utils.helpers import binary_search_html, linear_search_html
 
 from .browser import Browser

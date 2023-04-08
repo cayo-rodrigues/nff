@@ -2,9 +2,7 @@ from sys import exit
 
 from selenium.common.exceptions import WebDriverException
 
-from apis.database import DataBase
-from apis.gui import GUI
-from apis.logger import Logger
+from apis import GUI, DataBase, Logger
 from modules import cancel_invoices, make_invoices
 from utils import exceptions
 

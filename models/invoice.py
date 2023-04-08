@@ -1,11 +1,8 @@
 from pandas import DataFrame, Series
 
-from apis.database import DataBase
-from apis.file_manager import FileManager
+from apis import DataBase, FileManager
 from constants.db import DBColumns
 from constants.paths import INVOICES_DIR_PATH
-from models.entity import Entity
-from models.invoice_item import InvoiceItem
 from utils.exceptions import (
     InvalidEntityError,
     InvoiceWithNoItemsError,
@@ -19,6 +16,9 @@ from utils.helpers import (
     to_BRL,
 )
 from utils.messages import ErrorMessages
+
+from .entity import Entity
+from .invoice_item import InvoiceItem
 
 
 class Invoice:
