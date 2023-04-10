@@ -13,7 +13,7 @@ class DefaultValues:
         NCM = "94019900"
     
     class InvoiceCanceling:
-        YEAR = date.today().year
+        YEAR = str(date.today().year)
 
 
 class DBColumns:

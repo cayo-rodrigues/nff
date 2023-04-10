@@ -38,18 +38,29 @@ class DataBase(UseSingleton):
         )
 
     def get_sheet(
-        self, sheet_name: str, mandatory_fields: list[tuple[str, str]] = []
+        self,
+        sheet_name: str,
+        mandatory_fields: list[tuple[str, str]] = [],
+        sort_by: list[str] = [],
     ) -> NFFDataFrame:
-        self.data[sheet_name].sheet_name = sheet_name
-        self.data[sheet_name].mandatory_fields = mandatory_fields
-        return self.data[sheet_name]
+        df = self.data[sheet_name]
+
+        if sort_by:
+            df = df.sort_values(by=sort_by)
+
+        df.sheet_name = sheet_name
+        df.mandatory_fields = mandatory_fields
+
+        return df
 
     def get_entities(self) -> NFFDataFrame:
         return self.get_sheet(SheetNames.ENTITIES)
 
     def get_invoices(self) -> NFFDataFrame:
-        return self.get_sheet(SheetNames.INVOICES, MandatoryFields.INVOICE).sort_values(
-            by=[DBColumns.Invoice.SENDER]
+        return self.get_sheet(
+            SheetNames.INVOICES,
+            MandatoryFields.INVOICE,
+            sort_by=[DBColumns.Invoice.SENDER],
         )
 
     def get_invoices_products(self) -> NFFDataFrame:
@@ -57,7 +68,9 @@ class DataBase(UseSingleton):
 
     def get_invoices_cancelings(self) -> NFFDataFrame:
         return self.get_sheet(
-            SheetNames.INVOICES_CANCELINGS, MandatoryFields.INVOICE_CANCELING
+            SheetNames.INVOICES_CANCELINGS,
+            MandatoryFields.INVOICE_CANCELING,
+            sort_by=[DBColumns.InvoiceCanceling.ENTITY],
         )
 
     def get_rows(self, df: NFFDataFrame, by_col: str, where) -> pd.Series:

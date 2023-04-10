@@ -25,16 +25,19 @@ class InvoiceCanceling:
         self.year: int = normalize_text(year, keep_case=True)
         self.justification: str = normalize_text(justification, keep_case=True)
 
-        self.entity: str = normalize_text(entity, keep_case=True)
+        self.entity = normalize_text(entity, keep_case=True)
 
     def get_entity(self, entities: DataFrame) -> None:
         db = DataBase()
         entity_data = db.get_entity(entities, entity_id=self.entity)
 
+        # TODO
+        # não tem nf_index, e a forma que essa função monta a mensagem precisa ser refatorada
         error_msg = ErrorMessages.missing_entity(
             nf_index=int(self.nf_index), sender_is_missing=entity_data.empty
         )
         if error_msg:
+            # talvez os nomes desses erros também
             raise InvalidEntityError(error_msg)
 
         self.entity: Entity = Entity(data=entity_data, is_sender=True)

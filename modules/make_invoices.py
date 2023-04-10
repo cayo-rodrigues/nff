@@ -40,7 +40,7 @@ def make_invoices(
             gui.display_error_msg(msg=e.message, warning=True)
             continue
 
-        should_login = prev_sender != invoice.sender.cpf_cnpj or index == 0
+        should_login = prev_sender != invoice.sender.ie or index == 0
         if should_login:
             if invoice.sender.password is None:
                 invoice.sender.password = gui.get_user_password()
@@ -49,7 +49,7 @@ def make_invoices(
             siare.login(invoice.sender)
             siare.close_first_pop_up()
 
-            prev_sender = invoice.sender.cpf_cnpj
+            prev_sender = invoice.sender.ie
 
         siare.open_require_invoice_page()
         siare.fill_invoice_basic_data(invoice)
