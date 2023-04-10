@@ -33,7 +33,7 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 
 ## Como usar?
 
-* O primeiro passo é preencher a base de dados, que é o arquivo `"db"` (por favor, note que o nome desse arquivo não deve mudar).
+* O primeiro passo é preencher a base de dados, que é o arquivo `"db"` (os formatos aceitos são `.xlsx`, `.xls` e `.ods`).
 
 * Para preencher ele corretamente, siga o exemplo mostrado no arquivo `"db.example"`.
 
