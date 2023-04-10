@@ -1,19 +1,15 @@
 from os import getcwd
 from platform import system
 
-if system() == "Windows":
-    PATH_SEP = "\\"
-    DB_FILE_EXTENSION = "xlsx"
-else:
-    PATH_SEP = "/"
-    DB_FILE_EXTENSION = "ods"
+PATH_SEP = "\\" if system() == "Windows" else "/"
 
 PROJECT_DIR_PATH = getcwd() + PATH_SEP
 
 ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + PATH_SEP
 INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + PATH_SEP
 
-DB_FILE_PATH = PROJECT_DIR_PATH + "db." + DB_FILE_EXTENSION
+DB_FILE_EXTENSIONS = [".xlsx", ".ods"]
+DB_FILE_PATH = PROJECT_DIR_PATH + "db"
 
 PROJECT_ICON_PATH = ASSETS_DIR_PATH + "icon.ico"
 

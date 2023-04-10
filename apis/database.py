@@ -3,7 +3,7 @@ import warnings
 import pandas as pd
 
 from constants.db import DBColumns, MandatoryFields, SheetNames
-from constants.paths import DB_FILE_PATH
+from constants.paths import DB_FILE_EXTENSIONS, DB_FILE_PATH
 from utils.exceptions import EmptySheetError, MissingDBError, MissingFieldsError
 from utils.messages import ErrorMessages
 from utils.mixins import UseSingleton
@@ -22,10 +22,15 @@ class DataBase(UseSingleton):
             return
 
         warnings.simplefilter(action="ignore", category=UserWarning)
-        if not FileManager.file_exists(DB_FILE_PATH):
-            raise MissingDBError(ErrorMessages.MISSING_DB_ERROR)
 
-        self.data = pd.read_excel(DB_FILE_PATH, sheet_name=None, dtype=str)
+        self.data = pd.read_excel(self._get_db_file_path(), sheet_name=None, dtype=str)
+
+    def _get_db_file_path(cls):
+        for ext in DB_FILE_EXTENSIONS:
+            full_db_file_path = DB_FILE_PATH + ext
+            if FileManager.file_exists(full_db_file_path):
+                return full_db_file_path
+        raise MissingDBError(ErrorMessages.MISSING_DB_ERROR)
 
     def get_all_sheets(
         self,
