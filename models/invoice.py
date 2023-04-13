@@ -4,9 +4,9 @@ from apis import DataBase, FileManager
 from constants.db import DBColumns
 from constants.paths import INVOICES_DIR_PATH
 from utils.exceptions import (
-    InvalidEntityError,
+    EntityNotFoundError,
+    InvalidEntityDataError,
     InvoiceWithNoItemsError,
-    MissingEntityDataError,
 )
 from utils.helpers import (
     decode_icms_contributor_status,
@@ -63,34 +63,22 @@ class Invoice:
         recipient_data = db.get_entity(entities, entity_id=self.recipient)
 
         # if missing sender or recipient warn the user and skip this invoice
-        error_msg = ErrorMessages.missing_entity(
-            nf_index=int(self.nf_index),
-            sender_is_missing=sender_data.empty,
-            recipient_is_missing=recipient_data.empty,
-        )
-        if error_msg:
-            raise InvalidEntityError(error_msg)
+        if sender_data.empty or recipient_data.empty:
+            error_msg = ErrorMessages.entity_not_found_error(
+                nf_index=int(self.nf_index), sender_is_missing=sender_data.empty
+            )
+            raise EntityNotFoundError(error_msg)
 
         self.sender: Entity = Entity(data=sender_data, is_sender=True)
         self.recipient: Entity = Entity(data=recipient_data)
 
         if not self.sender.is_valid_sender():
-            error_msg = ErrorMessages.invalid_entity_error(
-                missing_data=self.sender.errors,
-                cpf_cnpj=self.sender.cpf_cnpj,
-                is_sender=True,
-                name=self.sender.name,
-            )
-            raise MissingEntityDataError(error_msg)
+            error_msg = ErrorMessages.invalid_entity_data_error(self.sender)
+            raise InvalidEntityDataError(error_msg)
 
         if not self.recipient.is_valid_recipient():
-            error_msg = ErrorMessages.invalid_entity_error(
-                missing_data=self.recipient.errors,
-                cpf_cnpj=self.recipient.cpf_cnpj,
-                is_sender=False,
-                name=self.recipient.name,
-            )
-            raise MissingEntityDataError(error_msg)
+            error_msg = ErrorMessages.invalid_entity_data_error(self.recipient)
+            raise InvalidEntityDataError(error_msg)
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()

@@ -22,13 +22,13 @@ def cancel_invoices(entities: NFFDataFrame, invoices_cancelings: NFFDataFrame):
     siare = Siare()
 
     for index, canceling_data in invoices_cancelings.iterrows():
-        invoice_canceling = InvoiceCanceling(canceling_data)
+        invoice_canceling = InvoiceCanceling(canceling_data, index + 1)
 
         Logger.canceling_invoice(invoice_canceling.invoice_id)
 
         try:
             invoice_canceling.get_entity(entities)
-        except (exceptions.InvalidEntityError, exceptions.MissingEntityDataError) as e:
+        except (exceptions.EntityNotFoundError, exceptions.InvalidEntityDataError) as e:
             gui.display_error_msg(msg=e.message, warning=True)
             continue
 

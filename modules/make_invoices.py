@@ -34,8 +34,8 @@ def make_invoices(
             invoice.get_items(invoices_items)
         except (
             exceptions.InvoiceWithNoItemsError,
-            exceptions.InvalidEntityError,
-            exceptions.MissingEntityDataError,
+            exceptions.EntityNotFoundError,
+            exceptions.InvalidEntityDataError,
         ) as e:
             gui.display_error_msg(msg=e.message, warning=True)
             continue
