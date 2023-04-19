@@ -112,3 +112,4 @@ class XPaths:
     INVOICE_CANCELING_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[4]/td[2]/input'
     INVOICE_CANCELING_YEAR_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[5]/td[2]/input'
     INVOICE_CANCELING_JUSTIFICATION_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[6]/td[2]/textarea'
+    INVOICE_CANCELING_FINISH_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[8]/td/a[2]'

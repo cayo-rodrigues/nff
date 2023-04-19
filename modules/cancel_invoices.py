@@ -42,3 +42,8 @@ def cancel_invoices(entities: NFFDataFrame, invoices_cancelings: NFFDataFrame):
             siare.close_first_pop_up()
 
             prev_entity = invoice_canceling.entity.ie
+
+    siare.open_cancel_invoice_page()
+    siare.fill_canceling_data(invoice_canceling)
+
+    Logger.finished_canceling(invoice_canceling.invoice_id)
