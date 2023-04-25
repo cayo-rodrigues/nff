@@ -4,8 +4,6 @@ from utils import exceptions
 
 
 def cancel_invoices(entities: NFFDataFrame, invoices_cancelings: NFFDataFrame):
-    print(":D")
-
     db = DataBase()
     gui = GUI()
 
@@ -43,7 +41,7 @@ def cancel_invoices(entities: NFFDataFrame, invoices_cancelings: NFFDataFrame):
 
             prev_entity = invoice_canceling.entity.ie
 
-    siare.open_cancel_invoice_page()
-    siare.fill_canceling_data(invoice_canceling)
+        siare.open_cancel_invoice_page()
+        siare.fill_canceling_data(invoice_canceling)
 
-    Logger.finished_canceling(invoice_canceling.invoice_id)
+        Logger.finished_canceling(invoice_canceling.invoice_id)
