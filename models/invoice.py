@@ -1,50 +1,24 @@
 from pandas import DataFrame, Series
 
-from constants.db import DBColumns, DefaultValues
+from apis import DataBase, FileManager
+from constants.db import DBColumns
 from constants.paths import INVOICES_DIR_PATH
-from models.entity import Entity
-from modules.database import DataBase
-from modules.file_manager import FileManager
 from utils.exceptions import (
-    InvalidEntityError,
+    EntityNotFoundError,
+    InvalidEntityDataError,
     InvoiceWithNoItemsError,
-    MissingEntityDataError,
 )
 from utils.helpers import (
     decode_icms_contributor_status,
     handle_empty_cell,
     normalize_text,
     str_to_boolean,
-    to_br_float,
     to_BRL,
 )
 from utils.messages import ErrorMessages
 
-
-class InvoiceItem:
-    def __init__(self, data: Series) -> None:
-        group = handle_empty_cell(data[DBColumns.InvoiceItem.GROUP])
-        ncm = (
-            handle_empty_cell(data[DBColumns.InvoiceItem.NCM])
-            or DefaultValues.InvoiceItem.NCM
-        )
-        description = handle_empty_cell(data[DBColumns.InvoiceItem.DESCRIPTION])
-        origin = handle_empty_cell(data[DBColumns.InvoiceItem.ORIGIN])
-        unity_of_measurement = handle_empty_cell(
-            data[DBColumns.InvoiceItem.UNITY_OF_MEASUREMENT]
-        )
-        quantity = handle_empty_cell(data[DBColumns.InvoiceItem.QUANTITY], numeric=True)
-        value_per_unity = handle_empty_cell(
-            data[DBColumns.InvoiceItem.VALUE_PER_UNITY], numeric=True
-        )
-
-        self.group: str = normalize_text(group)
-        self.ncm: str = normalize_text(ncm, keep_case=True)
-        self.description: str = normalize_text(description)
-        self.origin: str = normalize_text(origin)
-        self.unity_of_measurement: str = normalize_text(unity_of_measurement)
-        self.quantity: str = to_br_float(quantity)
-        self.value_per_unity: str = to_BRL(float(value_per_unity))
+from .entity import Entity
+from .invoice_item import InvoiceItem
 
 
 class Invoice:
@@ -89,34 +63,22 @@ class Invoice:
         recipient_data = db.get_entity(entities, entity_id=self.recipient)
 
         # if missing sender or recipient warn the user and skip this invoice
-        error_msg = ErrorMessages.missing_entity(
-            nf_index=int(self.nf_index),
-            sender_is_missing=sender_data.empty,
-            recipient_is_missing=recipient_data.empty,
-        )
-        if error_msg:
-            raise InvalidEntityError(error_msg)
+        if sender_data.empty or recipient_data.empty:
+            error_msg = ErrorMessages.entity_not_found_error(
+                nf_index=int(self.nf_index), sender_is_missing=sender_data.empty
+            )
+            raise EntityNotFoundError(error_msg)
 
         self.sender: Entity = Entity(data=sender_data, is_sender=True)
         self.recipient: Entity = Entity(data=recipient_data)
 
         if not self.sender.is_valid_sender():
-            error_msg = ErrorMessages.invalid_entity_error(
-                missing_data=self.sender.errors,
-                cpf_cnpj=self.sender.cpf_cnpj,
-                is_sender=True,
-                name=self.sender.name,
-            )
-            raise MissingEntityDataError(error_msg)
+            error_msg = ErrorMessages.invalid_entity_data_error(self.sender)
+            raise InvalidEntityDataError(error_msg)
 
         if not self.recipient.is_valid_recipient():
-            error_msg = ErrorMessages.invalid_entity_error(
-                missing_data=self.recipient.errors,
-                cpf_cnpj=self.recipient.cpf_cnpj,
-                is_sender=False,
-                name=self.recipient.name,
-            )
-            raise MissingEntityDataError(error_msg)
+            error_msg = ErrorMessages.invalid_entity_data_error(self.recipient)
+            raise InvalidEntityDataError(error_msg)
 
     def get_items(self, items: DataFrame) -> None:
         db = DataBase()

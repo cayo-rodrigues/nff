@@ -14,8 +14,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from constants.paths import INVOICES_DIR_PATH
 from constants.standards import STANDARD_SLEEP_TIME
-from modules.file_manager import FileManager
 from utils.decorators import wait_for_it
+
+from .file_manager import FileManager
 
 
 class Browser:

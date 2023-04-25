@@ -12,11 +12,11 @@ class InvoiceWithNoItemsError(NFFBaseException):
     ...
 
 
-class InvalidEntityError(NFFBaseException):
+class EntityNotFoundError(NFFBaseException):
     ...
 
 
-class MissingEntityDataError(NFFBaseException):
+class InvalidEntityDataError(NFFBaseException):
     ...
 
 

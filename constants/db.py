@@ -1,12 +1,19 @@
+from datetime import date
+
+
 class SheetNames:
     ENTITIES = "Entidades"
     INVOICES = "Nota Fiscal"
     INVOICES_ITEMS = "Dados de Produtos e Serviços NF"
+    INVOICES_CANCELINGS = "Dados para Cancelamento de NF"
 
 
 class DefaultValues:
     class InvoiceItem:
         NCM = "94019900"
+    
+    class InvoiceCanceling:
+        YEAR = str(date.today().year)
 
 
 class DBColumns:
@@ -46,6 +53,12 @@ class DBColumns:
         STREET_NAME = "logradouro (nome)"
         NUMBER = "número"
 
+    class InvoiceCanceling:
+        INVOICE_ID = "número da nota"
+        YEAR = "ano"
+        JUSTIFICATION = "justificativa"
+        ENTITY = "entidade"
+    
 
 class ModelFields:
     class Invoice:
@@ -83,6 +96,12 @@ class ModelFields:
         STREET_TYPE = "street_type"
         STREET_NAME = "street_name"
         NUMBER = "number"
+    
+    class InvoiceCanceling:
+        INVOICE_ID = "invoice_id"
+        YEAR = "year"
+        JUSTIFICATION = "justification"
+        ENTITY = "entity"
 
 
 class MandatoryFields:
@@ -122,4 +141,10 @@ class MandatoryFields:
         (ModelFields.Entity.NEIGHBORHOOD, DBColumns.Entity.NEIGHBORHOOD),
         (ModelFields.Entity.STREET_TYPE, DBColumns.Entity.STREET_TYPE),
         (ModelFields.Entity.STREET_NAME, DBColumns.Entity.STREET_NAME),
+    ]
+    
+    INVOICE_CANCELING = [
+        (ModelFields.InvoiceCanceling.INVOICE_ID, DBColumns.InvoiceCanceling.INVOICE_ID),
+        (ModelFields.InvoiceCanceling.JUSTIFICATION, DBColumns.InvoiceCanceling.JUSTIFICATION),
+        (ModelFields.InvoiceCanceling.ENTITY, DBColumns.InvoiceCanceling.ENTITY),
     ]

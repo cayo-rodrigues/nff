@@ -1,29 +1,27 @@
 from os import getcwd
 from platform import system
 
-if system() == "Windows":
-    PATH_SEP = "\\"
-    DB_FILE_EXTENSION = "xlsx"
-else:
-    PATH_SEP = "/"
-    DB_FILE_EXTENSION = "ods"
+PATH_SEP = "\\" if system() == "Windows" else "/"
 
 PROJECT_DIR_PATH = getcwd() + PATH_SEP
 
 ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + PATH_SEP
 INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + PATH_SEP
 
-DB_FILE_PATH = PROJECT_DIR_PATH + "db." + DB_FILE_EXTENSION
+DB_FILE_EXTENSIONS = [".xlsx", ".ods"]
+DB_FILE_PATH = PROJECT_DIR_PATH + "db"
 
 PROJECT_ICON_PATH = ASSETS_DIR_PATH + "icon.ico"
 
 ERROR_IMG_PATH = ASSETS_DIR_PATH + "error.png"
 WARNING_IMG_PATH = ASSETS_DIR_PATH + "warning.png"
+INFO_IMG_PATH = ASSETS_DIR_PATH + "info.png"
 
 
 class Urls:
     SIARE_URL = "https://www2.fazenda.mg.gov.br/sol/"
     REQUIRE_INVOICE_URL = SIARE_URL + "ctrl/SOL/NFAE/SERVICO_070?ACAO=NOVO"
+    REQUIRE_INVOICE_CANCELING_URL = SIARE_URL + "ctrl/SOL/NFAE/SERVICO_011?ACAO=NOVO"
 
 
 class XPaths:
@@ -108,3 +106,10 @@ class XPaths:
     # in the finish invoice tab
     PRINT_INVOICE_LINK = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td/a[2]"
     DOWNLOAD_INVOICE_BUTTON = '//*[@id="download"]'
+
+    # at invoice cancelling page
+    INVOICE_CANCELING_DOC_TYPE_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[2]/td[2]/nobr[2]/input'
+    INVOICE_CANCELING_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[4]/td[2]/input'
+    INVOICE_CANCELING_YEAR_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[5]/td[2]/input'
+    INVOICE_CANCELING_JUSTIFICATION_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[6]/td[2]/textarea'
+    INVOICE_CANCELING_FINISH_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[8]/td/a[2]'

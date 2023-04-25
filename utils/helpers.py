@@ -1,5 +1,4 @@
 import locale
-from datetime import date
 
 from pandas import isna
 from selenium.webdriver.remote.webelement import WebElement
