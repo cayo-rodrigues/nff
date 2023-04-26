@@ -33,7 +33,7 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 
 ## Como usar?
 
-* O primeiro passo é preencher a base de dados, que é o arquivo `"db"` (por favor, note que o nome desse arquivo não deve mudar).
+* O primeiro passo é preencher a base de dados, que é o arquivo `"db"` (os formatos aceitos são `.xlsx` e `.ods`).
 
 * Para preencher ele corretamente, siga o exemplo mostrado no arquivo `"db.example"`.
 
@@ -63,6 +63,8 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [x] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [x] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
+- [x] Possibilitar **cancelamento** de notas fiscais
+- [ ] Poder usar Google Sheets como base de dados
 
 ## Detalhes Técnicos
 

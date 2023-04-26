@@ -26,3 +26,11 @@ class Logger:
     @classmethod
     def unexpected_exit(self):
         print("O programa foi interrompido inesperadamente ;-;")
+
+    @classmethod
+    def canceling_invoice(self, invoice_id: str):
+        print(f"Cancelando nota fiscal número {invoice_id}...")
+
+    @classmethod
+    def finished_canceling(self, invoice_id: str):
+        print(f"Nota fiscal número {invoice_id} cancelada!")

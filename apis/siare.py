@@ -7,8 +7,7 @@ from selenium.webdriver.common.keys import Keys
 
 from constants.paths import Urls, XPaths
 from constants.standards import STANDARD_SLEEP_TIME
-from models.entity import Entity
-from models.invoice import Invoice, InvoiceItem
+from models import Entity, Invoice, InvoiceCanceling, InvoiceItem
 from utils.helpers import binary_search_html, linear_search_html
 
 from .browser import Browser
@@ -290,3 +289,22 @@ class Siare(Browser):
         self.accept_alert()
 
         self.wait_for_download()
+
+    def open_cancel_invoice_page(self):
+        self.get_page(url=Urls.REQUIRE_INVOICE_CANCELING_URL)
+
+    def fill_canceling_data(self, canceling: InvoiceCanceling):
+        xpath = XPaths.INVOICE_CANCELING_DOC_TYPE_INPUT
+        self.get_and_click(xpath)
+
+        xpath = XPaths.INVOICE_CANCELING_ID_INPUT
+        self.type_into_element(xpath, canceling.invoice_id)
+
+        xpath = XPaths.INVOICE_CANCELING_YEAR_INPUT
+        self.type_into_element(xpath, canceling.year)
+
+        xpath = XPaths.INVOICE_CANCELING_JUSTIFICATION_INPUT
+        self.type_into_element(xpath, canceling.justification)
+
+        xpath = XPaths.INVOICE_CANCELING_FINISH_BUTTON
+        self.get_and_click(xpath)
