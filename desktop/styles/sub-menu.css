@@ -1,0 +1,16 @@
+.sub-menu {
+  display: flex;
+}
+.sub-menu__item {
+  flex: 1;
+  border: 1px solid transparent;
+  transition: background .2s ease-in-out;
+}
+.sub-menu__item:hover {
+  background: var(--main-color);
+  cursor: pointer;
+  color: var(--white);
+}
+.sub-menu__item--selected {
+  background: var(--main-color-50);
+}
