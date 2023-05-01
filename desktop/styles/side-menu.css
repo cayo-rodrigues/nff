@@ -1,0 +1,17 @@
+.side-menu__item {
+  transition: background .2s ease-in-out;
+  line-height: 1.5rem;
+  border: 1px solid transparent;
+}
+.side-menu__item--selected {
+  background: var(--main-color-50);
+}
+
+.side-menu__item:hover {
+  color: var(--white);
+  background: var(--main-color);
+  cursor: pointer;
+}
+.side-menu__item:active {
+  transform: scale(0.95);
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NFF - Nota Fiscal Fácil</title>
+    <link rel="stylesheet" href="./styles/index.css" />    
+    <script src="./scripts/index.js" type="module"></script>
+  </head>
+  <body>
+    <div class="root-container">
+      <aside class="side-bar" >
+        <nav>
+          <!-- <div class="logo-container">
+            <img src="./assets/icon.ico" alt="nff logo" />
+          </div> -->
+          <ul id="side-menu" class="side-menu">
+            <li class="side-menu__item side-menu__item--selected" data-tab-name="entities" >Entidades</li>
+            <li class="side-menu__item" data-tab-name="invoices">Notas Fiscais</li>
+            <li class="side-menu__item" data-tab-name="templates">Templates</li>
+            <li class="side-menu__item" data-tab-name="history">Histórico</li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <h2 id="current-tab-title" class="current-tab-title">Entidades</h2>
+        <!-- quando tiver sub menu, estará aqui -->
+        <nav>
+          <ul class="sub-menu">
+            <li id="sub-entry-1" class="sub-menu__item sub-menu__item--selected" data-sub-entry="1">Listar Entidades</li>
+            <li id="sub-entry-2" class="sub-menu__item" data-sub-entry="2">Registrar Entidades</li>
+          </ul>
+        </nav>
+
+        <div id="content__core" class="content__core">
+          <!-- Na página de entidades... -->
+
+            <!-- Listar entidades -->
+
+          <!-- <ul class="entities-list">
+            <li class="entities-list__card">
+
+              <div class="entity-card__heading" >
+                <h3 class="entity-card__name">Emerson Frivasa</h3>
+                <div class="entity-card__action-icons">
+                  <span>Edit Icon</span>
+                  <span>Delete Icon</span>
+                </div>
+              </div>
+              
+              <div class="entity-card__contents" >
+                <ul class="entity-card__section">
+                  <li><b>Tipo:</b> <span>Produtor Rural</span></li>
+                  <li><b>IE:</b> <span>123456789</span></li>
+                  <li><b>CPF/CNPJ:</b> <span>987654321</span></li>
+                  <li><b>E-mail:</b> <span>aushduash@gmail.com</span></li>
+                  <li><b>Senha:</b> <span>123456</span></li>
+                </ul>
+                
+                <ul class="entity-card__section">
+                  <li><b>CEP:</b> <span>37508000</span></li>
+                  <li><b>Bairro:</b> <span>Laje</span></li>
+                  <li><b>Logradouro (tipo):</b> <span>Rua</span></li>
+                  <li><b>Logradouro (nome):</b> <span>Olegário Maciel</span></li>
+                  <li><b>Número:</b> <span>47</span></li>
+                </ul>
+              </div>
+
+            </li>
+          </ul> -->
+
+            <!-- Registrar Entidades -->
+
+
+          <!-- Na página de notas fiscais... -->
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
