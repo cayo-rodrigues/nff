@@ -41,7 +41,7 @@ export function listEntitiesPage() {
 
         <div class="entity-card__heading" >
           <h3 class="entity-card__name">${entity.name}</h3>
-          <div class="entity-card__action-icons">
+          <div class="entity-form__input" class="entity-card__action-icons">
             <span>Edit Icon</span>
             <span>Delete Icon</span>
           </div>
@@ -73,6 +73,63 @@ export function listEntitiesPage() {
 }
 
 export function createEntitiesPage() {
-  const contentCore = document.querySelector("#content__core")
-  contentCore.innerHTML = ":D"
+    const contentCore = document.querySelector("#content__core")
+    contentCore.innerHTML = `
+        <form class="entity-form">
+            <div class="entity-form__inputs-container">
+
+                <div class="entity-form__input">
+                    <label for="name-input">Nome</label>
+                    <input type="text" name="name" id="name-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="email-input">Email</label>
+                    <input type="email" name="email" id="email-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="type-input">Tipo</label>
+                    <select name="type" id="type-input">
+                        <option value="Produtor Rural">Produtor Rural</option>
+                    </select>
+                </div>
+                <div class="entity-form__input">
+                    <label for="cpf_cnpj-input">CPF/CNPJ</label>
+                    <input type="text" name="cpf_cnpj" id="cpf_cnpj-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="ie-input">Inscrição Estadual</label>
+                    <input type="text" name="ie" id="ie-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="password-input">Senha</label>
+                    <input type="password" name="password" id="password-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="postal_code-input">CEP</label>
+                    <input type="text" name="postal_code" id="postal_code-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="neighborhood-input">Bairro</label>
+                    <input type="text" name="neighborhood" id="neighborhood-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="street_type-input">Logradouro (tipo)</label>
+                    <select name="street_type" id="street_type-input">
+                        <option value="Rua">Rua</option>
+                    </select>
+                </div>
+                <div class="entity-form__input">
+                    <label for="street_name-input">Logradouro (nome)</label>
+                    <input type="text" name="street_name" id="street_name-input">
+                </div>
+                <div class="entity-form__input">
+                    <label for="number-input">Número</label>
+                    <input type="text" name="number" id="number-input">
+                </div>
+
+            </div>
+
+            <button class="entity-form__button" type="submit">Registrar Entidade</button>
+        </form>
+    `
 }
