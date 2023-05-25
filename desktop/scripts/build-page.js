@@ -20,4 +20,5 @@ export const buildPage = {
   },
   templates: () => {},
   history: () => {},
+  conf: () => {},
 }

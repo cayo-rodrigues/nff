@@ -132,4 +132,21 @@ export function createEntitiesPage() {
             <button class="entity-form__button" type="submit">Registrar Entidade</button>
         </form>
     `
+    const form = contentCore.querySelector('.entity-form')
+    form.addEventListener('submit', submitEntityForm)
+}
+
+function submitEntityForm(event) {
+    event.preventDefault()
+    const form = event.target
+
+    const formData = {}
+
+    for (const child of form) {
+        if (child.name) {
+            formData[child.name] = child.value
+        }
+    }
+
+    console.log(formData)
 }
