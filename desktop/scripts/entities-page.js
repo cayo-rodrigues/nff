@@ -88,7 +88,7 @@ export function createEntitiesPage() {
                 </div>
                 <div class="entity-form__input">
                     <label for="type-input">Tipo</label>
-                    <select name="type" id="type-input">
+                    <select name="entity_type" id="type-input">
                         <option value="Produtor Rural">Produtor Rural</option>
                     </select>
                 </div>
@@ -124,7 +124,7 @@ export function createEntitiesPage() {
                 </div>
                 <div class="entity-form__input">
                     <label for="number-input">Número</label>
-                    <input type="text" name="number" id="number-input">
+                    <input type="text" name="address_number" id="number-input">
                 </div>
 
             </div>
@@ -136,7 +136,7 @@ export function createEntitiesPage() {
     form.addEventListener('submit', submitEntityForm)
 }
 
-function submitEntityForm(event) {
+async function submitEntityForm(event) {
     event.preventDefault()
     const form = event.target
 
@@ -147,6 +147,7 @@ function submitEntityForm(event) {
             formData[child.name] = child.value
         }
     }
-
-    console.log(formData)
+    
+    const response = await pywebview.api.register_entity(formData)
+    console.log(response)
 }
