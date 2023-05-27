@@ -87,8 +87,8 @@ export function createEntitiesPage() {
                     <input type="email" name="email" id="email-input">
                 </div>
                 <div class="entity-form__input">
-                    <label for="type-input">Tipo</label>
-                    <select name="entity_type" id="type-input">
+                    <label for="user_type-input">Tipo</label>
+                    <select name="user_type" id="user_type-input">
                         <option value="Produtor Rural">Produtor Rural</option>
                     </select>
                 </div>
@@ -124,7 +124,7 @@ export function createEntitiesPage() {
                 </div>
                 <div class="entity-form__input">
                     <label for="number-input">Número</label>
-                    <input type="text" name="address_number" id="number-input">
+                    <input type="text" name="number" id="number-input">
                 </div>
 
             </div>
