@@ -31,6 +31,12 @@ export function createInvoicesPage() {
         else if (target.id && target.id.includes('close-dialog-button')) {
             document.getElementById(`items-dialog-${target.dataset.invoiceId}`).close()
         }
+        else if (target.id && target.id.includes('add-item-button')) {
+            const invoiceId = target.dataset.invoiceId
+            const dialogSectionsContainer = document.getElementById(`dialog-sections-container-${invoiceId}`)
+            const sectionId = dialogSectionsContainer.childElementCount + 1
+            dialogSectionsContainer.innerHTML += invoiceItemsSection(invoiceId, sectionId)
+        }
     })
 
     const addSectionButton = contentCore.querySelector('.invoices-form__add-section-button')
@@ -48,31 +54,31 @@ function invoicesFormSection(id) {
             <div id="${id}" class="invoices-form__inputs-container">
 
                 <div class="invoices-form__input">
-                    <label for="sender-input">Remetente</label>
-                    <select name="sender" id="sender-input">
+                    <label for="sender-input-${id}">Remetente</label>
+                    <select name="sender" id="sender-input-${id}">
                         <option value="sender-id">Emerson</option>
                     </select>
                 </div>
                 <div class="invoices-form__input">
-                    <label for="recipient-input">Destinatário</label>
-                    <select name="recipient" id="recipient-input">
+                    <label for="recipient-input-${id}">Destinatário</label>
+                    <select name="recipient" id="recipient-input-${id}">
                         <option value="emerson-id">Emerson</option>
                     </select>
                 </div>
                 <div class="invoices-form__input">
-                    <label for="operation-input">Natureza da Operação</label>
-                    <select name="operation" id="operation-input">
+                    <label for="operation-input-${id}">Natureza da Operação</label>
+                    <select name="operation" id="operation-input-${id}">
                         <option value="VENDA">VENDA</option>
                         <option value="REMESSA">REMESSA</option>
                     </select>
                 </div>
                 <div class="invoices-form__input">
-                    <label for="gta-input">GTA</label>
-                    <input type="gta" name="gta" id="gta-input">
+                    <label for="gta-input-${id}">GTA</label>
+                    <input type="gta" name="gta" id="gta-input-${id}">
                 </div>
                 <div class="invoices-form__input">
-                    <label for="cfop-input">CFOP</label>
-                    <select name="cfop" id="cfop-input">
+                    <label for="cfop-input-${id}">CFOP</label>
+                    <select name="cfop" id="cfop-input-${id}">
                         <option value="5101">5101</option>
                         <option value="5102">5102</option>
                         <option value="5103">5103</option>
@@ -80,37 +86,37 @@ function invoicesFormSection(id) {
                     </select>
                 </div>
                 <div class="invoices-form__input">
-                    <label for="shipping-input">Frete</label>
-                    <input type="number" step=0.01 name="shipping" id="shipping-input">
+                    <label for="shipping-input-${id}">Frete</label>
+                    <input type="number" step=0.01 name="shipping" id="shipping-input-${id}">
                 </div>
                 <div class="invoices-form__input">
-                    <label for="add_shipping_to_total_value-input">Adicionar Frete ao Total</label>
-                    <select name="add_shipping_to_total_value" id="add_shipping_to_total_value-input">
+                    <label for="add_shipping_to_total_value-input-${id}">Adicionar Frete ao Total</label>
+                    <select name="add_shipping_to_total_value" id="add_shipping_to_total_value-input-${id}">
                         <option value="sim">Sim</option>
                         <option value="não">Não</option>
                     </select>
                 </div>
                 <div class="invoices-form__input">
-                    <label for="is_final_customer-input">Consumidor Final</label>
-                    <select name="is_final_customer" id="is_final_customer-input">
+                    <label for="is_final_customer-input-${id}">Consumidor Final</label>
+                    <select name="is_final_customer" id="is_final_customer-input-${id}">
                         <option value="sim">Sim</option>
                         <option value="não">Não</option>
                     </select>
                 </div>
                 <div class="invoices-form__input">
-                    <label for="icms-input">Contribuinte ICMS</label>
-                    <select name="icms" id="icms-input">
+                    <label for="icms-input-${id}">Contribuinte ICMS</label>
+                    <select name="icms" id="icms-input-${id}">
                         <option value="sim">Sim</option>
                         <option value="não">Não</option>
                     </select>
                 </div>
                 <div class="invoices-form__input">
-                    <label for="custom_file_name-input">Nome do Arquivo</label>
-                    <input type="text" name="custom_file_name" id="custom_file_name-input">
+                    <label for="custom_file_name-input-${id}">Nome do Arquivo</label>
+                    <input type="text" name="custom_file_name" id="custom_file_name-input-${id}">
                 </div>
                 <div class="invoices-form__input">
-                    <label for="extra_notes-input">Informações Complementares</label>
-                    <input type="text" name="extra_notes" id="extra_notes-input">
+                    <label for="extra_notes-input-${id}">Informações Complementares</label>
+                    <input type="text" name="extra_notes" id="extra_notes-input-${id}">
                 </div>
                 <div class="invoices-form__input">
                     <label>Itens da Nota Fiscal</label>
@@ -131,24 +137,34 @@ function invoicesFormSection(id) {
     `
 }
 
-function manageInvoiceItemsDialog(id) {
+function manageInvoiceItemsDialog(invoiceId) {
     return `
-        <dialog id="items-dialog-${id}" data-invoice-id="${id}" class="invoice-items-dialog">
+        <dialog id="items-dialog-${invoiceId}" class="invoice-items-dialog">
             <div class="invoice-items-dialog__heading">
-                <h3>Itens da Nota Fiscal ${id}</h3>
+                <h3>Itens da Nota Fiscal ${invoiceId}</h3>
                     
                 <div class="invoice-items-dialog__buttons-container">
+                    <button
+                        type="button"
+                        class="invoice-items-dialog-button"
+                        id="add-item-button-${invoiceId}"
+                        data-invoice-id="${invoiceId}"
+                    >
+                        +
+                    </button>
                     <button 
                         type="button"
                         class="invoice-items-dialog__button invoice-items-dialog__confirm-button"
+                        id="confirm-items-button-${invoiceId}"
+                        data-invoice-id="${invoiceId}"
                     >
                         Confirmar
                     </button>
                     <button
                         type="button"
                         class="invoice-items-dialog__button invoice-items-dialog__cancel-button"
-                        id="close-dialog-button-${id}"
-                        data-invoice-id="${id}"
+                        id="close-dialog-button-${invoiceId}"
+                        data-invoice-id="${invoiceId}"
                     >
                         Cancelar
                     </button>
@@ -157,52 +173,65 @@ function manageInvoiceItemsDialog(id) {
 
             <hr/>
             
-            <div class="invoices-form__inputs-container">
+            <div id="dialog-sections-container-${invoiceId}" class="invoices-form__dialog-sections-container">
+                ${invoiceItemsSection(invoiceId, 1)}
+            </div>
+
+        </dialog>
+    `
+}
+
+function invoiceItemsSection(invoiceId, sectionId) {
+    return `
+        <section class="invoices-form__items-section">
+            <h4>Item ${sectionId}</h4>
+
+            <div id="${invoiceId}-${sectionId}" class="invoices-form__inputs-container">
                 
                 <div class="invoices-form__input">
-                    <label for="group-input">Grupo</label>
-                    <select name="group" id="group-input">
+                    <label for="group-input-${invoiceId}-${sectionId}">Grupo</label>
+                    <select name="group" id="group-input-${invoiceId}-${sectionId}">
                         <option value="Gado bovino para corte">Gado bovino para corte</option>
                     </select>
                 </div>
 
                 <div class="invoices-form__input">
-                    <label for="ncm-input">NCM</label>
-                    <input type="text" name="ncm" id="ncm-input">
+                    <label for="ncm-input-${invoiceId}-${sectionId}">NCM</label>
+                    <input type="text" name="ncm" id="ncm-input-${invoiceId}-${sectionId}">
                 </div>
 
                 <div class="invoices-form__input">
-                    <label for="description-input">Descrição</label>
-                    <input type="text" name="description" id="description-input">
+                    <label for="description-input-${invoiceId}-${sectionId}">Descrição</label>
+                    <input type="text" name="description" id="description-input-${invoiceId}-${sectionId}">
                 </div>
 
                 <div class="invoices-form__input">
-                    <label for="origin-input">Origem</label>
-                    <select name="origin" id="origin-input">
+                    <label for="origin-input-${invoiceId}-${sectionId}">Origem</label>
+                    <select name="origin" id="origin-input-${invoiceId}-${sectionId}">
                         <option value="Nacional">Nacional</option>
                     </select>
                 </div>
 
                 <div class="invoices-form__input">
-                    <label for="unity_of_measurement-input">Unidade de medida</label>
-                    <select name="unity_of_measurement" id="unity_of_measurement-input">
+                    <label for="unity_of_measurement-input-${invoiceId}-${sectionId}">Unidade de medida</label>
+                    <select name="unity_of_measurement" id="unity_of_measurement-input-${invoiceId}-${sectionId}">
                         <option value="CB">CB</option>
                     </select>
                 </div>
 
                 <div class="invoices-form__input">
-                    <label for="quantity-input">Quantidade</label>
-                    <input type="number" step=0.01 name="quantity" id="quantity-input">
+                    <label for="quantity-input-${invoiceId}-${sectionId}">Quantidade</label>
+                    <input type="number" step=0.01 name="quantity" id="quantity-input-${invoiceId}-${sectionId}">
                 </div>
 
                 <div class="invoices-form__input">
-                    <label for="value_per_unity-input">Valor Unitário</label>
-                    <input type="number" step=0.01 name="value_per_unity" id="value_per_unity-input">
+                    <label for="value_per_unity-input-${invoiceId}-${sectionId}">Valor Unitário</label>
+                    <input type="number" step=0.01 name="value_per_unity" id="value_per_unity-input-${invoiceId}-${sectionId}">
                 </div>
 
             </div>
+        </section>
 
-        </dialog>
     `
 }
 
