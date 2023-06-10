@@ -6,6 +6,10 @@ class API:
         print(entity_data)
         return entity_data
 
+    def create_invoices(self, invoices_data):
+        print(invoices_data)
+        return invoices_data
+
 
 api = API()
 webview.create_window(

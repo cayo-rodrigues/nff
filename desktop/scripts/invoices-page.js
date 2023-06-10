@@ -22,7 +22,7 @@ export function createInvoicesPage() {
             <button class="invoices-form__add-section-button" type="button">+</button>
         </form>
     `
-    
+
     const sectionsContainer = document.querySelector('.invoices-form__sections-container')
     sectionsContainer.addEventListener('click', ({ target }) => {
         if (target.id && target.id.includes('open-dialog-button')) {
@@ -44,6 +44,9 @@ export function createInvoicesPage() {
         const invoiceId = sectionsContainer.childElementCount + 1
         sectionsContainer.innerHTML += invoicesFormSection(invoiceId)
     })
+
+    const form = contentCore.querySelector('.invoices-form')
+    form.addEventListener('submit', submitInvoicesForm)
 }
 
 
@@ -190,43 +193,43 @@ function invoiceItemsSection(invoiceId, sectionId) {
                 
                 <div class="invoices-form__input">
                     <label for="group-input-${invoiceId}-${sectionId}">Grupo</label>
-                    <select name="group" id="group-input-${invoiceId}-${sectionId}">
+                    <select name="group" id="group-input-${invoiceId}-${sectionId}" data-section="items">
                         <option value="Gado bovino para corte">Gado bovino para corte</option>
                     </select>
                 </div>
 
                 <div class="invoices-form__input">
                     <label for="ncm-input-${invoiceId}-${sectionId}">NCM</label>
-                    <input type="text" name="ncm" id="ncm-input-${invoiceId}-${sectionId}">
+                    <input type="text" name="ncm" id="ncm-input-${invoiceId}-${sectionId}" data-section="items">
                 </div>
 
                 <div class="invoices-form__input">
                     <label for="description-input-${invoiceId}-${sectionId}">Descrição</label>
-                    <input type="text" name="description" id="description-input-${invoiceId}-${sectionId}">
+                    <input type="text" name="description" id="description-input-${invoiceId}-${sectionId}" data-section="items">
                 </div>
 
                 <div class="invoices-form__input">
                     <label for="origin-input-${invoiceId}-${sectionId}">Origem</label>
-                    <select name="origin" id="origin-input-${invoiceId}-${sectionId}">
+                    <select name="origin" id="origin-input-${invoiceId}-${sectionId}" data-section="items">
                         <option value="Nacional">Nacional</option>
                     </select>
                 </div>
 
                 <div class="invoices-form__input">
                     <label for="unity_of_measurement-input-${invoiceId}-${sectionId}">Unidade de medida</label>
-                    <select name="unity_of_measurement" id="unity_of_measurement-input-${invoiceId}-${sectionId}">
+                    <select name="unity_of_measurement" id="unity_of_measurement-input-${invoiceId}-${sectionId}" data-section="items">
                         <option value="CB">CB</option>
                     </select>
                 </div>
 
                 <div class="invoices-form__input">
                     <label for="quantity-input-${invoiceId}-${sectionId}">Quantidade</label>
-                    <input type="number" step=0.01 name="quantity" id="quantity-input-${invoiceId}-${sectionId}">
+                    <input type="number" step=0.01 name="quantity" id="quantity-input-${invoiceId}-${sectionId}" data-section="items">
                 </div>
 
                 <div class="invoices-form__input">
                     <label for="value_per_unity-input-${invoiceId}-${sectionId}">Valor Unitário</label>
-                    <input type="number" step=0.01 name="value_per_unity" id="value_per_unity-input-${invoiceId}-${sectionId}">
+                    <input type="number" step=0.01 name="value_per_unity" id="value_per_unity-input-${invoiceId}-${sectionId}" data-section="items">
                 </div>
 
             </div>
@@ -241,4 +244,44 @@ export function cancelInvoicesPage() {
     contentCore.innerHTML = `
         Cancel invoices!
     `
+}
+
+async function submitInvoicesForm(event) {
+    event.preventDefault()
+    const form = event.target
+
+    let invoiceSectionData = {
+        items: []
+    }
+    let itemSectionData = {}
+    const invoicesData = []
+
+    for (const child of form) {
+        if (child.name) {
+            // if this is true, then it means that in this loop begins the next form section
+            if (invoiceSectionData.hasOwnProperty(child.name)) {
+                invoiceSectionData.items.push(Object.assign({}, itemSectionData))
+                invoicesData.push(Object.assign({}, invoiceSectionData))
+                invoiceSectionData = {
+                    items: []
+                }
+                itemSectionData = {}
+            }
+            // here it means that this is the next item section within an invoice section
+            if (itemSectionData.hasOwnProperty(child.name)) {
+                invoiceSectionData.items.push(Object.assign({}, itemSectionData))
+                itemSectionData = {}
+            }
+            child.dataset.section === 'items'
+                ? itemSectionData[child.name] = child.value
+                : invoiceSectionData[child.name] = child.value
+        }
+    }
+    // applied only to the last invoice section 
+    invoicesData.push(invoiceSectionData)
+    invoiceSectionData.items.push(itemSectionData)
+
+
+    const response = await pywebview.api.create_invoices(invoicesData)
+    console.log(response)
 }
