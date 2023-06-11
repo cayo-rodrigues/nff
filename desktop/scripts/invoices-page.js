@@ -79,7 +79,7 @@ function newInvoiceSection(invoiceId, sectionsContainer) {
             </div>
             <div class="invoices-form__input">
                 <label for="gta-input-${invoiceId}">GTA</label>
-                <input type="gta" name="gta" id="gta-input-${invoiceId}">
+                <input type="text" name="gta" id="gta-input-${invoiceId}">
             </div>
             <div class="invoices-form__input">
                 <label for="cfop-input-${invoiceId}">CFOP</label>
@@ -240,8 +240,58 @@ export function cancelInvoicesPage() {
     const contentCore = document.querySelector("#content__core")
     contentCore.innerHTML = ""
     contentCore.innerHTML = `
-        Cancel invoices!
+        <form class="invoices-form">
+            <div class="invoices-form__sections-container"></div>
+
+            <button class="invoices-form__button" type="submit">Cancelar Notas Fiscais</button>
+            <button class="invoices-form__add-section-button" type="button">+</button>
+        </form>
     `
+
+    const sectionsContainer = document.querySelector('.invoices-form__sections-container')
+
+    const addSectionButton = contentCore.querySelector('.invoices-form__add-section-button')
+    addSectionButton.addEventListener('click', () => {
+        const cancelingId = sectionsContainer.childElementCount + 1
+        newCancelingSection(cancelingId, sectionsContainer)
+    })
+
+    const form = contentCore.querySelector('.invoices-form')
+    form.addEventListener('submit', submitCancelingsForm)
+
+    newCancelingSection(1, sectionsContainer)
+}
+
+function newCancelingSection(cancelingId, sectionsContainer) {
+    const newFormSection = document.createElement('section')
+    newFormSection.className = "invoices-form__section"
+    newFormSection.innerHTML = `
+        <h3>Cancelamento ${cancelingId}</h3>
+        <div id="${cancelingId}" class="invoices-form__inputs-container">
+
+            <div class="invoices-form__input">
+                <label for="entity-${cancelingId}">Entidade</label>
+                <select name="entity" id="entity-${cancelingId}">
+                    <option value="entity-id">Emerson</option>
+                </select>
+            </div>
+            <div class="invoices-form__input">
+                <label for="invoice-id-${cancelingId}">Número da nota</label>
+                <input type="text" name="invoice_id" id="invoice-id-${cancelingId}">
+            </div>
+            <div class="invoices-form__input">
+                <label for="year-${cancelingId}">Ano</label>
+                <input type="text" name="year" id="year-${cancelingId}">
+            </div>
+            <div class="invoices-form__input">
+                <label for="justification-${cancelingId}">Justificativa</label>
+                <input type="text" name="justification" id="justification-${cancelingId}">
+            </div>
+            
+        </div>
+    `
+
+    sectionsContainer.append(newFormSection)
 }
 
 async function submitInvoicesForm(event) {
@@ -281,5 +331,27 @@ async function submitInvoicesForm(event) {
 
 
     const response = await pywebview.api.create_invoices(invoicesData)
+    console.log(response)
+}
+
+async function submitCancelingsForm(event) {
+    event.preventDefault()
+    const form = event.target
+
+    const cancelingsData = []
+    let sectionData = {}
+
+    for (const child of form) {
+        if (child.name) {
+            if (sectionData.hasOwnProperty(child.name)) {
+                cancelingsData.push(Object.assign({}, sectionData))
+                sectionData = {}
+            }
+            sectionData[child.name] = child.value
+        }
+    }
+    cancelingsData.push(sectionData)
+
+    const response = await pywebview.api.cancel_invoices(cancelingsData)
     console.log(response)
 }

@@ -10,6 +10,10 @@ class API:
         print(invoices_data)
         return invoices_data
 
+    def cancel_invoices(self, cancelings_data):
+        print(cancelings_data)
+        return cancelings_data
+
 
 api = API()
 webview.create_window(
