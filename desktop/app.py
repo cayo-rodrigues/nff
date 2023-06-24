@@ -1,22 +1,17 @@
-import webview
+if __name__ == "__main__":
+    import webview
+    from api import API
 
+    api = API()
+    screen = webview.screens[0]
 
-class API:
-    def register_entity(self, entity_data):
-        print(entity_data)
-        return entity_data
+    webview.create_window(
+        title="NFF - Nota Fiscal Fácil",
+        url="./index.html",
+        js_api=api,
+        width=screen.width,
+        height=screen.height,
+    )
 
-    def create_invoices(self, invoices_data):
-        print(invoices_data)
-        return invoices_data
+    webview.start(debug=True)
 
-    def cancel_invoices(self, cancelings_data):
-        print(cancelings_data)
-        return cancelings_data
-
-
-api = API()
-webview.create_window(
-    "NFF - Nota Fiscal Fácil", url="./index.html", js_api=api,
-)
-webview.start(debug=True)

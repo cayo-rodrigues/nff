@@ -1,5 +1,3 @@
-/* register-invoices */
-
 .invoices-form {
     padding: 1rem;
 }
@@ -40,10 +38,6 @@
     cursor: pointer;
 }
 
-.invoices-form__items-dialog-button {
-    
-}
-
 .invoice-items-dialog {
     width: 80%;
     height: 60%;
@@ -52,9 +46,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-.invoice-items-dialog__buttons-container {
-
 }
 .invoice-items-dialog__button {
     text-transform: uppercase;

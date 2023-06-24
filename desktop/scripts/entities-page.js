@@ -1,4 +1,4 @@
-export function listEntitiesPage() {
+export async function listEntitiesPage() {
   document.querySelector("#current-tab-title").innerText = "Entidades"
 
   const className = "sub-menu__item--selected"
@@ -14,23 +14,7 @@ export function listEntitiesPage() {
   const contentCore = document.querySelector("#content__core")
   contentCore.innerHTML = ""
 
-  // MOCK
-  const entities = [
-    {
-      name: "Emerson Frivasa",
-      type: "Produtor Rural",
-      ie: "123456789",
-      cpf_cnpj: "987654321",
-      email: "aushuahsuahs@gmail.com",
-      password: "123456",
-      zip_code: "37508000",
-      neighborhood: "Laje",
-      street_type: "Rua",
-      street_name: "Olegário Maciel",
-      number: "47",
-    },
-  ]
-  // MOCK
+  const entities = await pywebview.api.get_entities()
 
   const entitiesList = document.createElement("ul")
   entitiesList.className = "entities-list"
@@ -49,7 +33,7 @@ export function listEntitiesPage() {
         
         <div class="entity-card__contents" >
           <ul class="entity-card__section">
-            <li><b>Tipo:</b> <span>${entity.type}</span></li>
+            <li><b>Tipo:</b> <span>${entity.user_type}</span></li>
             <li><b>IE:</b> <span>${entity.ie}</span></li>
             <li><b>CPF/CNPJ:</b> <span>${entity.cpf_cnpj}</span></li>
             <li><b>E-mail:</b> <span>${entity.email}</span></li>
@@ -57,7 +41,7 @@ export function listEntitiesPage() {
           </ul>
           
           <ul class="entity-card__section">
-            <li><b>CEP:</b> <span>${entity.zip_code}</span></li>
+            <li><b>CEP:</b> <span>${entity.postal_code}</span></li>
             <li><b>Bairro:</b> <span>${entity.neighborhood}</span></li>
             <li><b>Logradouro (tipo):</b> <span>${entity.street_type}</span></li>
             <li><b>Logradouro (nome):</b> <span>${entity.street_name}</span></li>
