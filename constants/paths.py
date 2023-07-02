@@ -1,12 +1,9 @@
-from os import getcwd
-from platform import system
+import os
 
-PATH_SEP = "\\" if system() == "Windows" else "/"
+PROJECT_DIR_PATH = os.getcwd() + os.sep
 
-PROJECT_DIR_PATH = getcwd() + PATH_SEP
-
-ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + PATH_SEP
-INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + PATH_SEP
+ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + os.sep
+INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + os.sep
 
 DB_FILE_EXTENSIONS = [".xlsx", ".ods"]
 DB_FILE_PATH = PROJECT_DIR_PATH + "db"

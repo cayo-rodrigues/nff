@@ -3,8 +3,10 @@
 .entities-list__card {
   box-shadow: 1px 1px 5px darkgray;
   margin: 2rem 1rem;
-  padding: 1.5rem;
+  padding: 0;
   transition: background .2s ease-in-out;
+  display: flex;
+  justify-content: space-between;
 }
 
 .entities-list__card:hover {
@@ -13,6 +15,34 @@
 
 .entities-list__card li {
   padding: .5rem 0;
+}
+
+.entity-card__shallow-info {
+    flex: 12;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 1.5rem;
+}
+.entity-card__shallow-info > .shallow-info__data {
+    flex: 1;
+}
+
+.entity-card__action-icons {
+  flex: 1;
+  border-left: 1px dashed lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+.entity-card__update-icon, .entity-card__delete-icon {
+    cursor: pointer;
+}
+.entity-card__action-icons svg {
+    height: 25px;
+}
+.entity-card__action-icons svg:hover {
+    fill: red;
 }
 
 .entity-card__contents {
@@ -32,6 +62,29 @@
 
 .entity-card__name {
   margin: 0;
+}
+
+.entity-card__details-dialog {
+    min-width: 50vw;
+    padding: 2rem;
+}
+.entity-card__details-dialog h3 {
+    margin: 0;
+}
+.entity-details__heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0 1rem 0;
+}
+.details-dialog__info-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0 0 0;
+}
+.details-dialog__info-section > ul {
+    flex: 1;
 }
 
 /* register-entities */
