@@ -37,3 +37,21 @@ def select(table_name: str, cursor: sqlite3.Cursor = None):
 @db_connection
 def delete(table_name: str, row_id: int, cursor: sqlite3.Cursor = None):
     cursor.execute(f"DELETE FROM {table_name} WHERE id = ?", [row_id])
+
+
+@db_connection
+def update(
+    table_name: str, data: dict, row_id: int, cursor: sqlite3.Cursor = None
+):
+    columns_with_placeholders = ', '.join(
+        [f"{column} = ?" for column in data.keys()]
+    )
+    values = list(data.values())
+    values.append(row_id)
+
+    cursor.execute(
+        f"""UPDATE {table_name}
+                SET {columns_with_placeholders}
+            WHERE id = ?""",
+        values
+    )

@@ -23,6 +23,7 @@
     justify-content: space-between;
     cursor: pointer;
     padding: 1.5rem;
+    margin: 0;
 }
 .entity-card__shallow-info > .shallow-info__data {
     flex: 1;
@@ -43,25 +44,6 @@
 }
 .entity-card__action-icons svg:hover {
     fill: red;
-}
-
-.entity-card__contents {
-  display: flex;
-  justify-content: space-between;
-}
-
-.entity-card__section {
-  flex: 1;
-}
-
-.entity-card__heading {
-  display: flex;
-  justify-content: space-between;
-  margin: .5rem 0 1.2rem 0;
-}
-
-.entity-card__name {
-  margin: 0;
 }
 
 .entity-card__details-dialog {
@@ -85,6 +67,17 @@
 }
 .details-dialog__info-section > ul {
     flex: 1;
+}
+
+.entity-card__update-dialog {
+    width: 65vw;
+}
+
+.update-entity__heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
 }
 
 /* register-entities */
