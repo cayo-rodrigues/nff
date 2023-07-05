@@ -21,3 +21,6 @@ class API:
     def cancel_invoices(self, cancelings_data):
         print(cancelings_data)
         return cancelings_data
+
+    def get_lists_data(self, columns: str):
+        return db.select('lists_data', columns=columns, group_by_columns=True)

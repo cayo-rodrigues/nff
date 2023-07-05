@@ -1,4 +1,6 @@
-export function createInvoicesPage() {
+import { entitiesToOptionTags, listsDataToOptionTags } from "./helpers.js"
+
+export async function createInvoicesPage() {
     document.querySelector("#current-tab-title").innerText = "Notas Fiscais"
 
     const className = "sub-menu__item--selected"
@@ -26,7 +28,9 @@ export function createInvoicesPage() {
         if (target.id && target.id.includes('open-dialog-button')) {
             document.getElementById(`items-dialog-${target.dataset.invoiceId}`).showModal()
         }
-        else if (target.id && target.id.includes('close-dialog-button')) {
+        else if (target.id && (target.id.includes('close-dialog-button') || target.id.includes('confirm-items-button'))) {
+            // CONFIRM BUTTON SHOULD KEEP THE ITEMS
+            // CANCEL BUTTON SHOULD ERASE THE ITEMS
             document.getElementById(`items-dialog-${target.dataset.invoiceId}`).close()
         }
         else if (target.id && target.id.includes('add-item-button')) {
@@ -34,24 +38,34 @@ export function createInvoicesPage() {
             const dialogSectionsContainer = document.getElementById(`dialog-sections-container-${invoiceId}`)
             const sectionId = dialogSectionsContainer.childElementCount + 1
 
-            newInvoiceItemSection(invoiceId, sectionId, dialogSectionsContainer)
+            newInvoiceItemSection(invoiceId, sectionId, dialogSectionsContainer, optionTags)
         }
     })
+
+    const entities = await pywebview.api.get_entities()
+    const listsData = await pywebview.api.get_lists_data(
+        'operation_options, cfop_options, icms_options, group_options, ' +
+        'origin_options, unity_of_measurement_options, boolean_options'
+    )
+    const optionTags = {
+        entities: entitiesToOptionTags(entities),
+    }
+    Object.assign(optionTags, listsDataToOptionTags(listsData))
 
     const addSectionButton = contentCore.querySelector('.invoices-form__add-section-button')
     addSectionButton.addEventListener('click', () => {
         const invoiceId = sectionsContainer.childElementCount + 1
-        newInvoiceSection(invoiceId, sectionsContainer)
+        newInvoiceSection(invoiceId, sectionsContainer, optionTags)
     })
 
     const form = contentCore.querySelector('.invoices-form')
     form.addEventListener('submit', submitInvoicesForm)
 
-    newInvoiceSection(1, sectionsContainer)
+    newInvoiceSection(1, sectionsContainer, optionTags)
 }
 
 
-function newInvoiceSection(invoiceId, sectionsContainer) {
+function newInvoiceSection(invoiceId, sectionsContainer, optionTags) {
     const newFormSection = document.createElement('section')
     newFormSection.className = "invoices-form__section"
     newFormSection.innerHTML = `
@@ -61,20 +75,19 @@ function newInvoiceSection(invoiceId, sectionsContainer) {
             <div class="invoices-form__input">
                 <label for="sender-input-${invoiceId}">Remetente</label>
                 <select name="sender" id="sender-input-${invoiceId}">
-                    <option value="sender-id">Emerson</option>
+                    ${optionTags.entities}
                 </select>
             </div>
             <div class="invoices-form__input">
                 <label for="recipient-input-${invoiceId}">Destinatário</label>
                 <select name="recipient" id="recipient-input-${invoiceId}">
-                    <option value="emerson-id">Emerson</option>
+                    ${optionTags.entities}
                 </select>
             </div>
             <div class="invoices-form__input">
                 <label for="operation-input-${invoiceId}">Natureza da Operação</label>
                 <select name="operation" id="operation-input-${invoiceId}">
-                    <option value="VENDA">VENDA</option>
-                    <option value="REMESSA">REMESSA</option>
+                    ${optionTags.operation_options}
                 </select>
             </div>
             <div class="invoices-form__input">
@@ -84,10 +97,7 @@ function newInvoiceSection(invoiceId, sectionsContainer) {
             <div class="invoices-form__input">
                 <label for="cfop-input-${invoiceId}">CFOP</label>
                 <select name="cfop" id="cfop-input-${invoiceId}">
-                    <option value="5101">5101</option>
-                    <option value="5102">5102</option>
-                    <option value="5103">5103</option>
-                    <option value="5105">5105</option>
+                    ${optionTags.cfop_options}
                 </select>
             </div>
             <div class="invoices-form__input">
@@ -97,22 +107,19 @@ function newInvoiceSection(invoiceId, sectionsContainer) {
             <div class="invoices-form__input">
                 <label for="add_shipping_to_total_value-input-${invoiceId}">Adicionar Frete ao Total</label>
                 <select name="add_shipping_to_total_value" id="add_shipping_to_total_value-input-${invoiceId}">
-                    <option value="sim">Sim</option>
-                    <option value="não">Não</option>
+                    ${optionTags.boolean_options}
                 </select>
             </div>
             <div class="invoices-form__input">
                 <label for="is_final_customer-input-${invoiceId}">Consumidor Final</label>
                 <select name="is_final_customer" id="is_final_customer-input-${invoiceId}">
-                    <option value="sim">Sim</option>
-                    <option value="não">Não</option>
+                    ${optionTags.boolean_options}
                 </select>
             </div>
             <div class="invoices-form__input">
                 <label for="icms-input-${invoiceId}">Contribuinte ICMS</label>
                 <select name="icms" id="icms-input-${invoiceId}">
-                    <option value="sim">Sim</option>
-                    <option value="não">Não</option>
+                    ${optionTags.icms_options}
                 </select>
             </div>
             <div class="invoices-form__input">
@@ -178,10 +185,10 @@ function newInvoiceSection(invoiceId, sectionsContainer) {
     `
 
     sectionsContainer.append(newFormSection)
-    newInvoiceItemSection(invoiceId, 1, document.getElementById(`dialog-sections-container-${invoiceId}`))
+    newInvoiceItemSection(invoiceId, 1, document.getElementById(`dialog-sections-container-${invoiceId}`), optionTags)
 }
 
-function newInvoiceItemSection(invoiceId, sectionId, dialogSectionsContainer) {
+function newInvoiceItemSection(invoiceId, sectionId, dialogSectionsContainer, optionTags) {
     const newItemSection = document.createElement('section')
     newItemSection.className = "invoices-form__items-section"
     newItemSection.innerHTML = `
@@ -192,7 +199,7 @@ function newInvoiceItemSection(invoiceId, sectionId, dialogSectionsContainer) {
             <div class="invoices-form__input">
                 <label for="group-input-${invoiceId}-${sectionId}">Grupo</label>
                 <select name="group" id="group-input-${invoiceId}-${sectionId}" data-section="items">
-                    <option value="Gado bovino para corte">Gado bovino para corte</option>
+                    ${optionTags.group_options}
                 </select>
             </div>
 
@@ -209,14 +216,14 @@ function newInvoiceItemSection(invoiceId, sectionId, dialogSectionsContainer) {
             <div class="invoices-form__input">
                 <label for="origin-input-${invoiceId}-${sectionId}">Origem</label>
                 <select name="origin" id="origin-input-${invoiceId}-${sectionId}" data-section="items">
-                    <option value="Nacional">Nacional</option>
+                    ${optionTags.origin_options}
                 </select>
             </div>
 
             <div class="invoices-form__input">
                 <label for="unity_of_measurement-input-${invoiceId}-${sectionId}">Unidade de medida</label>
                 <select name="unity_of_measurement" id="unity_of_measurement-input-${invoiceId}-${sectionId}" data-section="items">
-                    <option value="CB">CB</option>
+                    ${optionTags.unity_of_measurement_options}
                 </select>
             </div>
 
@@ -236,7 +243,7 @@ function newInvoiceItemSection(invoiceId, sectionId, dialogSectionsContainer) {
     dialogSectionsContainer.append(newItemSection)
 }
 
-export function cancelInvoicesPage() {
+export async function cancelInvoicesPage() {
     const contentCore = document.querySelector("#content__core")
     contentCore.innerHTML = ""
     contentCore.innerHTML = `
@@ -248,21 +255,26 @@ export function cancelInvoicesPage() {
         </form>
     `
 
+    const entities = await pywebview.api.get_entities()
+    const optionTags = {
+        entities: entitiesToOptionTags(entities)
+    }
+
     const sectionsContainer = document.querySelector('.invoices-form__sections-container')
 
     const addSectionButton = contentCore.querySelector('.invoices-form__add-section-button')
     addSectionButton.addEventListener('click', () => {
         const cancelingId = sectionsContainer.childElementCount + 1
-        newCancelingSection(cancelingId, sectionsContainer)
+        newCancelingSection(cancelingId, sectionsContainer, optionTags)
     })
 
     const form = contentCore.querySelector('.invoices-form')
     form.addEventListener('submit', submitCancelingsForm)
 
-    newCancelingSection(1, sectionsContainer)
+    newCancelingSection(1, sectionsContainer, optionTags)
 }
 
-function newCancelingSection(cancelingId, sectionsContainer) {
+function newCancelingSection(cancelingId, sectionsContainer, optionTags) {
     const newFormSection = document.createElement('section')
     newFormSection.className = "invoices-form__section"
     newFormSection.innerHTML = `
@@ -272,7 +284,7 @@ function newCancelingSection(cancelingId, sectionsContainer) {
             <div class="invoices-form__input">
                 <label for="entity-${cancelingId}">Entidade</label>
                 <select name="entity" id="entity-${cancelingId}">
-                    <option value="entity-id">Emerson</option>
+                    ${optionTags.entities}
                 </select>
             </div>
             <div class="invoices-form__input">

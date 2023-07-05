@@ -1,4 +1,4 @@
-import { toTitleCase, svgIcons } from "./helpers.js"
+import { toTitleCase, svgIcons, listsDataToOptionTags } from "./helpers.js"
 
 export async function listEntitiesPage() {
     document.querySelector("#current-tab-title").innerText = "Entidades"
@@ -17,12 +17,16 @@ export async function listEntitiesPage() {
     contentCore.innerHTML = ""
 
     const entities = await pywebview.api.get_entities()
+    const listsData = await pywebview.api.get_lists_data(
+        'user_type_options, street_type_options'
+    )
+    const optionTags = listsDataToOptionTags(listsData)
 
     const entitiesList = document.createElement("ul")
     entitiesList.className = "entities-list"
 
     for (let entity of entities) {
-        entitiesList.append(makeEntityCard(entity))
+        entitiesList.append(makeEntityCard(entity, optionTags))
     }
 
     entitiesList.addEventListener('click', handleEntityActions)
@@ -32,7 +36,7 @@ export async function listEntitiesPage() {
     })
 }
 
-function makeEntityCard(entity) {
+function makeEntityCard(entity, optionTags) {
     const entityCard = document.createElement('li')
     entityCard.className = 'entities-list__card'
     entityCard.id = entity.id
@@ -59,11 +63,11 @@ function makeEntityCard(entity) {
         </span>
       </div>
     `
-    entityCard.append(entityDetailsDialog(entity), updateEntityDialog(entity))
+    entityCard.append(entityDetailsDialog(entity), updateEntityDialog(entity, optionTags))
     return entityCard
 }
 
-function updateEntityDialog(entity) {
+function updateEntityDialog(entity, optionTags) {
     const dialog = document.createElement('dialog')
     dialog.className = "entity-card__update-dialog"
     dialog.id = `update-dialog-${entity.id}`
@@ -88,7 +92,7 @@ function updateEntityDialog(entity) {
                 <div class="entity-form__input">
                     <label for="user_type-input">Tipo</label>
                     <select name="user_type" id="user_type-input">
-                        <option value="Produtor Rural">Produtor Rural</option>
+                        ${optionTags.user_type_options}
                     </select>
                 </div>
                 <div class="entity-form__input">
@@ -114,7 +118,7 @@ function updateEntityDialog(entity) {
                 <div class="entity-form__input">
                     <label for="street_type-input">Logradouro (tipo)</label>
                     <select name="street_type" id="street_type-input">
-                        <option value="Rua">Rua</option>
+                        ${optionTags.street_type_options}
                     </select>
                 </div>
                 <div class="entity-form__input">
@@ -209,7 +213,11 @@ async function handleEntityActions(event) {
     }
 }
 
-export function createEntitiesPage() {
+export async function createEntitiesPage() {
+    const listsData = await pywebview.api.get_lists_data(
+        'user_type_options, street_type_options'
+    )
+    const options = listsDataToOptionTags(listsData)
     const contentCore = document.querySelector("#content__core")
     contentCore.innerHTML = `
         <form class="entity-form">
@@ -226,7 +234,7 @@ export function createEntitiesPage() {
                 <div class="entity-form__input">
                     <label for="user_type-input">Tipo</label>
                     <select name="user_type" id="user_type-input">
-                        <option value="Produtor Rural">Produtor Rural</option>
+                        ${options.user_type_options}
                     </select>
                 </div>
                 <div class="entity-form__input">
@@ -252,7 +260,7 @@ export function createEntitiesPage() {
                 <div class="entity-form__input">
                     <label for="street_type-input">Logradouro (tipo)</label>
                     <select name="street_type" id="street_type-input">
-                        <option value="Rua">Rua</option>
+                        ${options.street_type_options}
                     </select>
                 </div>
                 <div class="entity-form__input">

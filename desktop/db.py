@@ -12,7 +12,18 @@ def db_connection(f):
         connection.commit()
         connection.close()
 
-        return [dict(row) for row in result] if result else None
+        if result:
+            return (
+                {
+                    column: [
+                        row[column] for row in result if row[column]
+                    ]
+                    for column in dict(result[0]).keys()
+                }
+                if kwargs.get('group_by_columns')
+                else [dict(row) for row in result]
+            )
+        return None
 
     return wrapper
 
@@ -30,8 +41,13 @@ def insert(table_name: str, data: dict, cursor: sqlite3.Cursor = None):
 
 
 @db_connection
-def select(table_name: str, cursor: sqlite3.Cursor = None):
-    return cursor.execute(f"SELECT * FROM {table_name}").fetchall()
+def select(
+    table_name: str,
+    columns: str = "*",
+    group_by_columns: bool = False,
+    cursor: sqlite3.Cursor = None,
+):
+    return cursor.execute(f"SELECT {columns} FROM {table_name}").fetchall()
 
 
 @db_connection

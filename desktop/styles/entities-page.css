@@ -25,6 +25,9 @@
     padding: 1.5rem;
     margin: 0;
 }
+.entity-card__shallow-info h4 {
+    margin: 0;
+}
 .entity-card__shallow-info > .shallow-info__data {
     flex: 1;
 }
