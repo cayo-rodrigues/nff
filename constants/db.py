@@ -11,7 +11,7 @@ class SheetNames:
 class DefaultValues:
     class InvoiceItem:
         NCM = "94019900"
-    
+
     class InvoiceCanceling:
         YEAR = str(date.today().year)
 
@@ -58,7 +58,7 @@ class DBColumns:
         YEAR = "ano"
         JUSTIFICATION = "justificativa"
         ENTITY = "entidade"
-    
+
 
 class ModelFields:
     class Invoice:
@@ -96,7 +96,7 @@ class ModelFields:
         STREET_TYPE = "street_type"
         STREET_NAME = "street_name"
         NUMBER = "number"
-    
+
     class InvoiceCanceling:
         INVOICE_ID = "invoice_id"
         YEAR = "year"
@@ -142,7 +142,7 @@ class MandatoryFields:
         (ModelFields.Entity.STREET_TYPE, DBColumns.Entity.STREET_TYPE),
         (ModelFields.Entity.STREET_NAME, DBColumns.Entity.STREET_NAME),
     ]
-    
+
     INVOICE_CANCELING = [
         (ModelFields.InvoiceCanceling.INVOICE_ID, DBColumns.InvoiceCanceling.INVOICE_ID),
         (ModelFields.InvoiceCanceling.JUSTIFICATION, DBColumns.InvoiceCanceling.JUSTIFICATION),

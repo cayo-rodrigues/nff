@@ -30,5 +30,6 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (KeyboardInterrupt, WebDriverException):
+    except (KeyboardInterrupt, WebDriverException) as e:
+        print(e)
         Logger.unexpected_exit()
