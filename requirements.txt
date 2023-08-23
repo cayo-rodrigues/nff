@@ -61,4 +61,5 @@ trio==0.22.0
 trio-websocket==0.9.2
 urllib3==1.26.12
 wcwidth==0.2.5
+webdriver-manager @ git+https://github.com/SergeyPirogov/webdriver_manager@de0872ff7fb5eb141fdc32e991938f5ac494278e
 wsproto==1.2.0
