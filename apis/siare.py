@@ -65,10 +65,6 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_ADITIONAL_DATA_TAB
         self.get_and_click(xpath)
 
-    def close_first_pop_up(self) -> None:
-        xpath = XPaths.POP_UP_CLOSE_BUTTON
-        self.get_and_click(xpath)
-
     def fill_invoice_basic_data(self, invoice: Invoice) -> None:
         xpath = XPaths.INVOICE_BASIC_DATA_OPERATION_SELECT_INPUT
         self.get_and_click(xpath)

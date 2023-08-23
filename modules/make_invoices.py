@@ -47,7 +47,6 @@ def make_invoices(
 
             siare.open_website()
             siare.login(invoice.sender)
-            siare.close_first_pop_up()
 
             prev_sender = invoice.sender.ie
 
