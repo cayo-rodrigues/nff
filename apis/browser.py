@@ -10,8 +10,9 @@ from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
+from webdriver_manager.chrome import ChromeDriverManager
 
-from constants.paths import INVOICES_DIR_PATH, CHROME_DRIVER_PATH
+from constants.paths import INVOICES_DIR_PATH
 from constants.standards import STANDARD_SLEEP_TIME
 from utils.decorators import wait_for_it
 
@@ -46,7 +47,7 @@ class Browser:
 
         self._browser = webdriver.Chrome(
             chrome_options=options,
-            service=ChromeService(executable_path=CHROME_DRIVER_PATH),
+            service=ChromeService(executable_path=ChromeDriverManager().install()),
         )
         self.prev_num_files = FileManager.count_files(INVOICES_DIR_PATH)
 

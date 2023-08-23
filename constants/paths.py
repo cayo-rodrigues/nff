@@ -1,5 +1,4 @@
 import os
-import platform
 
 PROJECT_DIR_PATH = os.getcwd() + os.sep
 
@@ -14,10 +13,6 @@ PROJECT_ICON_PATH = ASSETS_DIR_PATH + "icon.ico"
 ERROR_IMG_PATH = ASSETS_DIR_PATH + "error.png"
 WARNING_IMG_PATH = ASSETS_DIR_PATH + "warning.png"
 INFO_IMG_PATH = ASSETS_DIR_PATH + "info.png"
-
-CHROME_DRIVER_PATH = PROJECT_DIR_PATH + "chromedriver"
-if platform.system() == "Windows":
-    CHROME_DRIVER_PATH += ".exe"
 
 
 class Urls:
