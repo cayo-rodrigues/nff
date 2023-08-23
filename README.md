@@ -64,7 +64,8 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [x] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [x] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
 - [x] Possibilitar **cancelamento** de notas fiscais
-- [ ] Poder usar Google Sheets como base de dados
+- [ ] Aba de Histórico de notas fiscais emitidas/canceladas
+- [ ] Possibilitar o uso de templates de nota fiscal, preenchendo automaticamente os campos no excel
 
 ## Detalhes Técnicos
 
