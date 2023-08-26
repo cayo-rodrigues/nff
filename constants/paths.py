@@ -1,12 +1,9 @@
-from os import getcwd
-from platform import system
+import os
 
-PATH_SEP = "\\" if system() == "Windows" else "/"
+PROJECT_DIR_PATH = os.getcwd() + os.sep
 
-PROJECT_DIR_PATH = getcwd() + PATH_SEP
-
-ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + PATH_SEP
-INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + PATH_SEP
+ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + os.sep
+INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + os.sep
 
 DB_FILE_EXTENSIONS = [".xlsx", ".ods"]
 DB_FILE_PATH = PROJECT_DIR_PATH + "db"
@@ -31,9 +28,6 @@ class XPaths:
     LOGIN_CPF_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[3]/div/div[1]/input"
     LOGIN_PASSWORD_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[5]/div/div[1]/input"
 
-    # initial page
-    POP_UP_CLOSE_BUTTON = '//*[@id="popCloseBox"]'
-
     # require invoice page
     INVOICE_BASIC_DATA_OPERATION_SELECT_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[4]/td[2]/div/div[1]"
     INVOICE_BASIC_DATA_OPERATION_BOX = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[4]/td[2]/div/div[2]"
@@ -53,9 +47,9 @@ class XPaths:
     INVOICE_RECIPIENT_CPF_CNPJ_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[5]/tbody/tr[2]/td[2]/input'
     INVOICE_RECIPIENT_SEARCH_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[5]/a"
     INVOICE_RECIPIENT_NAME_SPAN = '//*[@id="destinatario.nome"]'
-    
+
     INVOICE_RECIPIENT_OPEN_ADDRESS_WINDOW = '//*[@id="containerConteudoPrincipal"]/div/form/table[6]/tbody/tr[1]/td[2]/a'
-    
+
     INVOICE_RECIPIENT_ADDRESS_CEP_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[2]/tbody/tr[2]/td[2]/input"
     INVOICE_RECIPIENT_ADDRESS_SEARCH_CEP_BUTTON = "/html/body/form/table[1]/tbody/tr/td/table[2]/tbody/tr[2]/td[3]/a"
     INVOICE_RECIPIENT_ADDRESS_NEIGHBORHOOD_INPUT = "/html/body/form/table[1]/tbody/tr/td/table[4]/tbody/tr[3]/td[2]/input"
@@ -73,17 +67,17 @@ class XPaths:
 
     # used only when recipient is a company/enterprise
     INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[7]/tbody/tr[4]/td[3]/input"
-    
+
     # under invoice products/services tab
     INVOICE_ITEMS_DATA_TAB = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[8]/a"
-    
-    INVOICE_INCLUDE_ITEMS_TABLE_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[4]/tbody/tr/td[2]/a[1]"  
+
+    INVOICE_INCLUDE_ITEMS_TABLE_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[4]/tbody/tr/td[2]/a[1]"
 
     INVOICE_SHIPPING_VALUE_LABEL = '//*[@id="lblvalorFrete"]'
     INVOICE_SHIPPING_VALUE_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[4]/input"
     INVOICE_ADD_SHIPPING_RADIO_INPUT_TRUE = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[3]/td[4]/input[1]"
     INVOICE_ADD_SHIPPING_RADIO_INPUT_FALSE = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[3]/td[4]/input[2]"
-    
+
     # still under products/services tab but within add items table
     INVOICE_ITEMS_TABLE = "/html/body/div[3]/div[2]/div/div[3]/div/form/table"
     INVOICE_ITEMS_TABLE_CONFIRM_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table/tbody/tr[14]/td/a[1]"

@@ -42,6 +42,8 @@ class Siare(Browser):
         xpath = XPaths.LOGIN_PASSWORD_INPUT
         self.type_into_element(xpath, sender.password + Keys.RETURN)
 
+        self.wait_until_document_is_ready()
+
     def open_require_invoice_page(self) -> None:
         self.get_page(url=Urls.REQUIRE_INVOICE_URL)
 
@@ -63,10 +65,6 @@ class Siare(Browser):
 
     def open_aditional_data_tab(self) -> None:
         xpath = XPaths.INVOICE_ADITIONAL_DATA_TAB
-        self.get_and_click(xpath)
-
-    def close_first_pop_up(self) -> None:
-        xpath = XPaths.POP_UP_CLOSE_BUTTON
         self.get_and_click(xpath)
 
     def fill_invoice_basic_data(self, invoice: Invoice) -> None:

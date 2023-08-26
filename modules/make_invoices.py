@@ -47,10 +47,10 @@ def make_invoices(
 
             siare.open_website()
             siare.login(invoice.sender)
-            siare.close_first_pop_up()
 
             prev_sender = invoice.sender.ie
 
+        siare.wait_until_document_is_ready()
         siare.open_require_invoice_page()
         siare.fill_invoice_basic_data(invoice)
         siare.fill_invoice_initial_data(invoice)
