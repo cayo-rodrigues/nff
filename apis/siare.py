@@ -42,6 +42,8 @@ class Siare(Browser):
         xpath = XPaths.LOGIN_PASSWORD_INPUT
         self.type_into_element(xpath, sender.password + Keys.RETURN)
 
+        self.wait_until_document_is_ready()
+
     def open_require_invoice_page(self) -> None:
         self.get_page(url=Urls.REQUIRE_INVOICE_URL)
 
