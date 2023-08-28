@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="/static/styles/styles.css" rel="stylesheet" />
+    <link href="/static/styles/output.css" rel="stylesheet" />
+    <title>NFF - Nota Fiscal Fácil</title>
+</head>
+
+<body>
+    <header class="bg-sky-700 px-4 py-2 text-white sm:px-8 sm:py-3 flex justify-between">
+        <h1 class="text-xl">NFF - Nota Fiscal Fácil</h1>
+        <ul class="flex justify-evenly ">
+            {{ if .IsAuthenticated }}
+                <li
+                    class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90"
+                    hx-get="/entities"
+                    hx-target="#main"
+                    hx-push-url="true"
+                >
+                    Entidades
+                </li>
+                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Nota Fiscal</li>
+                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Modelos</li>
+                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Histórico</li>
+                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Sair</li>
+            {{ else }}
+                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Cadastro</li>
+                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Entrar</li>
+            {{ end }}
+        </ul>
+    </header>
+
+    <main id="main"></main>
+</body>
+
+<script src="https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js"></script>
+
+</html>
