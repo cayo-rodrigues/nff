@@ -13,6 +13,8 @@ func Entities(w http.ResponseWriter, r *http.Request) {
 }
 
 func getEntities(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/entities.html"))
-	tmpl.Execute(w, nil)
+	tmpl := template.Must(template.ParseFiles(
+		"templates/layout.html", "templates/entities.html",
+	))
+	tmpl.ExecuteTemplate(w, "layout", nil)
 }

@@ -6,9 +6,11 @@ import (
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl := template.Must(template.ParseFiles(
+		"templates/layout.html", "templates/home.html",
+	))
 	data := map[string]bool{
 		"IsAuthenticated": true,
 	}
-	tmpl.Execute(w, data)
+	tmpl.ExecuteTemplate(w, "layout", data)
 }
