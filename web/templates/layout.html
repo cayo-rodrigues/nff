@@ -6,34 +6,36 @@
     <title></title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="/static/styles/styles.css" rel="stylesheet" />
-    <link href="/static/styles/output.css" rel="stylesheet" />
-    <title>NFF - {{ template "title" . }}</title>
+
+    <link href="/static/styles/tailwind.css" rel="stylesheet" />
+
     <script src="https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js"></script>
+
+    <title>NFF - {{ template "title" . }}</title>
 </head>
 
 <body>
-    <header hx-boost="true" class="bg-sky-700 px-4 py-2 text-white sm:px-8 sm:py-3 flex justify-between">
+    <header hx-boost="true" class="sticky top-0 flex justify-between bg-sky-700 px-4 py-2 text-white sm:px-8 sm:py-3">
         <h1 class="text-xl">
             <a href="/">NFF - Nota Fiscal Fácil</a>
         </h1>
         <ul class="flex justify-evenly ">
             {{ if .IsAuthenticated }}
                 <a href="/entities">
-                    <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Entidades</li>
+                    <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Entidades</li>
                 </a>
-                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Nota Fiscal</li>
-                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Modelos</li>
-                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Histórico</li>
-                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Sair</li>
+                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Nota Fiscal</li>
+                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Modelos</li>
+                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Histórico</li>
+                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Sair</li>
             {{ else }}
-                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Cadastro</li>
-                <li class="hover:bg-sky-800 py-1 px-4 cursor-pointer rounded active:scale-90">Entrar</li>
+                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Cadastro</li>
+                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Entrar</li>
             {{ end }}
         </ul>
     </header>
 
-    <main id="main">
+    <main class="px-4 py-4 sm:px-8 sm:py-6">
         {{ template "main" . }}
     </main>
 </body>
