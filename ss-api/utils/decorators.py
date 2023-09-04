@@ -8,12 +8,14 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
 )
 
+from utils.exceptions import WebdriverTimeoutError
 from constants.standards import STANDARD_SLEEP_TIME
 
 
 def wait_for_it(f):
     def wrapper(*args, **kwargs):
-        while True:
+        attempts = 0
+        while attempts <= 120:  # or 30s
             try:
                 return f(*args, **kwargs)
             except (
@@ -23,6 +25,9 @@ def wait_for_it(f):
                 NoAlertPresentException,
                 StaleElementReferenceException,
             ):
+                attempts += 1
                 sleep(STANDARD_SLEEP_TIME)
+
+        raise WebdriverTimeoutError(code="WEBDRIVER_TIMEOUT")
 
     return wrapper

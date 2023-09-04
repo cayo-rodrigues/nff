@@ -16,3 +16,5 @@ def cancel_invoice(canceling_data: dict):
     siare.wait_until_document_is_ready()
     siare.open_cancel_invoice_page()
     siare.fill_canceling_data(invoice_canceling)
+
+    return {"success": True}
