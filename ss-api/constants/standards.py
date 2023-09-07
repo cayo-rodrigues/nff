@@ -1,6 +1,3 @@
-PROJECT_NAME = "NFF"
-PROJECT_FULL_NAME = "NFF - Nota Fiscal Fácil"
-
 TRUTHY_STRS = ["sim", "sin", "si", "s", "1"]
 FALSY_STRS = ["não", "nao", "na", "n", "0"]
 

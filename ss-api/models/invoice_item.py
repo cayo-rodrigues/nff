@@ -1,16 +1,20 @@
 from utils.helpers import normalize_text, to_br_float, to_BRL
-from constants.db import MandatoryFields
+from constants.db import MandatoryFields, DefaultValues
 
 
 class InvoiceItem:
     def __init__(self, data: dict) -> None:
-        self.group: str = normalize_text(data["group"])
-        self.ncm: str = normalize_text(data["ncm"], keep_case=True)
-        self.description: str = normalize_text(data["description"])
-        self.origin: str = normalize_text(data["origin"])
-        self.unity_of_measurement: str = normalize_text(data["unity_of_measurement"])
-        self.quantity: str = to_br_float(data["quantity"])
-        self.value_per_unity: str = to_BRL(float(data["value_per_unity"]))
+        self.group: str = normalize_text(data.get("group"))
+        self.ncm: str = normalize_text(
+            data.get("ncm", DefaultValues.InvoiceItem.NCM), keep_case=True
+        )
+        self.description: str = normalize_text(data.get("description"))
+        self.origin: str = normalize_text(data.get("origin"))
+        self.unity_of_measurement: str = normalize_text(
+            data.get("unity_of_measurement")
+        )
+        self.quantity: str = to_br_float(data.get("quantity"))
+        self.value_per_unity: str = to_BRL(data.get("value_per_unity"))
 
         self.errors = {}
 

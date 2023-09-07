@@ -1,3 +1,5 @@
+import sys
+import traceback
 from time import sleep
 
 from selenium import webdriver
@@ -15,6 +17,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from constants.paths import INVOICES_DIR_PATH
 from constants.standards import STANDARD_SLEEP_TIME
 from utils.decorators import wait_for_it
+from utils.exceptions import DownloadTimeoutError
 
 from .file_manager import FileManager
 
@@ -46,7 +49,6 @@ class Browser:
             },
         )
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
-        options.add_experimental_option("detach", True)
 
         self._browser = webdriver.Chrome(
             options=options,
@@ -94,24 +96,60 @@ class Browser:
     def accept_alert(self) -> None:
         Alert(self._browser).accept()
 
-    def wait_for_download(self) -> None:
-        while True:
+    def wait_for_download(self, max_wait_time: int = 60) -> None:
+        time_elapsed = 0.0
+        while time_elapsed < max_wait_time:
             sleep(STANDARD_SLEEP_TIME)
+            time_elapsed += STANDARD_SLEEP_TIME
 
             num_files = FileManager.count_files(INVOICES_DIR_PATH)
             while abs(num_files - self.prev_num_files) > 1:
                 num_files -= 1
 
             if num_files > self.prev_num_files:
+                most_recent_file_name = FileManager.get_latest_file_name(
+                    INVOICES_DIR_PATH
+                )
+                if not most_recent_file_name.endswith(".pdf"):
+                    continue
+
                 self.prev_num_files = num_files
                 return
+
+        raise DownloadTimeoutError
 
     def click_if_exists(self, xpath: str, root: WebElement = None) -> bool:
         try:
             self._find_element(xpath, root).click()
             return True
         except (NoSuchElementException, ElementNotInteractableException):
-            return False
+            ...
+        except Exception as e:
+            print(
+                "Browser.click_if_exists failed in an unexpected way:",
+                e,
+                file=sys.stderr,
+            )
+            traceback.print_exc()
+
+        return False
+
+    def get_attr_if_exists(
+        self, xpath: str, attr: str, root: WebElement = None
+    ) -> str | None:
+        try:
+            return self._find_element(xpath, root).get_attribute(attr)
+        except (NoSuchElementException, ElementNotInteractableException):
+            ...
+        except Exception as e:
+            print(
+                "Browser.get_attr_if_exists failed in an unexpected way:",
+                e,
+                file=sys.stderr,
+            )
+            traceback.print_exc()
+
+        return None
 
     def is_element_focused(self, element: WebElement) -> bool:
         return element == self._browser.switch_to.active_element

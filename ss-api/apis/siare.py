@@ -83,6 +83,8 @@ class Siare(Browser):
         self.get_and_click(xpath)
 
     def fill_invoice_initial_data(self, invoice: Invoice) -> None:
+        self.wait_until_document_is_ready()
+
         xpath = XPaths.INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT
         self.get_and_click(xpath)
 
@@ -280,6 +282,29 @@ class Siare(Browser):
         xpath = XPaths.FINISH_INVOICE_BUTTON
         self.get_and_click(xpath)
 
+    def get_invoice_error_feedback(self) -> str | None:
+        self.wait_until_document_is_ready()
+        xpath = XPaths.FINISH_INVOICE_ERROR_FEEDBACK
+        error_feedback = self.get_attr_if_exists(xpath, "innerText")
+        return error_feedback
+
+    def get_invoice_success_feedback(self) -> str | None:
+        self.wait_until_document_is_ready()
+        xpath = XPaths.FINISH_INVOICE_SUCCESS_FEEDBACK
+        success_feedback = self.get_element_attr(xpath, "innerText")
+        return success_feedback
+
+    def get_invoice_protocol(self) -> str:
+        self.wait_until_document_is_ready()
+        xpath = XPaths.FINISH_INVOICE_RAW_PROTOCOL
+        invoice_protocol = self.get_attr_if_exists(xpath, "value")
+
+        if not invoice_protocol:
+            xpath = XPaths.FINISH_INVOICE_PRETTY_PROTOCOL
+            invoice_protocol = self.get_element_attr(xpath, "innerText")
+
+        return invoice_protocol
+
     def download_invoice(self):
         xpath = XPaths.PRINT_INVOICE_LINK
         self.get_and_click(xpath)
@@ -306,3 +331,15 @@ class Siare(Browser):
 
         xpath = XPaths.INVOICE_CANCELING_FINISH_BUTTON
         self.get_and_click(xpath)
+
+    def get_canceling_error_feedback(self) -> str | None:
+        self.wait_until_document_is_ready()
+        xpath = XPaths.INVOICE_CANCELING_ERROR_FEEDBACK
+        feedback = self.get_attr_if_exists(xpath, "innerText")
+        return feedback
+
+    def get_canceling_success_feedback(self) -> str | None:
+        self.wait_until_document_is_ready()
+        xpath = XPaths.INVOICE_CANCELING_SUCCESS_FEEDBACK
+        feedback = self.get_element_attr(xpath, "innerText")
+        return feedback

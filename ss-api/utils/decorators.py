@@ -28,6 +28,6 @@ def wait_for_it(f):
                 attempts += 1
                 sleep(STANDARD_SLEEP_TIME)
 
-        raise WebdriverTimeoutError(code="WEBDRIVER_TIMEOUT")
+        raise WebdriverTimeoutError
 
     return wrapper

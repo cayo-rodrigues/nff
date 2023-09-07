@@ -3,6 +3,7 @@ import locale
 from selenium.webdriver.remote.webelement import WebElement
 
 from constants.standards import FALSY_STRS, TRUTHY_STRS
+from .exceptions import NFFBaseException
 
 
 def str_to_boolean(value: str) -> bool:
@@ -10,8 +11,10 @@ def str_to_boolean(value: str) -> bool:
 
 
 def decode_icms_contributor_status(value: str) -> str:
-    normalized_value = normalize_text(value)
+    if not value:
+        return ""
 
+    normalized_value = normalize_text(value)
     if normalized_value in TRUTHY_STRS:
         return "1"
     if normalized_value in FALSY_STRS:
@@ -35,13 +38,27 @@ def normalize_text(value: str, keep_case: bool = False, remove: list[str] = []) 
     return text
 
 
-def to_BRL(value: int | float) -> str:
+def to_BRL(value: str) -> str:
+    if not value:
+        return ""
+
+    try:
+        value = float(value)
+    except (ValueError, TypeError):
+        value = 0.0
     locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
     return locale.currency(value, symbol=None)
 
 
 def to_br_float(number: float | str) -> str:
+    if not number:
+        return ""
+
     return str(number).replace(".", ",")
+
+
+def error_response(e: NFFBaseException) -> (dict, int):
+    return {"errors": e.errors, "msg": e.msg}, e.status_code
 
 
 def binary_search_html(

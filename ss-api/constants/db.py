@@ -1,6 +1,12 @@
+from datetime import date
+
+
 class DefaultValues:
     class InvoiceItem:
         NCM = "94019900"
+
+    class InvoiceCanceling:
+        YEAR = lambda: str(date.today().year)
 
 
 class ModelFields:

@@ -1,12 +1,12 @@
 from apis import Siare
 from models import InvoiceCanceling
-from utils.exceptions import InvalidCancelingDataError
+from utils import exceptions
 
 
 def cancel_invoice(canceling_data: dict):
     invoice_canceling = InvoiceCanceling(data=canceling_data)
     if not invoice_canceling.is_valid():
-        raise InvalidCancelingDataError(errors=invoice_canceling.errors)
+        raise exceptions.InvalidCancelingDataError(errors=invoice_canceling.errors)
 
     siare = Siare()
 
@@ -17,4 +17,14 @@ def cancel_invoice(canceling_data: dict):
     siare.open_cancel_invoice_page()
     siare.fill_canceling_data(invoice_canceling)
 
-    return {"success": True}
+    error_feedback = siare.get_canceling_error_feedback()
+    if error_feedback:
+        raise exceptions.CouldNotFinishCancelingError(msg=error_feedback)
+
+    success_feedback = siare.get_canceling_success_feedback()
+
+    siare.close()
+
+    return {
+        "msg": success_feedback,
+    }

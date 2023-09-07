@@ -1,24 +1,13 @@
 import os
 
-PROJECT_DIR_PATH = os.getcwd() + os.sep
-
-ASSETS_DIR_PATH = PROJECT_DIR_PATH + "assets" + os.sep
-INVOICES_DIR_PATH = PROJECT_DIR_PATH + "docs" + os.sep
-
-DB_FILE_EXTENSIONS = [".xlsx", ".ods"]
-DB_FILE_PATH = PROJECT_DIR_PATH + "db"
-
-PROJECT_ICON_PATH = ASSETS_DIR_PATH + "icon.ico"
-
-ERROR_IMG_PATH = ASSETS_DIR_PATH + "error.png"
-WARNING_IMG_PATH = ASSETS_DIR_PATH + "warning.png"
-INFO_IMG_PATH = ASSETS_DIR_PATH + "info.png"
+INVOICES_DIR_PATH = os.getcwd() + os.sep + "docs" + os.sep
 
 
 class Urls:
-    SIARE_URL = "https://www2.fazenda.mg.gov.br/sol/"
-    REQUIRE_INVOICE_URL = SIARE_URL + "ctrl/SOL/NFAE/SERVICO_070?ACAO=NOVO"
-    REQUIRE_INVOICE_CANCELING_URL = SIARE_URL + "ctrl/SOL/NFAE/SERVICO_011?ACAO=NOVO"
+    SIARE_URL = "https://www2.fazenda.mg.gov.br"
+    REQUIRE_INVOICE_URL = SIARE_URL + "/sol/ctrl/SOL/NFAE/SERVICO_070?ACAO=NOVO"
+    REQUIRE_INVOICE_CANCELING_URL = SIARE_URL + "/sol/ctrl/SOL/NFAE/SERVICO_011?ACAO=NOVO"
+    PRINT_INVOICE_URL = SIARE_URL + "/sol/ctrl/SOL/NFAE/SERVICO_068?ACAO=VISUALIZAR"
 
 
 class XPaths:
@@ -34,7 +23,9 @@ class XPaths:
     INVOICE_BASIC_DATA_CONFIRMATION_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[3]/td[2]/a[1]"
 
     # under invoice initial data tab
-    INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[1]"
+    INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[8]/td[2]/div/input'
+    # INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[1]'
+    # INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[1]"
     INVOICE_INITIAL_DATA_CFOP_BOX = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[2]"
     INVOICE_INITIAL_DATA_DATE_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[9]/td[2]/input"
 
@@ -97,6 +88,12 @@ class XPaths:
 
     FINISH_INVOICE_BUTTON = "/html/body/div[1]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[3]/a"
 
+    FINISH_INVOICE_ERROR_FEEDBACK = '//*[@id="containerConteudoPrincipal"]/div/form/p'
+    FINISH_INVOICE_SUCCESS_FEEDBACK = '//*[@id="message"]'
+
+    FINISH_INVOICE_PRETTY_PROTOCOL = '//*[@id="protocoloFormatado"]'
+    FINISH_INVOICE_RAW_PROTOCOL = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[2]/input'
+
     # in the finish invoice tab
     PRINT_INVOICE_LINK = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td/a[2]"
     DOWNLOAD_INVOICE_BUTTON = '//*[@id="download"]'
@@ -107,3 +104,16 @@ class XPaths:
     INVOICE_CANCELING_YEAR_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[5]/td[2]/input'
     INVOICE_CANCELING_JUSTIFICATION_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[6]/td[2]/textarea'
     INVOICE_CANCELING_FINISH_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[8]/td/a[2]'
+
+    INVOICE_CANCELING_ERROR_FEEDBACK = '//*[@id="mensagem"]'
+    INVOICE_CANCELING_SUCCESS_FEEDBACK = '//*[@id="message"]'
+
+    # at print invoice page
+    PRINT_INVOICE_ID_TYPE_SELECT_BOX = '//*[@id="containerConteudoPrincipal"]/div/form/table[1]/tbody/tr[2]/td[2]/div'
+    PRINT_INVOICE_ID_TYPE_SELECT_BOX_LIST = '//*[@id="containerConteudoPrincipal"]/div/form/table[1]/tbody/tr[2]/td[2]/div/div[2]'
+    PRINT_INVOICE_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[1]/tbody/tr[3]/td[2]/input'
+
+    PRINT_INVOICE_SEARCH_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[1]/tbody/tr[2]/td[3]/a'
+
+    PRINT_INVOICE_CHECKBOX_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[1]/input'
+    PRINT_INVOICE_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[2]/td/a[1]'

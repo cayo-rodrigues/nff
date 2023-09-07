@@ -1,7 +1,7 @@
 from models.entity import Entity
 from utils.helpers import normalize_text
 
-from constants.db import MandatoryFields
+from constants.db import MandatoryFields, DefaultValues
 
 
 class InvoiceCanceling:
@@ -9,12 +9,12 @@ class InvoiceCanceling:
         self.invoice_id: str = normalize_text(
             data.get("invoice_id"), keep_case=True, remove=[".", "NFA", "-"]
         )
-        self.year: int = data.get("year")
+        self.year: int = data.get("year", DefaultValues.InvoiceCanceling.YEAR())
         self.justification: str = normalize_text(
             data.get("justification"), keep_case=True
         )
 
-        self.entity = Entity(data.get("entity"))
+        self.entity = Entity(data.get("entity"), is_sender=True)
 
         self.errors = {}
 

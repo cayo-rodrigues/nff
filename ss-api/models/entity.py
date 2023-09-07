@@ -3,9 +3,7 @@ from constants.db import MandatoryFields
 
 
 class Entity:
-    def __init__(self, data: dict) -> None:
-        if not data:
-            data = {}
+    def __init__(self, data: dict, is_sender: bool = False) -> None:
         self.name: str = normalize_text(data.get("name"), keep_case=True)
         self.email: str = normalize_text(data.get("email"))
         self.user_type: str = normalize_text(data.get("user_type"))
@@ -13,9 +11,7 @@ class Entity:
         self.cpf_cnpj: str = normalize_text(data.get("cpf_cnpj"), keep_case=True)
         self.password: str = data.get("password")
 
-        self.is_sender: bool = data.get("is_sender")
-
-        if not self.is_sender and not self.ie:
+        if not is_sender and not self.ie:
             self.postal_code = normalize_text(data.get("postal_code"), keep_case=True)
             self.neighborhood = normalize_text(data.get("neighborhood"))
             self.street_type = normalize_text(data.get("street_type"))
