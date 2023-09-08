@@ -4,7 +4,7 @@ import traceback
 from flask import Flask, request, jsonify
 from asgiref.wsgi import WsgiToAsgi
 
-from services import cancel_invoice, make_invoice
+from services import cancel_invoice, request_invoice
 from utils import exceptions
 from utils.helpers import error_response
 
@@ -12,10 +12,10 @@ app = Flask(__name__)
 asgi_app = WsgiToAsgi(app)
 
 
-@app.route("/invoice/make", methods=["POST"])
-def make_invoice_handler():
+@app.route("/invoice/request", methods=["POST"])
+def request_invoice_handler():
     try:
-        response = make_invoice(invoice_data=request.get_json())
+        response = request_invoice(invoice_data=request.get_json())
         status_code = 201
     except exceptions.InvalidInvoiceDataError as e:
         response, status_code = error_response(e)

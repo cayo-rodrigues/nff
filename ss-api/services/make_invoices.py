@@ -4,7 +4,7 @@ from utils import exceptions
 from constants.messages import WarningMessages
 
 
-def make_invoice(invoice_data: dict):
+def request_invoice(invoice_data: dict):
     invoice = Invoice(data=invoice_data)
     if not invoice.is_valid():
         raise exceptions.InvalidInvoiceDataError(errors=invoice.errors)
