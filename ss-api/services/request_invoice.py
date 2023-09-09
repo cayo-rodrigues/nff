@@ -49,9 +49,8 @@ def request_invoice(invoice_data: dict):
         raise exceptions.CouldNotFinishInvoiceError(msg=error_feedback)
 
     success_feedback = siare.get_invoice_success_feedback()
-    # check if success_feedback is really success, not invoice awaiting analisys
-    is_awaiting_analisys = False
 
+    is_awaiting_analisys = siare.is_invoice_awaiting_analisys()
     invoice_protocol = siare.get_invoice_protocol()
     msg = success_feedback
     encoded_invoice_pdf = ""

@@ -4,7 +4,7 @@ import traceback
 from flask import Flask, request, jsonify
 from asgiref.wsgi import WsgiToAsgi
 
-from services import cancel_invoice, request_invoice
+from services import cancel_invoice, request_invoice, print_invoice
 from utils import exceptions
 from utils.helpers import error_response
 
@@ -50,6 +50,14 @@ def cancel_invoice_handler():
     except Exception:
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
+
+    return jsonify(response), status_code
+
+
+@app.route("/invoice/print", methods=["POST"])
+def print_invoice_handler():
+    response = print_invoice(data=request.get_json())
+    status_code = 200
 
     return jsonify(response), status_code
 

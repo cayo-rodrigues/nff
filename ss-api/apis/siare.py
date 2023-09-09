@@ -7,7 +7,7 @@ from selenium.webdriver.common.keys import Keys
 
 from constants.paths import Urls, XPaths
 from constants.standards import STANDARD_SLEEP_TIME
-from models import Entity, Invoice, InvoiceCanceling, InvoiceItem
+from models import Entity, Invoice, InvoiceCanceling, InvoiceItem, InvoicePrinting
 from utils.helpers import binary_search_html, linear_search_html
 
 from .browser import Browser
@@ -43,6 +43,8 @@ class Siare(Browser):
         self.type_into_element(xpath, sender.password + Keys.RETURN)
 
         self.wait_until_document_is_ready()
+
+    # INVOICE REQUIREMENT
 
     def open_require_invoice_page(self) -> None:
         self.get_page(url=Urls.REQUIRE_INVOICE_URL)
@@ -305,6 +307,11 @@ class Siare(Browser):
 
         return invoice_protocol
 
+    def is_invoice_awaiting_analisys(self) -> bool:
+        xpath = XPaths.FINISH_INVOICE_NEXT_STEPS_MESSAGE
+        next_steps_msg = self.get_element_attr(xpath, "innerText")
+        return "já está disponível para impressão" not in next_steps_msg
+
     def download_invoice(self):
         xpath = XPaths.PRINT_INVOICE_LINK
         self.get_and_click(xpath)
@@ -312,6 +319,8 @@ class Siare(Browser):
         self.accept_alert()
 
         self.wait_for_download()
+
+    # INVOICE CANCELING
 
     def open_cancel_invoice_page(self):
         self.get_page(url=Urls.REQUIRE_INVOICE_CANCELING_URL)
@@ -343,3 +352,40 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_CANCELING_SUCCESS_FEEDBACK
         feedback = self.get_element_attr(xpath, "innerText")
         return feedback
+
+    # INVOICE PRINTING
+
+    def open_print_invoice_page(self):
+        self.get_page(url=Urls.PRINT_INVOICE_URL)
+
+    def fill_printing_data(self, printing_data: InvoicePrinting):
+        xpath = XPaths.PRINT_INVOICE_ID_TYPE_SELECT_BOX
+        self.get_and_click(xpath)
+
+        xpath = XPaths.PRINT_INVOICE_ID_TYPE_SELECT_BOX_LIST
+        id_type_list = self.get_element(xpath)
+        element = linear_search_html(
+            look_for=printing_data.invoice_id_type, items=id_type_list
+        )
+        if element:
+            self.click_element(element)
+
+        xpath = XPaths.PRINT_INVOICE_ID_INPUT
+        self.type_into_element(xpath, printing_data.invoice_id)
+
+        xpath = XPaths.PRINT_INVOICE_SEARCH_BUTTON
+        self.get_and_click(xpath)
+
+    def get_print_invoice_search_error_feedback(self) -> str | None:
+        xpath = XPaths.PRINT_INVOICE_SEARCH_ERROR_FEEDBACK
+        feedback = self.get_element_attr(xpath, "innerText")
+        return feedback
+
+    def finish_print_invoice(self):
+        xpath = XPaths.PRINT_INVOICE_CHECKBOX_INPUT
+        self.get_and_click(xpath)
+
+        # xpath = XPaths.PRINT_INVOICE_BUTTON
+        # self.get_and_click(xpath)
+
+        # self.wait_for_download()

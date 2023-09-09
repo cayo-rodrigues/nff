@@ -16,12 +16,17 @@ class InvalidInvoiceDataError(NFFBaseException):
     status_code = 400
 
 
-class CouldNotFinishInvoiceError(NFFBaseException):
+class InvalidCancelingDataError(NFFBaseException):
+    msg = ErrorMessages.INVALID_CANCELING_DATA
     status_code = 400
 
 
-class InvalidCancelingDataError(NFFBaseException):
-    msg = ErrorMessages.INVALID_CANCELING_DATA
+class InvalidPrintingDataError(NFFBaseException):
+    msg = ErrorMessages.INVALID_PRINTING_DATA
+    status_code = 400
+
+
+class CouldNotFinishInvoiceError(NFFBaseException):
     status_code = 400
 
 

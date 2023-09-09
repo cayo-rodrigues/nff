@@ -53,6 +53,11 @@ class ModelFields:
         JUSTIFICATION = "justification"
         ENTITY = "entity"
 
+    class InvoicePrinting:
+        INVOICE_ID = "invoice_id"
+        INVOICE_ID_TYPE = "invoice_id_type"
+        ENTITY = "entity"
+
 
 class MandatoryFields:
     INVOICE = [
@@ -100,4 +105,10 @@ class MandatoryFields:
         ModelFields.InvoiceCanceling.JUSTIFICATION,
         ModelFields.InvoiceCanceling.YEAR,
         ModelFields.InvoiceCanceling.ENTITY,
+    ]
+
+    INVOICE_PRINTING = [
+        ModelFields.InvoicePrinting.INVOICE_ID,
+        ModelFields.InvoicePrinting.INVOICE_ID_TYPE,
+        ModelFields.InvoicePrinting.ENTITY,
     ]

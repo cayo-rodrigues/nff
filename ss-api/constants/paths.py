@@ -89,14 +89,15 @@ class XPaths:
     FINISH_INVOICE_BUTTON = "/html/body/div[1]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[3]/a"
 
     FINISH_INVOICE_ERROR_FEEDBACK = '//*[@id="containerConteudoPrincipal"]/div/form/p'
-    FINISH_INVOICE_SUCCESS_FEEDBACK = '//*[@id="message"]'
 
-    FINISH_INVOICE_PRETTY_PROTOCOL = '//*[@id="protocoloFormatado"]'
-    FINISH_INVOICE_RAW_PROTOCOL = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[2]/input'
-
-    # in the finish invoice tab
+    # in the after finish invoice tab
     PRINT_INVOICE_LINK = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td/a[2]"
     DOWNLOAD_INVOICE_BUTTON = '//*[@id="download"]'
+
+    FINISH_INVOICE_SUCCESS_FEEDBACK = '//*[@id="message"]'
+    FINISH_INVOICE_PRETTY_PROTOCOL = '//*[@id="protocoloFormatado"]'
+    FINISH_INVOICE_RAW_PROTOCOL = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[2]/input'
+    FINISH_INVOICE_NEXT_STEPS_MESSAGE = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[3]/td[2]/span'
 
     # at invoice cancelling page
     INVOICE_CANCELING_DOC_TYPE_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr[2]/td[2]/nobr[2]/input'
@@ -114,6 +115,7 @@ class XPaths:
     PRINT_INVOICE_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[1]/tbody/tr[3]/td[2]/input'
 
     PRINT_INVOICE_SEARCH_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[1]/tbody/tr[2]/td[3]/a'
+    PRINT_INVOICE_SEARCH_ERROR_FEEDBACK = '//*[@id="lblMensagemErro"]'
 
     PRINT_INVOICE_CHECKBOX_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[1]/input'
     PRINT_INVOICE_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[2]/td/a[1]'

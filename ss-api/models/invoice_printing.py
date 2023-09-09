@@ -1,19 +1,13 @@
-from models.entity import Entity
 from utils.helpers import normalize_text
+from utils.mixins import Printable
+from constants.db import MandatoryFields
+from models.entity import Entity
 
-from constants.db import MandatoryFields, DefaultValues
 
-
-class InvoiceCanceling:
+class InvoicePrinting(Printable):
     def __init__(self, data: dict) -> None:
-        self.invoice_id: str = normalize_text(
-            data.get("invoice_id"), keep_case=True, remove=[".", "NFA", "-"]
-        )
-        self.year: int = data.get("year", DefaultValues.InvoiceCanceling.YEAR())
-        self.justification: str = normalize_text(
-            data.get("justification"), keep_case=True
-        )
-
+        self.invoice_id: str = normalize_text(data.get("invoice_id"))
+        self.invoice_id_type: str = normalize_text(data.get("invoice_id_type"))
         self.entity = Entity(data.get("entity", {}), is_sender=True)
 
         self.errors = {}
@@ -25,7 +19,7 @@ class InvoiceCanceling:
         if not self.entity.is_valid_sender():
             self.errors["entity"] = self.entity.errors
 
-        missing_fields = self.get_missing_fields(MandatoryFields.INVOICE_CANCELING)
+        missing_fields = self.get_missing_fields(MandatoryFields.INVOICE_PRINTING)
         if missing_fields:
             self.errors["missing_fields"] = missing_fields
 
