@@ -34,6 +34,10 @@ class CouldNotFinishCancelingError(NFFBaseException):
     status_code = 400
 
 
+class CouldNotFinishPrintingError(NFFBaseException):
+    status_code = 400
+
+
 class WebdriverTimeoutError(NFFBaseException):
     msg = ErrorMessages.WEBDRIVER_TIMEOUT
     status_code = 500

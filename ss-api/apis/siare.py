@@ -363,9 +363,11 @@ class Siare(Browser):
         self.get_and_click(xpath)
 
         xpath = XPaths.PRINT_INVOICE_ID_TYPE_SELECT_BOX_LIST
-        id_type_list = self.get_element(xpath)
+        id_types_box = self.get_element(xpath)
+
+        id_types = self.filter_elements(By.TAG_NAME, "span", id_types_box)
         element = linear_search_html(
-            look_for=printing_data.invoice_id_type, items=id_type_list
+            look_for=printing_data.invoice_id_type, items=id_types
         )
         if element:
             self.click_element(element)
@@ -377,6 +379,7 @@ class Siare(Browser):
         self.get_and_click(xpath)
 
     def get_print_invoice_search_error_feedback(self) -> str | None:
+        self.wait_until_document_is_ready()
         xpath = XPaths.PRINT_INVOICE_SEARCH_ERROR_FEEDBACK
         feedback = self.get_element_attr(xpath, "innerText")
         return feedback
@@ -385,7 +388,7 @@ class Siare(Browser):
         xpath = XPaths.PRINT_INVOICE_CHECKBOX_INPUT
         self.get_and_click(xpath)
 
-        # xpath = XPaths.PRINT_INVOICE_BUTTON
-        # self.get_and_click(xpath)
+        xpath = XPaths.PRINT_INVOICE_BUTTON
+        self.get_and_click(xpath)
 
-        # self.wait_for_download()
+        self.wait_for_download()

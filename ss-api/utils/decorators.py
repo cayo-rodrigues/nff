@@ -1,3 +1,4 @@
+import traceback
 from time import sleep
 
 from selenium.common.exceptions import (
@@ -28,6 +29,7 @@ def wait_for_it(f):
                 attempts += 1
                 sleep(STANDARD_SLEEP_TIME)
 
+        traceback.print_exc()
         raise WebdriverTimeoutError
 
     return wrapper

@@ -56,8 +56,22 @@ def cancel_invoice_handler():
 
 @app.route("/invoice/print", methods=["POST"])
 def print_invoice_handler():
-    response = print_invoice(data=request.get_json())
-    status_code = 200
+    try:
+        response = print_invoice(data=request.get_json())
+        status_code = 200
+    except exceptions.InvalidPrintingDataError as e:
+        response, status_code = error_response(e)
+    except exceptions.CouldNotFinishPrintingError as e:
+        response, status_code = error_response(e)
+    except exceptions.DownloadTimeoutError as e:
+        response, status_code = error_response(e)
+    except exceptions.WebdriverTimeoutError as e:
+        print("Wait for it exausted:", e, file=sys.stderr)
+        traceback.print_exc()
+        response, status_code = error_response(e)
+    except Exception:
+        traceback.print_exc()
+        response, status_code = error_response(exceptions.UnexpectedError())
 
     return jsonify(response), status_code
 
