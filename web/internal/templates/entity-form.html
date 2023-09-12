@@ -106,19 +106,18 @@
 {{ if .Entity }}
 <script>
     document.eraseEntityCard = function(event) {
-        const entityCard = document.querySelector("#entity-{{ .Entity.Id }}")
+        const entityId = event.detail.value
+        const entityCard = document.querySelector(`#entity-${entityId}`)
         if (entityCard) {
             entityCard.remove()
         }
     }
 
     document.eraseEntityListenerAdded = !!document.eraseEntityListenerAdded
-    if (document.eraseEntityListenerAdded) {
-        document.removeEventListener('entityDeleted', document.eraseEntityCard)
+    if (!document.eraseEntityListenerAdded) {
+        document.addEventListener('entityDeleted', document.eraseEntityCard);
+        document.eraseEntityListenerAdded = true
     }
-
-    document.addEventListener('entityDeleted', document.eraseEntityCard);
-    document.eraseEntityListenerAdded = true
 </script>
 {{ end }}
 {{ end }}

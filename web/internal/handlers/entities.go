@@ -120,15 +120,18 @@ func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
 
 func (page *EntitiesPage) DeleteEntity(w http.ResponseWriter, r *http.Request) {
 	dbpool := sql.GetDatabasePool()
+	entityId := chi.URLParam(r, "id")
 	_, err := dbpool.Exec(
 		r.Context(),
 		"DELETE FROM entities WHERE id = $1",
-		chi.URLParam(r, "id"),
+		entityId,
 	)
 	if err != nil {
 		return
 	}
-	w.Header().Add("HX-Trigger-After-Settle", "entityDeleted")
+
+	eventMsg := fmt.Sprintf("{\"entityDeleted\": \"%v\"}", entityId)
+	w.Header().Add("HX-Trigger-After-Settle", eventMsg)
 	page.tmpl.ExecuteTemplate(w, "entity-form", nil)
 }
 
