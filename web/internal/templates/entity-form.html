@@ -3,11 +3,11 @@
     <form>
         <div class="flex py-2">
             <input class="flex-1 text-2xl font-semibold" type="text" name="name" value="{{ .Entity.Name }}"
-                placeholder="Nome">
+                placeholder="Nome" required>
         </div>
         <hr>
-        <div class="mt-4 flex gap-x-6">
-            <div class="flex flex-1 flex-col gap-4">
+        <div class="mt-4 flex">
+            <div class="flex w-1/2 flex-col gap-4 pr-3">
                 <div class="flex flex-col gap-2">
                     <label for="user_type"><strong>Tipo</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="user_type" name="user_type">
@@ -18,17 +18,17 @@
                 <div class="flex flex-col gap-2">
                     <label for="cpf_cnpj"><strong>CPF/CNPJ</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="cpf_cnpj" name="cpf_cnpj"
-                        value="{{ .Entity.CpfCnpj }}">
+                        value="{{ .Entity.CpfCnpj }}" maxlength="14">
                 </div>
 
                 <div class="flex flex-col gap-2">
                     <label for="ie"><strong>Inscrição Estadual</strong></label>
-                    <input class="rounded bg-gray-100 p-2" type="text" id="ie" name="ie" value="{{ .Entity.Ie }}">
+                    <input class="rounded bg-gray-100 p-2" type="text" id="ie" name="ie" value="{{ .Entity.Ie }}" maxlength="13">
                 </div>
 
                 <div class="flex flex-col gap-2">
                     <label for="email"><strong>E-mail</strong></label>
-                    <input class="rounded bg-gray-100 p-2" type="text" id="email" name="email"
+                    <input class="rounded bg-gray-100 p-2" type="email" id="email" name="email"
                         value="{{ .Entity.Email }}">
                 </div>
 
@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-1 flex-col gap-4">
+            <div class="flex w-1/2 flex-col gap-4 pl-3">
                 <div class="flex flex-col gap-2">
                     <label for="postal_code"><strong>CEP</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="postal_code" name="postal_code"

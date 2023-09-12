@@ -2,22 +2,30 @@
 
 {{ define "main" }}
 <div class="flex justify-between gap-6">
-    <section class="flex-1">
-        <ul class="flex flex-col gap-6" id="entity-list">
-            {{ range .Entities }}
-                {{ block "entity-card" .}}
-                    <li
-                        class="flex cursor-pointer gap-16 rounded px-6 py-3 shadow shadow-gray-300 transition-shadow hover:shadow-gray-400"
-                        hx-get="/entities/{{ .Id }}/form" hx-trigger="click" hx-target="#entity-form"
-                        id="entity-{{ .Id }}">
-                        <div> <strong>Nome</strong>: <span>{{ .Name }}</span> </div>
-                        <div> <strong>CPF/CNPJ</strong>: <span>{{ .CpfCnpj }}</span> </div>
-                        <div> <strong>Inscrição Estadual</strong>: <span>{{ .Ie }}</span> </div>
-                        <div> <strong>Bairro</strong>: <span>{{ .Address.Neighborhood }}</span> </div>
-                    </li>
+    <section class="w-3/5">
+        <table class="flex flex-col gap-6" id="entity-list">
+            <thead class="sticky top-14 rounded bg-gray-100">
+                <tr class="flex gap-12 px-6 py-3">
+                    <th class="flex-1 text-center">Nome</th>
+                    <th class="flex-1 text-center">CPF/CNPJ</th>
+                    <th class="flex-1 text-center">Inscrição Estadual</th>
+                    <th class="flex-1 text-center">Bairro</th>
+                </tr>
+            </thead>
+            <tbody class="flex flex-1 flex-col gap-6">
+                {{ range .Entities }}
+                    {{ block "entity-card" .}}
+                        <tr class="flex cursor-pointer gap-12 rounded px-6 py-3 shadow shadow-gray-300 transition-shadow hover:shadow-gray-400"
+                            hx-get="/entities/{{ .Id }}/form" hx-trigger="click" hx-target="#entity-form" id="entity-{{ .Id }}">
+                            <td class="flex-1 truncate text-center"> {{ .Name }} </td>
+                            <td class="flex-1 truncate text-center"> {{ if .CpfCnpj }} {{ .CpfCnpj }} {{ else }} - {{ end }}</td>
+                            <td class="flex-1 truncate text-center"> {{ if .Ie }} {{ .Ie }} {{ else }} - {{ end }}</td>
+                            <td class="flex-1 truncate text-center"> {{ if .Address.Neighborhood }} {{ .Address.Neighborhood }} {{ else }} - {{ end }}</td>
+                        </tr>
+                    {{ end }}
                 {{ end }}
-            {{ end }}
-        </ul>
+            </tbody>
+        </table>
     </section>
     <aside class="w-2/5">
         {{ template "entity-form" . }}
