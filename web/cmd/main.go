@@ -1,19 +1,56 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/cayo-rodrigues/nff/web/handlers"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
+
+	"github.com/cayo-rodrigues/nff/web/internal/handlers"
+	"github.com/cayo-rodrigues/nff/web/internal/sql"
 )
 
 func main() {
-	http.HandleFunc("/static/styles/", handlers.ServeStyles)
+	PORT, isThere := os.LookupEnv("PORT")
+	if !isThere || PORT == "" {
+		log.Fatal("PORT env not set or has an empty value")
+	}
 
-	http.HandleFunc("/", handlers.Index)
-	http.HandleFunc("/entities", handlers.Entities)
+	dbpool := sql.GetDatabasePool()
+	defer dbpool.Close()
 
-	fmt.Println("Server running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	err := dbpool.Ping(context.Background())
+	if err != nil {
+		log.Fatal("Database connection is not OK, ping failed: ", err)
+	}
+
+	r := chi.NewRouter()
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
+
+	r.Get("/static/styles/{stylesheet}", handlers.ServeStyles)
+
+	r.Get("/", handlers.Index)
+
+	entitiesPage := handlers.EntitiesPage{}
+	entitiesPage.ParseTemplates()
+
+	r.Get("/entities", entitiesPage.Render)
+	r.Post("/entities", entitiesPage.CreateEntity)
+	r.Put("/entities/{id}", entitiesPage.CreateEntity)
+	r.Get("/entities/{id}/form", entitiesPage.GetEntityForm)
+
+	fmt.Println("Server running on port ", PORT)
+	log.Fatal(http.ListenAndServe(":"+PORT, r))
 }

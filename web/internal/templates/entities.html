@@ -1,0 +1,26 @@
+{{ define "title" }} Entidades {{ end }}
+
+{{ define "main" }}
+<div class="flex justify-between gap-6">
+    <section class="flex-1">
+        <ul class="flex flex-col gap-6" id="entity-list">
+            {{ range .Entities }}
+                {{ block "entity-card" .}}
+                    <li
+                        class="flex cursor-pointer gap-16 rounded px-6 py-3 shadow shadow-gray-300 transition-shadow hover:shadow-gray-400"
+                        hx-get="/entities/{{ .Id }}/form" hx-trigger="click" hx-target="#entity-form"
+                        id="entity-{{ .Id }}">
+                        <div> <strong>Nome</strong>: <span>{{ .Name }}</span> </div>
+                        <div> <strong>CPF/CNPJ</strong>: <span>{{ .CpfCnpj }}</span> </div>
+                        <div> <strong>Inscrição Estadual</strong>: <span>{{ .Ie }}</span> </div>
+                        <div> <strong>Bairro</strong>: <span>{{ .Address.Neighborhood }}</span> </div>
+                    </li>
+                {{ end }}
+            {{ end }}
+        </ul>
+    </section>
+    <aside class="w-2/5">
+        {{ template "entity-form" . }}
+    </aside>
+</div>
+{{ end }}
