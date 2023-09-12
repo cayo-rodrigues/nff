@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -112,6 +113,8 @@ func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	eventMsg := fmt.Sprintf("{\"entityUpdated\": \"%v\"}", entityId)
+	w.Header().Add("HX-Trigger-After-Settle", eventMsg)
 	page.tmpl.ExecuteTemplate(w, "entity-card", entity)
 }
 
@@ -125,6 +128,7 @@ func (page *EntitiesPage) DeleteEntity(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	w.Header().Add("HX-Trigger-After-Settle", "entityDeleted")
 	page.tmpl.ExecuteTemplate(w, "entity-form", nil)
 }
 

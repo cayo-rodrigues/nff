@@ -106,20 +106,18 @@
 {{ if .Entity }}
 <script>
     document.eraseEntityCard = function(event) {
-        if (event.detail.requestConfig.verb === 'delete') {
-            const entityCard = document.querySelector("#entity-{{ .Entity.Id }}")
-            if (entityCard) {
-                entityCard.remove()
-            }
+        const entityCard = document.querySelector("#entity-{{ .Entity.Id }}")
+        if (entityCard) {
+            entityCard.remove()
         }
     }
 
     document.eraseEntityListenerAdded = !!document.eraseEntityListenerAdded
     if (document.eraseEntityListenerAdded) {
-        document.removeEventListener('htmx:afterOnLoad', document.eraseEntityCard)
+        document.removeEventListener('entityDeleted', document.eraseEntityCard)
     }
 
-    document.addEventListener('htmx:afterOnLoad', document.eraseEntityCard);
+    document.addEventListener('entityDeleted', document.eraseEntityCard);
     document.eraseEntityListenerAdded = true
 </script>
 {{ end }}
