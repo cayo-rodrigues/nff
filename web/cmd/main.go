@@ -48,7 +48,8 @@ func main() {
 
 	r.Get("/entities", entitiesPage.Render)
 	r.Post("/entities", entitiesPage.CreateEntity)
-	r.Put("/entities/{id}", entitiesPage.CreateEntity)
+	r.Put("/entities/{id}", entitiesPage.UpdateEntity)
+	r.Delete("/entities/{id}", entitiesPage.DeleteEntity)
 	r.Get("/entities/{id}/form", entitiesPage.GetEntityForm)
 
 	fmt.Println("Server running on port ", PORT)

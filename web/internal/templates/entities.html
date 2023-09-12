@@ -5,7 +5,7 @@
     <section class="w-3/5">
         <table class="flex flex-col gap-6" id="entity-list">
             <thead class="sticky top-14 rounded bg-gray-100">
-                <tr class="flex gap-12 px-6 py-3">
+                <tr class="flex items-center gap-12 px-6 py-3">
                     <th class="flex-1 text-center">Nome</th>
                     <th class="flex-1 text-center">CPF/CNPJ</th>
                     <th class="flex-1 text-center">Inscrição Estadual</th>
@@ -14,7 +14,8 @@
             </thead>
             <tbody class="flex flex-1 flex-col gap-6">
                 {{ range .Entities }}
-                    {{ block "entity-card" .}}
+                    {{ block "entity-card" . }}
+                        {{ if . }}
                         <tr class="flex cursor-pointer gap-12 rounded px-6 py-3 shadow shadow-gray-300 transition-shadow hover:shadow-gray-400"
                             hx-get="/entities/{{ .Id }}/form" hx-trigger="click" hx-target="#entity-form" id="entity-{{ .Id }}">
                             <td class="flex-1 truncate text-center"> {{ .Name }} </td>
@@ -22,6 +23,7 @@
                             <td class="flex-1 truncate text-center"> {{ if .Ie }} {{ .Ie }} {{ else }} - {{ end }}</td>
                             <td class="flex-1 truncate text-center"> {{ if .Address.Neighborhood }} {{ .Address.Neighborhood }} {{ else }} - {{ end }}</td>
                         </tr>
+                        {{ end }}
                     {{ end }}
                 {{ end }}
             </tbody>

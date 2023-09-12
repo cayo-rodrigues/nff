@@ -3,7 +3,6 @@ package models
 import "net/http"
 
 type Address struct {
-	Id           int
 	PostalCode   string
 	Neighborhood string
 	StreetType   string

@@ -91,7 +91,7 @@
                 </svg>
                 Atualizar
             </button>
-            <button class="mt-4 flex flex-1 justify-center rounded bg-red-400 px-4 py-3 hover:bg-red-500">
+            <button hx-delete="/entities/{{ .Entity.Id }}" hx-target="#entity-form" hx-swap="outerHTML" class="mt-4 flex flex-1 justify-center rounded bg-red-400 px-4 py-3 hover:bg-red-500">
                 <svg class="mr-3 translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em"
                     viewBox="0 0 448 512">
                     <path
@@ -103,4 +103,24 @@
         </div>
     </form>
 </div>
+{{ if .Entity }}
+<script>
+    document.eraseEntityCard = function(event) {
+        if (event.detail.requestConfig.verb === 'delete') {
+            const entityCard = document.querySelector("#entity-{{ .Entity.Id }}")
+            if (entityCard) {
+                entityCard.remove()
+            }
+        }
+    }
+
+    document.eraseEntityListenerAdded = !!document.eraseEntityListenerAdded
+    if (document.eraseEntityListenerAdded) {
+        document.removeEventListener('htmx:afterOnLoad', document.eraseEntityCard)
+    }
+
+    document.addEventListener('htmx:afterOnLoad', document.eraseEntityCard);
+    document.eraseEntityListenerAdded = true
+</script>
+{{ end }}
 {{ end }}

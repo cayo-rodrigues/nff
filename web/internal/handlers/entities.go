@@ -3,6 +3,7 @@ package handlers
 import (
 	"html/template"
 	"net/http"
+	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
@@ -16,18 +17,7 @@ type EntitiesPage struct {
 
 func (page *EntitiesPage) Render(w http.ResponseWriter, r *http.Request) {
 	dbpool := sql.GetDatabasePool()
-	rows, _ := dbpool.Query(
-		r.Context(),
-		`SELECT
-			entities.*,
-			addresses.postal_code,
-			addresses.neighborhood,
-			addresses.street_type,
-			addresses.street_name,
-			addresses.number
-		 FROM entities
-		 JOIN addresses ON addresses.id = entities.id`,
-	)
+	rows, _ := dbpool.Query(r.Context(), "SELECT * FROM entities")
 	defer rows.Close()
 
 	entities := []models.Entity{}
@@ -38,7 +28,7 @@ func (page *EntitiesPage) Render(w http.ResponseWriter, r *http.Request) {
 		}
 		err := rows.Scan(
 			&entity.Id, &entity.Name, &entity.UserType, &entity.CpfCnpj, &entity.Ie, &entity.Email, &entity.Password,
-			&entity.Address.Id, &entity.Address.PostalCode, &entity.Address.Neighborhood, &entity.Address.StreetType, &entity.Address.StreetName, &entity.Address.Number,
+			&entity.Address.PostalCode, &entity.Address.Neighborhood, &entity.Address.StreetType, &entity.Address.StreetName, &entity.Address.Number,
 		)
 		if err != nil {
 			return
@@ -66,17 +56,9 @@ func (page *EntitiesPage) CreateEntity(w http.ResponseWriter, r *http.Request) {
 	dbpool := sql.GetDatabasePool()
 	row := dbpool.QueryRow(
 		r.Context(),
-		"INSERT INTO addresses (postal_code, neighborhood, street_type, street_name, number) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		"INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
+		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, passwordHash,
 		entity.Address.PostalCode, entity.Address.Neighborhood, entity.Address.StreetType, entity.Address.StreetName, entity.Address.Number,
-	)
-	err = row.Scan(&entity.Address.Id)
-	if err != nil {
-		return
-	}
-	row = dbpool.QueryRow(
-		r.Context(),
-		"INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, address_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
-		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, passwordHash, entity.Address.Id,
 	)
 	err = row.Scan(&entity.Id)
 	if err != nil {
@@ -90,16 +72,7 @@ func (page *EntitiesPage) GetEntityForm(w http.ResponseWriter, r *http.Request) 
 	dbpool := sql.GetDatabasePool()
 	row := dbpool.QueryRow(
 		r.Context(),
-		`SELECT
-			entities.*,
-			addresses.postal_code,
-			addresses.neighborhood,
-			addresses.street_type,
-			addresses.street_name,
-			addresses.number
-		 FROM entities
-		 JOIN addresses ON addresses.id = entities.id
-		 WHERE entities.id = $1`,
+		"SELECT * FROM entities WHERE entities.id = $1",
 		chi.URLParam(r, "id"),
 	)
 
@@ -108,7 +81,7 @@ func (page *EntitiesPage) GetEntityForm(w http.ResponseWriter, r *http.Request) 
 	}
 	err := row.Scan(
 		&entity.Id, &entity.Name, &entity.UserType, &entity.CpfCnpj, &entity.Ie, &entity.Email, &entity.Password,
-		&entity.Address.Id, &entity.Address.PostalCode, &entity.Address.Neighborhood, &entity.Address.StreetType, &entity.Address.StreetName, &entity.Address.Number,
+		&entity.Address.PostalCode, &entity.Address.Neighborhood, &entity.Address.StreetType, &entity.Address.StreetName, &entity.Address.Number,
 	)
 	if err != nil {
 		return
@@ -117,6 +90,42 @@ func (page *EntitiesPage) GetEntityForm(w http.ResponseWriter, r *http.Request) 
 		"Entity": entity,
 	}
 	page.tmpl.ExecuteTemplate(w, "entity-form", data)
+}
+
+func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
+	entity := models.NewEntityFromForm(r)
+	entityId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		return
+	}
+	entity.Id = entityId
+
+	dbpool := sql.GetDatabasePool()
+	_, err = dbpool.Exec(
+		r.Context(),
+		"UPDATE entities SET name = $1, user_type = $2, cpf_cnpj = $3, ie = $4, email = $5, password = $6, postal_code = $7, neighborhood = $8, street_type = $9, street_name = $10, number = $11 WHERE id = $12",
+		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
+		entity.Address.PostalCode, entity.Address.Neighborhood, entity.Address.StreetType, entity.Address.StreetName, entity.Address.Number,
+		entity.Id,
+	)
+	if err != nil {
+		return
+	}
+
+	page.tmpl.ExecuteTemplate(w, "entity-card", entity)
+}
+
+func (page *EntitiesPage) DeleteEntity(w http.ResponseWriter, r *http.Request) {
+	dbpool := sql.GetDatabasePool()
+	_, err := dbpool.Exec(
+		r.Context(),
+		"DELETE FROM entities WHERE id = $1",
+		chi.URLParam(r, "id"),
+	)
+	if err != nil {
+		return
+	}
+	page.tmpl.ExecuteTemplate(w, "entity-form", nil)
 }
 
 func (page *EntitiesPage) ParseTemplates() {
