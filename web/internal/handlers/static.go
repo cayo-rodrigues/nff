@@ -21,3 +21,17 @@ func ServeStyles(w http.ResponseWriter, r *http.Request) {
 
 	http.ServeFile(w, r, filepath)
 }
+
+func ServeJS(w http.ResponseWriter, r *http.Request) {
+	script := chi.URLParam(r, "script")
+
+	filepath := fmt.Sprintf("internal/static/scripts/%s", script)
+	_, err := os.Stat(filepath)
+	if os.IsNotExist(err) {
+		fmt.Printf("File '%s' does not exist.\n", filepath)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	http.ServeFile(w, r, filepath)
+}

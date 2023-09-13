@@ -40,6 +40,7 @@ func main() {
 	}))
 
 	r.Get("/static/styles/{stylesheet}", handlers.ServeStyles)
+	r.Get("/static/scripts/{script}", handlers.ServeJS)
 
 	r.Get("/", handlers.Index)
 

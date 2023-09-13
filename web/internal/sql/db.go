@@ -8,6 +8,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type Scanner interface {
+	Scan(dest ...interface{}) error
+}
+
 var dbpool *pgxpool.Pool = nil
 
 func GetDatabasePool () *pgxpool.Pool {

@@ -1,6 +1,10 @@
 package models
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/cayo-rodrigues/nff/web/internal/sql"
+)
 
 type Address struct {
 	PostalCode   string
@@ -11,52 +15,38 @@ type Address struct {
 }
 
 type Entity struct {
-	Id       int
-	Name     string
-	UserType string
-	Ie       string
-	CpfCnpj  string
-	Address  *Address
-	Email    string
-	Password string
-}
-
-func NewAddress(postalCode string, neighborhood string, streetType string, streetName string, number string) *Address {
-	return &Address{
-		PostalCode:   postalCode,
-		Neighborhood: neighborhood,
-		StreetType:   streetType,
-		StreetName:   streetName,
-		Number:       number,
-	}
-}
-
-func NewEntity(name string, userType string, cpfCnpj string, ie string, email string, password string, address *Address) *Entity {
-	return &Entity{
-		Name:     name,
-		UserType: userType,
-		CpfCnpj:  cpfCnpj,
-		Ie:       ie,
-		Email:    email,
-		Password: password,
-		Address:  address,
-	}
+	Id         int
+	Name       string
+	UserType   string
+	Ie         string
+	CpfCnpj    string
+	Address    *Address
+	Email      string
+	Password   string
+	IsSelected bool
 }
 
 func NewEntityFromForm(r *http.Request) *Entity {
-	return NewEntity(
-		r.PostFormValue("name"),
-		r.PostFormValue("user_type"),
-		r.PostFormValue("cpf_cnpj"),
-		r.PostFormValue("ie"),
-		r.PostFormValue("email"),
-		r.PostFormValue("password"),
-		NewAddress(
-			r.PostFormValue("postal_code"),
-			r.PostFormValue("neighborhood"),
-			r.PostFormValue("street_type"),
-			r.PostFormValue("street_name"),
-			r.PostFormValue("number"),
-		),
+	return &Entity{
+		Name:     r.PostFormValue("name"),
+		UserType: r.PostFormValue("user_type"),
+		CpfCnpj:  r.PostFormValue("cpf_cnpj"),
+		Ie:       r.PostFormValue("ie"),
+		Email:    r.PostFormValue("email"),
+		Password: r.PostFormValue("password"),
+		Address: &Address{
+			PostalCode:   r.PostFormValue("postal_code"),
+			Neighborhood: r.PostFormValue("neighborhood"),
+			StreetType:   r.PostFormValue("street_type"),
+			StreetName:   r.PostFormValue("street_name"),
+			Number:       r.PostFormValue("number"),
+		},
+	}
+}
+
+func (e *Entity) Scan(rows sql.Scanner) error {
+	return rows.Scan(
+		&e.Id, &e.Name, &e.UserType, &e.CpfCnpj, &e.Ie, &e.Email, &e.Password,
+		&e.Address.PostalCode, &e.Address.Neighborhood, &e.Address.StreetType, &e.Address.StreetName, &e.Address.Number,
 	)
 }

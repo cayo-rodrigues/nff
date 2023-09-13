@@ -10,6 +10,7 @@
     <link href="/static/styles/tailwind.css" rel="stylesheet" />
 
     <script src="https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js"></script>
+    <script src="/static/scripts/index.js"></script>
 
     <title>NFF - {{ template "title" . }}</title>
 </head>
@@ -25,8 +26,6 @@
                     <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Entidades</li>
                 </a>
                 <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Nota Fiscal</li>
-                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Modelos</li>
-                <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Histórico</li>
                 <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Sair</li>
             {{ else }}
                 <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Cadastro</li>

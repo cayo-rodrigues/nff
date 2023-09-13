@@ -13,16 +13,19 @@
                 </tr>
             </thead>
             <tbody class="flex flex-1 flex-col gap-6" id="entity-list">
-                {{ range .Entities }}
-                    {{ block "entity-card" . }}
-                        {{ if . }}
-                        <tr class="flex cursor-pointer gap-12 rounded px-6 py-3 shadow shadow-gray-300 transition-all hover:shadow-gray-400"
-                            hx-get="/entities/{{ .Id }}/form" hx-trigger="click" hx-target="#entity-form" id="entity-{{ .Id }}">
-                            <td class="flex-1 truncate text-center"> {{ .Name }} </td>
-                            <td class="flex-1 truncate text-center"> {{ if .CpfCnpj }} {{ .CpfCnpj }} {{ else }} - {{ end }}</td>
-                            <td class="flex-1 truncate text-center"> {{ if .Ie }} {{ .Ie }} {{ else }} - {{ end }}</td>
-                            <td class="flex-1 truncate text-center"> {{ if .Address.Neighborhood }} {{ .Address.Neighborhood }} {{ else }} - {{ end }}</td>
-                        </tr>
+                {{ if .Entities }}
+                    {{ range .Entities }}
+                        {{ block "entity-card" . }}
+                            {{ if . }}
+                            <tr class="flex cursor-pointer gap-12 rounded px-6 py-3 shadow shadow-gray-300 transition-all hover:shadow-gray-400 {{ if .IsSelected }} bg-gray-700 text-white {{ end }}"
+                                hx-get="/entities/{{ .Id }}/form" hx-trigger="click" hx-target="#entity-form"
+                                id="entity-{{ .Id }}">
+                                <td class="flex-1 truncate text-center"> {{ .Name }} </td>
+                                <td class="flex-1 truncate text-center"> {{ if .CpfCnpj }} {{ .CpfCnpj }} {{ else }} - {{ end }}</td>
+                                <td class="flex-1 truncate text-center"> {{ if .Ie }} {{ .Ie }} {{ else }} - {{ end }}</td>
+                                <td class="flex-1 truncate text-center"> {{ if .Address.Neighborhood }} {{ .Address.Neighborhood }} {{ else }} - {{ end }}</td>
+                            </tr>
+                            {{ end }}
                         {{ end }}
                     {{ end }}
                 {{ end }}
@@ -33,27 +36,4 @@
         {{ template "entity-form" . }}
     </aside>
 </div>
-<script>
-    document.querySelector('tbody').onclick = function (event) {
-        const entityCard = event.target.closest('tr')
-        if (entityCard) {
-            const previousSelectedCard = document.querySelector('tr.bg-gray-700.text-white')
-            if (previousSelectedCard) {
-                previousSelectedCard.className = entityCard.className
-            }
-            entityCard.className += " bg-gray-700 text-white"
-        }
-    }
-
-    document.highlightEntityListenerAdded = !!document.highlightEntityListenerAdded
-    if (!document.highlightEntityListenerAdded) {
-        document.addEventListener('entityUpdated', function(event) {
-            const entityId = event.detail.value
-            const entityCard = document.querySelector(`#entity-${entityId}`)
-            entityCard.className += " bg-gray-700 text-white"
-        })
-        document.highlightEntityListenerAdded = true
-    }
-
-</script>
 {{ end }}
