@@ -17,7 +17,7 @@
                     {{ range .Entities }}
                         {{ block "entity-card" . }}
                             {{ if . }}
-                            <tr class="flex cursor-pointer gap-12 rounded px-6 py-3 shadow shadow-gray-300 transition-all hover:shadow-gray-400 {{ if .IsSelected }} bg-gray-700 text-white {{ end }}"
+                            <tr class="flex cursor-pointer gap-12 rounded px-6 py-3 shadow shadow-gray-300 transition-all hover:shadow-gray-500 {{ if .IsSelected }} bg-gray-700 text-white {{ end }}"
                                 hx-get="/entities/{{ .Id }}/form" hx-trigger="click" hx-target="#entity-form"
                                 id="entity-{{ .Id }}">
                                 <td class="flex-1 truncate text-center"> {{ .Name }} </td>
@@ -35,5 +35,6 @@
     <aside class="w-2/5">
         {{ template "entity-form" . }}
     </aside>
+    <script src="/static/scripts/entity-page.js"></script>
 </div>
 {{ end }}

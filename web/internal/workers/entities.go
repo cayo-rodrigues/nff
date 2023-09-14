@@ -1,4 +1,4 @@
-package services
+package workers
 
 import (
 	"context"
@@ -26,7 +26,7 @@ func ListEntities(ctx context.Context) (*[]models.Entity, error) {
 		err := entity.Scan(rows)
 		if err != nil {
 			log.Println("Error scaning entity rows: ", err)
-			return nil, &utils.InternalServerError{}
+			return nil, utils.InternalServerErr
 		}
 		entities = append(entities, entity)
 	}
@@ -48,11 +48,11 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 	err := entity.Scan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("Entity with id %v not found: %v", entityId, err)
-		return nil, &utils.EntityNotFoundError{}
+		return nil, utils.EntityNotFoundErr
 	}
 	if err != nil {
 		log.Println("Error scaning entity row, likely because it has not been found: ", err)
-		return nil, &utils.InternalServerError{}
+		return nil, utils.InternalServerErr
 	}
 
 	return &entity, nil
@@ -62,7 +62,7 @@ func RegisterEntity(ctx context.Context, entity *models.Entity) error {
 	passwordHash, err := utils.HashPassword(entity.Password)
 	if err != nil {
 		log.Println("Error hashing entity password: ", err)
-		return &utils.InternalServerError{}
+		return utils.InternalServerErr
 	}
 
 	dbpool := sql.GetDatabasePool()
@@ -75,7 +75,7 @@ func RegisterEntity(ctx context.Context, entity *models.Entity) error {
 	err = row.Scan(&entity.Id)
 	if err != nil {
 		log.Println("Error when running insert entity query: ", err)
-		return &utils.InternalServerError{}
+		return utils.InternalServerErr
 	}
 
 	return nil
@@ -92,11 +92,11 @@ func UpdateEntity(ctx context.Context, entity *models.Entity) error {
 	)
 	if err != nil {
 		log.Println("Error when running update entity query: ", err)
-		return &utils.InternalServerError{}
+		return utils.InternalServerErr
 	}
 	if result.RowsAffected() == 0 {
 		log.Printf("Entity with id %v not found when running update query", entity.Id)
-		return &utils.EntityNotFoundError{}
+		return utils.EntityNotFoundErr
 	}
 
 	return nil
@@ -111,11 +111,11 @@ func DeleteEntity(ctx context.Context, entityId int) error {
 	)
 	if err != nil {
 		log.Println("Error when running delete entity query: ", err)
-		return &utils.InternalServerError{}
+		return utils.InternalServerErr
 	}
 	if result.RowsAffected() == 0 {
 		log.Printf("Entity with id %v not found when running delete query", entityId)
-		return &utils.EntityNotFoundError{}
+		return utils.EntityNotFoundErr
 	}
 
 	return nil

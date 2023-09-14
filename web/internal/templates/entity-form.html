@@ -82,7 +82,7 @@
                 Registrar
             </button>
             {{ if .Entity.IsSelected }}
-            <button hx-put="/entities/{{ .Entity.Id }}" hx-target="#entity-{{ .Entity.Id }}" hx-swap="outerHTML"
+            <button hx-put="/entities/{{ .Entity.Id }}" hx-target="#entity-{{ .Entity.Id }}" hx-swap="outerHTML" hx-vals="{'500': 'replace'}"
                 class="mt-4 flex flex-1 justify-center rounded bg-sky-300 px-4 py-3 hover:bg-sky-400" type="submit">
                 <svg class="mr-3 translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em"
                     viewBox="0 0 512 512">
@@ -104,4 +104,5 @@
         </div>
     </form>
 </div>
+
 {{ end }}
