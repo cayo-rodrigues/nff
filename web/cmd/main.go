@@ -44,14 +44,17 @@ func main() {
 
 	r.Get("/", handlers.Index)
 
-	entitiesPage := handlers.EntitiesPage{}
-	entitiesPage.ParseTemplates()
+	entitiesPage := handlers.NewEntitiesPage()
 
 	r.Get("/entities", entitiesPage.Render)
 	r.Post("/entities", entitiesPage.CreateEntity)
 	r.Put("/entities/{id}", entitiesPage.UpdateEntity)
 	r.Delete("/entities/{id}", entitiesPage.DeleteEntity)
 	r.Get("/entities/{id}/form", entitiesPage.GetEntityForm)
+
+	invoicesPage := handlers.NewInvoicesPage()
+
+	r.Get("/invoices", invoicesPage.Render)
 
 	fmt.Println("Server running on port ", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, r))

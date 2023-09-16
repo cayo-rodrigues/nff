@@ -24,6 +24,12 @@ type EntitiesPageData struct {
 	GeneralError    string
 }
 
+func NewEntitiesPage() *EntitiesPage {
+	entitiesPage := &EntitiesPage{}
+	entitiesPage.ParseTemplates()
+	return entitiesPage
+}
+
 func (page *EntitiesPage) ParseTemplates() {
 	page.tmpl = template.Must(template.ParseFiles(
 		"internal/templates/layout.html",
