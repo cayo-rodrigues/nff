@@ -22,6 +22,7 @@ func ListEntities(ctx context.Context) (*[]models.Entity, error) {
 	for rows.Next() {
 		entity := models.Entity{
 			Address: &models.Address{},
+			Errors:  &models.EntityFormError{},
 		}
 		err := entity.Scan(rows)
 		if err != nil {
@@ -44,6 +45,7 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 
 	entity := models.Entity{
 		Address: &models.Address{},
+		Errors:  &models.EntityFormError{},
 	}
 	err := entity.Scan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -59,20 +61,14 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 }
 
 func RegisterEntity(ctx context.Context, entity *models.Entity) error {
-	passwordHash, err := utils.HashPassword(entity.Password)
-	if err != nil {
-		log.Println("Error hashing entity password: ", err)
-		return utils.InternalServerErr
-	}
-
 	dbpool := sql.GetDatabasePool()
 	row := dbpool.QueryRow(
 		ctx,
 		"INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
-		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, passwordHash,
+		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
 		entity.Address.PostalCode, entity.Address.Neighborhood, entity.Address.StreetType, entity.Address.StreetName, entity.Address.Number,
 	)
-	err = row.Scan(&entity.Id)
+	err := row.Scan(&entity.Id)
 	if err != nil {
 		log.Println("Error when running insert entity query: ", err)
 		return utils.InternalServerErr
