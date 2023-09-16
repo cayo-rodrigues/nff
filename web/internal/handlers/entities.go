@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
-	"github.com/go-chi/chi/v5"
 )
 
 type EntitiesPage struct {
@@ -20,6 +21,7 @@ type EntitiesPageData struct {
 	IsAuthenticated bool
 	Entities        *[]models.Entity
 	Entity          *models.Entity
+	GeneralError    string
 }
 
 func (page *EntitiesPage) ParseTemplates() {
@@ -41,7 +43,8 @@ func (page *EntitiesPage) Render(w http.ResponseWriter, r *http.Request) {
 	}
 	entities, err := workers.ListEntities(r.Context())
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl, "layout", data)
+		data.GeneralError = err.Error()
+		utils.ErrorResponse(w, "general-error", page.tmpl, "layout", data)
 		return
 	}
 
@@ -59,13 +62,13 @@ func (page *EntitiesPage) GetEntityForm(w http.ResponseWriter, r *http.Request) 
 
 	entityId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl, "entity-form", data)
+		utils.GeneralErrorResponse(w, utils.EntityNotFoundErr, page.tmpl)
 		return
 	}
 
 	entity, err := workers.RetrieveEntity(r.Context(), entityId)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl, "entity-form", data)
+		utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 
@@ -88,7 +91,7 @@ func (page *EntitiesPage) CreateEntity(w http.ResponseWriter, r *http.Request) {
 
 	err := workers.RegisterEntity(r.Context(), entity)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl, "entity-card", nil)
+		utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 
@@ -102,7 +105,7 @@ func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
 
 	entityId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		utils.GeneralErrorResponse(w, utils.EntityNotFoundErr, page.tmpl, "entity-card", entity)
+		utils.GeneralErrorResponse(w, utils.EntityNotFoundErr, page.tmpl)
 		return
 	}
 	entity.Id = entityId
@@ -118,7 +121,7 @@ func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
 
 	err = workers.UpdateEntity(r.Context(), entity)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl, "entity-card", entity)
+		utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 
@@ -129,12 +132,12 @@ func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
 func (page *EntitiesPage) DeleteEntity(w http.ResponseWriter, r *http.Request) {
 	entityId, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl, "entity-form", nil)
+		utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 	err = workers.DeleteEntity(r.Context(), entityId)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl, "entity-form", nil)
+		utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 
