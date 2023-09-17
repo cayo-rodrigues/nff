@@ -14,7 +14,7 @@ import (
 // TODO accept filters
 func ListEntities(ctx context.Context) (*[]models.Entity, error) {
 	dbpool := sql.GetDatabasePool()
-	rows, _ := dbpool.Query(ctx, "SELECT * FROM entities")
+	rows, _ := dbpool.Query(ctx, "SELECT * FROM entities ORDER BY id")
 	defer rows.Close()
 
 	entities := []models.Entity{}

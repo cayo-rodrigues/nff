@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
@@ -18,10 +19,11 @@ type EntitiesPage struct {
 }
 
 type EntitiesPageData struct {
-	IsAuthenticated bool
-	Entities        *[]models.Entity
-	Entity          *models.Entity
-	GeneralError    string
+	IsAuthenticated  bool
+	Entities         *[]models.Entity
+	Entity           *models.Entity
+	GeneralError     string
+	FormSelectFields *models.EntityFormSelectFields
 }
 
 func NewEntitiesPage() *EntitiesPage {
@@ -46,6 +48,10 @@ func (page *EntitiesPage) Render(w http.ResponseWriter, r *http.Request) {
 			Address: &models.Address{},
 			Errors:  &models.EntityFormError{},
 		},
+		FormSelectFields: &models.EntityFormSelectFields{
+			UserTypes:   &globals.EntityUserTypes,
+			StreetTypes: &globals.EntityAddressStreetTypes,
+		},
 	}
 	entities, err := workers.ListEntities(r.Context())
 	if err != nil {
@@ -63,6 +69,10 @@ func (page *EntitiesPage) GetEntityForm(w http.ResponseWriter, r *http.Request) 
 		Entity: &models.Entity{
 			Address: &models.Address{},
 			Errors:  &models.EntityFormError{},
+		},
+		FormSelectFields: &models.EntityFormSelectFields{
+			UserTypes:   &globals.EntityUserTypes,
+			StreetTypes: &globals.EntityAddressStreetTypes,
 		},
 	}
 

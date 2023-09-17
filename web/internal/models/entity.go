@@ -2,11 +2,16 @@ package models
 
 import (
 	"net/http"
-	"regexp"
 	"strconv"
 
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
 )
+
+type EntityFormSelectFields struct {
+	UserTypes   *[14]string
+	StreetTypes *[3]string
+}
 
 type EntityFormError struct {
 	Name       string
@@ -45,13 +50,13 @@ func NewEntityFromForm(r *http.Request) *Entity {
 		id = 0
 	}
 	return &Entity{
-		Id:         id,
-		Name:       r.PostFormValue("name"),
-		UserType:   r.PostFormValue("user_type"),
-		CpfCnpj:    r.PostFormValue("cpf_cnpj"),
-		Ie:         r.PostFormValue("ie"),
-		Email:      r.PostFormValue("email"),
-		Password:   r.PostFormValue("password"),
+		Id:       id,
+		Name:     r.PostFormValue("name"),
+		UserType: r.PostFormValue("user_type"),
+		CpfCnpj:  r.PostFormValue("cpf_cnpj"),
+		Ie:       r.PostFormValue("ie"),
+		Email:    r.PostFormValue("email"),
+		Password: r.PostFormValue("password"),
 		Address: &Address{
 			PostalCode:   r.PostFormValue("postal_code"),
 			Neighborhood: r.PostFormValue("neighborhood"),
@@ -71,6 +76,8 @@ func (e *Entity) Scan(rows sql.Scanner) error {
 }
 
 func (e *Entity) IsValid() bool {
+	// TODO async validation, so that all validations happen at once
+
 	isValid := true
 	if e.Name == "" {
 		e.Errors.Name = "Campo obrigatório"
@@ -82,39 +89,52 @@ func (e *Entity) IsValid() bool {
 		isValid = false
 	}
 
-	reIEMG := regexp.MustCompile(`^\d{3}.?\d{3}.?\d{3}\/?\d{4}$`)
-	if e.Ie != "" && !reIEMG.MatchString(e.Ie) {
+	if e.Ie != "" && !globals.ReIeMg.MatchString(e.Ie) {
 		e.Errors.Ie = "Formato inválido"
 		isValid = false
 	}
 
-	reCpf := regexp.MustCompile(`^\d{3}.?\d{3}.?\d{3}\-?\d{2}$`)
-	reCnpj := regexp.MustCompile(`^(\d{2}.?\d{3}.?\d{3}\/?\d{4}\-?\d{2})$`)
-	if e.CpfCnpj != "" && !reCpf.MatchString(e.CpfCnpj) && !reCnpj.MatchString(e.CpfCnpj) {
+	if e.CpfCnpj != "" && !globals.ReCpf.MatchString(e.CpfCnpj) && !globals.ReCnpj.MatchString(e.CpfCnpj) {
 		e.Errors.CpfCnpj = "Formato inválido"
 		isValid = false
 	}
 
-	reEmail := regexp.MustCompile(`[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+`)
-	if e.Email != "" && !reEmail.MatchString(e.Email) {
+	if e.Email != "" && !globals.ReEmail.MatchString(e.Email) {
 		e.Errors.Email = "Formato inválido"
 		isValid = false
 	}
 
-	rePostalCode := regexp.MustCompile(`(^\d{5})\-?(\d{3}$)`)
-	if e.Address.PostalCode != "" && !rePostalCode.MatchString(e.Address.PostalCode) {
+	if e.Address.PostalCode != "" && !globals.RePostalCode.MatchString(e.Address.PostalCode) {
 		e.Errors.PostalCode = "Formato inválido"
 		isValid = false
 	}
 
-	if e.UserType != "" && e.UserType != "Produtor Rural" {
-		e.Errors.UserType = "Valor inaceitável"
-		isValid = false
+	if e.UserType != "" {
+		hasValidUserType := false
+		for _, userType := range globals.EntityUserTypes {
+			if e.UserType == userType {
+				hasValidUserType = true
+				break
+			}
+		}
+		if !hasValidUserType {
+			e.Errors.UserType = "Valor inaceitável"
+			isValid = false
+		}
 	}
 
 	if e.Address.StreetType != "" && e.Address.StreetType != "Rua" {
-		e.Errors.StreetType = "Valor inaceitável"
-		isValid = false
+		hasValidStreetType := false
+		for _, streetType := range globals.EntityAddressStreetTypes {
+			if e.Address.StreetType == streetType {
+				hasValidStreetType = true
+				break
+			}
+		}
+		if !hasValidStreetType {
+			e.Errors.StreetType = "Valor inaceitável"
+			isValid = false
+		}
 	}
 
 	return isValid

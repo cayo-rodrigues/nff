@@ -13,7 +13,9 @@
                 <div class="flex flex-col gap-2">
                     <label for="user_type"><strong>Tipo</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="user_type" name="user_type">
-                        <option value="Produtor Rural">Produtor Rural</option>
+                        {{ range .FormSelectFields.UserTypes }}
+                            <option {{ if eq $.Entity.UserType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                        {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Entity.Errors.UserType }}</sub>
                 </div>
@@ -63,11 +65,10 @@
 
                 <div class="flex flex-col gap-2">
                     <label for="street_type"><strong>Logradouro (tipo)</strong></label>
-                    <!-- <input class="rounded bg-gray-100 p-2" type="text" id="street_type" name="street_type" -->
-                    <!--     value="{{ .Entity.Address.StreetType }}"> -->
                     <select class="h-10 rounded bg-gray-100 p-2" id="street_type" name="street_type">
-                        <option value="Rua">Rua</option>
-                        <option value="Estrada">Estrada</option>
+                        {{ range .FormSelectFields.StreetTypes }}
+                        <option {{ if eq $.Entity.Address.StreetType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                        {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Entity.Errors.StreetType }}</sub>
                 </div>
