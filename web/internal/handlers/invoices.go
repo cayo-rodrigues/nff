@@ -13,7 +13,7 @@ type InvoicesPage struct {
 
 type InvoicesPageData struct {
 	IsAuthenticated bool
-	Invoices        *[]models.Entity
+	Invoices        *[]models.Invoice
 	GeneralError    string
 }
 
@@ -33,6 +33,6 @@ func (page *InvoicesPage) ParseTemplates() {
 func (page *InvoicesPage) Render(w http.ResponseWriter, r *http.Request) {
 	page.tmpl.ExecuteTemplate(w, "layout", &InvoicesPageData{
 		IsAuthenticated: true,
-		Invoices: &[]models.Entity{},
+		Invoices:        &[]models.Invoice{},
 	})
 }

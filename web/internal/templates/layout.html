@@ -25,9 +25,17 @@
                 <a href="/entities">
                     <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Entidades</li>
                 </a>
-                <a href="/invoices">
-                    <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Nota Fiscal</li>
-                </a>
+                <li class="group relative cursor-pointer rounded-t hover:bg-sky-800">
+                    <div class="px-4 py-1">Nota Fiscal</div>
+                    <ul class="absolute z-10 hidden w-full rounded-b bg-sky-800 group-hover:block">
+                        <a href="/invoices">
+                            <li class="rounded px-4 py-1 hover:bg-sky-900 active:scale-90">Emitir</li>
+                        </a>
+                        <li class="rounded px-4 py-1 hover:bg-sky-900 active:scale-90">Cancelar</li>
+                        <li class="rounded px-4 py-1 hover:bg-sky-900 active:scale-90">Modelos</li>
+                        <li class="rounded px-4 py-1 hover:bg-sky-900 active:scale-90">Histórico</li>
+                    </ul>
+                </li>
                 <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Sair</li>
             {{ else }}
                 <li class="cursor-pointer rounded px-4 py-1 hover:bg-sky-800 active:scale-90">Cadastro</li>
