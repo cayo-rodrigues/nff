@@ -101,6 +101,10 @@ func (page *EntitiesPage) CreateEntity(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("HX-Reswap", "outerHTML")
 		page.tmpl.ExecuteTemplate(w, "entity-form", &EntitiesPageData{
 			Entity: entity,
+			FormSelectFields: &models.EntityFormSelectFields{
+				UserTypes: &globals.EntityUserTypes,
+				StreetTypes: &globals.EntityAddressStreetTypes,
+			},
 		})
 		return
 	}
@@ -131,6 +135,10 @@ func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("HX-Reswap", "outerHTML")
 		page.tmpl.ExecuteTemplate(w, "entity-form", &EntitiesPageData{
 			Entity: entity,
+			FormSelectFields: &models.EntityFormSelectFields{
+				UserTypes: &globals.EntityUserTypes,
+				StreetTypes: &globals.EntityAddressStreetTypes,
+			},
 		})
 		return
 	}

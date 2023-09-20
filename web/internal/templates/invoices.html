@@ -1,5 +1,162 @@
 {{ define "title" }} Nota Fiscal {{ end }}
 
 {{ define "main" }}
-    <h1>Invoice!</h1>
+<form id="invoice-form" hx-post="/invoices" hx-target="this" hx-swap="outerHTML">
+    <div class="sticky top-14 flex items-center gap-6 border-b border-gray-300 bg-white py-2">
+        <button class="flex justify-center rounded bg-green-400 px-4 py-2 hover:bg-green-500" type="submit">
+            <svg class="mr-3 translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em"
+                viewBox="0 0 512 512">
+                <path
+                    d="M156.6 384.9L125.7 354c-8.5-8.5-11.5-20.8-7.7-32.2c3-8.9 7-20.5 11.8-33.8L24 288c-8.6 0-16.6-4.6-20.9-12.1s-4.2-16.7 .2-24.1l52.5-88.5c13-21.9 36.5-35.3 61.9-35.3l82.3 0c2.4-4 4.8-7.7 7.2-11.3C289.1-4.1 411.1-8.1 483.9 5.3c11.6 2.1 20.6 11.2 22.8 22.8c13.4 72.9 9.3 194.8-111.4 276.7c-3.5 2.4-7.3 4.8-11.3 7.2v82.3c0 25.4-13.4 49-35.3 61.9l-88.5 52.5c-7.4 4.4-16.6 4.5-24.1 .2s-12.1-12.2-12.1-20.9V380.8c-14.1 4.9-26.4 8.9-35.7 11.9c-11.2 3.6-23.4 .5-31.8-7.8zM384 168a40 40 0 1 0 0-80 40 40 0 1 0 0 80z" />
+            </svg>
+            Emitir
+        </button>
+        <button class="flex justify-center rounded bg-sky-300 px-4 py-2 hover:bg-sky-400" type="button">
+            <svg class="mr-3 translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em"
+                viewBox="0 0 576 512">
+                <path
+                    d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z" />
+            </svg>
+            Ver Progresso
+        </button>
+        <button class="rounded bg-gray-200 px-4 py-2 font-bold" type="button" hx-get="/invoices/form-section"
+            hx-target="#invoice-form" hx-swap="beforeend" hx-trigger="click">
+            +
+        </button>
+        <p class="flex-1 {{ if .FormSuccess }} text-green-500 {{ else }} text-red-500 {{ end }}">{{ .FormMsg }}</p>
+    </div>
+
+    {{ if .Invoices }}
+        {{ range .Invoices }}
+            {{ block "invoice-form-section" . }}
+            <section>
+                <div class="flex items-center justify-end pt-2">
+                    <button class="rounded p-1 shadow shadow-gray-400 hover:bg-gray-100 active:bg-gray-200" type="button"
+                        onclick="this.closest('section').remove()">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512">
+                            <path
+                                d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex gap-6 border-b border-gray-400 pb-4">
+
+                    <div class="flex-1">
+                        <div class="flex flex-col gap-2">
+                            <label for="sender"><strong>Remetente</strong></label>
+                            <select class="h-10 rounded bg-gray-100 p-2" id="sender" name="sender">
+                                {{ range .FormSelectFields.Entities }}
+                                    <option value="{{ .Id }}">{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label for="recipient"><strong>Destinatário</strong></label>
+                            <select class="h-10 rounded bg-gray-100 p-2" id="recipient" name="recipient">
+                                {{ range .FormSelectFields.Entities }}
+                                    <option value="{{ .Id }}">{{ .Name }}</option>
+                                {{ end }}
+                            </select>
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                    </div>
+
+                    <div class="flex-1">
+
+                        <div class="flex flex-col gap-2">
+                            <label for="operation"><strong>Operação</strong></label>
+                            <select class="h-10 rounded bg-gray-100 p-2" id="operation" name="operation">
+                                {{ range .FormSelectFields.Operations }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                {{ end }}
+                            </select>
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label for="cfop"><strong>CFOP</strong></label>
+                            <select class="h-10 rounded bg-gray-100 p-2" id="cfop" name="cfop">
+                                {{ range .FormSelectFields.Cfops }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                {{ end }}
+                            </select>
+                            <sub class="text-red-500"></sub>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+
+                        <div class="flex flex-col gap-2">
+                            <label for="is_icms_contributor"><strong>Contribuinte ICMS</strong></label>
+                            <select class="h-10 rounded bg-gray-100 p-2" id="is_icms_contributor" name="is_icms_contributor">
+                                {{ range .FormSelectFields.IcmsOptions }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                {{ end }}
+                            </select>
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label for="is_final_customer"><strong>Consumidor Final</strong></label>
+                            <select class="h-10 rounded bg-gray-100 p-2" id="is_final_customer" name="is_final_customer">
+                                {{ range .FormSelectFields.BooleanField }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                {{ end }}
+                            </select>
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="flex flex-col gap-2">
+                            <label for="shipping"><strong>Frete</strong></label>
+                            <input class="rounded bg-gray-100 p-2" type="number" step="0.01" id="shipping" name="shipping"
+                                value="{{ .Shipping }}">
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label for="add_shipping_to_total"><strong>Adicionar Frete ao Total</strong></label>
+                            <select class="h-10 rounded bg-gray-100 p-2" id="add_shipping_to_total"
+                                name="add_shipping_to_total">
+                                {{ range .FormSelectFields.BooleanField }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                {{ end }}
+                            </select>
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                    </div>
+
+                    <div class="flex-1">
+
+                        <div class="flex flex-col gap-2">
+                            <label for="gta"><strong>GTA</strong></label>
+                            <input class="rounded bg-gray-100 p-2" type="text" id="gta" name="gta" value="{{ .Gta }}">
+                            <sub class="text-red-500"></sub>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <strong>Produtos/Serviços</strong>
+                            <button onclick="this.closest('section').querySelector('dialog').showModal()"
+                                class="group w-full rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700" type="button">
+                                <div class="group-active:scale-90">Gerenciar</div>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <dialog>Form de itens da nf</dialog>
+            </section>
+            {{ end }}
+        {{ end }}
+    {{ end }}
+</form>
 {{ end }}
