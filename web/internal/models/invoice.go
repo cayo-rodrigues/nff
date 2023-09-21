@@ -9,6 +9,15 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
 
+type InvoiceItemFormError struct {
+	Group              string
+	Description        string
+	Origin             string
+	UnityOfMeasurement string
+	Quantity           string
+	ValuePerUnity      string
+}
+
 type InvoiceFormError struct {
 	Sender             string
 	Recipient          string
@@ -30,13 +39,21 @@ type InvoiceFormSelectFields struct {
 	IcmsOptions  *[3]string
 }
 
+type InvoiceItemFormSelectFields struct {
+	Groups               *[2]string
+	Origins              *[3]string
+	UnitiesOfMeasurement *[23]string
+}
+
 type InvoiceItem struct {
 	Group              string
 	Description        string
 	Origin             string
 	UnityOfMeasurement string
-	Quantity           int
+	Quantity           float64
 	ValuePerUnity      float64
+	FormSelectFields   *InvoiceItemFormSelectFields
+	Errors             *InvoiceItemFormError
 }
 
 type Invoice struct {
@@ -53,79 +70,80 @@ type Invoice struct {
 	Sender             *Entity
 	Recipient          *Entity
 	Items              *[]InvoiceItem
-	FormSelectFields   *InvoiceFormSelectFields
 	Errors             *InvoiceFormError
+}
+
+func NewEmptyInvoiceItem() *InvoiceItem {
+	return &InvoiceItem{
+		FormSelectFields: &InvoiceItemFormSelectFields{
+			Groups:               &globals.InvoiceItemGroups,
+			Origins:              &globals.InvoiceItemOrigins,
+			UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
+		},
+		Errors: &InvoiceItemFormError{},
+	}
 }
 
 func NewEmptyInvoice() *Invoice {
 	return &Invoice{
-		FormSelectFields: &InvoiceFormSelectFields{
-			Operations:   &globals.InvoiceOperations,
-			Cfops:        &globals.InvoiceCfops,
-			BooleanField: &globals.InvoiceBooleanField,
-			IcmsOptions:  &globals.InvoiceIcmsOptions,
-		},
 		Errors: &InvoiceFormError{},
+		Items:  &[]InvoiceItem{*NewEmptyInvoiceItem()},
 	}
 }
 
-func NewInvoiceListFromForm(r *http.Request, entities *[]Entity) (*[]Invoice, error) {
+func NewInvoiceFromForm(r *http.Request) (*Invoice, error) {
 	err := r.ParseForm()
 	if err != nil {
 		log.Println("Error parsing invoice form: ", err)
 		return nil, utils.InternalServerErr
 	}
 
-	invoices := []Invoice{}
-	invoicesQuantity := len(r.PostForm["gta"]) // it could be actually any field
-	for i := 0; i < invoicesQuantity; i++ {
-		invoice := NewEmptyInvoice()
+	invoice := NewEmptyInvoice()
 
-		invoice.FormSelectFields.Entities = entities
-
-		senderId, err := strconv.Atoi(r.PostForm["sender"][i])
+	invoice.Operation = r.PostFormValue("operation")
+	invoice.Cfop, err = strconv.Atoi(r.PostFormValue("cfop"))
+	if err != nil {
+		log.Println("Error converting invoice cfop from string to int: ", err)
+		return nil, utils.InternalServerErr
+	}
+	invoice.IsIcmsContributor = r.PostFormValue("is_icms_contributor")
+	invoice.IsFinalCustomer = r.PostFormValue("is_final_customer")
+	if r.PostFormValue("shipping") != "" {
+		invoice.Shipping, err = strconv.ParseFloat(r.PostFormValue("shipping"), 64)
 		if err != nil {
-			log.Println("Error converting sender id from string to int: ", err)
+			log.Println("Error converting invoice shipping from string to float64: ", err)
 			return nil, utils.InternalServerErr
 		}
-		recipientId, err := strconv.Atoi(r.PostForm["recipient"][i])
+	}
+	invoice.AddShippingToTotal = r.PostFormValue("add_shipping_to_total")
+	invoice.Gta = r.PostFormValue("gta")
+
+	items := []InvoiceItem{}
+	itemsQuantity := len(r.PostForm["description"]) // it could be any field
+	for i := 0; i < itemsQuantity; i++ {
+		item := NewEmptyInvoiceItem()
+
+		item.Group = r.PostForm["group"][i]
+		item.Description = r.PostForm["description"][i]
+		item.Origin = r.PostForm["origin"][i]
+		item.UnityOfMeasurement = r.PostForm["unity_of_measurement"][i]
+		item.Quantity, err = strconv.ParseFloat(r.PostForm["quantity"][i], 64)
 		if err != nil {
-			log.Println("Error converting recipient id from string to int: ", err)
+			log.Printf("Error converting invoice item %d quantity from string to float64: %v", i, err)
 			return nil, utils.InternalServerErr
 		}
-		for _, entity := range *entities {
-			if entity.Id == senderId {
-				invoice.Sender = &entity
-			}
-			if entity.Id == recipientId {
-				invoice.Recipient = &entity
-			}
-			if invoice.Sender != nil && invoice.Recipient != nil {
-				break
-			}
+		item.ValuePerUnity, err = strconv.ParseFloat(r.PostForm["value_per_unity"][i], 64)
+		if err != nil {
+			log.Printf("Error converting invoice item %d value_per_unity from string to float64: %v", i, err)
+			return nil, utils.InternalServerErr
 		}
 
-		invoice.Operation = r.PostForm["operation"][i]
-		invoice.Cfop, err = strconv.Atoi(r.PostForm["cfop"][i])
-		if err != nil {
-			log.Println("Error converting invoice cfop from string to int: ", err)
-			return nil, utils.InternalServerErr
-		}
-		invoice.IsIcmsContributor = r.PostForm["is_icms_contributor"][i]
-		invoice.IsFinalCustomer = r.PostForm["is_final_customer"][i]
-		if r.PostForm["shipping"][i] != "" {
-			invoice.Shipping, err = strconv.ParseFloat(r.PostForm["shipping"][i], 64)
-			if err != nil {
-				log.Println("Error converting invoice shipping from string to float64: ", err)
-				return nil, utils.InternalServerErr
-			}
-		}
-		invoice.AddShippingToTotal = r.PostForm["add_shipping_to_total"][i]
-		invoice.Gta = r.PostForm["gta"][i]
-		invoices = append(invoices, *invoice)
+		items = append(items, *item)
 	}
 
-	return &invoices, nil
+	invoice.Items = &items
+
+	return invoice, nil
 }
 
 func (i *Invoice) IsValid() bool {
@@ -195,7 +213,6 @@ func (i *Invoice) IsValid() bool {
 		}
 	}
 
-
 	if i.IsIcmsContributor != "" {
 		hasValidOption := false
 		for _, option := range &globals.InvoiceIcmsOptions {
@@ -234,6 +251,95 @@ func (i *Invoice) IsValid() bool {
 		}
 		if !hasValidOption {
 			i.Errors.AddShippingToTotal = "Valor inaceitável"
+			isValid = false
+		}
+	}
+
+	if len(*i.Items) == 0 {
+		i.Errors.Items = "A NF deve ter pelo menos 1 produto"
+		isValid = false
+	}
+
+	for _, item := range *i.Items {
+		if !item.IsValid() {
+			i.Errors.Items = "Dados dos produtos inválidos"
+			isValid = false
+		}
+	}
+
+	return isValid
+}
+
+func (i *InvoiceItem) IsValid() bool {
+	isValid := true
+	if i.Group == "" {
+		i.Errors.Group = "Campo obrigatório"
+		isValid = false
+	}
+
+	if i.Description == "" {
+		i.Errors.Description = "Campo obrigatório"
+		isValid = false
+	}
+
+	if i.Origin == "" {
+		i.Errors.Origin = "Campo obrigatório"
+		isValid = false
+	}
+
+	if i.UnityOfMeasurement == "" {
+		i.Errors.UnityOfMeasurement = "Campo obrigatório"
+		isValid = false
+	}
+
+	if i.Quantity == 0.0 {
+		i.Errors.Quantity = "Valor inaceitável"
+		isValid = false
+	}
+
+	if i.ValuePerUnity == 0.0 {
+		i.Errors.ValuePerUnity = "Valor inaceitável"
+		isValid = false
+	}
+
+	if i.Group != "" {
+		hasValidOption := false
+		for _, option := range &globals.InvoiceItemGroups {
+			if i.Group == option {
+				hasValidOption = true
+				break
+			}
+		}
+		if !hasValidOption {
+			i.Errors.Group = "Valor inaceitável"
+			isValid = false
+		}
+	}
+
+	if i.Origin != "" {
+		hasValidOption := false
+		for _, option := range &globals.InvoiceItemOrigins {
+			if i.Origin == option {
+				hasValidOption = true
+				break
+			}
+		}
+		if !hasValidOption {
+			i.Errors.Origin = "Valor inaceitável"
+			isValid = false
+		}
+	}
+
+	if i.UnityOfMeasurement != "" {
+		hasValidOption := false
+		for _, option := range &globals.InvoiceItemUnitiesOfMeaasurement {
+			if i.UnityOfMeasurement == option {
+				hasValidOption = true
+				break
+			}
+		}
+		if !hasValidOption {
+			i.Errors.UnityOfMeasurement = "Valor inaceitável"
 			isValid = false
 		}
 	}

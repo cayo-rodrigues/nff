@@ -55,8 +55,8 @@ func main() {
 	invoicesPage := handlers.NewInvoicesPage()
 
 	r.Get("/invoices", invoicesPage.Render)
-	r.Post("/invoices", invoicesPage.RequireInvoices)
-	r.Get("/invoices/form-section", invoicesPage.GetInvoiceFormSection)
+	r.Post("/invoices", invoicesPage.RequireInvoice)
+	r.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 
 	fmt.Println("Server running on port ", PORT)
 	log.Fatal(http.ListenAndServe(":"+PORT, r))

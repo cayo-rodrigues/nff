@@ -58,3 +58,40 @@ var InvoiceBooleanField = [2]string{
 	"Sim",
 	"Nâo",
 }
+
+var InvoiceItemGroups = [2]string{
+	"Bovino",
+	"Asinino",
+}
+
+var InvoiceItemOrigins = [3]string{
+	"Nacional",
+	"Estrangeira - Importação direta",
+	"Estrangeira - Adquirida no mercado interno",
+}
+
+var InvoiceItemUnitiesOfMeaasurement = [23]string{
+	"CB",
+	"CT",
+	"CX",
+	"DUZIA",
+	"EST",
+	"G",
+	"JOGO",
+	"KG",
+	"KM",
+	"LT",
+	"M2",
+	"M3",
+	"MDC",
+	"METRO",
+	"MI",
+	"PARES",
+	"PC",
+	"PT",
+	"QUILAT",
+	"SC",
+	"ST",
+	"TON",
+	"UN",
+}
