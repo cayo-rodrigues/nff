@@ -40,7 +40,7 @@ type InvoiceFormSelectFields struct {
 }
 
 type InvoiceItemFormSelectFields struct {
-	Groups               *[2]string
+	Groups               *[82]string
 	Origins              *[3]string
 	UnitiesOfMeasurement *[23]string
 }

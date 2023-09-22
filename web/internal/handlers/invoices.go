@@ -64,7 +64,7 @@ func (page *InvoicesPage) Render(w http.ResponseWriter, r *http.Request) {
 
 func (page *InvoicesPage) RequireInvoice(w http.ResponseWriter, r *http.Request) {
 	data := &InvoicesPageData{
-		FormMsg:     "Requerimento efetuado com sucesso! Acompanhe o progresso clicando no botão ao lado.",
+		FormMsg:     "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo.",
 		FormSuccess: true,
 		FormSelectFields: &models.InvoiceFormSelectFields{
 			Operations:   &globals.InvoiceOperations,
