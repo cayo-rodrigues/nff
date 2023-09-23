@@ -1,0 +1,21 @@
+{{ define "title" }} Entidades {{ end }}
+
+<div class="flex justify-between gap-6">
+    <section class="w-3/5">
+        <table class="flex flex-col gap-6">
+            <thead class="sticky top-14 rounded bg-gray-100">
+                <tr class="flex items-center gap-12 px-6 py-3">
+                    <th class="flex-1 text-center">Nome</th>
+                    <th class="flex-1 text-center">CPF/CNPJ</th>
+                    <th class="flex-1 text-center">Inscrição Estadual</th>
+                    <th class="flex-1 text-center">Bairro</th>
+                </tr>
+            </thead>
+            {{ template "entity-list" . }}
+        </table>
+    </section>
+    <aside class="w-2/5">
+        {{ template "entity-form" . }}
+    </aside>
+    <script src="/static/scripts/entity-page.js"></script>
+</div>

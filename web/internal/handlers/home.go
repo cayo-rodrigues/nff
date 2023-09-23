@@ -1,16 +1,12 @@
 package handlers
 
 import (
-	"html/template"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 )
 
-func Index(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles(
-		"internal/templates/layout.html", "internal/templates/home.html",
-	))
-	data := map[string]bool{
+func Index(ctx *fiber.Ctx) error {
+	return ctx.Render("home", fiber.Map{
 		"IsAuthenticated": true,
-	}
-	tmpl.ExecuteTemplate(w, "layout", data)
+		"Words": []string{"initial", "words", ":D"},
+	}, "layouts/base")
 }

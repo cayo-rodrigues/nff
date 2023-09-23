@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/cors"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/template/html/v2"
 
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
@@ -28,21 +29,41 @@ func main() {
 		log.Fatal("Database connection is not OK, ping failed: ", err)
 	}
 
+	engine := html.New("internal/views", ".html")
+
+	// Reload the templates on each render, good for development
+	engine.Reload(true) // Optional. Default: false
+
+	// Debug will print each template that is parsed, good for debugging
+	engine.Debug(true) // Optional. Default: false
+
+	// AddFunc adds a function to the template's global function map.
+	engine.AddFunc("greet", func(name string) string {
+		return "Hello, " + name + "!"
+	})
+
+	app := fiber.New(fiber.Config{
+		Views:             engine,
+		PassLocalsToViews: true,
+	})
+
+	app.Use(cors.New())
+
+	// app.Static("/static", "internal/static")
+	app.Get("/static/styles/:stylesheet", handlers.ServeStyles)
+	app.Get("/static/scripts/:script", handlers.ServeJS)
+
+	app.Get("/", handlers.Index)
+	app.Get("/p", func(c *fiber.Ctx) error {
+		return c.Render("partials/p", fiber.Map{
+			"Words": []string{"aaaa", "bbb", "c"},
+		})
+	})
+
+	fmt.Println("Server running on port", PORT)
+	log.Fatal(app.Listen(":" + PORT))
+
 	r := chi.NewRouter()
-
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://*", "http://*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           300,
-	}))
-
-	r.Get("/static/styles/{stylesheet}", handlers.ServeStyles)
-	r.Get("/static/scripts/{script}", handlers.ServeJS)
-
-	r.Get("/", handlers.Index)
 
 	entitiesPage := handlers.NewEntitiesPage()
 
@@ -57,7 +78,4 @@ func main() {
 	r.Get("/invoices", invoicesPage.Render)
 	r.Post("/invoices", invoicesPage.RequireInvoice)
 	r.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
-
-	fmt.Println("Server running on port ", PORT)
-	log.Fatal(http.ListenAndServe(":"+PORT, r))
 }

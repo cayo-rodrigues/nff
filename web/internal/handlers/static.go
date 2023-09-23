@@ -2,36 +2,33 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/gofiber/fiber/v2"
 )
 
-func ServeStyles(w http.ResponseWriter, r *http.Request) {
-	stylesheet := chi.URLParam(r, "stylesheet")
+func ServeStyles(ctx *fiber.Ctx) error {
+	stylesheet := ctx.Params("stylesheet")
 
 	filepath := fmt.Sprintf("internal/static/styles/%s", stylesheet)
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		fmt.Printf("File '%s' does not exist.\n", filepath)
-		w.WriteHeader(http.StatusNotFound)
-		return
+		msg := fmt.Sprintf("File '%s' does not exist.\n", filepath)
+		return ctx.Status(fiber.StatusNotFound).Send([]byte(msg))
 	}
 
-	http.ServeFile(w, r, filepath)
+	return ctx.SendFile(filepath)
 }
 
-func ServeJS(w http.ResponseWriter, r *http.Request) {
-	script := chi.URLParam(r, "script")
+func ServeJS(ctx *fiber.Ctx) error {
+	script := ctx.Params("script")
 
 	filepath := fmt.Sprintf("internal/static/scripts/%s", script)
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
-		fmt.Printf("File '%s' does not exist.\n", filepath)
-		w.WriteHeader(http.StatusNotFound)
-		return
+		msg := fmt.Sprintf("File '%s' does not exist.\n", filepath)
+		return ctx.Status(fiber.StatusNotFound).Send([]byte(msg))
 	}
 
-	http.ServeFile(w, r, filepath)
+	return ctx.SendFile(filepath)
 }
