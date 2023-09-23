@@ -49,7 +49,6 @@ func main() {
 
 	app.Use(cors.New())
 
-	// app.Static("/static", "internal/static")
 	app.Get("/static/styles/:stylesheet", handlers.ServeStyles)
 	app.Get("/static/scripts/:script", handlers.ServeJS)
 

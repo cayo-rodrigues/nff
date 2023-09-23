@@ -125,5 +125,5 @@ func (page *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
 	eventMsg := fmt.Sprintf("{\"entity-deleted\": %v}", entityId)
 	c.Set("HX-Trigger-After-Settle", eventMsg)
 
-	return c.Render("partials/entity-form", nil)
+	return c.Render("partials/entity-form", page.NewEmptyData())
 }
