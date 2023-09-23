@@ -1,11 +1,11 @@
 package models
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/gofiber/fiber/v2"
 )
 
 type EntityFormSelectFields struct {
@@ -44,25 +44,39 @@ type Entity struct {
 	Errors     *EntityFormError
 }
 
-func NewEntityFromForm(r *http.Request) *Entity {
-	id, err := strconv.Atoi(r.PostFormValue("id"))
+func NewEntityFormSelectFields() *EntityFormSelectFields {
+	return &EntityFormSelectFields{
+		UserTypes:   &globals.EntityUserTypes,
+		StreetTypes: &globals.EntityAddressStreetTypes,
+	}
+}
+
+func NewEmptyEntity() *Entity {
+	return &Entity{
+		Address: &Address{},
+		Errors:  &EntityFormError{},
+	}
+}
+
+func NewEntityFromForm(c *fiber.Ctx) *Entity {
+	id, err := strconv.Atoi(c.FormValue("id"))
 	if err != nil {
 		id = 0
 	}
 	return &Entity{
 		Id:       id,
-		Name:     r.PostFormValue("name"),
-		UserType: r.PostFormValue("user_type"),
-		CpfCnpj:  r.PostFormValue("cpf_cnpj"),
-		Ie:       r.PostFormValue("ie"),
-		Email:    r.PostFormValue("email"),
-		Password: r.PostFormValue("password"),
+		Name:     c.FormValue("name"),
+		UserType: c.FormValue("user_type"),
+		CpfCnpj:  c.FormValue("cpf_cnpj"),
+		Ie:       c.FormValue("ie"),
+		Email:    c.FormValue("email"),
+		Password: c.FormValue("password"),
 		Address: &Address{
-			PostalCode:   r.PostFormValue("postal_code"),
-			Neighborhood: r.PostFormValue("neighborhood"),
-			StreetType:   r.PostFormValue("street_type"),
-			StreetName:   r.PostFormValue("street_name"),
-			Number:       r.PostFormValue("number"),
+			PostalCode:   c.FormValue("postal_code"),
+			Neighborhood: c.FormValue("neighborhood"),
+			StreetType:   c.FormValue("street_type"),
+			StreetName:   c.FormValue("street_name"),
+			Number:       c.FormValue("number"),
 		},
 		Errors: &EntityFormError{},
 	}

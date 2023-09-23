@@ -3,12 +3,10 @@ package handlers
 import (
 	"fmt"
 	"html/template"
-	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
+	"github.com/gofiber/fiber/v2"
 
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
@@ -26,147 +24,106 @@ type EntitiesPageData struct {
 	FormSelectFields *models.EntityFormSelectFields
 }
 
-func NewEntitiesPage() *EntitiesPage {
-	entitiesPage := &EntitiesPage{}
-	entitiesPage.ParseTemplates()
-	return entitiesPage
-}
-
-func (page *EntitiesPage) ParseTemplates() {
-	page.tmpl = template.Must(template.ParseFiles(
-		"internal/templates/layout.html",
-		"internal/templates/entities.html",
-		"internal/templates/entity-form.html",
-	))
-}
-
-func (page *EntitiesPage) Render(w http.ResponseWriter, r *http.Request) {
-	data := &EntitiesPageData{
-		IsAuthenticated: true,
-		Entities:        nil,
-		Entity: &models.Entity{
-			Address: &models.Address{},
-			Errors:  &models.EntityFormError{},
-		},
-		FormSelectFields: &models.EntityFormSelectFields{
-			UserTypes:   &globals.EntityUserTypes,
-			StreetTypes: &globals.EntityAddressStreetTypes,
-		},
+func (page *EntitiesPage) NewEmptyData() *EntitiesPageData {
+	return &EntitiesPageData{
+		IsAuthenticated:  true,
+		Entity:           models.NewEmptyEntity(),
+		FormSelectFields: models.NewEntityFormSelectFields(),
 	}
-	entities, err := workers.ListEntities(r.Context())
+}
+
+func (page *EntitiesPage) Render(c *fiber.Ctx) error {
+	data := page.NewEmptyData()
+
+	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
 		data.GeneralError = err.Error()
-		utils.ErrorResponse(w, "general-error", page.tmpl, "layout", data)
-		return
+		c.Set("HX-Trigger-After-Settle", "general-error")
 	}
 
 	data.Entities = entities
-	page.tmpl.ExecuteTemplate(w, "layout", data)
+
+	return c.Render("entities", data, "layouts/base")
 }
 
-func (page *EntitiesPage) GetEntityForm(w http.ResponseWriter, r *http.Request) {
-	data := &EntitiesPageData{
-		Entity: &models.Entity{
-			Address: &models.Address{},
-			Errors:  &models.EntityFormError{},
-		},
-		FormSelectFields: &models.EntityFormSelectFields{
-			UserTypes:   &globals.EntityUserTypes,
-			StreetTypes: &globals.EntityAddressStreetTypes,
-		},
+func (page *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
+	data := page.NewEmptyData()
+
+	entityId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
 
-	entityId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	entity, err := workers.RetrieveEntity(c.Context(), entityId)
 	if err != nil {
-		utils.GeneralErrorResponse(w, utils.EntityNotFoundErr, page.tmpl)
-		return
-	}
-
-	entity, err := workers.RetrieveEntity(r.Context(), entityId)
-	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
 
 	data.Entity = entity
 	data.Entity.IsSelected = true
-	page.tmpl.ExecuteTemplate(w, "entity-form", data)
+
+	return c.Render("partials/entity-form", data)
 }
 
-func (page *EntitiesPage) CreateEntity(w http.ResponseWriter, r *http.Request) {
-	entity := models.NewEntityFromForm(r)
+func (page *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
+	entity := models.NewEntityFromForm(c)
 
 	if !entity.IsValid() {
-		w.Header().Add("HX-Retarget", "#entity-form")
-		w.Header().Add("HX-Reswap", "outerHTML")
-		page.tmpl.ExecuteTemplate(w, "entity-form", &EntitiesPageData{
-			Entity: entity,
-			FormSelectFields: &models.EntityFormSelectFields{
-				UserTypes: &globals.EntityUserTypes,
-				StreetTypes: &globals.EntityAddressStreetTypes,
-			},
-		})
-		return
+		data := page.NewEmptyData()
+		data.Entity = entity
+		c.Set("HX-Retarget", "#entity-form")
+		c.Set("HX-Reswap", "outerHTML")
+		return c.Render("partials/entity-form", data)
 	}
 
-	err := workers.RegisterEntity(r.Context(), entity)
+	err := workers.RegisterEntity(c.Context(), entity)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
 
-	w.Header().Add("HX-Trigger-After-Settle", "entity-created")
-	page.tmpl.ExecuteTemplate(w, "entity-card", entity)
+	c.Set("HX-Trigger-After-Settle", "entity-created")
+	return c.Render("partials/entity-card", entity)
 }
 
-func (page *EntitiesPage) UpdateEntity(w http.ResponseWriter, r *http.Request) {
-	entity := models.NewEntityFromForm(r)
+func (page *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
+	entity := models.NewEntityFromForm(c)
 	entity.IsSelected = true
 
-	entityId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	entityId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		utils.GeneralErrorResponse(w, utils.EntityNotFoundErr, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
 	entity.Id = entityId
 
 	if !entity.IsValid() {
-		w.Header().Add("HX-Retarget", "#entity-form")
-		w.Header().Add("HX-Reswap", "outerHTML")
-		page.tmpl.ExecuteTemplate(w, "entity-form", &EntitiesPageData{
-			Entity: entity,
-			FormSelectFields: &models.EntityFormSelectFields{
-				UserTypes: &globals.EntityUserTypes,
-				StreetTypes: &globals.EntityAddressStreetTypes,
-			},
-		})
-		return
+		data := page.NewEmptyData()
+		data.Entity = entity
+		c.Set("HX-Retarget", "#entity-form")
+		c.Set("HX-Reswap", "outerHTML")
+		return c.Render("partials/entity-form", data)
 	}
 
-	err = workers.UpdateEntity(r.Context(), entity)
+	err = workers.UpdateEntity(c.Context(), entity)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
 
-	w.Header().Add("HX-Trigger-After-Settle", "entity-updated")
-	page.tmpl.ExecuteTemplate(w, "entity-card", entity)
+	c.Set("HX-Trigger-After-Settle", "entity-updated")
+	return c.Render("partials/entity-card", entity)
 }
 
-func (page *EntitiesPage) DeleteEntity(w http.ResponseWriter, r *http.Request) {
-	entityId, err := strconv.Atoi(chi.URLParam(r, "id"))
+func (page *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
+	entityId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
-	err = workers.DeleteEntity(r.Context(), entityId)
+	err = workers.DeleteEntity(c.Context(), entityId)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
 
 	eventMsg := fmt.Sprintf("{\"entity-deleted\": %v}", entityId)
-	w.Header().Add("HX-Trigger-After-Settle", eventMsg)
+	c.Set("HX-Trigger-After-Settle", eventMsg)
 
-	page.tmpl.ExecuteTemplate(w, "entity-form", nil)
+	return c.Render("partials/entity-form", nil)
 }

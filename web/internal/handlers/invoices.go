@@ -8,7 +8,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/utils"
+	// "github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
 )
 
@@ -52,7 +52,7 @@ func (page *InvoicesPage) Render(w http.ResponseWriter, r *http.Request) {
 	entities, err := workers.ListEntities(r.Context())
 	if err != nil {
 		data.GeneralError = err.Error()
-		utils.ErrorResponse(w, "general-error", page.tmpl, "layout", data)
+		// utils.ErrorResponse(w, "general-error", page.tmpl, "layout", data)
 		return
 	}
 
@@ -76,7 +76,7 @@ func (page *InvoicesPage) RequireInvoice(w http.ResponseWriter, r *http.Request)
 
 	entities, err := workers.ListEntities(r.Context())
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
+		// utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 	data.FormSelectFields.Entities = entities
@@ -84,30 +84,30 @@ func (page *InvoicesPage) RequireInvoice(w http.ResponseWriter, r *http.Request)
 	senderId, err := strconv.Atoi(r.PostFormValue("sender"))
 	if err != nil {
 		log.Println("Error converting sender id from string to int: ", err)
-		utils.GeneralErrorResponse(w, utils.InternalServerErr, page.tmpl)
+		// utils.GeneralErrorResponse(w, utils.InternalServerErr, page.tmpl)
 		return
 	}
 	recipientId, err := strconv.Atoi(r.PostFormValue("recipient"))
 	if err != nil {
 		log.Println("Error converting recipient id from string to int: ", err)
-		utils.GeneralErrorResponse(w, utils.InternalServerErr, page.tmpl)
+		// utils.GeneralErrorResponse(w, utils.InternalServerErr, page.tmpl)
 		return
 	}
 
 	sender, err := workers.RetrieveEntity(r.Context(), senderId)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
+		// utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 	recipient, err := workers.RetrieveEntity(r.Context(), recipientId)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
+		// utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 
 	invoice, err := models.NewInvoiceFromForm(r)
 	if err != nil {
-		utils.GeneralErrorResponse(w, err, page.tmpl)
+		// utils.GeneralErrorResponse(w, err, page.tmpl)
 		return
 	}
 

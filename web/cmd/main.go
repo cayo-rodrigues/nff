@@ -54,24 +54,19 @@ func main() {
 	app.Get("/static/scripts/:script", handlers.ServeJS)
 
 	app.Get("/", handlers.Index)
-	app.Get("/p", func(c *fiber.Ctx) error {
-		return c.Render("partials/p", fiber.Map{
-			"Words": []string{"aaaa", "bbb", "c"},
-		})
-	})
+
+	entitiesPage := &handlers.EntitiesPage{}
+
+	app.Get("/entities", entitiesPage.Render)
+	app.Get("/entities/:id/form", entitiesPage.GetEntityForm)
+	app.Post("/entities", entitiesPage.CreateEntity)
+	app.Put("/entities/:id", entitiesPage.UpdateEntity)
+	app.Delete("/entities/:id", entitiesPage.DeleteEntity)
 
 	fmt.Println("Server running on port", PORT)
 	log.Fatal(app.Listen(":" + PORT))
 
 	r := chi.NewRouter()
-
-	entitiesPage := handlers.NewEntitiesPage()
-
-	r.Get("/entities", entitiesPage.Render)
-	r.Post("/entities", entitiesPage.CreateEntity)
-	r.Put("/entities/{id}", entitiesPage.UpdateEntity)
-	r.Delete("/entities/{id}", entitiesPage.DeleteEntity)
-	r.Get("/entities/{id}/form", entitiesPage.GetEntityForm)
 
 	invoicesPage := handlers.NewInvoicesPage()
 

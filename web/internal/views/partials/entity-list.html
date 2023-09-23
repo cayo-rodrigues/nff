@@ -1,8 +1,8 @@
-{{ define "entity-list" }}
+{{ define "partials/entity-list" }}
     <tbody class="flex flex-1 flex-col gap-6" id="entity-list">
         {{ if .Entities }}
             {{ range .Entities }}
-                {{ template "entity-card" . }}
+                {{ template "partials/entity-card" . }}
             {{ end }}
         {{ end }}
     </tbody>

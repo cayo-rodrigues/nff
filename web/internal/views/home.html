@@ -1,9 +1,3 @@
 {{ define "title" }} Home {{ end }}
 
 <h1>Home!</h1>
-
-<div id="pppp">
-    {{ template "partials/p" . }}
-</div>
-
-<button hx-get="/p" hx-target="#pppp" hx-trigger="click" hx-swap="beforeend">click me!</button>
