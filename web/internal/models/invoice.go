@@ -52,7 +52,6 @@ type InvoiceItem struct {
 	UnityOfMeasurement string  `form:"unity_of_measurement"`
 	Quantity           float64 `form:"quantity"`
 	ValuePerUnity      float64 `form:"value_per_unity"`
-	FormSelectFields   *InvoiceItemFormSelectFields
 	Errors             *InvoiceItemFormError
 }
 
@@ -75,19 +74,16 @@ type Invoice struct {
 
 func NewEmptyInvoiceItem() *InvoiceItem {
 	return &InvoiceItem{
-		FormSelectFields: &InvoiceItemFormSelectFields{
-			Groups:               &globals.InvoiceItemGroups,
-			Origins:              &globals.InvoiceItemOrigins,
-			UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
-		},
 		Errors: &InvoiceItemFormError{},
 	}
 }
 
 func NewEmptyInvoice() *Invoice {
 	return &Invoice{
-		Errors: &InvoiceFormError{},
-		Items:  &[]InvoiceItem{*NewEmptyInvoiceItem()},
+		Errors:    &InvoiceFormError{},
+		Items:     &[]InvoiceItem{*NewEmptyInvoiceItem()},
+		Sender:    NewEmptyEntity(),
+		Recipient: NewEmptyEntity(),
 	}
 }
 

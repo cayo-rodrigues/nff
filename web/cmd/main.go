@@ -10,7 +10,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html/v2"
 
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
+	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
 )
 
@@ -36,9 +38,12 @@ func main() {
 	// Debug will print each template that is parsed, good for debugging
 	engine.Debug(true) // Optional. Default: false
 
-	// AddFunc adds a function to the template's global function map.
-	engine.AddFunc("greet", func(name string) string {
-		return "Hello, " + name + "!"
+	engine.AddFunc("GetInvoiceItemSelectFields", func() *models.InvoiceItemFormSelectFields {
+		return &models.InvoiceItemFormSelectFields{
+			Groups:               &globals.InvoiceItemGroups,
+			Origins:              &globals.InvoiceItemOrigins,
+			UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
+		}
 	})
 
 	app := fiber.New(fiber.Config{
@@ -54,7 +59,6 @@ func main() {
 	app.Get("/", handlers.Index)
 
 	entitiesPage := &handlers.EntitiesPage{}
-
 	app.Get("/entities", entitiesPage.Render)
 	app.Get("/entities/:id/form", entitiesPage.GetEntityForm)
 	app.Post("/entities", entitiesPage.CreateEntity)
@@ -62,7 +66,6 @@ func main() {
 	app.Delete("/entities/:id", entitiesPage.DeleteEntity)
 
 	invoicesPage := &handlers.InvoicesPage{}
-
 	app.Get("/invoices", invoicesPage.Render)
 	app.Post("/invoices", invoicesPage.RequireInvoice)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)

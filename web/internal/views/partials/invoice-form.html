@@ -30,7 +30,7 @@
                     <label for="sender"><strong>Remetente</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="sender" name="sender">
                         {{ range .FormSelectFields.Entities }}
-                            <option value="{{ .Id }}">{{ .Name }}</option>
+                            <option {{ if eq $.Invoice.Sender.Id .Id }} selected {{ end }} value="{{ .Id }}">{{ .Name }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.Sender }}</sub>
@@ -40,7 +40,7 @@
                     <label for="recipient"><strong>Destinatário</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="recipient" name="recipient">
                         {{ range .FormSelectFields.Entities }}
-                            <option value="{{ .Id }}">{{ .Name }}</option>
+                            <option {{ if eq $.Invoice.Recipient.Id .Id }} selected {{ end }} value="{{ .Id }}">{{ .Name }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.Recipient }}</sub>
@@ -50,7 +50,7 @@
                     <label for="operation"><strong>Operação</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="operation" name="operation">
                         {{ range .FormSelectFields.Operations }}
-                        <option value="{{ . }}">{{ . }}</option>
+                            <option {{ if eq $.Invoice.Operation . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.Operation }}</sub>
@@ -60,7 +60,7 @@
                     <label for="cfop"><strong>CFOP</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="cfop" name="cfop">
                         {{ range .FormSelectFields.Cfops }}
-                        <option value="{{ . }}">{{ . }}</option>
+                            <option {{ if eq $.Invoice.Cfop . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.Cfop }}</sub>
@@ -70,7 +70,7 @@
                     <label class="truncate" for="is_icms_contributor"><strong>Contribuinte ICMS</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="is_icms_contributor" name="is_icms_contributor">
                         {{ range .FormSelectFields.IcmsOptions }}
-                            <option value="{{ . }}">{{ . }}</option>
+                            <option {{ if eq $.Invoice.IsIcmsContributor . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.IsIcmsContributor }}</sub>
@@ -84,7 +84,7 @@
                     <label class="truncate" for="is_final_customer"><strong>Consumidor Final</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="is_final_customer" name="is_final_customer">
                         {{ range .FormSelectFields.BooleanField }}
-                            <option value="{{ . }}">{{ . }}</option>
+                            <option {{ if eq $.Invoice.IsFinalCustomer . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.IsFinalCustomer }}</sub>
@@ -102,7 +102,7 @@
                     <select class="h-10 rounded bg-gray-100 p-2 md:w-full" id="add_shipping_to_total"
                         name="add_shipping_to_total">
                         {{ range .FormSelectFields.BooleanField }}
-                            <option value="{{ . }}">{{ . }}</option>
+                            <option {{ if eq $.Invoice.AddShippingToTotal . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.AddShippingToTotal }}</sub>

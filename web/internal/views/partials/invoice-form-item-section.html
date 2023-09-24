@@ -1,5 +1,7 @@
 {{ define "partials/invoice-form-item-section" }}
 
+{{ $FormSelectFields := GetInvoiceItemSelectFields }}
+
 <section>
     <div class="flex items-center justify-end pr-1 pt-2">
         <button class="rounded p-1 shadow shadow-gray-400 hover:bg-gray-100 active:bg-gray-200" type="button"
@@ -18,8 +20,8 @@
             <div class="flex flex-col gap-2 md:w-1/3">
                 <label for="group"><strong>Grupo</strong></label>
                 <select class="h-10 rounded bg-gray-100 p-2" id="group" name="group">
-                    {{ range .FormSelectFields.Groups }}
-                        <option value="{{ . }}">{{ . }}</option>
+                    {{ range $FormSelectFields.Groups }}
+                        <option {{ if eq $.Group . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                     {{ end }}
                 </select>
                 <sub class="text-red-500">{{ .Errors.Group }}</sub>
@@ -27,7 +29,7 @@
 
             <div class="flex flex-col gap-2 md:w-1/3">
                 <label for="description"><strong>Descrição</strong></label>
-                <input class="rounded bg-gray-100 p-2" type="text" id="description" name="description" value="">
+                <input class="rounded bg-gray-100 p-2" type="text" id="description" name="description" value="{{ .Description }}">
                 <sub class="text-red-500">{{ .Errors.Description }}</sub>
             </div>
 
@@ -52,8 +54,8 @@
             <div class="flex flex-col gap-2 md:w-1/3">
                 <label for="origin"><strong>Origem</strong></label>
                 <select class="h-10 rounded bg-gray-100 p-2" id="origin" name="origin">
-                    {{ range .FormSelectFields.Origins }}
-                        <option value="{{ . }}">{{ . }}</option>
+                    {{ range $FormSelectFields.Origins }}
+                        <option {{ if eq $.Origin . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                     {{ end }}
                 </select>
                 <sub class="text-red-500">{{ .Errors.Origin }}</sub>
@@ -62,8 +64,8 @@
             <div class="flex flex-col gap-2 md:w-1/3">
                 <label class="truncate" for="unity_of_measurement"><strong>Unidade de medida</strong></label>
                 <select class="h-10 rounded bg-gray-100 p-2" id="unity_of_measurement" name="unity_of_measurement">
-                    {{ range .FormSelectFields.UnitiesOfMeasurement }}
-                        <option value="{{ . }}">{{ . }}</option>
+                    {{ range $FormSelectFields.UnitiesOfMeasurement }}
+                        <option {{ if eq $.UnityOfMeasurement . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                     {{ end }}
                 </select>
                 <sub class="text-red-500">{{ .Errors.UnityOfMeasurement }}</sub>
