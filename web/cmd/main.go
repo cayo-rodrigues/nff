@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/template/html/v2"
@@ -62,14 +61,13 @@ func main() {
 	app.Put("/entities/:id", entitiesPage.UpdateEntity)
 	app.Delete("/entities/:id", entitiesPage.DeleteEntity)
 
+	invoicesPage := &handlers.InvoicesPage{}
+
+	app.Get("/invoices", invoicesPage.Render)
+	app.Post("/invoices", invoicesPage.RequireInvoice)
+	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
+
 	fmt.Println("Server running on port", PORT)
 	log.Fatal(app.Listen(":" + PORT))
 
-	r := chi.NewRouter()
-
-	invoicesPage := handlers.NewInvoicesPage()
-
-	r.Get("/invoices", invoicesPage.Render)
-	r.Post("/invoices", invoicesPage.RequireInvoice)
-	r.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 }

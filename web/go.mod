@@ -3,7 +3,6 @@ module github.com/cayo-rodrigues/nff/web
 go 1.20
 
 require (
-	github.com/go-chi/chi/v5 v5.0.10
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/gofiber/template/html/v2 v2.0.5
 	github.com/jackc/pgx/v5 v5.4.3

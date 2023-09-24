@@ -3,13 +3,13 @@ package handlers
 import (
 	"html/template"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	// "github.com/cayo-rodrigues/nff/web/internal/utils"
+	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
+	"github.com/gofiber/fiber/v2"
 )
 
 type InvoicesPage struct {
@@ -25,21 +25,8 @@ type InvoicesPageData struct {
 	FormSelectFields *models.InvoiceFormSelectFields
 }
 
-func NewInvoicesPage() *InvoicesPage {
-	invoicesPage := &InvoicesPage{}
-	invoicesPage.ParseTemplates()
-	return invoicesPage
-}
-
-func (page *InvoicesPage) ParseTemplates() {
-	page.tmpl = template.Must(template.ParseFiles(
-		"internal/templates/layout.html",
-		"internal/templates/invoices.html",
-	))
-}
-
-func (page *InvoicesPage) Render(w http.ResponseWriter, r *http.Request) {
-	data := &InvoicesPageData{
+func (page *InvoicesPage) NewEmptyData() *InvoicesPageData {
+	return &InvoicesPageData{
 		IsAuthenticated: true,
 		FormSelectFields: &models.InvoiceFormSelectFields{
 			Operations:   &globals.InvoiceOperations,
@@ -48,67 +35,57 @@ func (page *InvoicesPage) Render(w http.ResponseWriter, r *http.Request) {
 			IcmsOptions:  &globals.InvoiceIcmsOptions,
 		},
 	}
+}
 
-	entities, err := workers.ListEntities(r.Context())
+func (page *InvoicesPage) Render(c *fiber.Ctx) error {
+	data := page.NewEmptyData()
+
+	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
 		data.GeneralError = err.Error()
-		// utils.ErrorResponse(w, "general-error", page.tmpl, "layout", data)
-		return
+		c.Set("HX-Trigger-After-Settle", "general-error")
 	}
 
 	data.FormSelectFields.Entities = entities
 	data.Invoice = models.NewEmptyInvoice()
 
-	page.tmpl.ExecuteTemplate(w, "layout", data)
+	return c.Render("invoices", data, "layouts/base")
 }
 
-func (page *InvoicesPage) RequireInvoice(w http.ResponseWriter, r *http.Request) {
-	data := &InvoicesPageData{
-		FormMsg:     "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo.",
-		FormSuccess: true,
-		FormSelectFields: &models.InvoiceFormSelectFields{
-			Operations:   &globals.InvoiceOperations,
-			Cfops:        &globals.InvoiceCfops,
-			BooleanField: &globals.InvoiceBooleanField,
-			IcmsOptions:  &globals.InvoiceIcmsOptions,
-		},
-	}
+func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
+	data := page.NewEmptyData()
+	data.FormSuccess = true
+	data.FormMsg = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
 
-	entities, err := workers.ListEntities(r.Context())
+	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
-		// utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
 	data.FormSelectFields.Entities = entities
 
-	senderId, err := strconv.Atoi(r.PostFormValue("sender"))
+	senderId, err := strconv.Atoi(c.FormValue("sender"))
 	if err != nil {
 		log.Println("Error converting sender id from string to int: ", err)
-		// utils.GeneralErrorResponse(w, utils.InternalServerErr, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
-	recipientId, err := strconv.Atoi(r.PostFormValue("recipient"))
+	recipientId, err := strconv.Atoi(c.FormValue("recipient"))
 	if err != nil {
 		log.Println("Error converting recipient id from string to int: ", err)
-		// utils.GeneralErrorResponse(w, utils.InternalServerErr, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	sender, err := workers.RetrieveEntity(r.Context(), senderId)
+	sender, err := workers.RetrieveEntity(c.Context(), senderId)
 	if err != nil {
-		// utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
-	recipient, err := workers.RetrieveEntity(r.Context(), recipientId)
+	recipient, err := workers.RetrieveEntity(c.Context(), recipientId)
 	if err != nil {
-		// utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
 
-	invoice, err := models.NewInvoiceFromForm(r)
+	invoice, err := models.NewInvoiceFromForm(c)
 	if err != nil {
-		// utils.GeneralErrorResponse(w, err, page.tmpl)
-		return
+		return utils.GeneralErrorResponse(c, err)
 	}
 
 	invoice.Sender = sender
@@ -123,10 +100,10 @@ func (page *InvoicesPage) RequireInvoice(w http.ResponseWriter, r *http.Request)
 
 	// i would call ss-api here in case data.FormSuccess == true
 
-	page.tmpl.ExecuteTemplate(w, "main", data)
+	return c.Render("partials/invoice-form", data)
 }
 
-func (page *InvoicesPage) GetItemFormSection(w http.ResponseWriter, r *http.Request) {
-	item := *models.NewEmptyInvoiceItem()
-	page.tmpl.ExecuteTemplate(w, "invoice-item-form-section", item)
+func (page *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
+	item := models.NewEmptyInvoiceItem()
+	return c.Render("partials/invoice-form-item-section", item)
 }

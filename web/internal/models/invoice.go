@@ -2,11 +2,11 @@ package models
 
 import (
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
+	"github.com/gofiber/fiber/v2"
 )
 
 type InvoiceItemFormError struct {
@@ -46,12 +46,12 @@ type InvoiceItemFormSelectFields struct {
 }
 
 type InvoiceItem struct {
-	Group              string
-	Description        string
-	Origin             string
-	UnityOfMeasurement string
-	Quantity           float64
-	ValuePerUnity      float64
+	Group              string  `form:"group"`
+	Description        string  `form:"description"`
+	Origin             string  `form:"origin"`
+	UnityOfMeasurement string  `form:"unity_of_measurement"`
+	Quantity           float64 `form:"quantity"`
+	ValuePerUnity      float64 `form:"value_per_unity"`
 	FormSelectFields   *InvoiceItemFormSelectFields
 	Errors             *InvoiceItemFormError
 }
@@ -91,48 +91,53 @@ func NewEmptyInvoice() *Invoice {
 	}
 }
 
-func NewInvoiceFromForm(r *http.Request) (*Invoice, error) {
-	err := r.ParseForm()
-	if err != nil {
-		log.Println("Error parsing invoice form: ", err)
-		return nil, utils.InternalServerErr
-	}
+func NewInvoiceFromForm(c *fiber.Ctx) (*Invoice, error) {
+	var err error
 
 	invoice := NewEmptyInvoice()
 
-	invoice.Operation = r.PostFormValue("operation")
-	invoice.Cfop, err = strconv.Atoi(r.PostFormValue("cfop"))
+	invoice.Operation = c.FormValue("operation")
+	invoice.Cfop, err = strconv.Atoi(c.FormValue("cfop"))
 	if err != nil {
 		log.Println("Error converting invoice cfop from string to int: ", err)
 		return nil, utils.InternalServerErr
 	}
-	invoice.IsIcmsContributor = r.PostFormValue("is_icms_contributor")
-	invoice.IsFinalCustomer = r.PostFormValue("is_final_customer")
-	if r.PostFormValue("shipping") != "" {
-		invoice.Shipping, err = strconv.ParseFloat(r.PostFormValue("shipping"), 64)
+	invoice.IsIcmsContributor = c.FormValue("is_icms_contributor")
+	invoice.IsFinalCustomer = c.FormValue("is_final_customer")
+	if c.FormValue("shipping") != "" {
+		invoice.Shipping, err = strconv.ParseFloat(c.FormValue("shipping"), 64)
 		if err != nil {
 			log.Println("Error converting invoice shipping from string to float64: ", err)
 			return nil, utils.InternalServerErr
 		}
 	}
-	invoice.AddShippingToTotal = r.PostFormValue("add_shipping_to_total")
-	invoice.Gta = r.PostFormValue("gta")
+	invoice.AddShippingToTotal = c.FormValue("add_shipping_to_total")
+	invoice.Gta = c.FormValue("gta")
 
 	items := []InvoiceItem{}
-	itemsQuantity := len(r.PostForm["description"]) // it could be any field
+	postArgs := c.Request().PostArgs()
+
+	groups := postArgs.PeekMulti("group")
+	descriptions := postArgs.PeekMulti("description")
+	origins := postArgs.PeekMulti("origin")
+	unitiesOfMeasurement := postArgs.PeekMulti("unity_of_measurement")
+	quantities := postArgs.PeekMulti("quantity")
+	valuesPerUnity := postArgs.PeekMulti("value_per_unity")
+
+	itemsQuantity := len(groups) // it could be any field
 	for i := 0; i < itemsQuantity; i++ {
 		item := NewEmptyInvoiceItem()
 
-		item.Group = r.PostForm["group"][i]
-		item.Description = r.PostForm["description"][i]
-		item.Origin = r.PostForm["origin"][i]
-		item.UnityOfMeasurement = r.PostForm["unity_of_measurement"][i]
-		item.Quantity, err = strconv.ParseFloat(r.PostForm["quantity"][i], 64)
+		item.Group = string(groups[i])
+		item.Description = string(descriptions[i])
+		item.Origin = string(origins[i])
+		item.UnityOfMeasurement = string(unitiesOfMeasurement[i])
+		item.Quantity, err = strconv.ParseFloat(string(quantities[i]), 64)
 		if err != nil {
 			log.Printf("Error converting invoice item %d quantity from string to float64: %v", i, err)
 			return nil, utils.InternalServerErr
 		}
-		item.ValuePerUnity, err = strconv.ParseFloat(r.PostForm["value_per_unity"][i], 64)
+		item.ValuePerUnity, err = strconv.ParseFloat(string(valuesPerUnity[i]), 64)
 		if err != nil {
 			log.Printf("Error converting invoice item %d value_per_unity from string to float64: %v", i, err)
 			return nil, utils.InternalServerErr
