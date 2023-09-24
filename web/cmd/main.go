@@ -70,6 +70,10 @@ func main() {
 	app.Post("/invoices", invoicesPage.RequireInvoice)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 
+	cancelInvoicesPage := &handlers.CancelInvoicesPage{}
+	app.Get("/invoices/cancel", cancelInvoicesPage.Render)
+	app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)
+
 	fmt.Println("Server running on port", PORT)
 	log.Fatal(app.Listen(":" + PORT))
 

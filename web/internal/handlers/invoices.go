@@ -1,20 +1,18 @@
 package handlers
 
 import (
-	"html/template"
 	"log"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
-	"github.com/gofiber/fiber/v2"
 )
 
-type InvoicesPage struct {
-	tmpl *template.Template
-}
+type InvoicesPage struct{}
 
 type InvoicesPageData struct {
 	IsAuthenticated  bool

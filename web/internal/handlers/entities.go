@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"html/template"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,9 +11,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
 )
 
-type EntitiesPage struct {
-	tmpl *template.Template
-}
+type EntitiesPage struct{}
 
 type EntitiesPageData struct {
 	IsAuthenticated  bool
