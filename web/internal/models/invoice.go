@@ -46,12 +46,12 @@ type InvoiceItemFormSelectFields struct {
 }
 
 type InvoiceItem struct {
-	Group              string  `form:"group"`
-	Description        string  `form:"description"`
-	Origin             string  `form:"origin"`
-	UnityOfMeasurement string  `form:"unity_of_measurement"`
-	Quantity           float64 `form:"quantity"`
-	ValuePerUnity      float64 `form:"value_per_unity"`
+	Group              string
+	Description        string
+	Origin             string
+	UnityOfMeasurement string
+	Quantity           float64
+	ValuePerUnity      float64
 	Errors             *InvoiceItemFormError
 }
 

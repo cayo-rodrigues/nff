@@ -13,3 +13,31 @@ CREATE TABLE IF NOT EXISTS entities (
     number VARCHAR(6)
 );
 
+CREATE TABLE IF NOT EXISTS invoices (
+    id BIGSERIAL PRIMARY KEY,
+    number VARCHAR(9),
+    protocol VARCHAR(13),
+    operation VARCHAR(7) NOT NULL,
+    cfop INT NOT NULL,
+    is_final_customer VARCHAR(4) NOT NULL,
+    is_icms_contributor VARCHAR(6) NOT NULL,
+    shipping DOUBLE PRECISION NOT NULL,
+    add_shipping_to_total VARCHAR(4) NOT NULL,
+    gta VARCHAR(16),
+    sender_id BIGINT NOT NULL,
+    recipient_id BIGINT NOT NULL,
+    CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES entities(id) ON DELETE CASCADE,
+    CONSTRAINT fk_recipient FOREIGN KEY (recipient_id) REFERENCES entities(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS invoices_items (
+    id BIGSERIAL PRIMARY KEY,
+    item_group VARCHAR(64) NOT NULL,
+    description VARCHAR(128) NOT NULL,
+    origin VARCHAR(64) NOT NULL,
+    unity_of_measurement VARCHAR(8) NOT NULL,
+    quantity DOUBLE PRECISION NOT NULL,
+    value_per_unity DOUBLE PRECISION NOT NULL,
+    invoice_id BIGINT NOT NULL,
+    CONSTRAINT fk_invoice FOREIGN KEY(invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
+);
