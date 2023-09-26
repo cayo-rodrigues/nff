@@ -16,6 +16,7 @@ type InvoicesPage struct{}
 
 type InvoicesPageData struct {
 	IsAuthenticated  bool
+	Invoices         *[]models.Invoice
 	Invoice          *models.Invoice
 	GeneralError     string
 	FormMsg          string
@@ -42,10 +43,21 @@ func (page *InvoicesPage) Render(c *fiber.Ctx) error {
 	if err != nil {
 		data.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
+		return c.Render("invoices", data, "layouts/base")
 	}
 
 	data.FormSelectFields.Entities = entities
 	data.Invoice = models.NewEmptyInvoice()
+
+	// get the latest 10 invoices
+	invoices, err := workers.ListInvoices(c.Context())
+	if err != nil {
+		data.GeneralError = err.Error()
+		c.Set("HX-Trigger-After-Settle", "general-error")
+		return c.Render("invoices", data, "layouts/base")
+	}
+
+	data.Invoices = invoices
 
 	return c.Render("invoices", data, "layouts/base")
 }
@@ -86,15 +98,21 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	invoice.Sender = sender
-	invoice.Recipient = recipient
+	data.Invoice = invoice
+	data.Invoice.Sender = sender
+	data.Invoice.Recipient = recipient
 
-	if !invoice.IsValid() {
+	if !data.Invoice.IsValid() {
 		data.FormMsg = "Corrija os campos abaixo."
 		data.FormSuccess = false
+		return c.Render("partials/invoice-form", data)
 	}
 
-	data.Invoice = invoice
+	// insert invoice into db, along with invoice items
+	err = workers.CreateInvoice(c.Context(), data.Invoice)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
 
 	// i would call ss-api here in case data.FormSuccess == true
 

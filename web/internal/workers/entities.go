@@ -60,7 +60,7 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 	return &entity, nil
 }
 
-func RegisterEntity(ctx context.Context, entity *models.Entity) error {
+func CreateEntity(ctx context.Context, entity *models.Entity) error {
 	dbpool := sql.GetDatabasePool()
 	row := dbpool.QueryRow(
 		ctx,

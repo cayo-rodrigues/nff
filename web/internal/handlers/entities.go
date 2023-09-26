@@ -73,7 +73,7 @@ func (page *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
 		return c.Render("partials/entity-form", data)
 	}
 
-	err := workers.RegisterEntity(c.Context(), entity)
+	err := workers.CreateEntity(c.Context(), entity)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}

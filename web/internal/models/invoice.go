@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
+	"github.com/cayo-rodrigues/nff/web/internal/sql"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -346,4 +347,11 @@ func (i *InvoiceItem) IsValid() bool {
 	}
 
 	return isValid
+}
+
+func (i *Invoice) Scan(rows sql.Scanner) error {
+	return rows.Scan(
+		&i.Id, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
+		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.Sender.Id, &i.Recipient.Id,
+	)
 }
