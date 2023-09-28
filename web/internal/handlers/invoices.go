@@ -108,7 +108,6 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return c.Render("partials/invoice-form", data)
 	}
 
-	// insert invoice into db, along with invoice items
 	err = workers.CreateInvoice(c.Context(), data.Invoice)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
@@ -122,4 +121,15 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 func (page *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
 	item := models.NewEmptyInvoiceItem()
 	return c.Render("partials/invoice-form-item-section", item)
+}
+
+func (page *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
+	invoiceId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
+	}
+	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
+
+	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
+	return c.Render("partials/request-card-details", invoice)
 }

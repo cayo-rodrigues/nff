@@ -13,12 +13,13 @@ import (
 type CancelInvoicesPage struct{}
 
 type CancelInvoicesPageData struct {
-	IsAuthenticated  bool
-	InvoiceCancel    *models.InvoiceCancel
-	GeneralError     string
-	FormMsg          string
-	FormSuccess      bool
-	FormSelectFields *models.InvoiceCancelFormSelectFields
+	IsAuthenticated   bool
+	InvoiceCancel     *models.InvoiceCancel
+	InvoiceCancelings *[]models.InvoiceCancel
+	GeneralError      string
+	FormMsg           string
+	FormSuccess       bool
+	FormSelectFields  *models.InvoiceCancelFormSelectFields
 }
 
 func (page *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
@@ -41,6 +42,16 @@ func (page *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 
 	data.FormSelectFields.Entities = entities
 	data.InvoiceCancel = models.NewEmptyInvoiceCancel()
+
+	// get the latest 10 cancelings
+	cancelings, err := workers.ListInvoiceCancelings(c.Context())
+	if err != nil {
+		data.GeneralError = err.Error()
+		c.Set("HX-Trigger-After-Settle", "general-error")
+		return c.Render("invoices-cancel", data, "layouts/base")
+	}
+
+	data.InvoiceCancelings = cancelings
 
 	return c.Render("invoices-cancel", data, "layouts/base")
 }
@@ -72,14 +83,19 @@ func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	invoiceCancel.Entity = entity
+	data.InvoiceCancel = invoiceCancel
+	data.InvoiceCancel.Entity = entity
 
 	if !invoiceCancel.IsValid() {
 		data.FormMsg = "Corrija os campos abaixo."
 		data.FormSuccess = false
+		return c.Render("partials/invoice-cancel-form", data)
 	}
 
-	data.InvoiceCancel = invoiceCancel
+	err = workers.CreateInvoiceCanceling(c.Context(), data.InvoiceCancel)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
 
 	return c.Render("partials/invoice-cancel-form", data)
 }

@@ -41,3 +41,12 @@ CREATE TABLE IF NOT EXISTS invoices_items (
     invoice_id BIGINT NOT NULL,
     CONSTRAINT fk_invoice FOREIGN KEY(invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS invoices_cancelings (
+    id BIGSERIAL PRIMARY KEY,
+    invoice_number VARCHAR(9) NOT NULL,
+    year INT NOT NULL,
+    justification VARCHAR(128),
+    entity_id BIGINT NOT NULL,
+    CONSTRAINT fk_canceling_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
+)

@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cayo-rodrigues/nff/web/internal/sql"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -77,4 +78,8 @@ func (i *InvoiceCancel) IsValid() bool {
 	}
 
 	return isValid
+}
+
+func (c *InvoiceCancel) Scan(rows sql.Scanner) error {
+	return rows.Scan(&c.Id, &c.Number, &c.Year, &c.Justification, &c.Entity.Id)
 }

@@ -21,5 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.addEventListener('entity-created', clearFormErrors)
     document.addEventListener('entity-updated', clearFormErrors)
+
+    // display request card details modal for invoices and invoice cancels
+    document.addEventListener("open-request-card-details", function() {
+        document.querySelector("#request-card-details").showModal()
+    })
 })
 

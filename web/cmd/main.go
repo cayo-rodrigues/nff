@@ -69,6 +69,7 @@ func main() {
 	app.Get("/invoices", invoicesPage.Render)
 	app.Post("/invoices", invoicesPage.RequireInvoice)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
+	app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
 
 	cancelInvoicesPage := &handlers.CancelInvoicesPage{}
 	app.Get("/invoices/cancel", cancelInvoicesPage.Render)

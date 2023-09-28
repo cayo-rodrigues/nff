@@ -2,13 +2,16 @@ package workers
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
+	"github.com/jackc/pgx/v5"
 )
 
+// TODO accept filters
 func ListInvoices(ctx context.Context) (*[]models.Invoice, error) {
 	dbpool := sql.GetDatabasePool()
 	rows, _ := dbpool.Query(ctx, "SELECT * FROM invoices ORDER BY id DESC")
@@ -27,14 +30,23 @@ func ListInvoices(ctx context.Context) (*[]models.Invoice, error) {
 		sender, err := RetrieveEntity(ctx, invoice.Sender.Id)
 		if err != nil {
 			log.Println("Error linking invoice to sender: ", err)
+			return nil, utils.InternalServerErr
 		}
 		invoice.Sender = sender
 
 		recipient, err := RetrieveEntity(ctx, invoice.Recipient.Id)
 		if err != nil {
 			log.Println("Error linking invoice to recipient: ", err)
+			return nil, utils.InternalServerErr
 		}
 		invoice.Recipient = recipient
+
+		items, err := ListInvoiceItems(ctx, invoice.Id)
+		if err != nil {
+			log.Println("Error linking invoice to items: ", err)
+			return nil, utils.InternalServerErr
+		}
+		invoice.Items = items
 
 		invoices = append(invoices, *invoice)
 	}
@@ -59,5 +71,54 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 		return utils.InternalServerErr
 	}
 
+	err = BulkCreateInvoiceItems(ctx, invoice.Items, invoice.Id)
+	if err != nil {
+		log.Println("Error running create invoice items query: ", err)
+		return utils.InternalServerErr
+	}
+
 	return nil
+}
+
+func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error) {
+	dbpool := sql.GetDatabasePool()
+	row := dbpool.QueryRow(
+		ctx,
+		"SELECT * FROM invoices WHERE invoices.id = $1",
+		invoiceId,
+	)
+
+	invoice := models.NewEmptyInvoice()
+	err := invoice.Scan(row)
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.Printf("Invoice with id %v not found: %v", invoiceId, err)
+		return nil, utils.InvoiceNotFoundErr
+	}
+	if err != nil {
+		log.Println("Error scaning invoice row: ", err)
+		return nil, utils.InternalServerErr
+	}
+
+	sender, err := RetrieveEntity(ctx, invoice.Sender.Id)
+	if err != nil {
+		log.Println("Error linking invoice to sender: ", err)
+		return nil, utils.InternalServerErr
+	}
+	invoice.Sender = sender
+
+	recipient, err := RetrieveEntity(ctx, invoice.Recipient.Id)
+	if err != nil {
+		log.Println("Error linking invoice to recipient: ", err)
+		return nil, utils.InternalServerErr
+	}
+	invoice.Recipient = recipient
+
+	items, err := ListInvoiceItems(ctx, invoice.Id)
+	if err != nil {
+		log.Println("Error linking invoice to items: ", err)
+		return nil, utils.InternalServerErr
+	}
+	invoice.Items = items
+
+	return invoice, nil
 }

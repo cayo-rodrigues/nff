@@ -7,6 +7,8 @@ import (
 )
 
 var EntityNotFoundErr = errors.New("Entidade não encontrada")
+var InvoiceNotFoundErr = errors.New("NFA não encontrada")
+
 var InternalServerErr = errors.New("Ocorreu um erro inesperado no nosso servidor. Por favor tente novamente daqui a pouco.")
 
 func ErrorResponse(c *fiber.Ctx, tmplName string, tmplData interface{}, event string) error {
