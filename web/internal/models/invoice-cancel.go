@@ -28,13 +28,15 @@ type InvoiceCancel struct {
 	Justification string
 	Entity        *Entity
 	Errors        *InvoiceCancelFormErrors
+	OverviewType  string
 }
 
 func NewEmptyInvoiceCancel() *InvoiceCancel {
 	return &InvoiceCancel{
-		Entity: NewEmptyEntity(),
-		Errors: &InvoiceCancelFormErrors{},
-		Year:   time.Now().Year(),
+		Entity:       NewEmptyEntity(),
+		Errors:       &InvoiceCancelFormErrors{},
+		Year:         time.Now().Year(),
+		OverviewType: "canceling",
 	}
 }
 

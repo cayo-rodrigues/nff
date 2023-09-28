@@ -99,3 +99,14 @@ func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 
 	return c.Render("partials/invoice-cancel-form", data)
 }
+
+func (page *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
+	cancelingId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
+	}
+	canceling, err := workers.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+
+	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
+	return c.Render("partials/request-card-details", canceling)
+}

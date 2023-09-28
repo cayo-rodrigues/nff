@@ -58,22 +58,23 @@ func main() {
 
 	app.Get("/", handlers.Index)
 
-	entitiesPage := &handlers.EntitiesPage{}
+	entitiesPage := new(handlers.EntitiesPage)
 	app.Get("/entities", entitiesPage.Render)
 	app.Get("/entities/:id/form", entitiesPage.GetEntityForm)
 	app.Post("/entities", entitiesPage.CreateEntity)
 	app.Put("/entities/:id", entitiesPage.UpdateEntity)
 	app.Delete("/entities/:id", entitiesPage.DeleteEntity)
 
-	invoicesPage := &handlers.InvoicesPage{}
+	invoicesPage := new(handlers.InvoicesPage)
 	app.Get("/invoices", invoicesPage.Render)
 	app.Post("/invoices", invoicesPage.RequireInvoice)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 	app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
 
-	cancelInvoicesPage := &handlers.CancelInvoicesPage{}
+	cancelInvoicesPage := new(handlers.CancelInvoicesPage)
 	app.Get("/invoices/cancel", cancelInvoicesPage.Render)
 	app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)
+	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 
 	fmt.Println("Server running on port", PORT)
 	log.Fatal(app.Listen(":" + PORT))

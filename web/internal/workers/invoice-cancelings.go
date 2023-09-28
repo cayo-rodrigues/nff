@@ -2,13 +2,14 @@ package workers
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
+	"github.com/jackc/pgx/v5"
 )
-
 
 func ListInvoiceCancelings(ctx context.Context) (*[]models.InvoiceCancel, error) {
 	dbpool := sql.GetDatabasePool()
@@ -56,4 +57,33 @@ func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 	}
 
 	return nil
+}
+
+func RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.InvoiceCancel, error) {
+	dbpool := sql.GetDatabasePool()
+	row := dbpool.QueryRow(
+		ctx,
+		"SELECT * FROM invoices_cancelings WHERE id = $1",
+		cancelingId,
+	)
+
+	canceling := models.NewEmptyInvoiceCancel()
+	err := canceling.Scan(row)
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.Printf("Invoice canceling with id %v not found: %v", cancelingId, err)
+		return nil, utils.CancelingNotFoundErr
+	}
+	if err != nil {
+		log.Println("Error scaning canceling row: ", err)
+		return nil, utils.InternalServerErr
+	}
+
+	entity, err := RetrieveEntity(ctx, canceling.Entity.Id)
+	if err != nil {
+		log.Println("Error linking invoice canceling to entity: ", err)
+		return nil, utils.InternalServerErr
+	}
+	canceling.Entity = entity
+
+	return canceling, nil
 }

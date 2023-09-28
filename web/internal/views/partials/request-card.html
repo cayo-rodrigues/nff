@@ -1,4 +1,26 @@
 {{ define "partials/request-card" }}
+
+    {{ $from := "" }}
+    {{ $to := "" }}
+    {{ $is_downloadable := false }}
+    {{ $details_endpoint := ""}}
+
+    {{ if eq .OverviewType "invoice" }}
+        {{ $from = .Sender.Name }}
+        {{ $to = .Recipient.Name }}
+
+        {{ $is_downloadable = true }}
+
+        {{ $details_endpoint = "invoices"}}
+    {{ else if eq .OverviewType "canceling"}}
+        {{ $from = .Entity.Name }}
+        {{ $to = .Number }}
+
+        {{ $is_downloadable = false }}
+
+        {{ $details_endpoint = "invoices/cancel"}}
+    {{ end }}
+
 <li
     class="flex flex-wrap items-center justify-between gap-6 rounded px-4 py-4 shadow shadow-gray-300 transition-all hover:shadow-gray-500 sm:flex-nowrap sm:py-2">
     <div class="flex gap-3">
@@ -8,12 +30,12 @@
             <!-- <i class="fa-solid fa-circle-xmark text-red-600"></i> -->
             <!-- <i class="fa-solid fa-triangle-exclamation text-yellow-600"></i> -->
         </div>
-        <span>{{ .Sender.Name }}</span>
+        <span>{{ $from }}</span>
         <svg class="translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512">
             <path
                 d="M502.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L402.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l370.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z" />
         </svg>
-        <span>{{ .Recipient.Name }}</span>
+        <span>{{ $to }}</span>
     </div>
     <p class="flex-1 truncate text-green-600">
         Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.
@@ -21,7 +43,7 @@
     </p>
     <div class="flex flex-1 justify-end gap-3 sm:flex-none">
         <button
-            hx-get="/invoices/{{ .Id }}/request-card-details" hx-trigger="click" hx-target="#request-card-details" hx-swap="outerHTML"
+            hx-get="/{{ $details_endpoint }}/{{ .Id }}/request-card-details" hx-trigger="click" hx-target="#request-card-details" hx-swap="outerHTML"
             class="flex w-full justify-center gap-3 rounded bg-yellow-300 px-4 py-2 hover:bg-yellow-400 active:bg-yellow-500 sm:w-fit">
             <svg class="transform lg:translate-y-1" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512">
                 <path
@@ -31,6 +53,7 @@
                 Detalhes
             </span>
         </button>
+        {{ if $is_downloadable }}
         <button
             class="flex w-full justify-center gap-3 rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 active:bg-gray-800 sm:w-fit">
             <svg class="transform lg:translate-y-1" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 640 512"
@@ -42,6 +65,7 @@
                 Baixar
             </span>
         </button>
+        {{ end }}
         <button
             class="flex w-full justify-center gap-3 whitespace-nowrap rounded bg-sky-300 px-4 py-2 hover:bg-sky-400 active:bg-sky-500 sm:w-fit">
             <svg class="transform lg:translate-y-1" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 576 512">

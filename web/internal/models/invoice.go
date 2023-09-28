@@ -46,14 +46,16 @@ type Invoice struct {
 	Recipient          *Entity
 	Items              *[]InvoiceItem
 	Errors             *InvoiceFormError
+	OverviewType       string
 }
 
 func NewEmptyInvoice() *Invoice {
 	return &Invoice{
-		Errors:    &InvoiceFormError{},
-		Items:     &[]InvoiceItem{*NewEmptyInvoiceItem()},
-		Sender:    NewEmptyEntity(),
-		Recipient: NewEmptyEntity(),
+		Errors:       &InvoiceFormError{},
+		Items:        &[]InvoiceItem{*NewEmptyInvoiceItem()},
+		Sender:       NewEmptyEntity(),
+		Recipient:    NewEmptyEntity(),
+		OverviewType: "invoice",
 	}
 }
 
