@@ -20,7 +20,6 @@ type InvoicesPageData struct {
 	Invoice          *models.Invoice
 	GeneralError     string
 	FormMsg          string
-	FormSuccess      bool
 	FormSelectFields *models.InvoiceFormSelectFields
 }
 
@@ -64,8 +63,7 @@ func (page *InvoicesPage) Render(c *fiber.Ctx) error {
 
 func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 	data := page.NewEmptyData()
-	data.FormSuccess = true
-	data.FormMsg = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
+	// formSuccess := true
 
 	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
@@ -104,7 +102,9 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 
 	if !data.Invoice.IsValid() {
 		data.FormMsg = "Corrija os campos abaixo."
-		data.FormSuccess = false
+		// formSuccess = false
+		c.Set("HX-Retarget", "#invoice-form")
+		c.Set("HX-Reswap", "outerHTML")
 		return c.Render("partials/invoice-form", data)
 	}
 
@@ -113,9 +113,10 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	// i would call ss-api here in case data.FormSuccess == true
+	// i would call ss-api here in case formSuccess == true
 
-	return c.Render("partials/invoice-form", data)
+	c.Set("HX-Trigger-After-Settle", "invoice-required")
+	return c.Render("partials/request-card", data.Invoice)
 }
 
 func (page *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
@@ -129,6 +130,9 @@ func (page *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
 	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
 
 	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
 	return c.Render("partials/request-card-details", invoice)

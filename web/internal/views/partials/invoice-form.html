@@ -1,6 +1,6 @@
 {{ define "partials/invoice-form" }}
 
-<form id="invoice-form" hx-post="/invoices" hx-target="this" hx-swap="outerHTML">
+<form id="invoice-form" hx-post="/invoices" hx-target="#requests-overview" hx-swap="afterbegin">
     <div class="flex items-center gap-6 border-b border-gray-300 bg-white pb-2">
         <button class="flex w-full justify-center rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600 lg:w-auto" type="submit">
             <svg class="mr-3 translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em"
@@ -18,8 +18,8 @@
             </svg>
             Trazer Modelo
         </button>
-        <div class="{{ if not .FormMsg }} hidden {{ end }}">
-            <p class="flex-1 {{ if .FormSuccess }} text-green-500 {{ else }} text-red-500 {{ end }}">{{ .FormMsg }}</p>
+        <div id="invoice-form-msg" class="{{ if not .FormMsg }} hidden {{ end }}">
+            <p class="flex-1 text-red-500">{{ .FormMsg }}</p>
         </div>
     </div>
 

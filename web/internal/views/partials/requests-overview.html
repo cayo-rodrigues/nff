@@ -1,7 +1,7 @@
 {{ define "partials/requests-overview" }}
 <h3 class="text-xl font-semibold">Progresso</h3>
 <div class="py-6">
-    <ul class="flex flex-col gap-4">
+    <ul id="requests-overview" class="flex flex-col gap-4">
         {{ if . }}
             {{ range . }}
                 {{ template "partials/request-card" . }}

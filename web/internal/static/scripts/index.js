@@ -26,5 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener("open-request-card-details", function() {
         document.querySelector("#request-card-details").showModal()
     })
+
+    // clear form error messages after successful invoice requirement
+    // and display a success msg
+    document.addEventListener('invoice-required', function() {
+        document.querySelector('#invoice-form').querySelectorAll('sub, sup').forEach((elem) => {
+            elem.innerText = ""
+        })
+        const invoiceFormMsg = document.querySelector('#invoice-form-msg')
+        invoiceFormMsg.innerText = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
+        invoiceFormMsg.className = "flex-1 text-green-500"
+    })
 })
 
