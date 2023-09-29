@@ -33,10 +33,10 @@ func main() {
 	engine := html.New("internal/views", ".html")
 
 	// Reload the templates on each render, good for development
-	engine.Reload(true) // Optional. Default: false
+	engine.Reload(true)
 
 	// Debug will print each template that is parsed, good for debugging
-	engine.Debug(true) // Optional. Default: false
+	engine.Debug(true)
 
 	engine.AddFunc("GetInvoiceItemSelectFields", func() *models.InvoiceItemFormSelectFields {
 		return &models.InvoiceItemFormSelectFields{

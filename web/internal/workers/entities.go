@@ -13,8 +13,7 @@ import (
 
 // TODO accept filters
 func ListEntities(ctx context.Context) (*[]models.Entity, error) {
-	dbpool := sql.GetDatabasePool()
-	rows, _ := dbpool.Query(ctx, "SELECT * FROM entities ORDER BY id")
+	rows, _ := sql.DB.Query(ctx, "SELECT * FROM entities ORDER BY id")
 	defer rows.Close()
 
 	entities := []models.Entity{}
@@ -36,8 +35,7 @@ func ListEntities(ctx context.Context) (*[]models.Entity, error) {
 }
 
 func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
-	dbpool := sql.GetDatabasePool()
-	row := dbpool.QueryRow(
+	row := sql.DB.QueryRow(
 		ctx,
 		"SELECT * FROM entities WHERE entities.id = $1",
 		entityId,
@@ -61,8 +59,7 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 }
 
 func CreateEntity(ctx context.Context, entity *models.Entity) error {
-	dbpool := sql.GetDatabasePool()
-	row := dbpool.QueryRow(
+	row := sql.DB.QueryRow(
 		ctx,
 		"INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
@@ -78,8 +75,7 @@ func CreateEntity(ctx context.Context, entity *models.Entity) error {
 }
 
 func UpdateEntity(ctx context.Context, entity *models.Entity) error {
-	dbpool := sql.GetDatabasePool()
-	result, err := dbpool.Exec(
+	result, err := sql.DB.Exec(
 		ctx,
 		"UPDATE entities SET name = $1, user_type = $2, cpf_cnpj = $3, ie = $4, email = $5, password = $6, postal_code = $7, neighborhood = $8, street_type = $9, street_name = $10, number = $11 WHERE id = $12",
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
@@ -99,8 +95,7 @@ func UpdateEntity(ctx context.Context, entity *models.Entity) error {
 }
 
 func DeleteEntity(ctx context.Context, entityId int) error {
-	dbpool := sql.GetDatabasePool()
-	result, err := dbpool.Exec(
+	result, err := sql.DB.Exec(
 		ctx,
 		"DELETE FROM entities WHERE id = $1",
 		entityId,

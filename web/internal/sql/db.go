@@ -12,12 +12,12 @@ type Scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-var dbpool *pgxpool.Pool = nil
+var DB *pgxpool.Pool = nil
 
-func GetDatabasePool () *pgxpool.Pool {
-    if dbpool != nil {
-        return dbpool
-    }
+func GetDatabasePool() *pgxpool.Pool {
+	if DB != nil {
+		return DB
+	}
 
 	DB_URL, isThere := os.LookupEnv("DB_URL")
 	if !isThere || DB_URL == "" {
@@ -27,6 +27,6 @@ func GetDatabasePool () *pgxpool.Pool {
 	if err != nil {
 		log.Fatal("Could not create database connection pool: ", err)
 	}
-
-    return dbpool
+	DB = dbpool
+	return DB
 }

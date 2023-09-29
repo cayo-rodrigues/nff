@@ -12,8 +12,7 @@ import (
 )
 
 func ListInvoiceCancelings(ctx context.Context) (*[]models.InvoiceCancel, error) {
-	dbpool := sql.GetDatabasePool()
-	rows, _ := dbpool.Query(ctx, "SELECT * FROM invoices_cancelings ORDER BY id")
+	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices_cancelings ORDER BY id")
 	defer rows.Close()
 
 	cancelings := []models.InvoiceCancel{}
@@ -41,8 +40,7 @@ func ListInvoiceCancelings(ctx context.Context) (*[]models.InvoiceCancel, error)
 }
 
 func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
-	dbpool := sql.GetDatabasePool()
-	row := dbpool.QueryRow(
+	row := sql.DB.QueryRow(
 		ctx,
 		`INSERT INTO invoices_cancelings
 			(invoice_number, year, justification, entity_id)
@@ -60,8 +58,7 @@ func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 }
 
 func RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.InvoiceCancel, error) {
-	dbpool := sql.GetDatabasePool()
-	row := dbpool.QueryRow(
+	row := sql.DB.QueryRow(
 		ctx,
 		"SELECT * FROM invoices_cancelings WHERE id = $1",
 		cancelingId,

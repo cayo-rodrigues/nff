@@ -11,8 +11,7 @@ import (
 )
 
 func ListInvoiceItems(ctx context.Context, invoiceId int) (*[]models.InvoiceItem, error) {
-	dbpool := sql.GetDatabasePool()
-	rows, _ := dbpool.Query(ctx, "SELECT * FROM invoices_items WHERE invoice_id = $1 ORDER BY id", invoiceId)
+	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices_items WHERE invoice_id = $1 ORDER BY id", invoiceId)
 	defer rows.Close()
 
 	items := []models.InvoiceItem{}
@@ -33,7 +32,6 @@ func ListInvoiceItems(ctx context.Context, invoiceId int) (*[]models.InvoiceItem
 }
 
 func BulkCreateInvoiceItems(ctx context.Context, items *[]models.InvoiceItem, invoiceId int) error {
-	dbpool := sql.GetDatabasePool()
 	rows := [][]interface{}{}
 	for _, item := range *items {
 		item.InvoiceId = invoiceId
@@ -42,7 +40,7 @@ func BulkCreateInvoiceItems(ctx context.Context, items *[]models.InvoiceItem, in
 			item.Quantity, item.ValuePerUnity, item.InvoiceId,
 		})
 	}
-	_, err := dbpool.CopyFrom(
+	_, err := sql.DB.CopyFrom(
 		ctx,
 		pgx.Identifier{"invoices_items"},
 		[]string{"item_group", "description", "origin", "unity_of_measurement", "quantity", "value_per_unity", "invoice_id"},

@@ -13,8 +13,7 @@ import (
 
 // TODO accept filters
 func ListInvoices(ctx context.Context) (*[]models.Invoice, error) {
-	dbpool := sql.GetDatabasePool()
-	rows, _ := dbpool.Query(ctx, "SELECT * FROM invoices ORDER BY id DESC")
+	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices ORDER BY id DESC")
 	defer rows.Close()
 
 	invoices := []models.Invoice{}
@@ -55,8 +54,7 @@ func ListInvoices(ctx context.Context) (*[]models.Invoice, error) {
 }
 
 func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
-	dbpool := sql.GetDatabasePool()
-	row := dbpool.QueryRow(
+	row := sql.DB.QueryRow(
 		ctx,
 		`INSERT INTO invoices
 			(number, protocol, operation, cfop, is_final_customer, is_icms_contributor, shipping, add_shipping_to_total, gta, sender_id, recipient_id)
@@ -81,8 +79,7 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 }
 
 func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error) {
-	dbpool := sql.GetDatabasePool()
-	row := dbpool.QueryRow(
+	row := sql.DB.QueryRow(
 		ctx,
 		"SELECT * FROM invoices WHERE invoices.id = $1",
 		invoiceId,
