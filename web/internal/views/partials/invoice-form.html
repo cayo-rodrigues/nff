@@ -18,9 +18,7 @@
             </svg>
             Usar Modelo
         </button>
-        <div id="invoice-form-msg" class="{{ if not .FormMsg }} hidden {{ end }}">
-            <p class="flex-1 text-red-500">{{ .FormMsg }}</p>
-        </div>
+        <p id="invoice-form-msg" class="flex-1 text-red-500 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
     </div>
 
     <section>

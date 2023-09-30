@@ -37,5 +37,15 @@ document.addEventListener('DOMContentLoaded', () => {
         invoiceFormMsg.innerText = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
         invoiceFormMsg.className = "flex-1 text-green-500"
     })
+
+
+    document.addEventListener('invoice-cancel-required', function() {
+        document.querySelector('#invoice-cancel-form').querySelectorAll('sub, sup').forEach((elem) => {
+            elem.innerText = ""
+        })
+        const invoiceCancelFormMsg = document.querySelector('#invoice-cancel-form-msg')
+        invoiceCancelFormMsg.innerText = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
+        invoiceCancelFormMsg.className = "flex-1 text-green-500"
+    })
 })
 

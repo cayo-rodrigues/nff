@@ -58,8 +58,7 @@ func (page *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 
 func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 	data := page.NewEmptyData()
-	data.FormSuccess = true
-	data.FormMsg = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
+	// formSuccess := true
 
 	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
@@ -88,7 +87,9 @@ func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 
 	if !invoiceCancel.IsValid() {
 		data.FormMsg = "Corrija os campos abaixo."
-		data.FormSuccess = false
+		// formSuccess = false
+		c.Set("HX-Retarget", "#invoice-cancel-form")
+		c.Set("HX-Reswap", "outerHTML")
 		return c.Render("partials/invoice-cancel-form", data)
 	}
 
@@ -97,7 +98,8 @@ func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	return c.Render("partials/invoice-cancel-form", data)
+	c.Set("HX-Trigger-After-Settle", "invoice-cancel-required")
+	return c.Render("partials/request-card", data.InvoiceCancel)
 }
 
 func (page *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {

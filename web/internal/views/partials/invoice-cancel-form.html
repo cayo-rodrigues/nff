@@ -1,5 +1,6 @@
 {{ define "partials/invoice-cancel-form" }}
-<form id="invoice-cancel-form" hx-post="/invoices/cancel" hx-target="this" hx-swap="outerHTML">
+
+<form id="invoice-cancel-form" hx-post="/invoices/cancel" hx-target="#requests-overview" hx-swap="afterbegin">
     <div class="flex items-center gap-6 border-b border-gray-300 bg-white pb-2">
         <button
             class="flex w-full justify-center rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600 lg:w-auto"
@@ -11,7 +12,7 @@
             </svg>
             Requerer Cancelamento
         </button>
-        <p class="flex-1 {{ if .FormSuccess }} text-green-500 {{ else }} text-red-500 {{ end }}">{{ .FormMsg }}</p>
+        <p id="invoice-cancel-form-msg" class="flex-1 text-red-500 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
     </div>
 
     <section>
