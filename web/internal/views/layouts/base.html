@@ -8,20 +8,22 @@
 
     <link href="/static/styles/tailwind.css" rel="stylesheet" />
 
+    <link rel="icon" href="/static/icons/icon.ico" type="image/x-icon">
+
     <script src="https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js"></script>
     <script src="https://kit.fontawesome.com/58dd7cad0f.js" crossorigin="anonymous"></script>
     <script src="/static/scripts/index.js"></script>
 
-    <title>NFF - {{ template "title" . }}</title>
+    <title>NFF</title>
 </head>
 
 <body>
     <header hx-boost="true" class="fixed bottom-0 z-10 flex w-full justify-between bg-sky-700 px-4 py-2 text-white sm:sticky sm:top-0 sm:px-8 sm:py-3">
-        <a href="/">
-            <h1 class="hidden text-xl sm:block">
+        <h1 class="hidden text-xl sm:block">
+            <a href="/">
                 NFF - Nota Fiscal Fácil
-            </h1>
-        </a>
+            </a>
+        </h1>
         <ul class="flex w-full justify-evenly sm:w-fit">
             <a href="/" class="sm:hidden">
                 <li class="rounded px-4 py-1 hover:bg-sky-800 active:scale-90">

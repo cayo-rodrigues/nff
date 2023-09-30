@@ -32,3 +32,16 @@ func ServeJS(ctx *fiber.Ctx) error {
 
 	return ctx.SendFile(filepath)
 }
+
+func ServeIcons(ctx *fiber.Ctx) error {
+	icon := ctx.Params("icon")
+
+	filepath := fmt.Sprintf("internal/static/icons/%s", icon)
+	_, err := os.Stat(filepath)
+	if os.IsNotExist(err) {
+		msg := fmt.Sprintf("File '%s' does not exist.\n", filepath)
+		return ctx.Status(fiber.StatusNotFound).Send([]byte(msg))
+	}
+
+	return ctx.SendFile(filepath)
+}

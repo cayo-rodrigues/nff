@@ -55,6 +55,7 @@ func main() {
 
 	app.Get("/static/styles/:stylesheet", handlers.ServeStyles)
 	app.Get("/static/scripts/:script", handlers.ServeJS)
+	app.Get("/static/icons/:icon", handlers.ServeIcons)
 
 	app.Get("/", handlers.Index)
 
