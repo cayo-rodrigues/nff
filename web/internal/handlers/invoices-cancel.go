@@ -112,3 +112,26 @@ func (page *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
 	return c.Render("partials/request-card-details", canceling)
 }
+
+func (page *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
+	data := page.NewEmptyData()
+
+	entities, err := workers.ListEntities(c.Context())
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+	data.FormSelectFields.Entities = entities
+
+	cancelingId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
+	}
+	canceling, err := workers.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	data.InvoiceCancel = canceling
+
+	return c.Render("partials/invoice-cancel-form", data)
+}

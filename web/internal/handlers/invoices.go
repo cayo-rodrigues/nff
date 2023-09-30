@@ -137,3 +137,26 @@ func (page *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
 	return c.Render("partials/request-card-details", invoice)
 }
+
+func (page *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
+	data := page.NewEmptyData()
+
+	entities, err := workers.ListEntities(c.Context())
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+	data.FormSelectFields.Entities = entities
+
+	invoiceId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
+	}
+	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	data.Invoice = invoice
+
+	return c.Render("partials/invoice-form", data)
+}

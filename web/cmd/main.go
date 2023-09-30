@@ -69,12 +69,14 @@ func main() {
 	invoicesPage := new(handlers.InvoicesPage)
 	app.Get("/invoices", invoicesPage.Render)
 	app.Post("/invoices", invoicesPage.RequireInvoice)
-	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
+	app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
 	app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
+	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 
 	cancelInvoicesPage := new(handlers.CancelInvoicesPage)
 	app.Get("/invoices/cancel", cancelInvoicesPage.Render)
 	app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)
+	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 
 	fmt.Println("Server running on port", PORT)
