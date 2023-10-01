@@ -18,7 +18,7 @@
             </svg>
             Usar Modelo
         </button>
-        <p id="invoice-form-msg" class="flex-1 text-red-500 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
+        <p id="invoice-form-msg" class="flex-1 text-green-500 text-red-500 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
     </div>
 
     <section>
@@ -127,7 +127,7 @@
 
         </div>
 
-        <dialog id="invoice-items-dialog" class="relative h-2/3 rounded px-6 pb-4 outline-transparent sm:w-11/12 md:w-3/4 lg:w-2/3">
+        <dialog id="invoice-items-dialog" class="h-2/3 rounded px-6 pb-4 outline-transparent sm:w-11/12 md:w-3/4 lg:w-2/3">
             <div class="sticky top-0 z-10 flex items-center gap-6 border-b border-gray-300 bg-white py-2">
                 <button class="flex justify-center rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600" type="button"
                     onclick="this.closest('dialog').close()">

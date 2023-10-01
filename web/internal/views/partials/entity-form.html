@@ -8,10 +8,10 @@
                 placeholder="Nome">
         </div>
         <hr>
-        <div class="mt-4 flex">
-            <div class="flex w-1/2 flex-col gap-4 pr-3">
-                <div class="flex flex-col gap-2">
-                    <label for="user_type"><strong>Tipo</strong></label>
+        <div class="mt-4 flex flex-col xl:flex-row">
+            <div class="flex w-full xl:w-1/2 xl:flex-col xl:gap-4 xl:pr-3">
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="user_type"><strong>Tipo</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="user_type" name="user_type">
                         {{ range .FormSelectFields.UserTypes }}
                             <option {{ if eq $.Entity.UserType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
@@ -20,51 +20,51 @@
                     <sub class="text-red-500">{{ .Entity.Errors.UserType }}</sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="cpf_cnpj"><strong>CPF/CNPJ</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="cpf_cnpj"><strong>CPF/CNPJ</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="cpf_cnpj" name="cpf_cnpj"
                         value="{{ .Entity.CpfCnpj }}">
                     <sub class="text-red-500">{{ .Entity.Errors.CpfCnpj }}</sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="ie"><strong>Inscrição Estadual</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="ie"><strong>Inscrição Estadual</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="ie" name="ie" value="{{ .Entity.Ie }}">
                     <sub class="text-red-500">{{ .Entity.Errors.Ie }}</sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="email"><strong>E-mail</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="email"><strong>E-mail</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="email" id="email" name="email"
                         value="{{ .Entity.Email }}">
                     <sub class="text-red-500">{{ .Entity.Errors.Email }}</sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="password"><strong>Senha</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 xl:w-full">
+                    <label class="truncate" for="password"><strong>Senha</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="password" id="password" name="password"
                         value="{{ .Entity.Password }}">
                     <sub></sub>
                 </div>
             </div>
 
-            <div class="flex w-1/2 flex-col gap-4 pl-3">
-                <div class="flex flex-col gap-2">
-                    <label for="postal_code"><strong>CEP</strong></label>
+            <div class="flex w-full xl:w-1/2 xl:flex-col xl:gap-4 xl:pl-3">
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="postal_code"><strong>CEP</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="postal_code" name="postal_code"
                         value="{{ .Entity.Address.PostalCode }}">
                     <sub class="text-red-500">{{ .Entity.Errors.PostalCode }}</sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="neighborhood"><strong>Bairro</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="neighborhood"><strong>Bairro</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="neighborhood" name="neighborhood"
                         value="{{ .Entity.Address.Neighborhood}}">
                     <sub></sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="street_type"><strong>Logradouro (tipo)</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="street_type"><strong>Logradouro (tipo)</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="street_type" name="street_type">
                         {{ range .FormSelectFields.StreetTypes }}
                         <option {{ if eq $.Entity.Address.StreetType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
@@ -73,15 +73,15 @@
                     <sub class="text-red-500">{{ .Entity.Errors.StreetType }}</sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="street_name"><strong>Logradouro (nome)</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 pr-4 xl:w-full xl:pr-0">
+                    <label class="truncate" for="street_name"><strong>Logradouro (nome)</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="street_name" name="street_name"
                         value="{{ .Entity.Address.StreetName }}">
                     <sub></sub>
                 </div>
 
-                <div class="flex flex-col gap-2">
-                    <label for="number"><strong>Número da casa</strong></label>
+                <div class="flex w-1/5 flex-col gap-2 xl:w-full">
+                    <label class="truncate" for="number"><strong>Número da casa</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="number" name="number"
                         value="{{ .Entity.Address.Number }}">
                     <sub></sub>
