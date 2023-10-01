@@ -133,5 +133,6 @@ func (page *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
 
 	data.InvoiceCancel = canceling
 
+	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
 	return c.Render("partials/invoice-cancel-form", data)
 }

@@ -158,5 +158,6 @@ func (page *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 
 	data.Invoice = invoice
 
+	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
 	return c.Render("partials/invoice-form", data)
 }

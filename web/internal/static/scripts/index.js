@@ -38,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
         invoiceFormMsg.className = "flex-1 text-green-500"
     })
 
-
+    // clear form error messages after successful invoice canceling requirement
+    // and display a success msg
     document.addEventListener('invoice-cancel-required', function() {
         document.querySelector('#invoice-cancel-form').querySelectorAll('sub, sup').forEach((elem) => {
             elem.innerText = ""
@@ -47,5 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
         invoiceCancelFormMsg.innerText = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
         invoiceCancelFormMsg.className = "flex-1 text-green-500"
     })
+
+    // reset scrolling
+    document.addEventListener('scroll-to-top', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
+
 })
 
