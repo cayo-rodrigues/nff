@@ -5,8 +5,8 @@
             id="entity-{{ .Id }}">
             <td class="flex-1 truncate text-center"> {{ .Name }} </td>
             <td class="flex-1 truncate text-center"> {{ if .CpfCnpj }} {{ .CpfCnpj }} {{ else }} - {{ end }}</td>
-            <td class="flex-1 truncate text-center"> {{ if .Ie }} {{ .Ie }} {{ else }} - {{ end }}</td>
-            <td class="flex-1 truncate text-center"> {{ if .Address.Neighborhood }} {{ .Address.Neighborhood }} {{ else }} - {{ end }}</td>
+            <td class="hidden flex-1 truncate text-center sm:block"> {{ if .Ie }} {{ .Ie }} {{ else }} - {{ end }}</td>
+            <td class="hidden flex-1 truncate text-center sm:block"> {{ if .Address.Neighborhood }} {{ .Address.Neighborhood }} {{ else }} - {{ end }}</td>
         </tr>
     {{ end }}
 {{ end }}
