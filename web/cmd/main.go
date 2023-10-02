@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
@@ -52,6 +51,8 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views:             engine,
 		PassLocalsToViews: true,
+		Prefork:           true,
+		AppName:           "NFF",
 	})
 
 	app.Use(logger.New())
@@ -82,7 +83,5 @@ func main() {
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 
-	fmt.Println("Server running on port", PORT)
 	log.Fatal(app.Listen(":" + PORT))
-
 }
