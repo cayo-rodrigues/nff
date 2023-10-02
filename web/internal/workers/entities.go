@@ -38,10 +38,7 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 		entityId,
 	)
 
-	entity := models.Entity{
-		Address: &models.Address{},
-		Errors:  &models.EntityFormError{},
-	}
+	entity := models.NewEmptyEntity()
 	err := entity.Scan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("Entity with id %v not found: %v", entityId, err)
@@ -52,7 +49,7 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 		return nil, utils.InternalServerErr
 	}
 
-	return &entity, nil
+	return entity, nil
 }
 
 func CreateEntity(ctx context.Context, entity *models.Entity) error {
