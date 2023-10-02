@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html/v2"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -22,6 +22,12 @@ func main() {
 		log.Fatal("PORT env not set or has an empty value")
 	}
 
+	DEBUG := false
+	_, isThere = os.LookupEnv("DEBUG")
+	if isThere {
+		DEBUG = true
+	}
+
 	dbpool := sql.GetDatabasePool()
 	defer dbpool.Close()
 
@@ -32,11 +38,8 @@ func main() {
 
 	engine := html.New("internal/views", ".html")
 
-	// Reload the templates on each render, good for development
-	engine.Reload(true)
-
-	// Debug will print each template that is parsed, good for debugging
-	engine.Debug(true)
+	engine.Reload(DEBUG)
+	engine.Debug(DEBUG)
 
 	engine.AddFunc("GetInvoiceItemSelectFields", func() *models.InvoiceItemFormSelectFields {
 		return &models.InvoiceItemFormSelectFields{
@@ -51,7 +54,7 @@ func main() {
 		PassLocalsToViews: true,
 	})
 
-	app.Use(cors.New())
+	app.Use(logger.New())
 
 	app.Get("/static/styles/:stylesheet", handlers.ServeStyles)
 	app.Get("/static/scripts/:script", handlers.ServeJS)
