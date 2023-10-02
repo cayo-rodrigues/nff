@@ -12,11 +12,11 @@ import (
 )
 
 // TODO accept filters
-func ListInvoices(ctx context.Context) (*[]models.Invoice, error) {
+func ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
 	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices ORDER BY id DESC")
 	defer rows.Close()
 
-	invoices := []models.Invoice{}
+	invoices := []*models.Invoice{}
 
 	for rows.Next() {
 		invoice := models.NewEmptyInvoice()
@@ -47,10 +47,10 @@ func ListInvoices(ctx context.Context) (*[]models.Invoice, error) {
 		}
 		invoice.Items = items
 
-		invoices = append(invoices, *invoice)
+		invoices = append(invoices, invoice)
 	}
 
-	return &invoices, nil
+	return invoices, nil
 }
 
 func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {

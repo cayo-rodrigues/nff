@@ -11,11 +11,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func ListInvoiceCancelings(ctx context.Context) (*[]models.InvoiceCancel, error) {
+func ListInvoiceCancelings(ctx context.Context) ([]*models.InvoiceCancel, error) {
 	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices_cancelings ORDER BY id DESC")
 	defer rows.Close()
 
-	cancelings := []models.InvoiceCancel{}
+	cancelings := []*models.InvoiceCancel{}
 
 	for rows.Next() {
 		canceling := models.NewEmptyInvoiceCancel()
@@ -32,10 +32,10 @@ func ListInvoiceCancelings(ctx context.Context) (*[]models.InvoiceCancel, error)
 		}
 		canceling.Entity = entity
 
-		cancelings = append(cancelings, *canceling)
+		cancelings = append(cancelings, canceling)
 	}
 
-	return &cancelings, nil
+	return cancelings, nil
 
 }
 

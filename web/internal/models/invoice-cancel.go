@@ -11,7 +11,7 @@ import (
 )
 
 type InvoiceCancelFormSelectFields struct {
-	Entities *[]Entity
+	Entities []*Entity
 }
 
 type InvoiceCancelFormErrors struct {

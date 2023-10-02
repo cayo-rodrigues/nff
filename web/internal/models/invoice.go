@@ -24,7 +24,7 @@ type InvoiceFormError struct {
 }
 
 type InvoiceFormSelectFields struct {
-	Entities     *[]Entity
+	Entities     []*Entity
 	BooleanField *[2]string
 	Cfops        *[14]int
 	Operations   *[2]string

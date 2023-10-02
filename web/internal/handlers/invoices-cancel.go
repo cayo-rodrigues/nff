@@ -15,7 +15,7 @@ type CancelInvoicesPage struct{}
 type CancelInvoicesPageData struct {
 	IsAuthenticated   bool
 	InvoiceCancel     *models.InvoiceCancel
-	InvoiceCancelings *[]models.InvoiceCancel
+	InvoiceCancelings []*models.InvoiceCancel
 	GeneralError      string
 	FormMsg           string
 	FormSuccess       bool
@@ -26,7 +26,7 @@ func (page *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
 	return &CancelInvoicesPageData{
 		IsAuthenticated: true,
 		FormSelectFields: &models.InvoiceCancelFormSelectFields{
-			Entities: &[]models.Entity{},
+			Entities: []*models.Entity{},
 		},
 	}
 }
