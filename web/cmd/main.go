@@ -83,5 +83,8 @@ func main() {
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 
-	log.Fatal(app.Listen("0.0.0.0:" + PORT))
+	err = app.Listen("0.0.0.0:" + PORT)
+	if err != nil {
+		log.Fatalln(">:(", err)
+	}
 }
