@@ -2,9 +2,11 @@ package models
 
 import (
 	"strconv"
+	"sync"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -90,64 +92,35 @@ func (e *Entity) Scan(rows sql.Scanner) error {
 }
 
 func (e *Entity) IsValid() bool {
-	// TODO async validation, so that all validations happen at once
-
 	isValid := true
-	if e.Name == "" {
-		e.Errors.Name = "Campo obrigatório"
-		isValid = false
-	}
 
-	if e.Ie == "" && (e.Address.PostalCode == "" || e.Address.Neighborhood == "" || e.Address.StreetType == "" || e.Address.StreetName == "" || e.Address.Number == "") {
-		e.Errors.Ie = "Ie OU endereço completo obrigatórios"
-		isValid = false
-	}
+	mandatoryFieldMsg := "Campo obrigatório"
+	invalidFormatMsg := "Formato inválido"
+	eitherIeOrAddrMsg := "Ie OU endereço completo obrigatórios"
+	unacceptableValueMsg := "Valor inaceitável"
+	validationsCount := 8
 
-	if e.Ie != "" && !globals.ReIeMg.MatchString(e.Ie) {
-		e.Errors.Ie = "Formato inválido"
-		isValid = false
-	}
+	var wg sync.WaitGroup
+	wg.Add(validationsCount)
+	ch := make(chan bool, validationsCount)
 
-	if e.CpfCnpj != "" && !globals.ReCpf.MatchString(e.CpfCnpj) && !globals.ReCnpj.MatchString(e.CpfCnpj) {
-		e.Errors.CpfCnpj = "Formato inválido"
-		isValid = false
-	}
+	go utils.ValidateField(e.Name == "", &e.Errors.Name, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(e.Ie == "" && (e.Address.PostalCode == "" || e.Address.Neighborhood == "" || e.Address.StreetType == "" || e.Address.StreetName == "" || e.Address.Number == ""), &e.Errors.Ie, &eitherIeOrAddrMsg, ch, &wg)
+	go utils.ValidateField(e.Ie != "" && !globals.ReIeMg.MatchString(e.Ie), &e.Errors.Ie, &invalidFormatMsg, ch, &wg)
+	go utils.ValidateField(e.CpfCnpj != "" && !globals.ReCpf.MatchString(e.CpfCnpj) && !globals.ReCnpj.MatchString(e.CpfCnpj), &e.Errors.CpfCnpj, &invalidFormatMsg, ch, &wg)
+	go utils.ValidateField(e.Email != "" && !globals.ReEmail.MatchString(e.Email), &e.Errors.Email, &invalidFormatMsg, ch, &wg)
+	go utils.ValidateField(e.Address.PostalCode != "" && !globals.RePostalCode.MatchString(e.Address.PostalCode), &e.Errors.PostalCode, &invalidFormatMsg, ch, &wg)
 
-	if e.Email != "" && !globals.ReEmail.MatchString(e.Email) {
-		e.Errors.Email = "Formato inválido"
-		isValid = false
-	}
+	go utils.ValidateListField(e.UserType, globals.EntityUserTypes[:], &e.Errors.UserType, &unacceptableValueMsg, ch, &wg)
+	go utils.ValidateListField(e.Address.StreetType, globals.EntityAddressStreetTypes[:], &e.Errors.StreetType, &unacceptableValueMsg, ch, &wg)
 
-	if e.Address.PostalCode != "" && !globals.RePostalCode.MatchString(e.Address.PostalCode) {
-		e.Errors.PostalCode = "Formato inválido"
-		isValid = false
-	}
+	wg.Wait()
+	close(ch)
 
-	if e.UserType != "" {
-		hasValidUserType := false
-		for _, userType := range globals.EntityUserTypes {
-			if e.UserType == userType {
-				hasValidUserType = true
-				break
-			}
-		}
-		if !hasValidUserType {
-			e.Errors.UserType = "Valor inaceitável"
+	for i := 0; i < validationsCount; i++ {
+		if validationPassed := <-ch; !validationPassed {
 			isValid = false
-		}
-	}
-
-	if e.Address.StreetType != "" && e.Address.StreetType != "Rua" {
-		hasValidStreetType := false
-		for _, streetType := range globals.EntityAddressStreetTypes {
-			if e.Address.StreetType == streetType {
-				hasValidStreetType = true
-				break
-			}
-		}
-		if !hasValidStreetType {
-			e.Errors.StreetType = "Valor inaceitável"
-			isValid = false
+			break
 		}
 	}
 

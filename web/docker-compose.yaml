@@ -9,6 +9,7 @@ services:
     environment:
       - PORT=8080
       - DB_URL=postgres://nff:nff@db:5432/nff
+      - DEBUG=true
     ports:
       - 8080:8080
     volumes:

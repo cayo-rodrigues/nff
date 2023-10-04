@@ -16,7 +16,7 @@ type InvoicesPage struct{}
 
 type InvoicesPageData struct {
 	IsAuthenticated  bool
-	Invoices         *[]models.Invoice
+	Invoices         []*models.Invoice
 	Invoice          *models.Invoice
 	GeneralError     string
 	FormMsg          string

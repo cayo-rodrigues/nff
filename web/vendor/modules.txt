@@ -6,7 +6,7 @@ github.com/andybalholm/brotli
 github.com/gofiber/fiber/v2
 github.com/gofiber/fiber/v2/internal/schema
 github.com/gofiber/fiber/v2/log
-github.com/gofiber/fiber/v2/middleware/cors
+github.com/gofiber/fiber/v2/middleware/logger
 github.com/gofiber/fiber/v2/utils
 # github.com/gofiber/template v1.8.2
 ## explicit; go 1.20

@@ -15,7 +15,7 @@ type EntitiesPage struct{}
 
 type EntitiesPageData struct {
 	IsAuthenticated  bool
-	Entities         *[]models.Entity
+	Entities         []*models.Entity
 	Entity           *models.Entity
 	GeneralError     string
 	FormSelectFields *models.EntityFormSelectFields

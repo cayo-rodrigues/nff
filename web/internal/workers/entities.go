@@ -12,17 +12,14 @@ import (
 )
 
 // TODO accept filters
-func ListEntities(ctx context.Context) (*[]models.Entity, error) {
+func ListEntities(ctx context.Context) ([]*models.Entity, error) {
 	rows, _ := sql.DB.Query(ctx, "SELECT * FROM entities ORDER BY id")
 	defer rows.Close()
 
-	entities := []models.Entity{}
+	entities := []*models.Entity{}
 
 	for rows.Next() {
-		entity := models.Entity{
-			Address: &models.Address{},
-			Errors:  &models.EntityFormError{},
-		}
+		entity := models.NewEmptyEntity()
 		err := entity.Scan(rows)
 		if err != nil {
 			log.Println("Error scaning entity rows: ", err)
@@ -31,7 +28,7 @@ func ListEntities(ctx context.Context) (*[]models.Entity, error) {
 		entities = append(entities, entity)
 	}
 
-	return &entities, nil
+	return entities, nil
 }
 
 func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
@@ -41,10 +38,7 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 		entityId,
 	)
 
-	entity := models.Entity{
-		Address: &models.Address{},
-		Errors:  &models.EntityFormError{},
-	}
+	entity := models.NewEmptyEntity()
 	err := entity.Scan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("Entity with id %v not found: %v", entityId, err)
@@ -55,7 +49,7 @@ func RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error) {
 		return nil, utils.InternalServerErr
 	}
 
-	return &entity, nil
+	return entity, nil
 }
 
 func CreateEntity(ctx context.Context, entity *models.Entity) error {
