@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-br">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="/static/styles/tailwind.css" rel="stylesheet" />
+
+    <link rel="icon" href="/static/icons/icon.ico" type="image/x-icon">
+
+    <script src="https://unpkg.com/htmx.org@1.9.5/dist/htmx.min.js"></script>
+    <script src="https://kit.fontawesome.com/58dd7cad0f.js" crossorigin="anonymous"></script>
+    <script src="/static/scripts/index.js"></script>
+
+    <title>NFF</title>
+</head>
+
+<body>
+    {{ template "partials/nav" . }}
+
+    <main id="main" class="px-4 pb-20 pt-4 sm:px-8 sm:py-6">
+        {{ embed }}
+    </main>
+
+    {{ template "partials/general-error" .GeneralError }}
+</body>
+
+</html>

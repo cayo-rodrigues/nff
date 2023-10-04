@@ -6,7 +6,8 @@ dist
 db.xlsx
 db.ods
 *.log
-.vscode
 docs
 ~$*
 .~lock*
+bin
+tmp

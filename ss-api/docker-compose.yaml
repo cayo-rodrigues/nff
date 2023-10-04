@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  ss-api:
+    container_name: ss-api
+    environment:
+      - PORT=5000
+    ports:
+      - 5000:5000
+    tty: true
+    build: .
+    volumes:
+      - ./:/app

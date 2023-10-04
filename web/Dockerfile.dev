@@ -1,0 +1,21 @@
+FROM golang:1.21
+
+RUN apt update -y && \
+    apt upgrade -y
+
+RUN useradd nff
+
+WORKDIR /home/app
+
+RUN go install github.com/cosmtrek/air@latest
+
+COPY . .
+
+RUN go mod download
+
+RUN chown -R nff /home && \
+    chmod -R u+w /home
+
+USER nff
+
+CMD [ "air" ]

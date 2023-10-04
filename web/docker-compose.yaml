@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  web:
+    container_name: nff-web
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - PORT=8080
+      - DB_URL=postgres://nff:nff@db:5432/nff
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/home/app
+    depends_on:
+      - db
+
+  db:
+    container_name: nff-db
+    image: postgres:latest
+    ports:
+      - 5434:5432
+    environment:
+      - POSTGRES_USER=nff
+      - POSTGRES_PASSWORD=nff
+      - POSTGRES_DB=nff
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./internal/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:
+
