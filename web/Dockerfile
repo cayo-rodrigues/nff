@@ -18,4 +18,4 @@ COPY --from=builder /app/internal/static /internal/static/
 
 EXPOSE $PORT
 
-CMD [ "PORT=$PORT ./nff" ]
+CMD [ "./nff" ]
