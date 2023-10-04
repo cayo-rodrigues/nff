@@ -10,11 +10,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func ListInvoiceItems(ctx context.Context, invoiceId int) (*[]models.InvoiceItem, error) {
+func ListInvoiceItems(ctx context.Context, invoiceId int) ([]*models.InvoiceItem, error) {
 	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices_items WHERE invoice_id = $1 ORDER BY id", invoiceId)
 	defer rows.Close()
 
-	items := []models.InvoiceItem{}
+	items := []*models.InvoiceItem{}
 
 	for rows.Next() {
 		item := models.NewEmptyInvoiceItem()
@@ -24,16 +24,16 @@ func ListInvoiceItems(ctx context.Context, invoiceId int) (*[]models.InvoiceItem
 			return nil, utils.InternalServerErr
 		}
 
-		items = append(items, *item)
+		items = append(items, item)
 	}
 
-	return &items, nil
+	return items, nil
 
 }
 
-func BulkCreateInvoiceItems(ctx context.Context, items *[]models.InvoiceItem, invoiceId int) error {
+func BulkCreateInvoiceItems(ctx context.Context, items []*models.InvoiceItem, invoiceId int) error {
 	rows := [][]interface{}{}
-	for _, item := range *items {
+	for _, item := range items {
 		item.InvoiceId = invoiceId
 		rows = append(rows, []interface{}{
 			item.Group, item.Description, item.Origin, item.UnityOfMeasurement,

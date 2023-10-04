@@ -3,6 +3,7 @@ package models
 import (
 	"log"
 	"strconv"
+	"sync"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
@@ -44,7 +45,7 @@ type Invoice struct {
 	Gta                string
 	Sender             *Entity
 	Recipient          *Entity
-	Items              *[]InvoiceItem
+	Items              []*InvoiceItem
 	Errors             *InvoiceFormError
 	OverviewType       string
 }
@@ -52,7 +53,7 @@ type Invoice struct {
 func NewEmptyInvoice() *Invoice {
 	return &Invoice{
 		Errors:       &InvoiceFormError{},
-		Items:        &[]InvoiceItem{*NewEmptyInvoiceItem()},
+		Items:        []*InvoiceItem{NewEmptyInvoiceItem()},
 		Sender:       NewEmptyEntity(),
 		Recipient:    NewEmptyEntity(),
 		OverviewType: "invoice",
@@ -94,123 +95,46 @@ func NewInvoiceFromForm(c *fiber.Ctx) (*Invoice, error) {
 }
 
 func (i *Invoice) IsValid() bool {
-	// TODO parallel validation
 	isValid := true
 
-	if i.Sender == nil {
-		i.Errors.Sender = "Campo obrigatório"
-		isValid = false
+	mandatoryFieldMsg := "Campo obrigatório"
+	unacceptableValueMsg := "Valor inaceitável"
+	mustHaveItemsMsg := "A NF deve ter pelo menos 1 produto"
+	invalidItemsMsg := "Dados dos produtos inválidos"
+	itemsCount := len(i.Items)
+	validationsCount := 13 + itemsCount
+
+	var wg sync.WaitGroup
+	wg.Add(validationsCount)
+	ch := make(chan bool, validationsCount)
+
+	go utils.ValidateField(i.Sender == nil, &i.Errors.Sender, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Recipient == nil, &i.Errors.Recipient, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Operation == "", &i.Errors.Operation, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Cfop == 0, &i.Errors.Cfop, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.IsIcmsContributor == "", &i.Errors.IsIcmsContributor, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.IsFinalCustomer == "", &i.Errors.IsFinalCustomer, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.AddShippingToTotal == "", &i.Errors.AddShippingToTotal, &mandatoryFieldMsg, ch, &wg)
+
+	go utils.ValidateListField(i.Operation, globals.InvoiceOperations[:], &i.Errors.Operation, &unacceptableValueMsg, ch, &wg)
+	go utils.ValidateListField(i.Cfop, globals.InvoiceCfops[:], &i.Errors.Cfop, &unacceptableValueMsg, ch, &wg)
+	go utils.ValidateListField(i.IsIcmsContributor, globals.InvoiceIcmsOptions[:], &i.Errors.IsIcmsContributor, &unacceptableValueMsg, ch, &wg)
+	go utils.ValidateListField(i.IsFinalCustomer, globals.InvoiceBooleanField[:], &i.Errors.IsFinalCustomer, &unacceptableValueMsg, ch, &wg)
+	go utils.ValidateListField(i.AddShippingToTotal, globals.InvoiceBooleanField[:], &i.Errors.AddShippingToTotal, &unacceptableValueMsg, ch, &wg)
+
+	go utils.ValidateField(itemsCount == 0, &i.Errors.Items, &mustHaveItemsMsg, ch, &wg)
+
+	for _, item := range i.Items {
+		go utils.ValidateField(!item.IsValid(), &i.Errors.Items, &invalidItemsMsg, ch, &wg)
 	}
 
-	if i.Recipient == nil {
-		i.Errors.Recipient = "Campo obrigatório"
-		isValid = false
-	}
+	wg.Wait()
+	close(ch)
 
-	if i.Operation == "" {
-		i.Errors.Operation = "Campo obrigatório"
-		isValid = false
-	}
-
-	if i.Cfop == 0 {
-		i.Errors.Cfop = "Campo obrigatório"
-		isValid = false
-	}
-
-	if i.IsIcmsContributor == "" {
-		i.Errors.Cfop = "Campo obrigatório"
-		isValid = false
-	}
-
-	if i.IsFinalCustomer == "" {
-		i.Errors.IsFinalCustomer = "Campo obrigatório"
-		isValid = false
-	}
-
-	if i.AddShippingToTotal == "" {
-		i.Errors.AddShippingToTotal = "Campo obrigatório"
-		isValid = false
-	}
-
-	if i.Operation != "" {
-		hasValidOption := false
-		for _, operation := range &globals.InvoiceOperations {
-			if i.Operation == operation {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.Operation = "Valor inaceitável"
+	for i := 0; i < validationsCount; i++ {
+		if validationPassed := <-ch; !validationPassed {
 			isValid = false
-		}
-	}
-
-	if i.Cfop != 0 {
-		hasValidOption := false
-		for _, cfop := range &globals.InvoiceCfops {
-			if i.Cfop == cfop {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.Cfop = "Valor inaceitável"
-			isValid = false
-		}
-	}
-
-	if i.IsIcmsContributor != "" {
-		hasValidOption := false
-		for _, option := range &globals.InvoiceIcmsOptions {
-			if i.IsIcmsContributor == option {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.IsIcmsContributor = "Valor inaceitável"
-			isValid = false
-		}
-	}
-
-	if i.IsFinalCustomer != "" {
-		hasValidOption := false
-		for _, option := range &globals.InvoiceBooleanField {
-			if i.IsFinalCustomer == option {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.IsFinalCustomer = "Valor inaceitável"
-			isValid = false
-		}
-	}
-
-	if i.AddShippingToTotal != "" {
-		hasValidOption := false
-		for _, option := range &globals.InvoiceBooleanField {
-			if i.AddShippingToTotal == option {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.AddShippingToTotal = "Valor inaceitável"
-			isValid = false
-		}
-	}
-
-	if len(*i.Items) == 0 {
-		i.Errors.Items = "A NF deve ter pelo menos 1 produto"
-		isValid = false
-	}
-
-	for _, item := range *i.Items {
-		if !item.IsValid() {
-			i.Errors.Items = "Dados dos produtos inválidos"
-			isValid = false
+			break
 		}
 	}
 

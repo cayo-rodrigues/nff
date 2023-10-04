@@ -3,6 +3,7 @@ package models
 import (
 	"log"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
@@ -59,24 +60,27 @@ func NewInvoiceCancelFromForm(c *fiber.Ctx) (*InvoiceCancel, error) {
 func (i *InvoiceCancel) IsValid() bool {
 	isValid := true
 
-	if i.Entity == nil {
-		i.Errors.Entity = "Campo obrigatório"
-		isValid = false
-	}
+	mandatoryFieldMsg := "Campo obrigatório"
+	unacceptableValueMsg := "Valor inaceitável"
+	validationsCount := 4
 
-	if i.Number == "" {
-		i.Errors.Number = "Campo obrigatório"
-		isValid = false
-	}
+	var wg sync.WaitGroup
+	wg.Add(validationsCount)
+	ch := make(chan bool, validationsCount)
 
-	if i.Justification == "" {
-		i.Errors.Justification = "Campo obrigatório"
-		isValid = false
-	}
+	go utils.ValidateField(i.Entity == nil, &i.Errors.Entity, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Number == "", &i.Errors.Number, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Justification == "", &i.Errors.Justification, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Year == 0 || i.Year > time.Now().Year(), &i.Errors.Year, &unacceptableValueMsg, ch, &wg)
 
-	if i.Year == 0 || i.Year > time.Now().Year() {
-		i.Errors.Year = "Valor inaceitável"
-		isValid = false
+	wg.Wait()
+	close(ch)
+
+	for i := 0; i < validationsCount; i++ {
+		if validationPassed := <-ch; !validationPassed {
+			isValid = false
+			break
+		}
 	}
 
 	return isValid

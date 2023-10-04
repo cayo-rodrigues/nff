@@ -3,6 +3,7 @@ package models
 import (
 	"log"
 	"strconv"
+	"sync"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/sql"
@@ -43,10 +44,10 @@ func NewEmptyInvoiceItem() *InvoiceItem {
 	}
 }
 
-func NewInvoiceItemsFromForm(c *fiber.Ctx) (*[]InvoiceItem, error) {
+func NewInvoiceItemsFromForm(c *fiber.Ctx) ([]*InvoiceItem, error) {
 	var err error
 
-	items := []InvoiceItem{}
+	items := []*InvoiceItem{}
 	postArgs := c.Request().PostArgs()
 
 	groups := postArgs.PeekMulti("group")
@@ -75,83 +76,41 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) (*[]InvoiceItem, error) {
 			return nil, utils.InternalServerErr
 		}
 
-		items = append(items, *item)
+		items = append(items, item)
 	}
 
-	return &items, nil
+	return items, nil
 }
 
 func (i *InvoiceItem) IsValid() bool {
 	isValid := true
-	if i.Group == "" {
-		i.Errors.Group = "Campo obrigatório"
-		isValid = false
-	}
 
-	if i.Description == "" {
-		i.Errors.Description = "Campo obrigatório"
-		isValid = false
-	}
+	mandatoryFieldMsg := "Campo obrigatório"
+	unacceptableValueMsg := "Valor inaceitável"
+	validationsCount := 9
 
-	if i.Origin == "" {
-		i.Errors.Origin = "Campo obrigatório"
-		isValid = false
-	}
+	var wg sync.WaitGroup
+	wg.Add(validationsCount)
+	ch := make(chan bool, validationsCount)
 
-	if i.UnityOfMeasurement == "" {
-		i.Errors.UnityOfMeasurement = "Campo obrigatório"
-		isValid = false
-	}
+	go utils.ValidateField(i.Group == "", &i.Errors.Group, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Description == "", &i.Errors.Description, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Origin == "", &i.Errors.Origin, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.UnityOfMeasurement == "", &i.Errors.UnityOfMeasurement, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Quantity == 0.0, &i.Errors.Quantity, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.ValuePerUnity == 0.0, &i.Errors.ValuePerUnity, &mandatoryFieldMsg, ch, &wg)
 
-	if i.Quantity == 0.0 {
-		i.Errors.Quantity = "Valor inaceitável"
-		isValid = false
-	}
+	go utils.ValidateListField(i.Group, globals.InvoiceItemGroups[:], &i.Errors.Group, &unacceptableValueMsg, ch, &wg)
+	go utils.ValidateListField(i.Origin, globals.InvoiceItemOrigins[:], &i.Errors.Origin, &unacceptableValueMsg, ch, &wg)
+	go utils.ValidateListField(i.UnityOfMeasurement, globals.InvoiceItemUnitiesOfMeaasurement[:], &i.Errors.UnityOfMeasurement, &unacceptableValueMsg, ch, &wg)
 
-	if i.ValuePerUnity == 0.0 {
-		i.Errors.ValuePerUnity = "Valor inaceitável"
-		isValid = false
-	}
+	wg.Wait()
+	close(ch)
 
-	if i.Group != "" {
-		hasValidOption := false
-		for _, option := range &globals.InvoiceItemGroups {
-			if i.Group == option {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.Group = "Valor inaceitável"
+	for i := 0; i < validationsCount; i++ {
+		if validationPassed := <-ch; !validationPassed {
 			isValid = false
-		}
-	}
-
-	if i.Origin != "" {
-		hasValidOption := false
-		for _, option := range &globals.InvoiceItemOrigins {
-			if i.Origin == option {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.Origin = "Valor inaceitável"
-			isValid = false
-		}
-	}
-
-	if i.UnityOfMeasurement != "" {
-		hasValidOption := false
-		for _, option := range &globals.InvoiceItemUnitiesOfMeaasurement {
-			if i.UnityOfMeasurement == option {
-				hasValidOption = true
-				break
-			}
-		}
-		if !hasValidOption {
-			i.Errors.UnityOfMeasurement = "Valor inaceitável"
-			isValid = false
+			break
 		}
 	}
 
