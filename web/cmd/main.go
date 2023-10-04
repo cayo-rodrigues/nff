@@ -27,6 +27,11 @@ func main() {
 		DEBUG = true
 	}
 
+	HOST, isThere := os.LookupEnv("RAILWAY_PRIVATE_DOMAIN")
+	if !isThere {
+		HOST = "0.0.0.0"
+	}
+
 	dbpool := sql.GetDatabasePool()
 	defer dbpool.Close()
 
@@ -83,7 +88,7 @@ func main() {
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 
-	err = app.Listen("0.0.0.0:" + PORT)
+	err = app.Listen(HOST + ":" + PORT)
 	if err != nil {
 		log.Fatalln(">:(", err)
 	}
