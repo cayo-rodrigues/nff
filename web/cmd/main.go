@@ -27,6 +27,12 @@ func main() {
 		DEBUG = true
 	}
 
+	PREFORK := false
+	_, isThere = os.LookupEnv("PREFORK")
+	if isThere {
+		PREFORK = true
+	}
+
 	dbpool := sql.GetDatabasePool()
 	defer dbpool.Close()
 
@@ -51,7 +57,7 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views:             engine,
 		PassLocalsToViews: true,
-		Prefork:           true,
+		Prefork:           PREFORK,
 		AppName:           "NFF",
 	})
 
