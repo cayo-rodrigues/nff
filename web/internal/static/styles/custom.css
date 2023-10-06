@@ -1,0 +1,10 @@
+.hx-indicator {
+    display: none;
+    transition: all 500ms ease-in;
+}
+.htmx-request .hx-indicator {
+    display: flex;
+}
+.htmx-request.hx-indicator {
+    display: flex;
+}
