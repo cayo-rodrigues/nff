@@ -25,6 +25,10 @@
     </main>
 
     {{ template "partials/general-error" .GeneralError }}
+
+    <div id="global-indicator" class="htmx-indicator absolute top-0 flex h-screen w-screen items-center justify-center bg-black bg-opacity-10">
+        <i class="fa-solid fa-spinner fa-spin text-5xl opacity-70"></i>
+    </div>
 </body>
 
 </html>
