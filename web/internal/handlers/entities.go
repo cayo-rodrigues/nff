@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -32,7 +31,7 @@ func (page *EntitiesPage) NewEmptyData() *EntitiesPageData {
 
 func (page *EntitiesPage) Render(c *fiber.Ctx) error {
 	data := page.NewEmptyData()
-	time.Sleep(time.Second * 3)
+
 	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
 		data.GeneralError = err.Error()
