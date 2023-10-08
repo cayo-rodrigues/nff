@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .hx-indicator {
     display: none;
     transition: all 500ms ease-in;
@@ -7,4 +11,11 @@
 }
 .htmx-request.hx-indicator {
     display: flex;
+}
+
+.icon-btn.htmx-request .hx-indicator {
+    display: inline;
+}
+.icon-btn.htmx-request .original-icon {
+    display: none;
 }
