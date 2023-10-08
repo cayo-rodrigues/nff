@@ -55,10 +55,11 @@ def request_invoice(invoice_data: dict):
     msg = success_feedback
     encoded_invoice_pdf = ""
     invoice_id = ""
+    should_download = invoice_data.get("should_download")
 
     if is_awaiting_analisys:
         msg = WarningMessages.INVOICE_AWAITING_ANALISYS
-    else:
+    elif should_download:
         siare.download_invoice()
         siare.close_unfocused_windows()
         encoded_invoice_pdf = invoice.pdf_to_base64()

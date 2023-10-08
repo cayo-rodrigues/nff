@@ -119,3 +119,15 @@ class XPaths:
 
     PRINT_INVOICE_CHECKBOX_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[1]/input'
     PRINT_INVOICE_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[2]/td/a[1]'
+
+    # at request details page (from home page list)
+    CANCELING_SUCCESS_FEEDBACK = '//*[@id="message"]'
+    CANCELING_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[2]/tbody/tr/td[3]/a'
+    SELECT_REQUEST_CHECKBOX_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[3]/td[1]/input'
+    OPEN_REQUEST_DETAILS_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[4]/td/table/tbody/tr/td[2]/a'
+    NEXT_PAGINATION_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr/td[3]/a[1]'
+    CURRENT_AND_TOTAL_PAGES_TEXT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr/td[3]/text()[2]'
+    REQUEST_PROTOCOL_TEXT = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[2]/td[2]/text()'
+
+    # anywhere
+    CLOSE_HOME_POPUP_BUTTON = '//*[@id="popCloseBox"]'
