@@ -48,6 +48,8 @@ type Invoice struct {
 	Items              []*InvoiceItem
 	Errors             *InvoiceFormError
 	OverviewType       string
+	ReqStatus          string
+	ReqMsg             string
 }
 
 func NewEmptyInvoice() *Invoice {
@@ -145,5 +147,6 @@ func (i *Invoice) Scan(rows sql.Scanner) error {
 	return rows.Scan(
 		&i.Id, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.Sender.Id, &i.Recipient.Id,
+		&i.ReqStatus, &i.ReqMsg,
 	)
 }

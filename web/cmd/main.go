@@ -81,6 +81,7 @@ func main() {
 	app.Post("/invoices", invoicesPage.RequireInvoice)
 	app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
 	app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
+	app.Get("/invoices/:id/request-card-status", invoicesPage.GetRequestStatus)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 
 	cancelInvoicesPage := new(handlers.CancelInvoicesPage)

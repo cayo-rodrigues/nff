@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -63,7 +65,6 @@ func (page *InvoicesPage) Render(c *fiber.Ctx) error {
 
 func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 	data := page.NewEmptyData()
-	// formSuccess := true
 
 	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
@@ -96,27 +97,46 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	data.Invoice = invoice
-	data.Invoice.Sender = sender
-	data.Invoice.Recipient = recipient
+	invoice.Sender = sender
+	invoice.Recipient = recipient
 
-	if !data.Invoice.IsValid() {
+	if !invoice.IsValid() {
 		data.FormMsg = "Corrija os campos abaixo."
-		// formSuccess = false
+		data.Invoice = invoice
 		c.Set("HX-Retarget", "#invoice-form")
 		c.Set("HX-Reswap", "outerHTML")
 		return c.Render("partials/invoice-form", data)
 	}
 
-	err = workers.CreateInvoice(c.Context(), data.Invoice)
+	err = workers.CreateInvoice(c.Context(), invoice)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	// i would call ss-api here in case formSuccess == true
+	// i would call ss-api here
+	go func(invoice *models.Invoice) {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
+		defer cancel()
+
+		// do the thing
+		time.Sleep(time.Second * 30)
+
+		// update invoice worker, puting number, protocol, req_status ('success', 'warning', 'error') and req_msg
+		invoice.Number = "1234"
+		invoice.Protocol = "9876"
+		invoice.ReqStatus = "success"
+		invoice.ReqMsg = "Requerimento efetuado com sucesso!"
+		err := workers.UpdateInvoice(ctx, invoice)
+		if err != nil {
+			log.Println("ops")
+		}
+
+		// update the global map (later on it will be a redis key instead)
+		globals.InvoiceReqStatusMap[invoice.Id] = true
+	}(invoice)
 
 	c.Set("HX-Trigger-After-Settle", "invoice-required")
-	return c.Render("partials/request-card", data.Invoice)
+	return c.Render("partials/request-card", invoice)
 }
 
 func (page *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
@@ -160,4 +180,28 @@ func (page *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 
 	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
 	return c.Render("partials/invoice-form", data)
+}
+
+func (page *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
+	invoiceId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
+	}
+	finished, hasKey := globals.InvoiceReqStatusMap[invoiceId]
+
+	if !hasKey || !finished {
+		return c.Render("partials/request-card-status", "pending")
+	}
+
+	// free the global map, afterall the important info is already saved
+	delete(globals.InvoiceReqStatusMap, invoiceId)
+
+	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	c.Set("HX-Retarget", "#request-card-" + c.Params("id"))
+	c.Set("HX-Reswap", "outerHTML")
+	return c.Status(286).Render("partials/request-card", invoice)
 }

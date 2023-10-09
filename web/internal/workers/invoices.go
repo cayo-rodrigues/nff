@@ -59,11 +59,11 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 		`INSERT INTO invoices
 			(number, protocol, operation, cfop, is_final_customer, is_icms_contributor, shipping, add_shipping_to_total, gta, sender_id, recipient_id)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-		RETURNING id`,
+		RETURNING id, req_status, req_msg`,
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
 		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.Sender.Id, invoice.Recipient.Id,
 	)
-	err := row.Scan(&invoice.Id)
+	err := row.Scan(&invoice.Id, &invoice.ReqStatus, &invoice.ReqMsg)
 	if err != nil {
 		log.Println("Error when running insert invoice query: ", err)
 		return utils.InternalServerErr
@@ -92,7 +92,7 @@ func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error
 		return nil, utils.InvoiceNotFoundErr
 	}
 	if err != nil {
-		log.Println("Error scaning invoice row: ", err)
+		log.Println("AQUI Error scaning invoice row: ", err)
 		return nil, utils.InternalServerErr
 	}
 
@@ -118,4 +118,22 @@ func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error
 	invoice.Items = items
 
 	return invoice, nil
+}
+
+func UpdateInvoice(ctx context.Context, invoice *models.Invoice)  error {
+	result, err := sql.DB.Exec(
+		ctx,
+		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4 WHERE id = $5",
+		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.Id,
+	)
+	if err != nil {
+		log.Println("Error when running update invoice query: ", err)
+		return utils.InternalServerErr
+	}
+	if result.RowsAffected() == 0 {
+		log.Printf("Invoice with id %v not found when running update query", invoice.Id)
+		return utils.InvoiceNotFoundErr
+	}
+
+	return nil
 }
