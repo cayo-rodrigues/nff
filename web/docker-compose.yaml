@@ -9,6 +9,7 @@ services:
     environment:
       - PORT=8080
       - DB_URL=postgres://nff:nff@db:5432/nff
+      - REDIS_URL=redis://rdb:6379/0
       - DEBUG=true
     ports:
       - 8080:8080
@@ -16,6 +17,7 @@ services:
       - ./:/home/app
     depends_on:
       - db
+      - rdb
 
   db:
     container_name: nff-db
@@ -30,6 +32,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./internal/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  rdb:
+    container_name: nff-rdb
+    image: redis:latest
+    ports:
+      - 6378:6379
+    volumes:
+      - redis_data:/var/lib/redis/data
+
 volumes:
   postgres_data:
+  redis_data:
 
