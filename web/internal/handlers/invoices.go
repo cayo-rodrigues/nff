@@ -2,12 +2,15 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -113,15 +116,13 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	// i would call ss-api here
 	go func(invoice *models.Invoice) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
 		defer cancel()
 
-		// do the thing
+		// i would call ss-api here
 		time.Sleep(time.Second * 30)
 
-		// update invoice worker, puting number, protocol, req_status ('success', 'warning', 'error') and req_msg
 		invoice.Number = "1234"
 		invoice.Protocol = "9876"
 		invoice.ReqStatus = "success"
@@ -131,8 +132,8 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 			log.Println("ops")
 		}
 
-		// update the global map (later on it will be a redis key instead)
-		globals.InvoiceReqStatusMap[invoice.Id] = true
+		key := fmt.Sprintf("reqstatus:invoice:%v", invoice.Id)
+		db.Redis.Set(ctx, key, true, time.Minute)
 	}(invoice)
 
 	c.Set("HX-Trigger-After-Settle", "invoice-required")
@@ -187,14 +188,16 @@ func (page *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
-	finished, hasKey := globals.InvoiceReqStatusMap[invoiceId]
 
-	if !hasKey || !finished {
+	key := fmt.Sprintf("reqstatus:invoice:%v", invoiceId)
+	err = db.Redis.GetDel(c.Context(), key).Err()
+	if err == redis.Nil {
 		return c.Render("partials/request-card-status", "pending")
 	}
-
-	// free the global map, afterall the important info is already saved
-	delete(globals.InvoiceReqStatusMap, invoiceId)
+	if err != nil {
+		log.Printf("Error reading redis key %v: %v\n", key, err)
+		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
+	}
 
 	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
 	if err != nil {

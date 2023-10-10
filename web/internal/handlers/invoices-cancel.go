@@ -2,15 +2,17 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
 
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 )
 
 type CancelInvoicesPage struct{}
@@ -106,7 +108,6 @@ func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 		// do the thing
 		time.Sleep(time.Second * 15)
 
-		// update invoice cancel worker, puting req_status ('success', 'warning', 'error') and req_msg
 		invoiceCancel.ReqStatus = "success"
 		invoiceCancel.ReqMsg = "Cancelamento efetuado com sucesso!"
 		err := workers.UpdateInvoiceCanceling(ctx, invoiceCancel)
@@ -114,8 +115,8 @@ func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 			log.Println("ops")
 		}
 
-		// update the global map (later on it will be a redis key instead)
-		globals.CancelingReqStatusMap[invoiceCancel.Id] = true
+		key := fmt.Sprintf("reqstatus:canceling:%v", invoiceCancel.Id)
+		db.Redis.Set(ctx, key, true, time.Minute)
 	}(invoiceCancel)
 
 	c.Set("HX-Trigger-After-Settle", "invoice-cancel-required")
@@ -162,14 +163,16 @@ func (page *CancelInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
 	}
-	finished, hasKey := globals.CancelingReqStatusMap[cancelingId]
 
-	if !hasKey || !finished {
+	key := fmt.Sprintf("reqstatus:canceling:%v", cancelingId)
+	err = db.Redis.GetDel(c.Context(), key).Err()
+	if err == redis.Nil {
 		return c.Render("partials/request-card-status", "pending")
 	}
-
-	// free the global map, afterall the important info is already saved
-	delete(globals.CancelingReqStatusMap, cancelingId)
+	if err != nil {
+		log.Printf("Error reading redis key %v: %v\n", key, err)
+		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
+	}
 
 	canceling, err := workers.RetrieveInvoiceCanceling(c.Context(), cancelingId)
 	if err != nil {

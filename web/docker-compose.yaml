@@ -30,7 +30,7 @@ services:
       - POSTGRES_DB=nff
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./internal/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./internal/db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   rdb:
     container_name: nff-rdb

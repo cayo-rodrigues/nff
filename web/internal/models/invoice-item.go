@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
-	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -117,7 +117,7 @@ func (i *InvoiceItem) IsValid() bool {
 	return isValid
 }
 
-func (i *InvoiceItem) Scan(rows sql.Scanner) error {
+func (i *InvoiceItem) Scan(rows db.Scanner) error {
 	return rows.Scan(
 		&i.Id, &i.Group, &i.Description, &i.Origin,
 		&i.UnityOfMeasurement, &i.Quantity, &i.ValuePerUnity, &i.InvoiceId,

@@ -6,13 +6,13 @@ import (
 	"log"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/jackc/pgx/v5"
 )
 
 func ListInvoiceCancelings(ctx context.Context) ([]*models.InvoiceCancel, error) {
-	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices_cancelings ORDER BY id DESC")
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_cancelings ORDER BY id DESC")
 	defer rows.Close()
 
 	cancelings := []*models.InvoiceCancel{}
@@ -40,7 +40,7 @@ func ListInvoiceCancelings(ctx context.Context) ([]*models.InvoiceCancel, error)
 }
 
 func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
-	row := sql.DB.QueryRow(
+	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices_cancelings
 			(invoice_number, year, justification, entity_id)
@@ -58,7 +58,7 @@ func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 }
 
 func RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.InvoiceCancel, error) {
-	row := sql.DB.QueryRow(
+	row := db.PG.QueryRow(
 		ctx,
 		"SELECT * FROM invoices_cancelings WHERE id = $1",
 		cancelingId,
@@ -86,7 +86,7 @@ func RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.Inv
 }
 
 func UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel)  error {
-	result, err := sql.DB.Exec(
+	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2 WHERE id = $3",
 		canceling.ReqStatus, canceling.ReqMsg, canceling.Id,

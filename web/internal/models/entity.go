@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
-	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -84,7 +84,7 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 	}
 }
 
-func (e *Entity) Scan(rows sql.Scanner) error {
+func (e *Entity) Scan(rows db.Scanner) error {
 	return rows.Scan(
 		&e.Id, &e.Name, &e.UserType, &e.CpfCnpj, &e.Ie, &e.Email, &e.Password,
 		&e.Address.PostalCode, &e.Address.Neighborhood, &e.Address.StreetType, &e.Address.StreetName, &e.Address.Number,

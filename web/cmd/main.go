@@ -12,7 +12,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 )
 
 func main() {
@@ -33,12 +33,20 @@ func main() {
 		PREFORK = true
 	}
 
-	dbpool := sql.GetDatabasePool()
+	dbpool := db.GetDBPool()
 	defer dbpool.Close()
 
 	err := dbpool.Ping(context.Background())
 	if err != nil {
 		log.Fatal("Database connection is not OK, ping failed: ", err)
+	}
+
+	rdb := db.GetRedisConn()
+	defer rdb.Close()
+
+	err = rdb.Ping(context.Background()).Err()
+	if err != nil {
+		log.Fatal("Redis db connection is not OK, ping failed: ", err)
 	}
 
 	engine := html.New("internal/views", ".html")

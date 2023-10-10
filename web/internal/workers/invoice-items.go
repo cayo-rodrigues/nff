@@ -5,13 +5,13 @@ import (
 	"log"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/jackc/pgx/v5"
 )
 
 func ListInvoiceItems(ctx context.Context, invoiceId int) ([]*models.InvoiceItem, error) {
-	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices_items WHERE invoice_id = $1 ORDER BY id", invoiceId)
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_items WHERE invoice_id = $1 ORDER BY id", invoiceId)
 	defer rows.Close()
 
 	items := []*models.InvoiceItem{}
@@ -40,7 +40,7 @@ func BulkCreateInvoiceItems(ctx context.Context, items []*models.InvoiceItem, in
 			item.Quantity, item.ValuePerUnity, item.InvoiceId,
 		})
 	}
-	_, err := sql.DB.CopyFrom(
+	_, err := db.PG.CopyFrom(
 		ctx,
 		pgx.Identifier{"invoices_items"},
 		[]string{"item_group", "description", "origin", "unity_of_measurement", "quantity", "value_per_unity", "invoice_id"},

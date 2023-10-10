@@ -6,14 +6,14 @@ import (
 	"log"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/sql"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/jackc/pgx/v5"
 )
 
 // TODO accept filters
 func ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
-	rows, _ := sql.DB.Query(ctx, "SELECT * FROM invoices ORDER BY id DESC")
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices ORDER BY id DESC")
 	defer rows.Close()
 
 	invoices := []*models.Invoice{}
@@ -54,7 +54,7 @@ func ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
 }
 
 func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
-	row := sql.DB.QueryRow(
+	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices
 			(number, protocol, operation, cfop, is_final_customer, is_icms_contributor, shipping, add_shipping_to_total, gta, sender_id, recipient_id)
@@ -79,7 +79,7 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 }
 
 func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error) {
-	row := sql.DB.QueryRow(
+	row := db.PG.QueryRow(
 		ctx,
 		"SELECT * FROM invoices WHERE invoices.id = $1",
 		invoiceId,
@@ -121,7 +121,7 @@ func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error
 }
 
 func UpdateInvoice(ctx context.Context, invoice *models.Invoice)  error {
-	result, err := sql.DB.Exec(
+	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4 WHERE id = $5",
 		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.Id,
