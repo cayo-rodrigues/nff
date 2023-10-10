@@ -45,10 +45,10 @@ func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 		`INSERT INTO invoices_cancelings
 			(invoice_number, year, justification, entity_id)
 			VALUES ($1, $2, $3, $4)
-		RETURNING id`,
+		RETURNING id, req_status, req_msg`,
 		canceling.Number, canceling.Year, canceling.Justification, canceling.Entity.Id,
 	)
-	err := row.Scan(&canceling.Id)
+	err := row.Scan(&canceling.Id, &canceling.ReqStatus, &canceling.ReqMsg)
 	if err != nil {
 		log.Println("Error when running insert canceling query: ", err)
 		return utils.InternalServerErr
@@ -83,4 +83,22 @@ func RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.Inv
 	canceling.Entity = entity
 
 	return canceling, nil
+}
+
+func UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel)  error {
+	result, err := sql.DB.Exec(
+		ctx,
+		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2 WHERE id = $3",
+		canceling.ReqStatus, canceling.ReqMsg, canceling.Id,
+	)
+	if err != nil {
+		log.Println("Error when running update invoice canceling query: ", err)
+		return utils.InternalServerErr
+	}
+	if result.RowsAffected() == 0 {
+		log.Printf("Canceling with id %v not found when running update query", canceling.Id)
+		return utils.CancelingNotFoundErr
+	}
+
+	return nil
 }

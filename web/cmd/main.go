@@ -89,6 +89,7 @@ func main() {
 	app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
+	app.Get("/invoices/cancel/:id/request-card-status", cancelInvoicesPage.GetRequestStatus)
 
 	err = app.Listen(":" + PORT)
 	if err != nil {

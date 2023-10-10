@@ -30,6 +30,8 @@ type InvoiceCancel struct {
 	Entity        *Entity
 	Errors        *InvoiceCancelFormErrors
 	OverviewType  string
+	ReqStatus     string
+	ReqMsg        string
 }
 
 func NewEmptyInvoiceCancel() *InvoiceCancel {
@@ -87,5 +89,8 @@ func (i *InvoiceCancel) IsValid() bool {
 }
 
 func (c *InvoiceCancel) Scan(rows sql.Scanner) error {
-	return rows.Scan(&c.Id, &c.Number, &c.Year, &c.Justification, &c.Entity.Id)
+	return rows.Scan(
+		&c.Id, &c.Number, &c.Year, &c.Justification, &c.Entity.Id,
+		&c.ReqStatus, &c.ReqMsg,
+	)
 }

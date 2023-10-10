@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"log"
 	"strconv"
+	"time"
 
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/cayo-rodrigues/nff/web/internal/workers"
@@ -58,7 +61,6 @@ func (page *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 
 func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 	data := page.NewEmptyData()
-	// formSuccess := true
 
 	entities, err := workers.ListEntities(c.Context())
 	if err != nil {
@@ -82,24 +84,42 @@ func (page *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	data.InvoiceCancel = invoiceCancel
-	data.InvoiceCancel.Entity = entity
+	invoiceCancel.Entity = entity
 
 	if !invoiceCancel.IsValid() {
+		data.InvoiceCancel = invoiceCancel
 		data.FormMsg = "Corrija os campos abaixo."
-		// formSuccess = false
 		c.Set("HX-Retarget", "#invoice-cancel-form")
 		c.Set("HX-Reswap", "outerHTML")
 		return c.Render("partials/invoice-cancel-form", data)
 	}
 
-	err = workers.CreateInvoiceCanceling(c.Context(), data.InvoiceCancel)
+	err = workers.CreateInvoiceCanceling(c.Context(), invoiceCancel)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
+	go func(invoiceCancel *models.InvoiceCancel) {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
+		defer cancel()
+
+		// do the thing
+		time.Sleep(time.Second * 15)
+
+		// update invoice cancel worker, puting req_status ('success', 'warning', 'error') and req_msg
+		invoiceCancel.ReqStatus = "success"
+		invoiceCancel.ReqMsg = "Cancelamento efetuado com sucesso!"
+		err := workers.UpdateInvoiceCanceling(ctx, invoiceCancel)
+		if err != nil {
+			log.Println("ops")
+		}
+
+		// update the global map (later on it will be a redis key instead)
+		globals.CancelingReqStatusMap[invoiceCancel.Id] = true
+	}(invoiceCancel)
+
 	c.Set("HX-Trigger-After-Settle", "invoice-cancel-required")
-	return c.Render("partials/request-card", data.InvoiceCancel)
+	return c.Render("partials/request-card", invoiceCancel)
 }
 
 func (page *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
@@ -135,4 +155,28 @@ func (page *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
 
 	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
 	return c.Render("partials/invoice-cancel-form", data)
+}
+
+func (page *CancelInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
+	cancelingId, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
+	}
+	finished, hasKey := globals.CancelingReqStatusMap[cancelingId]
+
+	if !hasKey || !finished {
+		return c.Render("partials/request-card-status", "pending")
+	}
+
+	// free the global map, afterall the important info is already saved
+	delete(globals.CancelingReqStatusMap, cancelingId)
+
+	canceling, err := workers.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	c.Set("HX-Retarget", "#request-card-" + c.Params("id"))
+	c.Set("HX-Reswap", "outerHTML")
+	return c.Status(286).Render("partials/request-card", canceling)
 }
