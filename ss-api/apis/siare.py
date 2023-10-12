@@ -44,6 +44,11 @@ class Siare(Browser):
 
         self.wait_until_document_is_ready()
 
+    def get_login_error_feedback(self):
+        xpath = XPaths.LOGIN_ERROR_FEEDBACK
+        error_feedback = self.get_attr_if_exists(xpath, "innerText")
+        return error_feedback
+
     # INVOICE REQUIREMENT
 
     def open_require_invoice_page(self) -> None:

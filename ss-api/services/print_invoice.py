@@ -1,7 +1,7 @@
 from models import InvoicePrinting
 from utils import exceptions
 from apis import Siare
-from constants.messages import SuccessMessages
+from constants.messages import ErrorMessages, SuccessMessages
 
 
 def print_invoice(data: dict):
@@ -13,6 +13,10 @@ def print_invoice(data: dict):
 
     siare.open_website()
     siare.login(invoice_printing.entity)
+
+    error_feedback = siare.get_login_error_feedback()
+    if error_feedback:
+        raise exceptions.InvalidLoginDataError(msg=f"{ErrorMessages.LOGIN_FAILED} {error_feedback}")
 
     siare.wait_until_document_is_ready()
 
