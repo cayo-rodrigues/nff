@@ -51,6 +51,8 @@ func SiareRequestInvoice(invoice *models.Invoice) {
 		ShouldNotFinish: true,
 	}
 
+	fmt.Println(SS_API_BASE_URL)
+	fmt.Println(SS_API_BASE_URL + "/invoice/request")
 	agent := fiber.Post(SS_API_BASE_URL + "/invoice/request")
 	statusCode, body, errs := agent.JSON(reqBody).Bytes()
 	// TODO handle errors key on body appropriately
