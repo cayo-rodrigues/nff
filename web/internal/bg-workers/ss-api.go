@@ -51,9 +51,9 @@ func SiareRequestInvoice(invoice *models.Invoice) {
 		ShouldNotFinish: true,
 	}
 
-	fmt.Println(SS_API_BASE_URL)
-	fmt.Println(SS_API_BASE_URL + "/invoice/request")
 	agent := fiber.Post(SS_API_BASE_URL + "/invoice/request")
+	// TEMP!
+	agent.InsecureSkipVerify()
 	statusCode, body, errs := agent.JSON(reqBody).Bytes()
 	// TODO handle errors key on body appropriately
 	fmt.Println(statusCode)
@@ -86,6 +86,8 @@ func SiareRequestInvoiceCanceling(invoiceCancel *models.InvoiceCancel) {
 	}
 
 	agent := fiber.Post(SS_API_BASE_URL + "/invoice/cancel")
+	// TEMP!
+	agent.InsecureSkipVerify()
 	statusCode, body, errs := agent.JSON(reqBody).Bytes()
 	// TODO handle errors key on body appropriately
 	fmt.Println(statusCode)
