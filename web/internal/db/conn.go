@@ -29,6 +29,12 @@ func GetDBPool() *pgxpool.Pool {
 	if err != nil {
 		log.Fatal("Could not create database connection pool: ", err)
 	}
+
+	err = dbpool.Ping(context.Background())
+	if err != nil {
+		log.Fatal("Database connection is not OK, ping failed: ", err)
+	}
+
 	PG = dbpool
 	return PG
 }
@@ -42,11 +48,17 @@ func GetRedisConn() *redis.Client {
 	if !isThere || REDIS_URL == "" {
 		log.Fatal("REDIS_URL env not set or has an empty value")
 	}
-    redis_opts, err := redis.ParseURL(REDIS_URL)
-    if err != nil {
+	redis_opts, err := redis.ParseURL(REDIS_URL)
+	if err != nil {
 		log.Fatal("Could not create redis db connection: ", err)
-    }
-    rdb := redis.NewClient(redis_opts)
+	}
+	rdb := redis.NewClient(redis_opts)
+
+	err = rdb.Ping(context.Background()).Err()
+	if err != nil {
+		log.Fatal("Redis db connection is not OK, ping failed: ", err)
+	}
+
 	Redis = rdb
 	return Redis
 }

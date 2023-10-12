@@ -6,7 +6,6 @@
     {{ $details_endpoint := "" }}
     {{ $get_form_endpoint := "" }}
     {{ $target_form := "" }}
-    {{ $get_status_interval := "10s" }}
 
     {{ $should_check_status := eq .ReqStatus "pending" }}
     {{ $req_msg_color := "" }}
@@ -30,7 +29,6 @@
         {{ $details_endpoint = "invoices" }}
         {{ $get_form_endpoint = "invoices" }}
         {{ $target_form = "#invoice-form" }}
-        {{ $get_status_interval = "10s" }}
     {{ else if eq .OverviewType "canceling" }}
         {{ $from = .Entity.Name }}
         {{ $to = .Number }}
@@ -40,14 +38,13 @@
         {{ $details_endpoint = "invoices/cancel" }}
         {{ $get_form_endpoint = "invoices/cancel" }}
         {{ $target_form = "#invoice-cancel-form" }}
-        {{ $get_status_interval = "8s" }}
     {{ end }}
 
 <li
     id="request-card-{{ .Id }}"
     class="flex flex-wrap items-center justify-between gap-6 rounded px-4 py-4 shadow shadow-gray-300 transition-all hover:shadow-gray-500 sm:flex-nowrap sm:py-2">
     <div class="flex gap-3">
-        <div {{ if $should_check_status }} hx-get="/{{ $details_endpoint }}/{{ .Id }}/request-card-status" hx-target="this" hx-swap="innerHTML" hx-trigger="every {{ $get_status_interval }}" {{ end }}>
+        <div {{ if $should_check_status }} hx-get="/{{ $details_endpoint }}/{{ .Id }}/request-card-status" hx-target="this" hx-swap="innerHTML" hx-trigger="every 5s" {{ end }}>
             {{ template "partials/request-card-status" .ReqStatus }}
         </div>
         <span>{{ $from }}</span>

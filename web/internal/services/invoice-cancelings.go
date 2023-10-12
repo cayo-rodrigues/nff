@@ -1,12 +1,12 @@
-package workers
+package services
 
 import (
 	"context"
 	"errors"
 	"log"
 
-	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/jackc/pgx/v5"
 )
@@ -58,6 +58,7 @@ func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 }
 
 func RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.InvoiceCancel, error) {
+	// TODO maybe JOIN would be more efficient than two separated queries
 	row := db.PG.QueryRow(
 		ctx,
 		"SELECT * FROM invoices_cancelings WHERE id = $1",
@@ -85,7 +86,7 @@ func RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.Inv
 	return canceling, nil
 }
 
-func UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel)  error {
+func UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
 	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2 WHERE id = $3",
@@ -102,3 +103,5 @@ func UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 
 	return nil
 }
+
+

@@ -7,8 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
+	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
-	"github.com/cayo-rodrigues/nff/web/internal/workers"
 )
 
 type EntitiesPage struct{}
@@ -21,7 +21,7 @@ type EntitiesPageData struct {
 	FormSelectFields *models.EntityFormSelectFields
 }
 
-func (page *EntitiesPage) NewEmptyData() *EntitiesPageData {
+func (p *EntitiesPage) NewEmptyData() *EntitiesPageData {
 	return &EntitiesPageData{
 		IsAuthenticated:  true,
 		Entity:           models.NewEmptyEntity(),
@@ -29,51 +29,51 @@ func (page *EntitiesPage) NewEmptyData() *EntitiesPageData {
 	}
 }
 
-func (page *EntitiesPage) Render(c *fiber.Ctx) error {
-	data := page.NewEmptyData()
+func (p *EntitiesPage) Render(c *fiber.Ctx) error {
+	pageData := p.NewEmptyData()
 
-	entities, err := workers.ListEntities(c.Context())
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
-		data.GeneralError = err.Error()
+		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
 	}
 
-	data.Entities = entities
+	pageData.Entities = entities
 
-	return c.Render("entities", data, "layouts/base")
+	return c.Render("entities", pageData, "layouts/base")
 }
 
-func (page *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
-	data := page.NewEmptyData()
+func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
+	pageData := p.NewEmptyData()
 
 	entityId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
 
-	entity, err := workers.RetrieveEntity(c.Context(), entityId)
+	entity, err := services.RetrieveEntity(c.Context(), entityId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	data.Entity = entity
-	data.Entity.IsSelected = true
+	pageData.Entity = entity
+	pageData.Entity.IsSelected = true
 
-	return c.Render("partials/entity-form", data)
+	return c.Render("partials/entity-form", pageData)
 }
 
-func (page *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
+func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
 	entity := models.NewEntityFromForm(c)
 
 	if !entity.IsValid() {
-		data := page.NewEmptyData()
-		data.Entity = entity
+		pageData := p.NewEmptyData()
+		pageData.Entity = entity
 		c.Set("HX-Retarget", "#entity-form")
 		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/entity-form", data)
+		return c.Render("partials/entity-form", pageData)
 	}
 
-	err := workers.CreateEntity(c.Context(), entity)
+	err := services.CreateEntity(c.Context(), entity)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -82,7 +82,7 @@ func (page *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
 	return c.Render("partials/entity-card", entity)
 }
 
-func (page *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
+func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 	entity := models.NewEntityFromForm(c)
 	entity.IsSelected = true
 
@@ -93,14 +93,14 @@ func (page *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 	entity.Id = entityId
 
 	if !entity.IsValid() {
-		data := page.NewEmptyData()
-		data.Entity = entity
+		pageData := p.NewEmptyData()
+		pageData.Entity = entity
 		c.Set("HX-Retarget", "#entity-form")
 		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/entity-form", data)
+		return c.Render("partials/entity-form", pageData)
 	}
 
-	err = workers.UpdateEntity(c.Context(), entity)
+	err = services.UpdateEntity(c.Context(), entity)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -109,12 +109,12 @@ func (page *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 	return c.Render("partials/entity-card", entity)
 }
 
-func (page *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
+func (p *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
 	entityId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
-	err = workers.DeleteEntity(c.Context(), entityId)
+	err = services.DeleteEntity(c.Context(), entityId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -122,5 +122,5 @@ func (page *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
 	eventMsg := fmt.Sprintf("{\"entity-deleted\": %v}", entityId)
 	c.Set("HX-Trigger-After-Settle", eventMsg)
 
-	return c.Render("partials/entity-form", page.NewEmptyData())
+	return c.Render("partials/entity-form", p.NewEmptyData())
 }

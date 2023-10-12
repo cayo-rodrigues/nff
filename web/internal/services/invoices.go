@@ -1,12 +1,12 @@
-package workers
+package services
 
 import (
 	"context"
 	"errors"
 	"log"
 
-	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/jackc/pgx/v5"
 )
@@ -25,6 +25,8 @@ func ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
 			log.Println("Error scaning invoice rows: ", err)
 			return nil, utils.InternalServerErr
 		}
+
+		// TODO async data aggregation with go routines
 
 		sender, err := RetrieveEntity(ctx, invoice.Sender.Id)
 		if err != nil {
@@ -96,6 +98,8 @@ func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error
 		return nil, utils.InternalServerErr
 	}
 
+	// TODO async data aggregation with go routines
+
 	sender, err := RetrieveEntity(ctx, invoice.Sender.Id)
 	if err != nil {
 		log.Println("Error linking invoice to sender: ", err)
@@ -120,7 +124,7 @@ func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error
 	return invoice, nil
 }
 
-func UpdateInvoice(ctx context.Context, invoice *models.Invoice)  error {
+func UpdateInvoice(ctx context.Context, invoice *models.Invoice) error {
 	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4 WHERE id = $5",
@@ -137,3 +141,5 @@ func UpdateInvoice(ctx context.Context, invoice *models.Invoice)  error {
 
 	return nil
 }
+
+

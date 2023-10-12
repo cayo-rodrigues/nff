@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"os"
 
@@ -9,10 +8,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html/v2"
 
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/db"
 )
 
 func main() {
@@ -36,18 +35,8 @@ func main() {
 	dbpool := db.GetDBPool()
 	defer dbpool.Close()
 
-	err := dbpool.Ping(context.Background())
-	if err != nil {
-		log.Fatal("Database connection is not OK, ping failed: ", err)
-	}
-
 	rdb := db.GetRedisConn()
 	defer rdb.Close()
-
-	err = rdb.Ping(context.Background()).Err()
-	if err != nil {
-		log.Fatal("Redis db connection is not OK, ping failed: ", err)
-	}
 
 	engine := html.New("internal/views", ".html")
 
@@ -99,7 +88,7 @@ func main() {
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 	app.Get("/invoices/cancel/:id/request-card-status", cancelInvoicesPage.GetRequestStatus)
 
-	err = app.Listen(":" + PORT)
+	err := app.Listen(":" + PORT)
 	if err != nil {
 		log.Fatalln(">:(", err)
 	}

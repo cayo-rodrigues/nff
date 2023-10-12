@@ -1,20 +1,19 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
+	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
-	"github.com/cayo-rodrigues/nff/web/internal/workers"
 )
 
 type InvoicesPage struct{}
@@ -28,7 +27,7 @@ type InvoicesPageData struct {
 	FormSelectFields *models.InvoiceFormSelectFields
 }
 
-func (page *InvoicesPage) NewEmptyData() *InvoicesPageData {
+func (p *InvoicesPage) NewEmptyData() *InvoicesPageData {
 	return &InvoicesPageData{
 		IsAuthenticated: true,
 		FormSelectFields: &models.InvoiceFormSelectFields{
@@ -40,40 +39,43 @@ func (page *InvoicesPage) NewEmptyData() *InvoicesPageData {
 	}
 }
 
-func (page *InvoicesPage) Render(c *fiber.Ctx) error {
-	data := page.NewEmptyData()
+func (p *InvoicesPage) Render(c *fiber.Ctx) error {
+	pageData := p.NewEmptyData()
 
-	entities, err := workers.ListEntities(c.Context())
+	// TODO async data aggregation with go routines
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
-		data.GeneralError = err.Error()
+		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
-		return c.Render("invoices", data, "layouts/base")
+		return c.Render("invoices", pageData, "layouts/base")
 	}
 
-	data.FormSelectFields.Entities = entities
-	data.Invoice = models.NewEmptyInvoice()
+	pageData.FormSelectFields.Entities = entities
+	pageData.Invoice = models.NewEmptyInvoice()
 
 	// get the latest 10 invoices
-	invoices, err := workers.ListInvoices(c.Context())
+	invoices, err := services.ListInvoices(c.Context())
 	if err != nil {
-		data.GeneralError = err.Error()
+		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
-		return c.Render("invoices", data, "layouts/base")
+		return c.Render("invoices", pageData, "layouts/base")
 	}
 
-	data.Invoices = invoices
+	pageData.Invoices = invoices
 
-	return c.Render("invoices", data, "layouts/base")
+	return c.Render("invoices", pageData, "layouts/base")
 }
 
-func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
-	data := page.NewEmptyData()
+func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
+	pageData := p.NewEmptyData()
 
-	entities, err := workers.ListEntities(c.Context())
+	// TODO async data aggregation with go routines
+
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	data.FormSelectFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	senderId, err := strconv.Atoi(c.FormValue("sender"))
 	if err != nil {
@@ -86,11 +88,11 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	sender, err := workers.RetrieveEntity(c.Context(), senderId)
+	sender, err := services.RetrieveEntity(c.Context(), senderId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	recipient, err := workers.RetrieveEntity(c.Context(), recipientId)
+	recipient, err := services.RetrieveEntity(c.Context(), recipientId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -104,53 +106,35 @@ func (page *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 	invoice.Recipient = recipient
 
 	if !invoice.IsValid() {
-		data.FormMsg = "Corrija os campos abaixo."
-		data.Invoice = invoice
+		pageData.FormMsg = "Corrija os campos abaixo."
+		pageData.Invoice = invoice
 		c.Set("HX-Retarget", "#invoice-form")
 		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/invoice-form", data)
+		return c.Render("partials/invoice-form", pageData)
 	}
 
-	err = workers.CreateInvoice(c.Context(), invoice)
+	err = services.CreateInvoice(c.Context(), invoice)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	go func(invoice *models.Invoice) {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
-		defer cancel()
-
-		// i would call ss-api here
-		time.Sleep(time.Second * 30)
-
-		invoice.Number = "1234"
-		invoice.Protocol = "9876"
-		invoice.ReqStatus = "success"
-		invoice.ReqMsg = "Requerimento efetuado com sucesso!"
-		err := workers.UpdateInvoice(ctx, invoice)
-		if err != nil {
-			log.Println("ops")
-		}
-
-		key := fmt.Sprintf("reqstatus:invoice:%v", invoice.Id)
-		db.Redis.Set(ctx, key, true, time.Minute)
-	}(invoice)
+	go bgworkers.SiareRequestInvoice(invoice)
 
 	c.Set("HX-Trigger-After-Settle", "invoice-required")
 	return c.Render("partials/request-card", invoice)
 }
 
-func (page *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
+func (p *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
 	item := models.NewEmptyInvoiceItem()
 	return c.Render("partials/invoice-form-item-section", item)
 }
 
-func (page *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
+func (p *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 	invoiceId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
-	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -159,31 +143,33 @@ func (page *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 	return c.Render("partials/request-card-details", invoice)
 }
 
-func (page *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
-	data := page.NewEmptyData()
+func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
+	pageData := p.NewEmptyData()
 
-	entities, err := workers.ListEntities(c.Context())
+	// TODO async data aggregation with go routines
+
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	data.FormSelectFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	invoiceId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
-	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	data.Invoice = invoice
+	pageData.Invoice = invoice
 
 	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
-	return c.Render("partials/invoice-form", data)
+	return c.Render("partials/invoice-form", pageData)
 }
 
-func (page *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
+func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	invoiceId, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
@@ -199,12 +185,12 @@ func (page *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	invoice, err := workers.RetrieveInvoice(c.Context(), invoiceId)
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	c.Set("HX-Retarget", "#request-card-" + c.Params("id"))
+	c.Set("HX-Retarget", "#request-card-"+c.Params("id"))
 	c.Set("HX-Reswap", "outerHTML")
 	return c.Status(286).Render("partials/request-card", invoice)
 }
