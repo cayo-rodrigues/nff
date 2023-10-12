@@ -13,7 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const SS_API_BASE_URL = "https://nff-ss-api.up.railway.app"
+var SS_API_BASE_URL = ""
 
 type SSAPIInvoiceRequest struct {
 	*models.Invoice

@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html/v2"
 
+	bgworkers "github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
@@ -30,6 +31,11 @@ func main() {
 	_, isThere = os.LookupEnv("PREFORK")
 	if isThere {
 		PREFORK = true
+	}
+
+	bgworkers.SS_API_BASE_URL, isThere = os.LookupEnv("SS_API_BASE_URL")
+	if !isThere || bgworkers.SS_API_BASE_URL == "" {
+		log.Fatal("SS_API_BASE_URL end not set or has an empty value")
 	}
 
 	dbpool := db.GetDBPool()
