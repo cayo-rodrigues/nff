@@ -34,7 +34,6 @@ class InvalidPrintingDataError(NFFBaseException):
 
 
 class InvalidLoginDataError(NFFBaseException):
-    msg = ErrorMessages.LOGIN_FAILED
     status_code = 401
 
 
