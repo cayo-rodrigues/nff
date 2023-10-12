@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     sender_id BIGINT NOT NULL,
     recipient_id BIGINT NOT NULL,
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
-    req_msg VARCHAR(64) DEFAULT 'Em andamento...',
+    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES entities(id) ON DELETE CASCADE,
     CONSTRAINT fk_recipient FOREIGN KEY (recipient_id) REFERENCES entities(id) ON DELETE CASCADE
 );
@@ -51,6 +51,6 @@ CREATE TABLE IF NOT EXISTS invoices_cancelings (
     justification VARCHAR(128),
     entity_id BIGINT NOT NULL,
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
-    req_msg VARCHAR(64) DEFAULT 'Em andamento...',
+    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     CONSTRAINT fk_canceling_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 )

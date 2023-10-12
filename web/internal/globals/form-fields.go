@@ -2,7 +2,7 @@ package globals
 
 // ENTITIES
 
-var EntityUserTypes = [14]string{
+var EntityUserTypes = [15]string{
 	"Produtor Rural",
 	"Inscrição Estadual",
 	"Protocolo",
@@ -17,6 +17,7 @@ var EntityUserTypes = [14]string{
 	"Pessoa Física Autuada - PTA eletrônico",
 	"Responsável Tributário - Instituição Financeira",
 	"Conselheiro",
+	"Apenas Destinatário",
 }
 var EntityAddressStreetTypes = [3]string{
 	"Rua",

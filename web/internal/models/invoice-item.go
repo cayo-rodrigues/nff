@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -27,15 +27,15 @@ type InvoiceItemFormSelectFields struct {
 }
 
 type InvoiceItem struct {
-	Id                 int
-	Group              string
-	Description        string
-	Origin             string
-	UnityOfMeasurement string
-	Quantity           float64
-	ValuePerUnity      float64
-	InvoiceId          int
-	Errors             *InvoiceItemFormError
+	Id                 int                   `json:"-"`
+	Group              string                `json:"group"`
+	Description        string                `json:"description"`
+	Origin             string                `json:"origin"`
+	UnityOfMeasurement string                `json:"unity_of_measurement"`
+	Quantity           float64               `json:"quantity"`
+	ValuePerUnity      float64               `json:"value_per_unity"`
+	InvoiceId          int                   `json:"-"`
+	Errors             *InvoiceItemFormError `json:"-"`
 }
 
 func NewEmptyInvoiceItem() *InvoiceItem {

@@ -4,14 +4,14 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
 type EntityFormSelectFields struct {
-	UserTypes   *[14]string
+	UserTypes   *[15]string
 	StreetTypes *[3]string
 }
 
@@ -26,24 +26,24 @@ type EntityFormError struct {
 }
 
 type Address struct {
-	PostalCode   string
-	Neighborhood string
-	StreetType   string
-	StreetName   string
-	Number       string
+	PostalCode   string `json:"postal_code"`
+	Neighborhood string `json:"neighborhood"`
+	StreetType   string `json:"street_type"`
+	StreetName   string `json:"street_name"`
+	Number       string `json:"number"`
 }
 
 type Entity struct {
-	Id         int
-	Name       string
-	UserType   string
-	Ie         string
-	CpfCnpj    string
-	Email      string
-	Password   string
-	IsSelected bool
-	Address    *Address
-	Errors     *EntityFormError
+	Id         int              `json:"-"`
+	Name       string           `json:"-"`
+	UserType   string           `json:"user_type"`
+	Ie         string           `json:"ie"`
+	CpfCnpj    string           `json:"cpf_cnpj"`
+	Email      string           `json:"email"`
+	Password   string           `json:"password"`
+	IsSelected bool             `json:"-"`
+	Address    *Address         `json:"address"`
+	Errors     *EntityFormError `json:"-"`
 }
 
 func NewEntityFormSelectFields() *EntityFormSelectFields {

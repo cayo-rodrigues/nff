@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,23 +33,23 @@ type InvoiceFormSelectFields struct {
 }
 
 type Invoice struct {
-	Id                 int
-	Number             string
-	Protocol           string
-	Operation          string
-	Cfop               int
-	IsFinalCustomer    string
-	IsIcmsContributor  string
-	Shipping           float64
-	AddShippingToTotal string
-	Gta                string
-	Sender             *Entity
-	Recipient          *Entity
-	Items              []*InvoiceItem
-	Errors             *InvoiceFormError
-	OverviewType       string
-	ReqStatus          string
-	ReqMsg             string
+	Id                 int               `json:"-"`
+	Number             string            `json:"-"`
+	Protocol           string            `json:"-"`
+	Operation          string            `json:"operation"`
+	Cfop               int               `json:"cfop,string"`
+	IsFinalCustomer    string            `json:"is_final_customer"`
+	IsIcmsContributor  string            `json:"icms"`
+	Shipping           float64           `json:"shipping"`
+	AddShippingToTotal string            `json:"add_shipping_to_total_value"`
+	Gta                string            `json:"gta"`
+	Sender             *Entity           `json:"sender"`
+	Recipient          *Entity           `json:"recipient"`
+	Items              []*InvoiceItem    `json:"items"`
+	Errors             *InvoiceFormError `json:"-"`
+	OverviewType       string            `json:"-"`
+	ReqStatus          string            `json:"-"`
+	ReqMsg             string            `json:"-"`
 }
 
 func NewEmptyInvoice() *Invoice {
