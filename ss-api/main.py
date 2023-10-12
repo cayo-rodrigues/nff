@@ -19,6 +19,8 @@ def request_invoice_handler():
         status_code = 201
     except exceptions.InvalidInvoiceDataError as e:
         response, status_code = error_response(e)
+    except exceptions.InvalidLoginDataError as e:
+        response, status_code = error_response(e)
     except exceptions.CouldNotFinishInvoiceError as e:
         response, status_code = error_response(e)
     except exceptions.DownloadTimeoutError as e:
@@ -41,6 +43,8 @@ def cancel_invoice_handler():
         status_code = 200
     except exceptions.InvalidCancelingDataError as e:
         response, status_code = error_response(e)
+    except exceptions.InvalidLoginDataError as e:
+        response, status_code = error_response(e)
     except exceptions.CouldNotFinishCancelingError as e:
         response, status_code = error_response(e)
     except exceptions.WebdriverTimeoutError as e:
@@ -60,6 +64,8 @@ def print_invoice_handler():
         response = print_invoice(data=request.get_json())
         status_code = 200
     except exceptions.InvalidPrintingDataError as e:
+        response, status_code = error_response(e)
+    except exceptions.InvalidLoginDataError as e:
         response, status_code = error_response(e)
     except exceptions.CouldNotFinishPrintingError as e:
         response, status_code = error_response(e)
