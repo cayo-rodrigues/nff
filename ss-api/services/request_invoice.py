@@ -44,6 +44,10 @@ def request_invoice(invoice_data: dict):
     siare.open_aditional_data_tab()
     siare.fill_invoice_aditional_data(invoice)
 
+    should_finish = invoice_data.get("should_finish")
+    if should_finish:
+        siare.finish_invoice()
+
     error_feedback = siare.get_invoice_error_feedback()
     if error_feedback:
         raise exceptions.CouldNotFinishInvoiceError(msg=error_feedback)

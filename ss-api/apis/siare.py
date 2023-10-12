@@ -281,6 +281,7 @@ class Siare(Browser):
             xpath = XPaths.INVOICE_ADITIONAL_DATA_EXTRA_NOTES_INPUT
             self.type_into_element(xpath, invoice.extra_notes)
 
+    def finish_invoice(self):
         xpath = XPaths.FINISH_INVOICE_BUTTON
         self.get_and_click(xpath)
 
