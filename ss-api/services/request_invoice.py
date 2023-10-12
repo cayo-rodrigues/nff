@@ -52,6 +52,7 @@ def request_invoice(invoice_data: dict):
             "invoice_id": "",
             "invoice_pdf": "",
             "is_awaiting_analisys": False,
+            "status": "success",
         }
 
     siare.finish_invoice()
@@ -65,12 +66,14 @@ def request_invoice(invoice_data: dict):
     is_awaiting_analisys = siare.is_invoice_awaiting_analisys()
     invoice_protocol = siare.get_invoice_protocol()
     msg = success_feedback
+    status = "success"
     encoded_invoice_pdf = ""
     invoice_id = ""
     should_download = invoice_data.get("should_download")
 
     if is_awaiting_analisys:
         msg = WarningMessages.INVOICE_AWAITING_ANALISYS
+        status = "warning"
     elif should_download:
         siare.download_invoice()
         siare.close_unfocused_windows()
@@ -81,6 +84,7 @@ def request_invoice(invoice_data: dict):
 
     return {
         "msg": msg,
+        "status": status,
         "invoice_protocol": invoice_protocol,
         "invoice_id": invoice_id,
         "invoice_pdf": encoded_invoice_pdf,

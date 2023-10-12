@@ -27,4 +27,5 @@ def cancel_invoice(canceling_data: dict):
 
     return {
         "msg": success_feedback,
+        "status": "success",
     }

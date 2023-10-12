@@ -58,7 +58,7 @@ def to_br_float(number: float | str) -> str:
 
 
 def error_response(e: NFFBaseException) -> (dict, int):
-    return {"errors": e.errors, "msg": e.msg}, e.status_code
+    return {"errors": e.errors, "msg": e.msg, "status": "error"}, e.status_code
 
 
 def binary_search_html(
