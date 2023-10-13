@@ -1,4 +1,4 @@
-<img src="./icon.ico" width="10%" align="left" alt="NFF main icon">
+<img src="./web/internal/static/icons/icon.ico" width="10%" align="left" alt="NFF main icon">
 
 # NFF - Nota Fiscal Fácil
 
@@ -21,9 +21,13 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 ## Próximos passos
 
 - [x] Lidar com casos de destinatário sem inscrição estadual
-- [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
+- [x] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
 - [x] Ter um modo de mudar o nome do arquivo da nota fiscal
 - [x] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
 - [x] Possibilitar **cancelamento** de notas fiscais
-- [ ] Aba de Histórico de notas fiscais emitidas/canceladas
-- [ ] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos
+- [x] Aba de Histórico de notas fiscais emitidas/canceladas
+- [ ] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos (já implementado, porém pode melhorar)
+
+### Projeto no insomnia
+
+Clique [aqui](https://drive.google.com/file/d/1wk0HeMX07f_M2HsvvOuSvlhfHrX85BKa/view?usp=sharing) para baixar.
