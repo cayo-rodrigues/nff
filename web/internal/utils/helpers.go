@@ -1,6 +1,9 @@
 package utils
 
-import "sync"
+import (
+	"strings"
+	"sync"
+)
 
 func ValidateField(errCondition bool, errField *string, errMsg *string, result chan<- bool, wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -31,4 +34,9 @@ func ValidateListField[T string | int](val T, options []T, errField *string, err
 		*errField = *errMsg
 	}
 	result <- isValid
+}
+
+func GetReqCardErrSummary(reqMsg string) string {
+	errSummary, _, _ := strings.Cut(reqMsg, "\n")
+	return errSummary
 }

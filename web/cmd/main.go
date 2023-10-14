@@ -13,6 +13,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
+	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
 
 func main() {
@@ -56,6 +57,7 @@ func main() {
 			UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
 		}
 	})
+	engine.AddFunc("GetReqCardErrSummary", utils.GetReqCardErrSummary)
 
 	app := fiber.New(fiber.Config{
 		Views:             engine,

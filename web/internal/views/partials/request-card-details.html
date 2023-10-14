@@ -50,9 +50,9 @@
             </button>
         </header>
         <hr>
-        <p class="py-4 text-{{ $FeedbackTextColor }}-600">
-            {{ .ReqMsg }}
-        </p>
+        <pre class="py-4 text-{{ $FeedbackTextColor }}-600 whitespace-pre-wrap">
+            {{- .ReqMsg -}}
+        </pre>
         <hr>
         <ul class="flex flex-col gap-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
             {{ if $IsInvoicePage }}
