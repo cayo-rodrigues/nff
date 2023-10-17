@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/template/html/v2"
 
-	bgworkers "github.com/cayo-rodrigues/nff/web/internal/bg-workers"
+	"github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
