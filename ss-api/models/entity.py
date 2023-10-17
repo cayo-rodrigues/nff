@@ -9,7 +9,7 @@ class Entity:
         self.user_type: str = normalize_text(data.get("user_type"))
         self.ie: str = normalize_text(data.get("ie"), keep_case=True)
         self.cpf_cnpj: str = normalize_text(data.get("cpf_cnpj"), keep_case=True)
-        self.password: str = data.get("password")
+        self.password: str | None = data.get("password")
 
         if not is_sender and not self.ie:
             self.postal_code = normalize_text(data.get("postal_code"), keep_case=True)

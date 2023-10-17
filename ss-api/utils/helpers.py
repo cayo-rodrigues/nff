@@ -6,11 +6,11 @@ from constants.standards import FALSY_STRS, TRUTHY_STRS
 from .exceptions import NFFBaseException
 
 
-def str_to_boolean(value: str) -> bool:
+def str_to_boolean(value: str | None) -> bool:
     return normalize_text(value) in TRUTHY_STRS
 
 
-def decode_icms_contributor_status(value: str) -> str:
+def decode_icms_contributor_status(value: str | None) -> str:
     if not value:
         return ""
 
@@ -23,7 +23,7 @@ def decode_icms_contributor_status(value: str) -> str:
     return "9"
 
 
-def normalize_text(value: str, keep_case: bool = False, remove: list[str] = []) -> str:
+def normalize_text(value: str | None, keep_case: bool = False, remove: list[str] = []) -> str:
     if not value:
         return ""
 
@@ -38,7 +38,7 @@ def normalize_text(value: str, keep_case: bool = False, remove: list[str] = []) 
     return text
 
 
-def to_BRL(value: str) -> str:
+def to_BRL(value: str | float | None) -> str:
     if not value:
         return ""
 
@@ -47,17 +47,17 @@ def to_BRL(value: str) -> str:
     except (ValueError, TypeError):
         value = 0.0
     locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
-    return locale.currency(value, symbol=None)
+    return locale.currency(value, symbol=False)
 
 
-def to_br_float(number: float | str) -> str:
+def to_br_float(number: float | str | None) -> str:
     if not number:
         return ""
 
     return str(number).replace(".", ",")
 
 
-def error_response(e: NFFBaseException) -> (dict, int):
+def error_response(e: NFFBaseException) -> tuple[dict, int]:
     return {"errors": e.errors, "msg": e.msg, "status": "error"}, e.status_code
 
 
@@ -78,12 +78,13 @@ def binary_search_html(
     value = element.get_attribute(attr_name)
     value = normalize_text(value) if normalize else value
 
-    if look_for < value:
-        return binary_search_html(look_for, left, attr_name, normalize)
-    elif look_for > value:
-        return binary_search_html(look_for, right, attr_name, normalize)
-    else:
-        return element
+    if value:
+        if look_for < value:
+            return binary_search_html(look_for, left, attr_name, normalize)
+        elif look_for > value:
+            return binary_search_html(look_for, right, attr_name, normalize)
+        else:
+            return element
 
 
 def linear_search_html(

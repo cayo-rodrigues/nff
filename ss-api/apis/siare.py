@@ -15,7 +15,7 @@ from .browser import Browser
 
 class Siare(Browser):
     def __init__(self, open_now: bool = False) -> None:
-        super().__init__(url=Urls.SIARE_URL if open_now else None)
+        super().__init__(url=Urls.SIARE_URL if open_now else "")
 
     def open_website(self) -> None:
         self.get_page(url=Urls.SIARE_URL)
@@ -26,8 +26,11 @@ class Siare(Browser):
 
         options = self.filter_elements(By.TAG_NAME, "option", element)
         for option in options:
-            option_text = option.get_attribute("innerHTML").lower()
-            option_value = option.get_attribute("value").lower()
+            option_text = option.get_attribute("innerHTML")
+            option_value = option.get_attribute("value")
+
+            option_text = option_text.lower() if option_text else option_text
+            option_value = option_value.lower() if option_value else option_value
 
             if sender.user_type.lower() in [option_text, option_value]:
                 option.click()
@@ -100,7 +103,8 @@ class Siare(Browser):
 
         cfops_box = self.filter_elements(By.TAG_NAME, "span", root)
         for cfop in cfops_box:
-            if invoice.cfop == cfop.get_attribute("innerHTML").split(" -")[0]:
+            cfop_inner_html = cfop.get_attribute("innerHTML")
+            if cfop_inner_html and invoice.cfop == cfop_inner_html.split(" -")[0]:
                 cfop.click()
                 break
 
@@ -302,7 +306,7 @@ class Siare(Browser):
         success_feedback = self.get_element_attr(xpath, "innerText")
         return success_feedback
 
-    def get_invoice_protocol(self) -> str:
+    def get_invoice_protocol(self) -> str | None:
         self.wait_until_document_is_ready()
         xpath = XPaths.FINISH_INVOICE_RAW_PROTOCOL
         invoice_protocol = self.get_attr_if_exists(xpath, "value")
@@ -316,7 +320,9 @@ class Siare(Browser):
     def is_invoice_awaiting_analisys(self) -> bool:
         xpath = XPaths.FINISH_INVOICE_NEXT_STEPS_MESSAGE
         next_steps_msg = self.get_element_attr(xpath, "innerText")
-        return "já está disponível para impressão" not in next_steps_msg
+        if next_steps_msg:
+            return "já está disponível para impressão" not in next_steps_msg
+        return False
 
     def download_invoice(self):
         xpath = XPaths.PRINT_INVOICE_LINK
@@ -398,3 +404,5 @@ class Siare(Browser):
         self.get_and_click(xpath)
 
         self.wait_for_download()
+
+    # GENERAL BALANCE CALC

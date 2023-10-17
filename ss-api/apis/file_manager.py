@@ -3,39 +3,44 @@ import os
 
 class FileManager:
     @classmethod
-    def file_exists(self, path: str) -> bool:
+    def file_exists(cls, path: str) -> bool:
         return os.path.isfile(path)
 
     @classmethod
-    def dir_exists(self, path: str) -> bool:
+    def dir_exists(cls, path: str) -> bool:
         return os.path.isdir(path)
 
     @classmethod
-    def get_or_create_dir(self, path: str) -> str:
-        if not self.dir_exists(path):
+    def get_or_create_dir(cls, path: str) -> str:
+        if not cls.dir_exists(path):
             os.mkdir(path)
         return path
 
     @classmethod
-    def list_file_names(self, dir_path: str) -> list[str]:
-        return os.listdir(self.get_or_create_dir(dir_path))
+    def list_file_names(cls, dir_path: str) -> list[str]:
+        return os.listdir(cls.get_or_create_dir(dir_path))
 
     @classmethod
-    def count_files(self, dir_path: str) -> int:
-        return len(self.list_file_names(dir_path))
+    def count_files(cls, dir_path: str) -> int:
+        return len(cls.list_file_names(dir_path))
 
     @classmethod
-    def rename_file(self, old_name: str, new_name: str) -> None:
-        if self.file_exists(old_name):
+    def rename_file(cls, old_name: str, new_name: str) -> None:
+        if cls.file_exists(old_name):
             os.rename(src=old_name, dst=new_name)
 
     @classmethod
-    def get_latest_file_name(self, dir_path: str) -> str:
+    def get_latest_file_name(cls, dir_path: str) -> str:
         return max(
-            [dir_path + name for name in self.list_file_names(dir_path)],
+            [dir_path + name for name in cls.list_file_names(dir_path)],
             key=os.path.getctime,
         )
 
     @classmethod
-    def get_file_name_from_path(self, path: str) -> str:
+    def get_file_name_from_path(cls, path: str) -> str:
         return os.path.basename(path)
+
+    @classmethod
+    def erase_file(cls, path: str) -> None:
+        if cls.file_exists(path):
+            os.remove(path)

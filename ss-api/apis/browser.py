@@ -1,6 +1,7 @@
 import sys
 import traceback
 from time import sleep
+from typing import Optional
 
 from selenium import webdriver
 from selenium.common.exceptions import (
@@ -23,15 +24,15 @@ from .file_manager import FileManager
 
 
 class Browser:
-    def __init__(self, url: str = None) -> None:
+    def __init__(self, url: str = "") -> None:
         self.open()
         if url:
             self.get_page(url)
 
-    def _get_lookup_root(self, root: WebElement) -> WebDriver | WebElement:
+    def _get_lookup_root(self, root: Optional[WebElement]) -> WebDriver | WebElement:
         return root or self._browser
 
-    def _find_element(self, xpath: str, root: WebElement = None) -> WebElement:
+    def _find_element(self, xpath: str, root: Optional[WebElement] = None) -> WebElement:
         return self._get_lookup_root(root).find_element(By.XPATH, xpath)
 
     def open(self) -> None:
@@ -63,17 +64,17 @@ class Browser:
         self._browser.get(url)
 
     @wait_for_it
-    def get_element(self, xpath: str, root: WebElement = None) -> WebElement:
+    def get_element(self, xpath: str, root: Optional[WebElement] = None) -> WebElement:
         return self._find_element(xpath, root)
 
     @wait_for_it
     def filter_elements(
-        self, by: str, where: str, root: WebElement = None
+        self, by: str, where: str, root: Optional[WebElement] = None
     ) -> list[WebElement]:
         return self._get_lookup_root(root).find_elements(by, where)
 
     @wait_for_it
-    def get_and_click(self, xpath: str, root: WebElement = None) -> None:
+    def get_and_click(self, xpath: str, root: Optional[WebElement] = None) -> None:
         self.get_element(xpath, root).click()
 
     @wait_for_it
@@ -82,13 +83,13 @@ class Browser:
 
     @wait_for_it
     def type_into_element(
-        self, xpath: str, value: str, root: WebElement = None
+        self, xpath: str, value: str | int, root: Optional[WebElement] = None
     ) -> None:
         self.get_element(xpath, root).send_keys(value)
 
     @wait_for_it
     def get_element_attr(
-        self, xpath: str, attr: str, root: WebElement = None
+        self, xpath: str, attr: str, root: Optional[WebElement] = None
     ) -> str | None:
         return self.get_element(xpath, root).get_attribute(attr)
 
@@ -118,7 +119,7 @@ class Browser:
 
         raise DownloadTimeoutError
 
-    def click_if_exists(self, xpath: str, root: WebElement = None) -> bool:
+    def click_if_exists(self, xpath: str, root: Optional[WebElement] = None) -> bool:
         try:
             self._find_element(xpath, root).click()
             return True
@@ -135,7 +136,7 @@ class Browser:
         return False
 
     def get_attr_if_exists(
-        self, xpath: str, attr: str, root: WebElement = None
+        self, xpath: str, attr: str, root: Optional[WebElement] = None
     ) -> str | None:
         try:
             return self._find_element(xpath, root).get_attribute(attr)

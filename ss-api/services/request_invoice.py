@@ -16,7 +16,9 @@ def request_invoice(invoice_data: dict):
 
     error_feedback = siare.get_login_error_feedback()
     if error_feedback:
-        raise exceptions.InvalidLoginDataError(msg=f"{ErrorMessages.LOGIN_FAILED} {error_feedback}")
+        raise exceptions.InvalidLoginDataError(
+            msg=f"{ErrorMessages.LOGIN_FAILED} {error_feedback}"
+        )
 
     siare.wait_until_document_is_ready()
     siare.open_require_invoice_page()
@@ -83,6 +85,7 @@ def request_invoice(invoice_data: dict):
         siare.close_unfocused_windows()
         encoded_invoice_pdf = invoice.pdf_to_base64()
         invoice_id = invoice.get_id_from_filename()
+        invoice.erase_file()
 
     siare.close()
 

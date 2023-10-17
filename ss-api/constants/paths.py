@@ -8,6 +8,7 @@ class Urls:
     REQUIRE_INVOICE_URL = SIARE_URL + "/sol/ctrl/SOL/NFAE/SERVICO_070?ACAO=NOVO"
     REQUIRE_INVOICE_CANCELING_URL = SIARE_URL + "/sol/ctrl/SOL/NFAE/SERVICO_011?ACAO=NOVO"
     PRINT_INVOICE_URL = SIARE_URL + "/sol/ctrl/SOL/NFAE/SERVICO_068?ACAO=VISUALIZAR"
+    QUERY_INVOICE_URL = SIARE_URL + "/sol/ctrl/SOL/NFAE/LISTA_013?ACAO=VISUALIZAR"
 
 
 class XPaths:
@@ -25,8 +26,6 @@ class XPaths:
 
     # under invoice initial data tab
     INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[8]/td[2]/div/input'
-    # INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[1]'
-    # INVOICE_INITIAL_DATA_CFOP_SELECT_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[1]"
     INVOICE_INITIAL_DATA_CFOP_BOX = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[8]/td[2]/div/div[2]"
     INVOICE_INITIAL_DATA_DATE_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[9]/td[2]/input"
 
@@ -130,5 +129,17 @@ class XPaths:
     CURRENT_AND_TOTAL_PAGES_TEXT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr/td[3]/text()[2]'
     REQUEST_PROTOCOL_TEXT = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[2]/td[2]/text()'
 
-    # anywhere
+    # at query invoice page
+    QUERY_INVOICE_BOTH_IN_AND_OUT_OPTION = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[2]/div/div[1]/label[3]'
+    QUERY_INVOICE_INITIAL_DATE_INPUT = '/html/body/div[3]/div[2]/div/div[2]/div/form/div[2]/div[2]/div[6]/div[1]/div[1]/input'
+    QUERY_INVOICE_FINAL_DATE_INPUT = '/html/body/div[3]/div[2]/div/div[2]/div/form/div[2]/div[2]/div[6]/div[2]/div[1]/input'
+    QUERY_INVOICE_OPERATION_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[4]/div[1]/div[1]/select'
+    QUERY_INVOICE_STATUS_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[4]/div[2]/div[1]/select'
+    QUERY_INVOICE_SENDER_ID_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[7]/div[2]/div[1]/div[1]/select'
+    QUERY_INVOICE_SENDER_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[7]/div[2]/div[2]/div[1]/input'
+    QUERY_INVOICE_RECIPIENT_ID_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[8]/div[2]/div[1]/div[1]/select'
+    QUERY_INVOICE_RECIPIENT_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[8]/div[2]/div[2]/div[1]/input'
+    QUERY_INVOICE_SUBMIT_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/div[3]/input'
+
+    # at home page
     CLOSE_HOME_POPUP_BUTTON = '//*[@id="popCloseBox"]'

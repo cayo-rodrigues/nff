@@ -5,6 +5,8 @@ from apis import FileManager
 
 
 class Printable:
+    custom_file_name: str
+
     def get_id_from_filename(self):
         pdf_file_path = FileManager.get_latest_file_name(INVOICES_DIR_PATH)
         invoice_id = (
@@ -31,3 +33,7 @@ class Printable:
         )
 
         FileManager.rename_file(old_name=invoice_file_name, new_name=new_file_name)
+
+    def erase_file(self):
+        pdf_file_path = FileManager.get_latest_file_name(INVOICES_DIR_PATH)
+        FileManager.erase_file(pdf_file_path)
