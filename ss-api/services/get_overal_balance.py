@@ -1,5 +1,5 @@
 from apis import Siare
-from constants.messages import ErrorMessages
+from constants.messages import ErrorMessages, SuccessMessages
 from models import InvoiceQuery
 from utils import exceptions
 from utils.exceptions import InvalidQueryDataError
@@ -37,7 +37,7 @@ def get_overal_balance(data: dict):
     siare.traverse_invoice_query_results(query)
 
     return {
-        "msg": "ok!",
+        "msg": SuccessMessages.INVOICE_QUERY,
         "total_income": query.results.total_income,
         "total_expenses": query.results.total_expenses,
         "average_income": query.results.average_income,

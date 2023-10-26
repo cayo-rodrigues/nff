@@ -457,6 +457,8 @@ class Siare(Browser):
 
         while True:
             while True:
+                # TODO
+                # set a timeout (do the same for the loop a few lines above)
                 sleep(STANDARD_SLEEP_TIME)
                 xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
                 tbody = self.get_element_if_exists(xpath)

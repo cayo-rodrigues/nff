@@ -15,3 +15,4 @@ class WarningMessages:
 
 class SuccessMessages:
     INVOICE_PRINTING = "Download da nota fiscal realizado com sucesso."
+    INVOICE_QUERY = "Consulta realizada com sucesso."
