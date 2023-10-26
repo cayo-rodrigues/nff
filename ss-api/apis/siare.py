@@ -4,11 +4,25 @@ from time import sleep
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.select import Select
 
 from constants.paths import Urls, XPaths
 from constants.standards import STANDARD_SLEEP_TIME
-from models import Entity, Invoice, InvoiceCanceling, InvoiceItem, InvoicePrinting
-from utils.helpers import binary_search_html, linear_search_html
+from models import (
+    Entity,
+    Invoice,
+    InvoiceCanceling,
+    InvoiceItem,
+    InvoicePrinting,
+    InvoiceQuery,
+    InvoiceQueryResults,
+)
+from utils.helpers import (
+    binary_search_html,
+    from_BRL_to_float,
+    linear_search_html,
+    normalize_text,
+)
 
 from .browser import Browser
 
@@ -71,7 +85,7 @@ class Siare(Browser):
 
     def open_transport_tab(self) -> bool:
         xpath = XPaths.INVOICE_TRANSPORT_TAB
-        return self.click_if_exists(xpath)
+        return self.get_and_click_if_exists(xpath)
 
     def open_aditional_data_tab(self) -> None:
         xpath = XPaths.INVOICE_ADITIONAL_DATA_TAB
@@ -161,7 +175,7 @@ class Siare(Browser):
                 break
 
         xpath = XPaths.INVOICE_NOT_WITH_PRESUMED_CREDIT_OPTION
-        self.click_if_exists(xpath)
+        self.get_and_click_if_exists(xpath)
 
     def fill_invoice_recipient_address_data(self, recipient: Entity) -> None:
         xpath = XPaths.INVOICE_RECIPIENT_ADDRESS_CEP_INPUT
@@ -406,3 +420,80 @@ class Siare(Browser):
         self.wait_for_download()
 
     # GENERAL BALANCE CALC
+
+    def open_query_invoice_page(self):
+        self.get_page(url=Urls.QUERY_INVOICE_URL)
+
+    def fill_query_invoice_form(self, query: InvoiceQuery):
+        xpath = XPaths.QUERY_INVOICE_BOTH_IN_AND_OUT_OPTION
+        self.get_and_click(xpath)
+
+        xpath = XPaths.QUERY_INVOICE_OPERATION_TYPE_SELECT_INPUT
+        Select(self.get_element(xpath)).select_by_visible_text("VENDA")
+
+        xpath = XPaths.QUERY_INVOICE_NFA_STATUS_SELECT_INPUT
+        Select(self.get_element(xpath)).select_by_visible_text("Impressa")
+
+        xpath = XPaths.QUERY_INVOICE_INITIAL_DATE_INPUT
+        self.type_into_element(xpath, query.start_date)
+
+        xpath = XPaths.QUERY_INVOICE_FINAL_DATE_INPUT
+        self.type_into_element(xpath, query.end_date)
+
+    def submit_query_invoice_form(self):
+        xpath = XPaths.QUERY_INVOICE_SUBMIT_BUTTON
+        self.get_and_click(xpath)
+
+    def get_invoice_query_error_feedback(self) -> str | None:
+        xpath = XPaths.QUERY_INVOICE_NO_RESULTS_FOUND_MSG
+        error_feedback = self.get_attr_if_exists(xpath, "innerText")
+        if error_feedback:
+            return error_feedback
+
+        return None
+
+    def traverse_invoice_query_results(self, query: InvoiceQuery):
+        query.results = InvoiceQueryResults()
+
+        while True:
+            while True:
+                sleep(STANDARD_SLEEP_TIME)
+                xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
+                tbody = self.get_element_if_exists(xpath)
+                if tbody:
+                    break
+
+            rows = self.filter_elements(By.TAG_NAME, "tr", tbody)
+            for row in rows:
+                data = self.filter_elements(By.TAG_NAME, "td", row)
+                invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
+                invoice_value = from_BRL_to_float(data[-2].text)
+
+                is_income = query.entity.ie == invoice_sender_ie
+                if is_income:
+                    query.results.total_income += invoice_value
+                    query.results.positive_entries += 1
+                else:
+                    query.results.total_expenses += invoice_value
+                    query.results.negative_entries += 1
+
+            xpath = XPaths.QUERY_INVOICE_RESULTS_CURRENT_PAGE
+            current_page = int(self.get_element(xpath).text)
+
+            xpath = XPaths.QUERY_INVOICE_RESULTS_INFO_DATA
+            total_pages = int(self.get_element(xpath).text.split(" ")[-3])
+
+            if current_page < total_pages:
+                xpath = XPaths.QUERY_INVOICE_RESULTS_NEXT_PAGE
+                link = self.get_element(xpath)
+                if link.get_attribute("name") == "linkProximo":
+                    link.click()
+                else:
+                    xpath = XPaths.QUERY_INVOICE_RESULTS_NEXT_PAGE_ALT
+                    self.get_and_click(xpath)
+                self.wait_until_document_is_ready()
+                continue
+
+            break
+
+        query.results.do_the_math()

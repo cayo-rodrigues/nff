@@ -24,4 +24,4 @@ RUN apt install -y python3-pip && \
 
 COPY . .
 
-CMD uvicorn --host 0.0.0.0 --port $PORT main:asgi_app --timeout-keep-alive 120
+CMD uvicorn --host 0.0.0.0 --port $PORT main:asgi_app --timeout-keep-alive 300

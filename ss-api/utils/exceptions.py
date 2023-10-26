@@ -33,6 +33,11 @@ class InvalidPrintingDataError(NFFBaseException):
     status_code = 400
 
 
+class InvalidQueryDataError(NFFBaseException):
+    msg = ErrorMessages.INVALID_QUERY_DATA
+    status_code = 400
+
+
 class InvalidLoginDataError(NFFBaseException):
     status_code = 401
 
@@ -47,6 +52,10 @@ class CouldNotFinishCancelingError(NFFBaseException):
 
 class CouldNotFinishPrintingError(NFFBaseException):
     status_code = 400
+
+
+class CouldNotFinishQueryError(NFFBaseException):
+    status_code = 404
 
 
 class DownloadTimeoutError(NFFBaseException):

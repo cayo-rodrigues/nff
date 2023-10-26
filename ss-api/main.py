@@ -4,7 +4,7 @@ import traceback
 from flask import Flask, request, jsonify
 from asgiref.wsgi import WsgiToAsgi
 
-from services import cancel_invoice, request_invoice, print_invoice
+from services import cancel_invoice, request_invoice, print_invoice, get_overal_balance
 from utils import exceptions
 from utils.helpers import error_response
 
@@ -81,6 +81,26 @@ def print_invoice_handler():
 
     return jsonify(response), status_code
 
+
+@app.route("/invoice/overal-balance", methods=["GET"])
+def overal_balance_handler():
+    try:
+        response = get_overal_balance(data={**request.args, **request.get_json()})
+        status_code = 200
+    except exceptions.InvalidQueryDataError as e:
+        response, status_code = error_response(e)
+    except exceptions.InvalidLoginDataError as e:
+        response, status_code = error_response(e)
+    except exceptions.CouldNotFinishQueryError as e:
+        response, status_code = error_response(e)
+    except exceptions.WebdriverTimeoutError as e:
+        print("Wait for it exausted:", e, file=sys.stderr)
+        traceback.print_exc()
+        response, status_code = error_response(e)
+    except Exception:
+        traceback.print_exc()
+        response, status_code = error_response(exceptions.UnexpectedError())
+    return jsonify(response), status_code
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

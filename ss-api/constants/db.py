@@ -58,6 +58,11 @@ class ModelFields:
         INVOICE_ID_TYPE = "invoice_id_type"
         ENTITY = "entity"
 
+    class InvoiceQuery:
+        START_DATE = "start_date"
+        END_DATE = "end_date"
+        ENTITY = "entity"
+
 
 class MandatoryFields:
     INVOICE = [
@@ -111,4 +116,10 @@ class MandatoryFields:
         ModelFields.InvoicePrinting.INVOICE_ID,
         ModelFields.InvoicePrinting.INVOICE_ID_TYPE,
         ModelFields.InvoicePrinting.ENTITY,
+    ]
+
+    INVOICE_QUERY = [
+        ModelFields.InvoiceQuery.START_DATE,
+        ModelFields.InvoiceQuery.END_DATE,
+        ModelFields.InvoiceQuery.ENTITY,
     ]

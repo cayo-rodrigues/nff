@@ -134,12 +134,16 @@ class XPaths:
     QUERY_INVOICE_INITIAL_DATE_INPUT = '/html/body/div[3]/div[2]/div/div[2]/div/form/div[2]/div[2]/div[6]/div[1]/div[1]/input'
     QUERY_INVOICE_FINAL_DATE_INPUT = '/html/body/div[3]/div[2]/div/div[2]/div/form/div[2]/div[2]/div[6]/div[2]/div[1]/input'
     QUERY_INVOICE_OPERATION_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[4]/div[1]/div[1]/select'
-    QUERY_INVOICE_STATUS_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[4]/div[2]/div[1]/select'
-    QUERY_INVOICE_SENDER_ID_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[7]/div[2]/div[1]/div[1]/select'
-    QUERY_INVOICE_SENDER_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[7]/div[2]/div[2]/div[1]/input'
-    QUERY_INVOICE_RECIPIENT_ID_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[8]/div[2]/div[1]/div[1]/select'
-    QUERY_INVOICE_RECIPIENT_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[8]/div[2]/div[2]/div[1]/input'
+    QUERY_INVOICE_NFA_STATUS_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[4]/div[2]/div[1]/select'
     QUERY_INVOICE_SUBMIT_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/div[3]/input'
+
+    QUERY_INVOICE_NO_RESULTS_FOUND_MSG = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/table/tbody/tr/td/p'
+
+    QUERY_INVOICE_RESULTS_TBODY = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/table/tbody'
+    QUERY_INVOICE_RESULTS_NEXT_PAGE = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/div/div[2]/a[1]'
+    QUERY_INVOICE_RESULTS_NEXT_PAGE_ALT = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/div/div[2]/a[2]'
+    QUERY_INVOICE_RESULTS_CURRENT_PAGE = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/div/div[2]/b'
+    QUERY_INVOICE_RESULTS_INFO_DATA = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/div/div[2]'
 
     # at home page
     CLOSE_HOME_POPUP_BUTTON = '//*[@id="popCloseBox"]'

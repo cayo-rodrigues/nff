@@ -1,13 +1,7 @@
-import sys
-import traceback
 from time import sleep
-from typing import Optional
+from typing import Any, Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import (
-    ElementNotInteractableException,
-    NoSuchElementException,
-)
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
@@ -17,7 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from constants.paths import INVOICES_DIR_PATH
 from constants.standards import STANDARD_SLEEP_TIME
-from utils.decorators import wait_for_it
+from utils.decorators import try_it, wait_for_it
 from utils.exceptions import DownloadTimeoutError
 
 from .file_manager import FileManager
@@ -32,7 +26,9 @@ class Browser:
     def _get_lookup_root(self, root: Optional[WebElement]) -> WebDriver | WebElement:
         return root or self._browser
 
-    def _find_element(self, xpath: str, root: Optional[WebElement] = None) -> WebElement:
+    def _find_element(
+        self, xpath: str, root: Optional[WebElement] = None
+    ) -> WebElement:
         return self._get_lookup_root(root).find_element(By.XPATH, xpath)
 
     def open(self) -> None:
@@ -90,7 +86,7 @@ class Browser:
     @wait_for_it
     def get_element_attr(
         self, xpath: str, attr: str, root: Optional[WebElement] = None
-    ) -> str | None:
+    ) -> Any:
         return self.get_element(xpath, root).get_attribute(attr)
 
     @wait_for_it
@@ -119,38 +115,24 @@ class Browser:
 
         raise DownloadTimeoutError
 
-    def click_if_exists(self, xpath: str, root: Optional[WebElement] = None) -> bool:
-        try:
-            self._find_element(xpath, root).click()
-            return True
-        except (NoSuchElementException, ElementNotInteractableException):
-            ...
-        except Exception as e:
-            print(
-                "Browser.click_if_exists failed in an unexpected way:",
-                e,
-                file=sys.stderr,
-            )
-            traceback.print_exc()
+    @try_it()
+    def get_element_if_exists(
+        self, xpath: str, root: Optional[WebElement] = None
+    ) -> WebElement | None:
+        return self._find_element(xpath, root)
 
-        return False
+    @try_it(fallback_return=False)
+    def get_and_click_if_exists(
+        self, xpath: str, root: Optional[WebElement] = None
+    ) -> bool:
+        self._find_element(xpath, root).click()
+        return True
 
+    @try_it()
     def get_attr_if_exists(
         self, xpath: str, attr: str, root: Optional[WebElement] = None
     ) -> str | None:
-        try:
-            return self._find_element(xpath, root).get_attribute(attr)
-        except (NoSuchElementException, ElementNotInteractableException):
-            ...
-        except Exception as e:
-            print(
-                "Browser.get_attr_if_exists failed in an unexpected way:",
-                e,
-                file=sys.stderr,
-            )
-            traceback.print_exc()
-
-        return None
+        return self._find_element(xpath, root).get_attribute(attr)
 
     def is_element_focused(self, element: WebElement) -> bool:
         return element == self._browser.switch_to.active_element

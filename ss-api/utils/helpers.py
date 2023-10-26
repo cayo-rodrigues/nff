@@ -1,4 +1,5 @@
 import locale
+import re
 
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -23,7 +24,9 @@ def decode_icms_contributor_status(value: str | None) -> str:
     return "9"
 
 
-def normalize_text(value: str | None, keep_case: bool = False, remove: list[str] = []) -> str:
+def normalize_text(
+    value: str | None, keep_case: bool = False, remove: list[str] = []
+) -> str:
     if not value:
         return ""
 
@@ -57,8 +60,23 @@ def to_br_float(number: float | str | None) -> str:
     return str(number).replace(".", ",")
 
 
+def from_BRL_to_float(number: str) -> float:
+    if not number:
+        return 0.0
+
+    return float(normalize_text(number, remove=["."]).replace(",", "."))
+
+
+def is_valid_br_date(value: str) -> bool:
+    if not value:
+        return False
+
+    pattern = r"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\d{4}$"
+    return bool(re.match(pattern, value))
+
+
 def error_response(e: NFFBaseException) -> tuple[dict, int]:
-    return {"errors": e.errors, "msg": e.msg, "status": "error"}, e.status_code
+    return {"errors": e.errors, "msg": e.msg, "status": e.req_status}, e.status_code
 
 
 def binary_search_html(
