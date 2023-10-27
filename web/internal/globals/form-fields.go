@@ -1,5 +1,11 @@
 package globals
 
+type InvoiceItemFormSelectFields struct {
+	Groups               *[82]string
+	Origins              *[3]string
+	UnitiesOfMeasurement *[23]string
+}
+
 // ENTITIES
 
 var EntityUserTypes = [15]string{

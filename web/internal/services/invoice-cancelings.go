@@ -5,11 +5,12 @@ import (
 	"errors"
 	"log"
 
+	"github.com/jackc/pgx/v5"
+
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 type CancelingService struct {

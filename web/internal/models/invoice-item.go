@@ -20,12 +20,6 @@ type InvoiceItemFormError struct {
 	ValuePerUnity      string
 }
 
-type InvoiceItemFormSelectFields struct {
-	Groups               *[82]string
-	Origins              *[3]string
-	UnitiesOfMeasurement *[23]string
-}
-
 type InvoiceItem struct {
 	Id                 int                   `json:"-"`
 	Group              string                `json:"group"`

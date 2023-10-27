@@ -10,9 +10,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
-	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
@@ -51,14 +49,19 @@ func main() {
 	engine.Reload(DEBUG)
 	engine.Debug(DEBUG)
 
-	engine.AddFunc("GetInvoiceItemSelectFields", func() *models.InvoiceItemFormSelectFields {
-		return &models.InvoiceItemFormSelectFields{
-			Groups:               &globals.InvoiceItemGroups,
-			Origins:              &globals.InvoiceItemOrigins,
-			UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
-		}
-	})
+	engine.AddFunc("GetInvoiceItemSelectFields", utils.GetInvoiceItemSelectFields)
 	engine.AddFunc("GetReqCardErrSummary", utils.GetReqCardErrSummary)
+
+	entityService := services.NewEntityService()
+	itemsService := services.NewItemsService()
+	invoiceService := services.NewInvoiceService(entityService, itemsService)
+	cancelingService := services.NewCancelingService(entityService)
+
+	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService)
+
+	entitiesPage := handlers.NewEntitiesPage(entityService)
+	invoicesPage := handlers.NewInvoicesPage(invoiceService, entityService, siareBGWorker)
+	cancelInvoicesPage := handlers.NewCancelInvoicesPage(cancelingService, entityService, siareBGWorker)
 
 	app := fiber.New(fiber.Config{
 		Views:             engine,
@@ -73,23 +76,14 @@ func main() {
 	app.Get("/static/scripts/:script", handlers.ServeJS)
 	app.Get("/static/icons/:icon", handlers.ServeIcons)
 
-	entityService := services.NewEntityService()
-	itemsService := services.NewItemsService()
-	invoiceService := services.NewInvoiceService(entityService, itemsService)
-	cancelingService := services.NewCancelingService(entityService)
-
-	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService)
-
 	app.Get("/", handlers.Index)
 
-	entitiesPage := handlers.NewEntitiesPage(entityService)
 	app.Get("/entities", entitiesPage.Render)
 	app.Get("/entities/:id/form", entitiesPage.GetEntityForm)
 	app.Post("/entities", entitiesPage.CreateEntity)
 	app.Put("/entities/:id", entitiesPage.UpdateEntity)
 	app.Delete("/entities/:id", entitiesPage.DeleteEntity)
 
-	invoicesPage := handlers.NewInvoicesPage(invoiceService, entityService, siareBGWorker)
 	app.Get("/invoices", invoicesPage.Render)
 	app.Post("/invoices", invoicesPage.RequireInvoice)
 	app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
@@ -97,7 +91,6 @@ func main() {
 	app.Get("/invoices/:id/request-card-status", invoicesPage.GetRequestStatus)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 
-	cancelInvoicesPage := handlers.NewCancelInvoicesPage(cancelingService, entityService, siareBGWorker)
 	app.Get("/invoices/cancel", cancelInvoicesPage.Render)
 	app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)

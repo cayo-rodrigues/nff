@@ -3,6 +3,8 @@ package utils
 import (
 	"strings"
 	"sync"
+
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 )
 
 func ValidateField(errCondition bool, errField *string, errMsg *string, result chan<- bool, wg *sync.WaitGroup) {
@@ -39,4 +41,12 @@ func ValidateListField[T string | int](val T, options []T, errField *string, err
 func GetReqCardErrSummary(reqMsg string) string {
 	errSummary, _, _ := strings.Cut(reqMsg, "\n")
 	return errSummary
+}
+
+func GetInvoiceItemSelectFields() *globals.InvoiceItemFormSelectFields {
+	return &globals.InvoiceItemFormSelectFields{
+		Groups:               &globals.InvoiceItemGroups,
+		Origins:              &globals.InvoiceItemOrigins,
+		UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
+	}
 }
