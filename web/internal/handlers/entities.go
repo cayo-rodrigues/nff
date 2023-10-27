@@ -6,12 +6,20 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
 
-type EntitiesPage struct{}
+type EntitiesPage struct {
+	service interfaces.EntityService
+}
+
+func NewEntitiesPage(entityService interfaces.EntityService) *EntitiesPage {
+	return &EntitiesPage{
+		service: entityService,
+	}
+}
 
 type EntitiesPageData struct {
 	IsAuthenticated  bool
@@ -32,7 +40,7 @@ func (p *EntitiesPage) NewEmptyData() *EntitiesPageData {
 func (p *EntitiesPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 
-	entities, err := services.ListEntities(c.Context())
+	entities, err := p.service.ListEntities(c.Context())
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -51,7 +59,7 @@ func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
 
-	entity, err := services.RetrieveEntity(c.Context(), entityId)
+	entity, err := p.service.RetrieveEntity(c.Context(), entityId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -73,7 +81,7 @@ func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
 		return c.Render("partials/entity-form", pageData)
 	}
 
-	err := services.CreateEntity(c.Context(), entity)
+	err := p.service.CreateEntity(c.Context(), entity)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -100,7 +108,7 @@ func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 		return c.Render("partials/entity-form", pageData)
 	}
 
-	err = services.UpdateEntity(c.Context(), entity)
+	err = p.service.UpdateEntity(c.Context(), entity)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -114,7 +122,7 @@ func (p *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
-	err = services.DeleteEntity(c.Context(), entityId)
+	err = p.service.DeleteEntity(c.Context(), entityId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}

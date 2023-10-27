@@ -8,14 +8,25 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
 
-type CancelInvoicesPage struct{}
+type CancelInvoicesPage struct {
+	service       interfaces.CancelingService
+	entityService interfaces.EntityService
+	siareBGWorker interfaces.SiareBGWorker
+}
+
+func NewCancelInvoicesPage(service interfaces.CancelingService, entityService interfaces.EntityService, siareBGWorker interfaces.SiareBGWorker) *CancelInvoicesPage {
+	return &CancelInvoicesPage{
+		service:       service,
+		entityService: entityService,
+		siareBGWorker: siareBGWorker,
+	}
+}
 
 type CancelInvoicesPageData struct {
 	IsAuthenticated   bool
@@ -39,7 +50,7 @@ func (p *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
 func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 
-	entities, err := services.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context())
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -49,7 +60,7 @@ func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.InvoiceCancel = models.NewEmptyInvoiceCancel()
 
 	// get the latest 10 cancelings
-	cancelings, err := services.ListInvoiceCancelings(c.Context())
+	cancelings, err := p.service.ListInvoiceCancelings(c.Context())
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -64,7 +75,7 @@ func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 
-	entities, err := services.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context())
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -76,7 +87,7 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	entity, err := services.RetrieveEntity(c.Context(), entityId)
+	entity, err := p.entityService.RetrieveEntity(c.Context(), entityId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -96,12 +107,12 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 		return c.Render("partials/invoice-cancel-form", pageData)
 	}
 
-	err = services.CreateInvoiceCanceling(c.Context(), invoiceCancel)
+	err = p.service.CreateInvoiceCanceling(c.Context(), invoiceCancel)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	go bgworkers.SiareRequestInvoiceCanceling(invoiceCancel)
+	go p.siareBGWorker.RequestInvoiceCanceling(invoiceCancel)
 
 	c.Set("HX-Trigger-After-Settle", "invoice-cancel-required")
 	return c.Render("partials/request-card", invoiceCancel)
@@ -112,7 +123,7 @@ func (p *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
 	}
-	canceling, err := services.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingId)
 
 	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
 	return c.Render("partials/request-card-details", canceling)
@@ -121,7 +132,7 @@ func (p *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 func (p *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 
-	entities, err := services.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context())
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -131,7 +142,7 @@ func (p *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
 	}
-	canceling, err := services.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -158,7 +169,7 @@ func (p *CancelInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	canceling, err := services.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}

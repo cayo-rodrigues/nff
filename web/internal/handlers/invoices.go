@@ -8,15 +8,26 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
+	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
 
-type InvoicesPage struct{}
+type InvoicesPage struct {
+	service       interfaces.InvoiceService
+	entityService interfaces.EntityService
+	siareBGWorker interfaces.SiareBGWorker
+}
+
+func NewInvoicesPage(service interfaces.InvoiceService, entityService interfaces.EntityService, siareBGWorker interfaces.SiareBGWorker) *InvoicesPage {
+	return &InvoicesPage{
+		service:       service,
+		entityService: entityService,
+		siareBGWorker: siareBGWorker,
+	}
+}
 
 type InvoicesPageData struct {
 	IsAuthenticated  bool
@@ -43,7 +54,7 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 
 	// TODO async data aggregation with go routines
-	entities, err := services.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context())
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -54,7 +65,7 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.Invoice = models.NewEmptyInvoice()
 
 	// get the latest 10 invoices
-	invoices, err := services.ListInvoices(c.Context())
+	invoices, err := p.service.ListInvoices(c.Context())
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -71,7 +82,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 
 	// TODO async data aggregation with go routines
 
-	entities, err := services.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context())
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -88,11 +99,11 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	sender, err := services.RetrieveEntity(c.Context(), senderId)
+	sender, err := p.entityService.RetrieveEntity(c.Context(), senderId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	recipient, err := services.RetrieveEntity(c.Context(), recipientId)
+	recipient, err := p.entityService.RetrieveEntity(c.Context(), recipientId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -113,12 +124,12 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return c.Render("partials/invoice-form", pageData)
 	}
 
-	err = services.CreateInvoice(c.Context(), invoice)
+	err = p.service.CreateInvoice(c.Context(), invoice)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	go bgworkers.SiareRequestInvoice(invoice)
+	go p.siareBGWorker.RequestInvoice(invoice)
 
 	c.Set("HX-Trigger-After-Settle", "invoice-required")
 	return c.Render("partials/request-card", invoice)
@@ -134,7 +145,7 @@ func (p *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
-	invoice, err := services.RetrieveInvoice(c.Context(), invoiceId)
+	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -148,7 +159,7 @@ func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 
 	// TODO async data aggregation with go routines
 
-	entities, err := services.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context())
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -158,7 +169,7 @@ func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
-	invoice, err := services.RetrieveInvoice(c.Context(), invoiceId)
+	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -185,7 +196,7 @@ func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	invoice, err := services.RetrieveInvoice(c.Context(), invoiceId)
+	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceId)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}

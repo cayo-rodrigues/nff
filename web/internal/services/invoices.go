@@ -6,13 +6,26 @@ import (
 	"log"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/jackc/pgx/v5"
 )
 
+type InvoiceService struct {
+	entityService interfaces.EntityService
+	itemsService  interfaces.ItemsService
+}
+
+func NewInvoiceService(entityService interfaces.EntityService, itemsService interfaces.ItemsService) *InvoiceService {
+	return &InvoiceService{
+		entityService: entityService,
+		itemsService:  itemsService,
+	}
+}
+
 // TODO accept filters
-func ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
+func (s *InvoiceService) ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
 	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices ORDER BY id DESC")
 	defer rows.Close()
 
@@ -28,21 +41,21 @@ func ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
 
 		// TODO async data aggregation with go routines
 
-		sender, err := RetrieveEntity(ctx, invoice.Sender.Id)
+		sender, err := s.entityService.RetrieveEntity(ctx, invoice.Sender.Id)
 		if err != nil {
 			log.Println("Error linking invoice to sender: ", err)
 			return nil, utils.InternalServerErr
 		}
 		invoice.Sender = sender
 
-		recipient, err := RetrieveEntity(ctx, invoice.Recipient.Id)
+		recipient, err := s.entityService.RetrieveEntity(ctx, invoice.Recipient.Id)
 		if err != nil {
 			log.Println("Error linking invoice to recipient: ", err)
 			return nil, utils.InternalServerErr
 		}
 		invoice.Recipient = recipient
 
-		items, err := ListInvoiceItems(ctx, invoice.Id)
+		items, err := s.itemsService.ListInvoiceItems(ctx, invoice.Id)
 		if err != nil {
 			log.Println("Error linking invoice to items: ", err)
 			return nil, utils.InternalServerErr
@@ -55,7 +68,7 @@ func ListInvoices(ctx context.Context) ([]*models.Invoice, error) {
 	return invoices, nil
 }
 
-func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
+func (s *InvoiceService) CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices
@@ -71,7 +84,7 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 		return utils.InternalServerErr
 	}
 
-	err = BulkCreateInvoiceItems(ctx, invoice.Items, invoice.Id)
+	err = s.itemsService.BulkCreateInvoiceItems(ctx, invoice.Items, invoice.Id)
 	if err != nil {
 		log.Println("Error running create invoice items query: ", err)
 		return utils.InternalServerErr
@@ -80,7 +93,7 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 	return nil
 }
 
-func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error) {
+func (s *InvoiceService) RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error) {
 	row := db.PG.QueryRow(
 		ctx,
 		"SELECT * FROM invoices WHERE invoices.id = $1",
@@ -100,21 +113,21 @@ func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error
 
 	// TODO async data aggregation with go routines
 
-	sender, err := RetrieveEntity(ctx, invoice.Sender.Id)
+	sender, err := s.entityService.RetrieveEntity(ctx, invoice.Sender.Id)
 	if err != nil {
 		log.Println("Error linking invoice to sender: ", err)
 		return nil, utils.InternalServerErr
 	}
 	invoice.Sender = sender
 
-	recipient, err := RetrieveEntity(ctx, invoice.Recipient.Id)
+	recipient, err := s.entityService.RetrieveEntity(ctx, invoice.Recipient.Id)
 	if err != nil {
 		log.Println("Error linking invoice to recipient: ", err)
 		return nil, utils.InternalServerErr
 	}
 	invoice.Recipient = recipient
 
-	items, err := ListInvoiceItems(ctx, invoice.Id)
+	items, err := s.itemsService.ListInvoiceItems(ctx, invoice.Id)
 	if err != nil {
 		log.Println("Error linking invoice to items: ", err)
 		return nil, utils.InternalServerErr
@@ -124,7 +137,7 @@ func RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error
 	return invoice, nil
 }
 
-func UpdateInvoice(ctx context.Context, invoice *models.Invoice) error {
+func (s *InvoiceService) UpdateInvoice(ctx context.Context, invoice *models.Invoice) error {
 	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4 WHERE id = $5",
@@ -141,5 +154,3 @@ func UpdateInvoice(ctx context.Context, invoice *models.Invoice) error {
 
 	return nil
 }
-
-

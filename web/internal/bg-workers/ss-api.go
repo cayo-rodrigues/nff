@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
-	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -60,7 +60,19 @@ type SSAPICancelingResponse struct {
 	Errors *SSAPICancelingErrors `json:"errors"`
 }
 
-func SiareRequestInvoice(invoice *models.Invoice) {
+type SiareBGWorker struct {
+	invoiceService   interfaces.InvoiceService
+	cancelingService interfaces.CancelingService
+}
+
+func NewSiareBGWorker(invoiceService interfaces.InvoiceService, cancelingService interfaces.CancelingService) *SiareBGWorker {
+	return &SiareBGWorker{
+		invoiceService:   invoiceService,
+		cancelingService: cancelingService,
+	}
+}
+
+func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
 	defer cancel()
 
@@ -93,7 +105,7 @@ func SiareRequestInvoice(invoice *models.Invoice) {
 	invoice.ReqMsg = response.Msg
 	invoice.ReqStatus = response.Status
 
-	err := services.UpdateInvoice(ctx, invoice)
+	err := w.invoiceService.UpdateInvoice(ctx, invoice)
 	if err != nil {
 		log.Printf("Something went wrong when updating invoice history. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.Id, err)
 	}
@@ -102,7 +114,7 @@ func SiareRequestInvoice(invoice *models.Invoice) {
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 
-func SiareRequestInvoiceCanceling(invoiceCancel *models.InvoiceCancel) {
+func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCancel) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*2)
 	defer cancel()
 
@@ -131,7 +143,7 @@ func SiareRequestInvoiceCanceling(invoiceCancel *models.InvoiceCancel) {
 	invoiceCancel.ReqStatus = response.Status
 	invoiceCancel.ReqMsg = response.Msg
 
-	err := services.UpdateInvoiceCanceling(ctx, invoiceCancel)
+	err := w.cancelingService.UpdateInvoiceCanceling(ctx, invoiceCancel)
 	if err != nil {
 		log.Printf("Something went wrong when updating invoice canceling history. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.Id, err)
 	}
