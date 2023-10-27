@@ -67,6 +67,11 @@ class WebdriverTimeoutError(NFFBaseException):
     msg = ErrorMessages.WEBDRIVER_TIMEOUT
     status_code = 500
 
+    def __init__(self, decorator: str, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.decorator = decorator
+
+
 
 class UnexpectedError(NFFBaseException):
     msg = ErrorMessages.UNEXPECTED_ERROR

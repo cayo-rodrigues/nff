@@ -17,7 +17,7 @@ from constants.standards import STANDARD_SLEEP_TIME
 def wait_for_it(f):
     def wrapper(*args, **kwargs):
         attempts = 0
-        while attempts <= 120:  # or 30s
+        while attempts < 40:  # 10s
             try:
                 return f(*args, **kwargs)
             except (
@@ -31,9 +31,26 @@ def wait_for_it(f):
                 sleep(STANDARD_SLEEP_TIME)
 
         traceback.print_exc()
-        raise WebdriverTimeoutError
+        raise WebdriverTimeoutError(decorator="wait_for_it")
 
     return wrapper
+
+
+def believe_in_it(f):
+    def wrapper(*args, **kwargs):
+        attempts = 0
+        while attempts < 40:  # 10s
+            thing = f(*args, **kwargs)
+            if thing:
+                return thing
+
+            attempts += 1
+            sleep(STANDARD_SLEEP_TIME)
+
+        raise WebdriverTimeoutError(decorator="believe_in_it")
+
+    return wrapper
+
 
 def try_it(fallback_return=None):
     def decorator(f):
@@ -52,5 +69,7 @@ def try_it(fallback_return=None):
                 raise e
 
             return fallback_return
+
         return wrapper
+
     return decorator

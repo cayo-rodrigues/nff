@@ -11,7 +11,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from constants.paths import INVOICES_DIR_PATH
 from constants.standards import STANDARD_SLEEP_TIME
-from utils.decorators import try_it, wait_for_it
+from utils.decorators import believe_in_it, try_it, wait_for_it
 from utils.exceptions import DownloadTimeoutError
 
 from .file_manager import FileManager
@@ -133,6 +133,18 @@ class Browser:
         self, xpath: str, attr: str, root: Optional[WebElement] = None
     ) -> str | None:
         return self._find_element(xpath, root).get_attribute(attr)
+
+    @believe_in_it
+    def get_element_when_exists(
+        self, xpath: str, root: Optional[WebElement] = None
+    ) -> WebElement | None:
+        return self._find_element(xpath, root)
+
+    @believe_in_it
+    def filter_elements_when_exists(
+        self, by: str, where: str, root: Optional[WebElement] = None
+    ) -> list[WebElement]:
+        return self._get_lookup_root(root).find_elements(by, where)
 
     def is_element_focused(self, element: WebElement) -> bool:
         return element == self._browser.switch_to.active_element

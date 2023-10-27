@@ -1,5 +1,4 @@
 from datetime import date
-from time import sleep
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -7,7 +6,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
 
 from constants.paths import Urls, XPaths
-from constants.standards import STANDARD_SLEEP_TIME
 from models import (
     Entity,
     Invoice,
@@ -208,14 +206,10 @@ class Siare(Browser):
         self.get_and_click(xpath)
 
     def fill_invoice_items_data(self, invoice_items: list[InvoiceItem]):
-        while True:
-            sleep(STANDARD_SLEEP_TIME)
-            xpath = XPaths.INVOICE_ITEMS_TABLE
-            table = self.get_element(xpath)
+        xpath = XPaths.INVOICE_ITEMS_TABLE
+        table = self.get_element(xpath)
 
-            table_rows = self.filter_elements(By.TAG_NAME, "tr", table)[2:-2]
-            if table_rows:
-                break
+        table_rows = self.filter_elements_when_exists(By.TAG_NAME, "tr", table)[2:-2]
 
         for i, row in enumerate(table_rows):
             if i % 2 != 0:
@@ -456,14 +450,8 @@ class Siare(Browser):
         query.results = InvoiceQueryResults()
 
         while True:
-            while True:
-                # TODO
-                # set a timeout (do the same for the loop a few lines above)
-                sleep(STANDARD_SLEEP_TIME)
-                xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
-                tbody = self.get_element_if_exists(xpath)
-                if tbody:
-                    break
+            xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
+            tbody = self.get_element_when_exists(xpath)
 
             rows = self.filter_elements(By.TAG_NAME, "tr", tbody)
             for row in rows:
