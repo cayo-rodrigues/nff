@@ -11,6 +11,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
+	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
@@ -51,6 +52,7 @@ func main() {
 
 	engine.AddFunc("GetInvoiceItemSelectFields", utils.GetInvoiceItemSelectFields)
 	engine.AddFunc("GetReqCardErrSummary", utils.GetReqCardErrSummary)
+	engine.AddFunc("GetReqCardData", models.NewRequestCard)
 
 	entityService := services.NewEntityService()
 	itemsService := services.NewItemsService()
