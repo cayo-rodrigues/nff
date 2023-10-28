@@ -53,4 +53,4 @@ CREATE TABLE IF NOT EXISTS invoices_cancelings (
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     CONSTRAINT fk_canceling_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
-)
+);
