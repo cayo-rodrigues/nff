@@ -45,4 +45,5 @@ def get_overal_balance(data: dict):
         "is_positive": query.results.is_positive,
         "diff": query.results.diff,
         "total_records": query.results.total_records,
+        "status": "success",
     }
