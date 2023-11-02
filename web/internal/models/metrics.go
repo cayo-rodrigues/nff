@@ -74,7 +74,8 @@ func (q *MetricsQuery) IsValid() bool {
 
 	mandatoryFieldMsg := "Campo obrigatório"
 	ilogicalDatesMsg := "Data inicial deve ser anterior à final"
-	validationsCount := 4
+	timeRangeTooLargeMsg := "Período não pode ser maior que 365 dias"
+	validationsCount := 5
 
 	var wg sync.WaitGroup
 	wg.Add(validationsCount)
@@ -82,10 +83,13 @@ func (q *MetricsQuery) IsValid() bool {
 
 	startDateIsEmpty := q.StartDate.IsZero()
 	endDateIsEmpty := q.EndDate.IsZero()
+	startDateGreaterThanEndDate := q.StartDate.After(q.EndDate)
+	timeRangeTooLarge := int(q.EndDate.Sub(q.StartDate).Hours()/24) > 365
 
 	go utils.ValidateField(startDateIsEmpty, &q.Errors.StartDate, &mandatoryFieldMsg, ch, &wg)
 	go utils.ValidateField(endDateIsEmpty, &q.Errors.EndDate, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(!startDateIsEmpty && !endDateIsEmpty && q.StartDate.After(q.EndDate), &q.Errors.StartDate, &ilogicalDatesMsg, ch, &wg)
+	go utils.ValidateField(startDateGreaterThanEndDate, &q.Errors.StartDate, &ilogicalDatesMsg, ch, &wg)
+	go utils.ValidateField(timeRangeTooLarge, &q.Errors.StartDate, &timeRangeTooLargeMsg, ch, &wg)
 	go utils.ValidateField(q.Entity == nil, &q.Errors.Entity, &mandatoryFieldMsg, ch, &wg)
 
 	wg.Wait()
