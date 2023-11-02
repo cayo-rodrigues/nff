@@ -41,7 +41,9 @@ def normalize_text(
     return text
 
 
-def to_BRL(value: str | float | None) -> str:
+def to_BRL(
+    value: str | float | None, symbol: bool = False, grouping: bool = False
+) -> str:
     if not value:
         return ""
 
@@ -50,7 +52,7 @@ def to_BRL(value: str | float | None) -> str:
     except (ValueError, TypeError):
         value = 0.0
     locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
-    return locale.currency(value, symbol=False)
+    return locale.currency(value, symbol=symbol, grouping=grouping)
 
 
 def to_br_float(number: float | str | None) -> str:

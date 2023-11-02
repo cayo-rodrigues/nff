@@ -446,7 +446,7 @@ class Siare(Browser):
 
         return None
 
-    def traverse_invoice_query_results(self, query: InvoiceQuery):
+    def aggregate_invoice_query_results(self, query: InvoiceQuery):
         query.results = InvoiceQueryResults()
 
         while True:
@@ -485,5 +485,3 @@ class Siare(Browser):
                 continue
 
             break
-
-        query.results.do_the_math()

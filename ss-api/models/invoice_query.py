@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils.helpers import is_valid_br_date, normalize_text
+from utils.helpers import is_valid_br_date, normalize_text, to_BRL
 from constants.db import MandatoryFields
 from models.entity import Entity
 
@@ -26,6 +26,13 @@ class InvoiceQueryResults:
             self.average_expenses = 0.0
 
         self.total_records: int = self.positive_entries + self.negative_entries
+
+    def format_values(self):
+        self.pretty_total_income: str = to_BRL(self.total_income, grouping=True)
+        self.pretty_total_expenses: str = to_BRL(self.total_expenses, grouping=True)
+        self.pretty_avg_income: str = to_BRL(self.average_income, grouping=True)
+        self.pretty_avg_expenses: str = to_BRL(self.average_expenses, grouping=True)
+        self.pretty_diff: str = to_BRL(self.diff, grouping=True)
 
 
 class InvoiceQuery:

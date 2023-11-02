@@ -34,16 +34,21 @@ def get_overal_balance(data: dict):
         )
 
     siare.wait_until_document_is_ready()
-    siare.traverse_invoice_query_results(query)
+    siare.aggregate_invoice_query_results(query)
+
+    query.results.do_the_math()
+    query.results.format_values()
 
     return {
         "msg": SuccessMessages.INVOICE_QUERY,
-        "total_income": query.results.total_income,
-        "total_expenses": query.results.total_expenses,
-        "average_income": query.results.average_income,
-        "average_expenses": query.results.average_expenses,
+        "total_income": query.results.pretty_total_income,
+        "total_expenses": query.results.pretty_total_expenses,
+        "average_income": query.results.pretty_avg_income,
+        "average_expenses": query.results.pretty_avg_expenses,
+        "diff": query.results.pretty_diff,
         "is_positive": query.results.is_positive,
-        "diff": query.results.diff,
         "total_records": query.results.total_records,
+        "positive_records": query.results.positive_entries,
+        "negative_records": query.results.negative_entries,
         "status": "success",
     }
