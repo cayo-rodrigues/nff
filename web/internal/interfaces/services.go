@@ -32,3 +32,10 @@ type ItemsService interface {
 	ListInvoiceItems(ctx context.Context, invoiceId int) ([]*models.InvoiceItem, error)
 	BulkCreateInvoiceItems(ctx context.Context, items []*models.InvoiceItem, invoiceId int) error
 }
+
+type MetricsService interface {
+	ListMetrics(ctx context.Context) ([]*models.MetricsQuery, error)
+	CreateMetrics(ctx context.Context, query *models.MetricsQuery) error
+	RetrieveMetrics(ctx context.Context, queryId int) (*models.MetricsQuery, error)
+	UpdateMetrics(ctx context.Context, query *models.MetricsQuery) error
+}

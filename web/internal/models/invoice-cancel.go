@@ -29,17 +29,15 @@ type InvoiceCancel struct {
 	Justification string                   `json:"justification"`
 	Entity        *Entity                  `json:"entity"`
 	Errors        *InvoiceCancelFormErrors `json:"-"`
-	OverviewType  string                   `json:"-"`
 	ReqStatus     string                   `json:"-"`
 	ReqMsg        string                   `json:"-"`
 }
 
 func NewEmptyInvoiceCancel() *InvoiceCancel {
 	return &InvoiceCancel{
-		Entity:       NewEmptyEntity(),
-		Errors:       &InvoiceCancelFormErrors{},
-		Year:         time.Now().Year(),
-		OverviewType: "canceling",
+		Entity: NewEmptyEntity(),
+		Errors: &InvoiceCancelFormErrors{},
+		Year:   time.Now().Year(),
 	}
 }
 

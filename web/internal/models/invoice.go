@@ -47,18 +47,16 @@ type Invoice struct {
 	Recipient          *Entity           `json:"recipient"`
 	Items              []*InvoiceItem    `json:"items"`
 	Errors             *InvoiceFormError `json:"-"`
-	OverviewType       string            `json:"-"`
 	ReqStatus          string            `json:"-"`
 	ReqMsg             string            `json:"-"`
 }
 
 func NewEmptyInvoice() *Invoice {
 	return &Invoice{
-		Errors:       &InvoiceFormError{},
-		Items:        []*InvoiceItem{NewEmptyInvoiceItem()},
-		Sender:       NewEmptyEntity(),
-		Recipient:    NewEmptyEntity(),
-		OverviewType: "invoice",
+		Errors:    &InvoiceFormError{},
+		Items:     []*InvoiceItem{NewEmptyInvoiceItem()},
+		Sender:    NewEmptyEntity(),
+		Recipient: NewEmptyEntity(),
 	}
 }
 

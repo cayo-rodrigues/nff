@@ -53,17 +53,21 @@ func main() {
 	engine.AddFunc("GetInvoiceItemSelectFields", utils.GetInvoiceItemSelectFields)
 	engine.AddFunc("GetReqCardErrSummary", utils.GetReqCardErrSummary)
 	engine.AddFunc("GetReqCardData", models.NewRequestCard)
+	engine.AddFunc("FormatDate", utils.FormatDate)
+	engine.AddFunc("FormatDateAsBR", utils.FormatDateAsBR)
 
 	entityService := services.NewEntityService()
 	itemsService := services.NewItemsService()
 	invoiceService := services.NewInvoiceService(entityService, itemsService)
 	cancelingService := services.NewCancelingService(entityService)
+	metricsService := services.NewMetricsService(entityService)
 
-	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService)
+	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService)
 
 	entitiesPage := handlers.NewEntitiesPage(entityService)
 	invoicesPage := handlers.NewInvoicesPage(invoiceService, entityService, siareBGWorker)
 	cancelInvoicesPage := handlers.NewCancelInvoicesPage(cancelingService, entityService, siareBGWorker)
+	metricsPage := handlers.NewMetricsPage(metricsService, entityService, siareBGWorker)
 
 	app := fiber.New(fiber.Config{
 		Views:             engine,
@@ -98,6 +102,12 @@ func main() {
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 	app.Get("/invoices/cancel/:id/request-card-status", cancelInvoicesPage.GetRequestStatus)
+
+	app.Get("/metrics", metricsPage.Render)
+	app.Post("/metrics", metricsPage.GenerateMetrics)
+	app.Get("/metrics/:id/form", metricsPage.GetMetricsForm)
+	app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)
+	app.Get("/metrics/:id/request-card-status", metricsPage.GetRequestStatus)
 
 	err := app.Listen(":" + PORT)
 	if err != nil {

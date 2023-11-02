@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"math"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 )
@@ -36,6 +38,28 @@ func ValidateListField[T string | int](val T, options []T, errField *string, err
 		*errField = *errMsg
 	}
 	result <- isValid
+}
+
+func ParseDate(date string) (time.Time, error) {
+	return time.Parse("2006-01-02", date)
+}
+
+func FormatDate(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.Format("2006-01-02")
+}
+
+func FormatDateAsBR(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.Format("02/01/2006")
+}
+
+func RoundToTwoDecimalPlaces(num float64) float64 {
+	return math.Round(num*100) / 100
 }
 
 func GetReqCardErrSummary(reqMsg string) string {

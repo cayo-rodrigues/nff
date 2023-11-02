@@ -23,7 +23,7 @@
         </header>
         <hr>
         <pre class="py-4 text-{{ $ReqCardData.FeedbackTextColor }}-600 whitespace-pre-wrap">
-            {{- .ReqMsg -}}
+            {{- $ReqCardData.ReqMsg -}}
         </pre>
         <hr>
         <ul class="flex flex-col gap-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
@@ -64,6 +64,31 @@
                 </li>
                 <li class="sm:w-1/2 sm:pl-2">
                     <strong>Justificativa</strong>: <span> {{ .Justification }} </span>
+                </li>
+            {{ else if eq $ReqCardData.OverviewType "metrics" }}
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Lucro total</strong>: <span class="text-green-600"> R$ {{ .Results.TotalIncome }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Lucro médio</strong>: <span class="text-green-600"> R$ {{ .Results.AvgIncome }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Despesa total</strong>: <span class="text-red-600"> R$ {{ .Results.TotalExpenses }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Despesa média</strong>: <span class="text-red-600"> R$ {{ .Results.AvgExpenses }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Diferença</strong>: <span class="text-{{ if .Results.IsPositive}}green{{ else }}red{{ end }}-600"> R$ {{ .Results.Diff }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Total de registros</strong>: <span> {{ .Results.TotalRecords }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Entradas</strong>: <span> {{ .Results.PositiveRecords }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Saídas</strong>: <span> {{ .Results.NegativeRecords }}</span>
                 </li>
             {{ end }}
         </ul>

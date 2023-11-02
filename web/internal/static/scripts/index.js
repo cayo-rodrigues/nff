@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const defaultFormSuccessMsg = 'Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo.'
+
     // display general errors
     document.addEventListener('general-error', function() {
         document.querySelector('#general-error-msg').showModal()
@@ -13,40 +15,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // clear form error messages after successful entity create/update
-    function clearFormErrors() {
-        document.querySelector('#entity-form').querySelectorAll('sub, sup').forEach((elem) => {
+    // clear form error messages after successful submit
+    // and possibly display a success msg
+    function clearFormErrors(formId, formMsgId, successMsg) {
+        document.querySelector(formId).querySelectorAll('sub, sup').forEach((elem) => {
             elem.innerText = ""
         })
+        if (formMsgId && successMsg) {
+            const formMsgElement = document.querySelector(formMsgId)
+            formMsgElement.innerText = successMsg
+            formMsgElement.className = "flex-1 text-green-500"
+        }
     }
-    document.addEventListener('entity-created', clearFormErrors)
-    document.addEventListener('entity-updated', clearFormErrors)
+    document.addEventListener('entity-created', () => clearFormErrors('#entity-form'))
+    document.addEventListener('entity-updated', () => clearFormErrors('#entity-form'))
+    document.addEventListener('invoice-required', () => clearFormErrors('#invoice-form', '#invoice-form-msg', defaultFormSuccessMsg))
+    document.addEventListener('invoice-cancel-required', () => clearFormErrors('#invoice-cancel-form', '#invoice-cancel-form-msg', defaultFormSuccessMsg))
+    document.addEventListener('metrics-query-started', () => clearFormErrors('#metrics-form', '#metrics-form-msg', defaultFormSuccessMsg))
 
-    // display request card details modal for invoices and invoice cancels
+    // display request card details modal for invoices, invoice cancels and metrics
     document.addEventListener("open-request-card-details", function() {
         document.querySelector("#request-card-details").showModal()
-    })
-
-    // clear form error messages after successful invoice requirement
-    // and display a success msg
-    document.addEventListener('invoice-required', function() {
-        document.querySelector('#invoice-form').querySelectorAll('sub, sup').forEach((elem) => {
-            elem.innerText = ""
-        })
-        const invoiceFormMsg = document.querySelector('#invoice-form-msg')
-        invoiceFormMsg.innerText = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
-        invoiceFormMsg.className = "flex-1 text-green-500"
-    })
-
-    // clear form error messages after successful invoice canceling requirement
-    // and display a success msg
-    document.addEventListener('invoice-cancel-required', function() {
-        document.querySelector('#invoice-cancel-form').querySelectorAll('sub, sup').forEach((elem) => {
-            elem.innerText = ""
-        })
-        const invoiceCancelFormMsg = document.querySelector('#invoice-cancel-form-msg')
-        invoiceCancelFormMsg.innerText = "Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo."
-        invoiceCancelFormMsg.className = "flex-1 text-green-500"
     })
 
     // reset scrolling

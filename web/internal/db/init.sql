@@ -54,3 +54,22 @@ CREATE TABLE IF NOT EXISTS invoices_cancelings (
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     CONSTRAINT fk_canceling_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS metrics_history (
+    id BIGSERIAL PRIMARY KEY,
+    start_date TIMESTAMPTZ NOT NULL,
+    end_date TIMESTAMPTZ NOT NULL,
+    total_income VARCHAR(16) DEFAULT '',
+    total_expenses VARCHAR(16) DEFAULT '',
+    avg_income VARCHAR(16) DEFAULT '',
+    avg_expenses VARCHAR(16) DEFAULT '',
+    diff VARCHAR(16) DEFAULT '',
+    is_positive BOOLEAN DEFAULT false,
+    total_records INT DEFAULT 0,
+    positive_records INT DEFAULT 0,
+    negative_records INT DEFAULT 0,
+    req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
+    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
+    entity_id BIGINT NOT NULL,
+    CONSTRAINT fk_metrics_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
+);
