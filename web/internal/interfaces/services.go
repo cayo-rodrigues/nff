@@ -39,3 +39,10 @@ type MetricsService interface {
 	RetrieveMetrics(ctx context.Context, queryId int) (*models.MetricsQuery, error)
 	UpdateMetrics(ctx context.Context, query *models.MetricsQuery) error
 }
+
+type PrintingService interface {
+	ListInvoicePrintings(ctx context.Context) ([]*models.InvoicePrint, error)
+	CreateInvoicePrinting(ctx context.Context, canceling *models.InvoicePrint) error
+	RetrieveInvoicePrinting(ctx context.Context, cancelingId int) (*models.InvoicePrint, error)
+	UpdateInvoicePrinting(ctx context.Context, canceling *models.InvoicePrint) error
+}

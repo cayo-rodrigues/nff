@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod download && go mod verify
-
 RUN go build -o nff ./cmd/main.go
 
 FROM scratch

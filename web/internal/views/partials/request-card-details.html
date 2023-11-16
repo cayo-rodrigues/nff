@@ -90,6 +90,13 @@
                 <li class="sm:w-1/2 sm:pl-2">
                     <strong>Saídas</strong>: <span> {{ .Results.NegativeRecords }}</span>
                 </li>
+            {{ else if eq $ReqCardData.OverviewType "printing" }}
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Identificador</strong>: <span> {{ .InvoiceId }}</span>
+                </li>
+                <li class="sm:w-1/2 sm:pl-2">
+                    <strong>Tipo de identificação</strong>: <span> {{ .InvoiceIdType }}</span>
+                </li>
             {{ end }}
         </ul>
         {{ if $ReqCardData.HasItems }}

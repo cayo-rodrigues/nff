@@ -66,6 +66,11 @@ var InvoiceBooleanField = [2]string{
 	"Nâo",
 }
 
+var InvoiceIdTypes = [2]string{
+	"Número da NFA",
+	"Protocolo",
+}
+
 // INVOICE ITEMS
 
 var InvoiceItemGroups = [82]string{

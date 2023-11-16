@@ -22,7 +22,7 @@ type RequestCard struct {
 	ShouldCheckStatus bool
 }
 
-// req may be either *Invoice, *InvoiceCancel or *MetricsQuery
+// req may be either *Invoice, *InvoiceCancel, *MetricsQuery or *InvoicePrint
 func NewRequestCard(req any) *RequestCard {
 	var prefix, reqStatus, reqMsg, from, to, overviewType, resourceName, targetForm string
 	var hasItems, isDownloadable bool
@@ -55,6 +55,18 @@ func NewRequestCard(req any) *RequestCard {
 		resourceName = "metrics"
 		targetForm = "#metrics-form"
 		overviewType = "metrics"
+	case *InvoicePrint:
+		from = r.Entity.Name
+		to = r.InvoiceId
+		if r.InvoiceIdType == "Número da NFA" {
+			prefix = "NFA-"
+		}
+		reqStatus = r.ReqStatus
+		reqMsg = r.ReqMsg
+		resourceName = "invoices/print"
+		targetForm = "#invoice-print-form"
+		overviewType = "printing"
+		isDownloadable = true
 	}
 
 	feedbackColor := ""
@@ -69,6 +81,8 @@ func NewRequestCard(req any) *RequestCard {
 		feedbackColor = "sky"
 	}
 
+	isFinished := reqStatus != "pending"
+
 	return &RequestCard{
 		From:              from,
 		To:                to,
@@ -80,8 +94,8 @@ func NewRequestCard(req any) *RequestCard {
 		TargetForm:        targetForm,
 		OverviewType:      overviewType,
 		HasItems:          hasItems,
-		IsFinished:        reqStatus != "pending",
+		IsFinished:        isFinished,
 		IsDownloadable:    isDownloadable,
-		ShouldCheckStatus: reqStatus == "pending",
+		ShouldCheckStatus: !isFinished,
 	}
 }

@@ -59,11 +59,11 @@ CREATE TABLE IF NOT EXISTS metrics_history (
     id BIGSERIAL PRIMARY KEY,
     start_date TIMESTAMPTZ NOT NULL,
     end_date TIMESTAMPTZ NOT NULL,
-    total_income VARCHAR(16) DEFAULT '',
-    total_expenses VARCHAR(16) DEFAULT '',
-    avg_income VARCHAR(16) DEFAULT '',
-    avg_expenses VARCHAR(16) DEFAULT '',
-    diff VARCHAR(16) DEFAULT '',
+    total_income VARCHAR(16) DEFAULT '0,00',
+    total_expenses VARCHAR(16) DEFAULT '0,00',
+    avg_income VARCHAR(16) DEFAULT '0,00',
+    avg_expenses VARCHAR(16) DEFAULT '0,00',
+    diff VARCHAR(16) DEFAULT '0,00',
     is_positive BOOLEAN DEFAULT false,
     total_records INT DEFAULT 0,
     positive_records INT DEFAULT 0,
@@ -72,4 +72,14 @@ CREATE TABLE IF NOT EXISTS metrics_history (
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,
     CONSTRAINT fk_metrics_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS invoices_printings (
+    id BIGSERIAL PRIMARY KEY,
+    invoice_id VARCHAR(13), -- number or protocol
+    invoice_id_type VARCHAR(13),
+    req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
+    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
+    entity_id BIGINT NOT NULL,
+    CONSTRAINT fk_printing_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
 );

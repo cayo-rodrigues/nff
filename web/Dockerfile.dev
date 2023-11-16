@@ -11,8 +11,6 @@ RUN go install github.com/cosmtrek/air@latest
 
 COPY . .
 
-RUN go mod download
-
 RUN chown -R nff /home && \
     chmod -R u+w /home
 

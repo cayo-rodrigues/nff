@@ -83,24 +83,45 @@ type SSAPIMetricsRequestBody struct {
 
 type SSAPIMetricsResponse struct {
 	*models.MetricsResult
-	Errors                *SSAPIMetricsErrors `json:"errors"`
+	Errors *SSAPIMetricsErrors `json:"errors"`
+}
+
+type SSAPIPrintingErrors struct {
+	MissingFields []string           `json:"missing_fields"`
+	InvalidFields []string           `json:"invalid_fields"`
+	Entity        *SSAPIEntityErrors `json:"entity"`
+}
+
+type SSAPIPrintingRequest struct {
+	*models.InvoicePrint
+}
+
+type SSAPIPrintingResponse struct {
+	Msg        string               `json:"msg"`
+	InvoiceId  string               `json:"invoice_id"`
+	InvoicePDF string               `json:"invoice_pdf"`
+	Status     string               `json:"status"`
+	Errors     *SSAPIPrintingErrors `json:"errors"`
 }
 
 type SiareBGWorker struct {
 	invoiceService   interfaces.InvoiceService
 	cancelingService interfaces.CancelingService
 	metricsService   interfaces.MetricsService
+	printingService  interfaces.PrintingService
 }
 
 func NewSiareBGWorker(
 	invoiceService interfaces.InvoiceService,
 	cancelingService interfaces.CancelingService,
 	metricsService interfaces.MetricsService,
+	printingService interfaces.PrintingService,
 ) *SiareBGWorker {
 	return &SiareBGWorker{
 		invoiceService:   invoiceService,
 		cancelingService: cancelingService,
 		metricsService:   metricsService,
+		printingService:  printingService,
 	}
 }
 
@@ -109,9 +130,8 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	defer cancel()
 
 	reqBody := SSAPIInvoiceRequest{
-		Invoice:         invoice,
-		ShouldDownload:  false,
-		ShouldNotFinish: true,
+		Invoice:        invoice,
+		ShouldDownload: true,
 	}
 
 	agent := fiber.Post(SS_API_BASE_URL + "/invoice/request")
@@ -227,6 +247,44 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 
+func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint) {
+	ctx, print := context.WithTimeout(context.Background(), time.Minute*10)
+	defer print()
+
+	reqBody := SSAPIPrintingRequest{
+		InvoicePrint: invoicePrint,
+	}
+
+	agent := fiber.Post(SS_API_BASE_URL + "/invoice/print")
+	// TEMP!
+	agent.InsecureSkipVerify()
+	_, body, errs := agent.JSON(reqBody).Bytes()
+
+	for _, err := range errs {
+		if err != nil {
+			log.Printf("Something went wrong with the request at /invoice/print for printing with id %v: %v\n", invoicePrint.Id, err)
+		}
+	}
+
+	var response SSAPIPrintingResponse
+	json.Unmarshal(body, &response)
+
+	if response.Errors != nil {
+		response.Msg = fmt.Sprintf("%s\n%s", response.Msg, formatPrintingErrs(&response))
+	}
+
+	invoicePrint.ReqStatus = response.Status
+	invoicePrint.ReqMsg = response.Msg
+
+	err := w.printingService.UpdateInvoicePrinting(ctx, invoicePrint)
+	if err != nil {
+		log.Printf("Something went wrong when updating invoice printing history. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.Id, err)
+	}
+
+	key := fmt.Sprintf("reqstatus:printing:%v", invoicePrint.Id)
+	db.Redis.Set(ctx, key, true, time.Minute)
+}
+
 func formatErrResponseField(fieldErrs []string, prefix string) string {
 	var builder strings.Builder
 
@@ -285,6 +343,24 @@ func formatCancelingErrs(response *SSAPICancelingResponse) string {
 }
 
 func formatMetricsErrs(response *SSAPIMetricsResponse) string {
+	invalidFields := "Campos inválidos:\n"
+	missingFields := "Campos faltando:\n"
+	entityInvalidFields := "Campos inválidos na entidade:\n"
+	entityMissingFields := "Campos faltando na entidade:\n"
+
+	var clientErrs strings.Builder
+
+	clientErrs.WriteString(formatErrResponseField(response.Errors.InvalidFields, invalidFields))
+	clientErrs.WriteString(formatErrResponseField(response.Errors.MissingFields, missingFields))
+	if response.Errors.Entity != nil {
+		clientErrs.WriteString(formatErrResponseField(response.Errors.Entity.InvalidFields, entityInvalidFields))
+		clientErrs.WriteString(formatErrResponseField(response.Errors.Entity.MissingFields, entityMissingFields))
+	}
+
+	return clientErrs.String()
+}
+
+func formatPrintingErrs(response *SSAPIPrintingResponse) string {
 	invalidFields := "Campos inválidos:\n"
 	missingFields := "Campos faltando:\n"
 	entityInvalidFields := "Campos inválidos na entidade:\n"

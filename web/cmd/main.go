@@ -61,13 +61,15 @@ func main() {
 	invoiceService := services.NewInvoiceService(entityService, itemsService)
 	cancelingService := services.NewCancelingService(entityService)
 	metricsService := services.NewMetricsService(entityService)
+	printingService := services.NewPrintingService(entityService)
 
-	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService)
+	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService, printingService)
 
 	entitiesPage := handlers.NewEntitiesPage(entityService)
 	invoicesPage := handlers.NewInvoicesPage(invoiceService, entityService, siareBGWorker)
 	cancelInvoicesPage := handlers.NewCancelInvoicesPage(cancelingService, entityService, siareBGWorker)
 	metricsPage := handlers.NewMetricsPage(metricsService, entityService, siareBGWorker)
+	printInvoicesPage := handlers.NewPrintInvoicesPage(printingService, entityService, siareBGWorker)
 
 	app := fiber.New(fiber.Config{
 		Views:             engine,
@@ -102,6 +104,12 @@ func main() {
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 	app.Get("/invoices/cancel/:id/request-card-status", cancelInvoicesPage.GetRequestStatus)
+
+	app.Get("/invoices/print", printInvoicesPage.Render)
+	app.Post("/invoices/print", printInvoicesPage.PrintInvoice)
+	app.Get("/invoices/print/:id/form", printInvoicesPage.GetInvoicePrintForm)
+	app.Get("/invoices/print/:id/request-card-details", printInvoicesPage.GetRequestCardDetails)
+	app.Get("/invoices/print/:id/request-card-status", printInvoicesPage.GetRequestStatus)
 
 	app.Get("/metrics", metricsPage.Render)
 	app.Post("/metrics", metricsPage.GenerateMetrics)
