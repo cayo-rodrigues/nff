@@ -32,6 +32,7 @@ def print_invoice(data: dict):
 
     encoded_invoice_pdf = invoice_printing.pdf_to_base64()
     invoice_id = invoice_printing.get_id_from_filename()
+    invoice_printing.erase_file()
 
     siare.close()
 
