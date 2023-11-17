@@ -102,5 +102,6 @@ def overal_balance_handler():
         response, status_code = error_response(exceptions.UnexpectedError())
     return jsonify(response), status_code
 
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

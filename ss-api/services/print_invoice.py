@@ -2,6 +2,7 @@ from models import InvoicePrinting
 from utils import exceptions
 from apis import Siare
 from constants.messages import ErrorMessages, SuccessMessages
+from utils.aws import upload_to_s3
 
 
 def print_invoice(data: dict):
@@ -30,8 +31,11 @@ def print_invoice(data: dict):
     siare.finish_print_invoice()
     siare.close_unfocused_windows()
 
-    encoded_invoice_pdf = invoice_printing.pdf_to_base64()
     invoice_id = invoice_printing.get_id_from_filename()
+    invoice_file_path = invoice_printing.get_file_path()
+    invoice_file_name = invoice_printing.get_file_name()
+    pdf_url = upload_to_s3(file_path=invoice_file_path, s3_file_name=invoice_file_name)
+
     invoice_printing.erase_file()
 
     siare.close()
@@ -39,6 +43,6 @@ def print_invoice(data: dict):
     return {
         "msg": SuccessMessages.INVOICE_PRINTING,
         "invoice_id": invoice_id,
-        "invoice_pdf": encoded_invoice_pdf,
+        "invoice_pdf": pdf_url,
         "status": "success",
     }

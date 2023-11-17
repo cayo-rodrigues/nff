@@ -2,6 +2,7 @@ from apis import Siare
 from models import Invoice
 from utils import exceptions
 from constants.messages import ErrorMessages, WarningMessages
+from utils.aws import upload_to_s3
 
 
 def request_invoice(invoice_data: dict):
@@ -50,17 +51,6 @@ def request_invoice(invoice_data: dict):
     siare.open_aditional_data_tab()
     siare.fill_invoice_aditional_data(invoice)
 
-    should_not_finish = invoice_data.get("should_not_finish")
-    if should_not_finish:
-        return {
-            "msg": "Deu tudo certo mas não clicou no botão de finalizar requerimento",
-            "invoice_protocol": "",
-            "invoice_id": "",
-            "invoice_pdf": "",
-            "is_awaiting_analisys": False,
-            "status": "success",
-        }
-
     siare.finish_invoice()
 
     error_feedback = siare.get_invoice_error_feedback()
@@ -73,7 +63,7 @@ def request_invoice(invoice_data: dict):
     invoice_protocol = siare.get_invoice_protocol()
     msg = success_feedback
     status = "success"
-    encoded_invoice_pdf = ""
+    pdf_url = ""
     invoice_id = ""
     should_download = invoice_data.get("should_download")
 
@@ -83,8 +73,11 @@ def request_invoice(invoice_data: dict):
     elif should_download:
         siare.download_invoice()
         siare.close_unfocused_windows()
-        encoded_invoice_pdf = invoice.pdf_to_base64()
-        invoice_id = invoice.get_id_from_filename()
+        invoice_file_path = invoice.get_file_path()
+        invoice_file_name = invoice.get_file_name()
+        pdf_url = upload_to_s3(
+            file_path=invoice_file_path, s3_file_name=invoice_file_name
+        )
         invoice.erase_file()
 
     siare.close()
@@ -94,6 +87,6 @@ def request_invoice(invoice_data: dict):
         "status": status,
         "invoice_protocol": invoice_protocol,
         "invoice_id": invoice_id,
-        "invoice_pdf": encoded_invoice_pdf,
+        "invoice_pdf": pdf_url,
         "is_awaiting_analisys": is_awaiting_analisys,
     }

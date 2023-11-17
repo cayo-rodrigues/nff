@@ -5,6 +5,7 @@ FROM ubuntu:22.04
 WORKDIR /app
 
 RUN apt update -y && \
+    apt upgrade -y && \
     apt install -y wget locales
 
 RUN locale-gen pt_BR.UTF-8
@@ -24,4 +25,4 @@ RUN apt install -y python3-pip && \
 
 COPY . .
 
-CMD uvicorn --host 0.0.0.0 --port $PORT main:asgi_app --timeout-keep-alive 300
+CMD uvicorn --host 0.0.0.0 --port $PORT main:asgi_app --timeout-keep-alive 600
