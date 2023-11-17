@@ -156,6 +156,7 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	invoice.Protocol = response.InvoiceProtocol
 	invoice.ReqMsg = response.Msg
 	invoice.ReqStatus = response.Status
+	invoice.PDF = response.InvoicePDF
 
 	err := w.invoiceService.UpdateInvoice(ctx, invoice)
 	if err != nil {
@@ -275,6 +276,7 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 
 	invoicePrint.ReqStatus = response.Status
 	invoicePrint.ReqMsg = response.Msg
+	invoicePrint.InvoicePDF = response.InvoicePDF
 
 	err := w.printingService.UpdateInvoicePrinting(ctx, invoicePrint)
 	if err != nil {

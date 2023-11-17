@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('entity-updated', () => clearFormErrors('#entity-form'))
     document.addEventListener('invoice-required', () => clearFormErrors('#invoice-form', '#invoice-form-msg', defaultFormSuccessMsg))
     document.addEventListener('invoice-cancel-required', () => clearFormErrors('#invoice-cancel-form', '#invoice-cancel-form-msg', defaultFormSuccessMsg))
+    document.addEventListener('invoice-print-required', () => clearFormErrors('#invoice-print-form', '#invoice-print-form-msg', defaultFormSuccessMsg))
     document.addEventListener('metrics-query-started', () => clearFormErrors('#metrics-form', '#metrics-form-msg', defaultFormSuccessMsg))
 
     // display request card details modal for invoices, invoice cancels and metrics

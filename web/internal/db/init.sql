@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     recipient_id BIGINT NOT NULL,
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
+    invoice_pdf VARCHAR(128)  DEFAULT '',
     CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES entities(id) ON DELETE CASCADE,
     CONSTRAINT fk_recipient FOREIGN KEY (recipient_id) REFERENCES entities(id) ON DELETE CASCADE
 );
@@ -78,6 +79,7 @@ CREATE TABLE IF NOT EXISTS invoices_printings (
     id BIGSERIAL PRIMARY KEY,
     invoice_id VARCHAR(13), -- number or protocol
     invoice_id_type VARCHAR(13),
+    invoice_pdf VARCHAR(128) DEFAULT '',
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,

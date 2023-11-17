@@ -23,6 +23,7 @@ type InvoicePrint struct {
 	Id            int
 	InvoiceId     string                  `json:"invoice_id"`
 	InvoiceIdType string                  `json:"invoice_id_type"`
+	InvoicePDF    string                  `json:"invoice_pdf"`
 	Entity        *Entity                 `json:"entity"`
 	Errors        *InvoicePrintFormErrors `json:"-"`
 	ReqStatus     string                  `json:"-"`
@@ -38,7 +39,7 @@ func NewEmptyInvoicePrint() *InvoicePrint {
 
 func (p *InvoicePrint) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&p.Id, &p.InvoiceId, &p.InvoiceIdType,
+		&p.Id, &p.InvoiceId, &p.InvoiceIdType, &p.InvoicePDF,
 		&p.ReqStatus, &p.ReqMsg, &p.Entity.Id,
 	)
 }

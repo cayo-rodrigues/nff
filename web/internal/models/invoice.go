@@ -34,7 +34,7 @@ type InvoiceFormSelectFields struct {
 
 type Invoice struct {
 	Id                 int               `json:"-"`
-	Number             string            `json:"-"`
+	Number             string            `json:"invoice_id"`
 	Protocol           string            `json:"-"`
 	Operation          string            `json:"operation"`
 	Cfop               int               `json:"cfop,string"`
@@ -49,6 +49,7 @@ type Invoice struct {
 	Errors             *InvoiceFormError `json:"-"`
 	ReqStatus          string            `json:"-"`
 	ReqMsg             string            `json:"-"`
+	PDF                string            `json:"invoice_pdf"`
 }
 
 func NewEmptyInvoice() *Invoice {
@@ -145,6 +146,6 @@ func (i *Invoice) Scan(rows db.Scanner) error {
 	return rows.Scan(
 		&i.Id, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.Sender.Id, &i.Recipient.Id,
-		&i.ReqStatus, &i.ReqMsg,
+		&i.ReqStatus, &i.ReqMsg, &i.PDF,
 	)
 }

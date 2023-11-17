@@ -19,12 +19,13 @@ type RequestCard struct {
 	HasItems          bool
 	IsFinished        bool
 	IsDownloadable    bool
+	DownloadLink      string
 	ShouldCheckStatus bool
 }
 
 // req may be either *Invoice, *InvoiceCancel, *MetricsQuery or *InvoicePrint
 func NewRequestCard(req any) *RequestCard {
-	var prefix, reqStatus, reqMsg, from, to, overviewType, resourceName, targetForm string
+	var prefix, reqStatus, reqMsg, from, to, overviewType, resourceName, targetForm, downloadLink string
 	var hasItems, isDownloadable bool
 
 	switch r := req.(type) {
@@ -38,6 +39,7 @@ func NewRequestCard(req any) *RequestCard {
 		overviewType = "invoice"
 		hasItems = true
 		isDownloadable = true
+		downloadLink = r.PDF
 	case *InvoiceCancel:
 		from = r.Entity.Name
 		to = r.Number
@@ -67,6 +69,7 @@ func NewRequestCard(req any) *RequestCard {
 		targetForm = "#invoice-print-form"
 		overviewType = "printing"
 		isDownloadable = true
+		downloadLink = r.InvoicePDF
 	}
 
 	feedbackColor := ""
@@ -96,6 +99,7 @@ func NewRequestCard(req any) *RequestCard {
 		HasItems:          hasItems,
 		IsFinished:        isFinished,
 		IsDownloadable:    isDownloadable,
+		DownloadLink:      downloadLink,
 		ShouldCheckStatus: !isFinished,
 	}
 }
