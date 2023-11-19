@@ -36,7 +36,7 @@ func (s *MetricsService) ListMetrics(ctx context.Context) ([]*models.MetricsQuer
 			return nil, utils.InternalServerErr
 		}
 
-		entity, err := s.entityService.RetrieveEntity(ctx, metricsQuery.Entity.Id)
+		entity, err := s.entityService.RetrieveEntity(ctx, metricsQuery.Entity.ID)
 		if err != nil {
 			log.Println("Error linking metrics query to entity: ", err)
 			return nil, utils.InternalServerErr
@@ -56,7 +56,7 @@ func (s *MetricsService) CreateMetrics(ctx context.Context, query *models.Metric
 			(start_date, end_date, entity_id)
 			VALUES ($1, $2, $3)
 		RETURNING *`,
-		query.StartDate, query.EndDate, query.Entity.Id,
+		query.StartDate, query.EndDate, query.Entity.ID,
 	)
 	err := query.Scan(row)
 	if err != nil {
@@ -86,7 +86,7 @@ func (s *MetricsService) RetrieveMetrics(ctx context.Context, queryId int) (*mod
 		return nil, utils.InternalServerErr
 	}
 
-	entity, err := s.entityService.RetrieveEntity(ctx, query.Entity.Id)
+	entity, err := s.entityService.RetrieveEntity(ctx, query.Entity.ID)
 	if err != nil {
 		log.Println("Error linking metrics query to entity: ", err)
 		return nil, utils.InternalServerErr
@@ -107,7 +107,7 @@ func (s *MetricsService) UpdateMetrics(ctx context.Context, query *models.Metric
 		query.Results.ReqStatus, query.Results.ReqMsg, query.Results.TotalIncome, query.Results.TotalExpenses,
 		query.Results.AvgIncome, query.Results.AvgExpenses, query.Results.Diff, query.Results.IsPositive,
 		query.Results.TotalRecords, query.Results.PositiveRecords, query.Results.NegativeRecords,
-		query.Id,
+		query.ID,
 	)
 	if err != nil {
 		log.Println("REQ STATUS =", query.Results.ReqStatus, len(query.Results.ReqStatus))
@@ -115,7 +115,7 @@ func (s *MetricsService) UpdateMetrics(ctx context.Context, query *models.Metric
 		return utils.InternalServerErr
 	}
 	if result.RowsAffected() == 0 {
-		log.Printf("Metrics with id %v not found when running update query", query.Id)
+		log.Printf("Metrics with id %v not found when running update query", query.ID)
 		return utils.MetricsNotFoundErr
 	}
 

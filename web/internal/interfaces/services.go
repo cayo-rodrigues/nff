@@ -46,3 +46,8 @@ type PrintingService interface {
 	RetrieveInvoicePrinting(ctx context.Context, cancelingId int) (*models.InvoicePrint, error)
 	UpdateInvoicePrinting(ctx context.Context, canceling *models.InvoicePrint) error
 }
+
+type UserService interface {
+	RetrieveUser(ctx context.Context, userId int) (*models.User, error)
+	CreateUser(ctx context.Context, user *models.User) error
+}

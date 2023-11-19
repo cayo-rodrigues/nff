@@ -11,6 +11,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/bg-workers"
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/handlers"
+	"github.com/cayo-rodrigues/nff/web/internal/middlewares"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/services"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -56,6 +57,7 @@ func main() {
 	engine.AddFunc("FormatDate", utils.FormatDate)
 	engine.AddFunc("FormatDateAsBR", utils.FormatDateAsBR)
 
+	userService := services.NewUserService()
 	entityService := services.NewEntityService()
 	itemsService := services.NewItemsService()
 	invoiceService := services.NewInvoiceService(entityService, itemsService)
@@ -65,6 +67,7 @@ func main() {
 
 	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService, printingService)
 
+	registerPage := handlers.NewRegisterPage(userService)
 	entitiesPage := handlers.NewEntitiesPage(entityService)
 	invoicesPage := handlers.NewInvoicesPage(invoiceService, entityService, siareBGWorker)
 	cancelInvoicesPage := handlers.NewCancelInvoicesPage(cancelingService, entityService, siareBGWorker)
@@ -84,7 +87,15 @@ func main() {
 	app.Get("/static/scripts/:script", handlers.ServeJS)
 	app.Get("/static/icons/:icon", handlers.ServeIcons)
 
-	app.Get("/", handlers.Index)
+	app.Get("/register", registerPage.Render)
+	app.Post("/register", registerPage.CreateUser)
+
+	app.Get("/login", handlers.Login)
+	app.Get("/logout", handlers.Logout)
+
+	app.Use(middlewares.AuthMiddleware)
+
+	app.Get("/", handlers.Home)
 
 	app.Get("/entities", entitiesPage.Render)
 	app.Get("/entities/:id/form", entitiesPage.GetEntityForm)

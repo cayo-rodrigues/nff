@@ -4,8 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Index(ctx *fiber.Ctx) error {
-	return ctx.Render("home", fiber.Map{
-		"IsAuthenticated": true,
-	}, "layouts/base")
+func Home(c *fiber.Ctx) error {
+	return c.Render("home", fiber.Map{}, "layouts/base")
 }

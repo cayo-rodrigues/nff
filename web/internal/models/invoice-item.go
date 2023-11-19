@@ -4,6 +4,7 @@ import (
 	"log"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -21,15 +22,18 @@ type InvoiceItemFormError struct {
 }
 
 type InvoiceItem struct {
-	Id                 int                   `json:"-"`
+	ID                 int                   `json:"-"`
 	Group              string                `json:"group"`
 	Description        string                `json:"description"`
 	Origin             string                `json:"origin"`
 	UnityOfMeasurement string                `json:"unity_of_measurement"`
 	Quantity           float64               `json:"quantity"`
 	ValuePerUnity      float64               `json:"value_per_unity"`
-	InvoiceId          int                   `json:"-"`
+	InvoiceID          int                   `json:"-"`
 	Errors             *InvoiceItemFormError `json:"-"`
+	CreatedBy          int                   `json:"-"`
+	CreatedAt          time.Time             `json:"-"`
+	UpdatedAt          time.Time             `json:"-"`
 }
 
 func NewEmptyInvoiceItem() *InvoiceItem {
@@ -113,7 +117,8 @@ func (i *InvoiceItem) IsValid() bool {
 
 func (i *InvoiceItem) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&i.Id, &i.Group, &i.Description, &i.Origin,
-		&i.UnityOfMeasurement, &i.Quantity, &i.ValuePerUnity, &i.InvoiceId,
+		&i.ID, &i.Group, &i.Description, &i.Origin,
+		&i.UnityOfMeasurement, &i.Quantity, &i.ValuePerUnity, &i.InvoiceID,
+		&i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
 	)
 }

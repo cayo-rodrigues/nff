@@ -141,7 +141,7 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/request for invoice with id %v: %v\n", invoice.Id, err)
+			log.Printf("Something went wrong with the request at /invoice/request for invoice with id %v: %v\n", invoice.ID, err)
 		}
 	}
 
@@ -160,10 +160,10 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 
 	err := w.invoiceService.UpdateInvoice(ctx, invoice)
 	if err != nil {
-		log.Printf("Something went wrong when updating invoice history. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.Id, err)
+		log.Printf("Something went wrong when updating invoice history. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.ID, err)
 	}
 
-	key := fmt.Sprintf("reqstatus:invoice:%v", invoice.Id)
+	key := fmt.Sprintf("reqstatus:invoice:%v", invoice.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 
@@ -182,7 +182,7 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/cancel for canceling with id %v: %v\n", invoiceCancel.Id, err)
+			log.Printf("Something went wrong with the request at /invoice/cancel for canceling with id %v: %v\n", invoiceCancel.ID, err)
 		}
 	}
 
@@ -198,10 +198,10 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 
 	err := w.cancelingService.UpdateInvoiceCanceling(ctx, invoiceCancel)
 	if err != nil {
-		log.Printf("Something went wrong when updating invoice canceling history. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.Id, err)
+		log.Printf("Something went wrong when updating invoice canceling history. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.ID, err)
 	}
 
-	key := fmt.Sprintf("reqstatus:canceling:%v", invoiceCancel.Id)
+	key := fmt.Sprintf("reqstatus:canceling:%v", invoiceCancel.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 
@@ -226,7 +226,7 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/overal-balance for metrics query with id %v: %v\n", query.Id, err)
+			log.Printf("Something went wrong with the request at /invoice/overal-balance for metrics query with id %v: %v\n", query.ID, err)
 		}
 	}
 
@@ -241,10 +241,10 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 
 	err := w.metricsService.UpdateMetrics(ctx, query)
 	if err != nil {
-		log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.Id, err)
+		log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
 	}
 
-	key := fmt.Sprintf("reqstatus:metrics:%v", query.Id)
+	key := fmt.Sprintf("reqstatus:metrics:%v", query.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 
@@ -263,7 +263,7 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/print for printing with id %v: %v\n", invoicePrint.Id, err)
+			log.Printf("Something went wrong with the request at /invoice/print for printing with id %v: %v\n", invoicePrint.ID, err)
 		}
 	}
 
@@ -280,10 +280,10 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 
 	err := w.printingService.UpdateInvoicePrinting(ctx, invoicePrint)
 	if err != nil {
-		log.Printf("Something went wrong when updating invoice printing history. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.Id, err)
+		log.Printf("Something went wrong when updating invoice printing history. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.ID, err)
 	}
 
-	key := fmt.Sprintf("reqstatus:printing:%v", invoicePrint.Id)
+	key := fmt.Sprintf("reqstatus:printing:%v", invoicePrint.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 

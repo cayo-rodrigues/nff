@@ -2,6 +2,7 @@ package models
 
 import (
 	"sync"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -20,7 +21,7 @@ type InvoicePrintFormErrors struct {
 }
 
 type InvoicePrint struct {
-	Id            int
+	ID            int
 	InvoiceId     string                  `json:"invoice_id"`
 	InvoiceIdType string                  `json:"invoice_id_type"`
 	InvoicePDF    string                  `json:"invoice_pdf"`
@@ -28,6 +29,9 @@ type InvoicePrint struct {
 	Errors        *InvoicePrintFormErrors `json:"-"`
 	ReqStatus     string                  `json:"-"`
 	ReqMsg        string                  `json:"-"`
+	CreatedBy     int                     `json:"-"`
+	CreatedAt     time.Time               `json:"-"`
+	UpdatedAt     time.Time               `json:"-"`
 }
 
 func NewEmptyInvoicePrint() *InvoicePrint {
@@ -35,13 +39,6 @@ func NewEmptyInvoicePrint() *InvoicePrint {
 		Entity: NewEmptyEntity(),
 		Errors: &InvoicePrintFormErrors{},
 	}
-}
-
-func (p *InvoicePrint) Scan(rows db.Scanner) error {
-	return rows.Scan(
-		&p.Id, &p.InvoiceId, &p.InvoiceIdType, &p.InvoicePDF,
-		&p.ReqStatus, &p.ReqMsg, &p.Entity.Id,
-	)
 }
 
 func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
@@ -81,4 +78,12 @@ func (i *InvoicePrint) IsValid() bool {
 	}
 
 	return isValid
+}
+
+func (p *InvoicePrint) Scan(rows db.Scanner) error {
+	return rows.Scan(
+		&p.ID, &p.InvoiceId, &p.InvoiceIdType, &p.InvoicePDF,
+		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
+		&p.CreatedBy, &p.CreatedAt, &p.UpdatedAt,
+	)
 }

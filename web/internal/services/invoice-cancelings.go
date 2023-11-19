@@ -37,7 +37,7 @@ func (s *CancelingService) ListInvoiceCancelings(ctx context.Context) ([]*models
 			return nil, utils.InternalServerErr
 		}
 
-		entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.Id)
+		entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.ID)
 		if err != nil {
 			log.Println("Error linking invoice canceling to entity: ", err)
 			return nil, utils.InternalServerErr
@@ -58,9 +58,9 @@ func (s *CancelingService) CreateInvoiceCanceling(ctx context.Context, canceling
 			(invoice_number, year, justification, entity_id)
 			VALUES ($1, $2, $3, $4)
 		RETURNING id, req_status, req_msg`,
-		canceling.Number, canceling.Year, canceling.Justification, canceling.Entity.Id,
+		canceling.Number, canceling.Year, canceling.Justification, canceling.Entity.ID,
 	)
-	err := row.Scan(&canceling.Id, &canceling.ReqStatus, &canceling.ReqMsg)
+	err := row.Scan(&canceling.ID, &canceling.ReqStatus, &canceling.ReqMsg)
 	if err != nil {
 		log.Println("Error when running insert canceling query: ", err)
 		return utils.InternalServerErr
@@ -88,7 +88,7 @@ func (s *CancelingService) RetrieveInvoiceCanceling(ctx context.Context, canceli
 		return nil, utils.InternalServerErr
 	}
 
-	entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.Id)
+	entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.ID)
 	if err != nil {
 		log.Println("Error linking invoice canceling to entity: ", err)
 		return nil, utils.InternalServerErr
@@ -102,14 +102,14 @@ func (s *CancelingService) UpdateInvoiceCanceling(ctx context.Context, canceling
 	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2 WHERE id = $3",
-		canceling.ReqStatus, canceling.ReqMsg, canceling.Id,
+		canceling.ReqStatus, canceling.ReqMsg, canceling.ID,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice canceling query: ", err)
 		return utils.InternalServerErr
 	}
 	if result.RowsAffected() == 0 {
-		log.Printf("Canceling with id %v not found when running update query", canceling.Id)
+		log.Printf("Canceling with id %v not found when running update query", canceling.ID)
 		return utils.CancelingNotFoundErr
 	}
 

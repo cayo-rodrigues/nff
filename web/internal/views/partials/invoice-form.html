@@ -15,7 +15,7 @@
             </svg>
             <span>Usar Modelo</span>
         </button>
-        <p id="invoice-form-msg" class="flex-1 text-green-500 text-red-500 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
+        <p id="invoice-form-msg" class="flex-1 text-red-500 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
     </div>
 
     <section>
@@ -27,7 +27,7 @@
                     <label for="sender"><strong>Remetente</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="sender" name="sender">
                         {{ range .FormSelectFields.Entities }}
-                            <option {{ if eq $.Invoice.Sender.Id .Id }} selected {{ end }} value="{{ .Id }}">{{ .Name }}</option>
+                            <option {{ if eq $.Invoice.Sender.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.Sender }}</sub>
@@ -37,7 +37,7 @@
                     <label for="recipient"><strong>Destinatário</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="recipient" name="recipient">
                         {{ range .FormSelectFields.Entities }}
-                            <option {{ if eq $.Invoice.Recipient.Id .Id }} selected {{ end }} value="{{ .Id }}">{{ .Name }}</option>
+                            <option {{ if eq $.Invoice.Recipient.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .Invoice.Errors.Recipient }}</sub>

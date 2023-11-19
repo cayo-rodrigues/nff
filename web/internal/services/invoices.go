@@ -41,21 +41,21 @@ func (s *InvoiceService) ListInvoices(ctx context.Context) ([]*models.Invoice, e
 
 		// TODO async data aggregation with go routines
 
-		sender, err := s.entityService.RetrieveEntity(ctx, invoice.Sender.Id)
+		sender, err := s.entityService.RetrieveEntity(ctx, invoice.Sender.ID)
 		if err != nil {
 			log.Println("Error linking invoice to sender: ", err)
 			return nil, utils.InternalServerErr
 		}
 		invoice.Sender = sender
 
-		recipient, err := s.entityService.RetrieveEntity(ctx, invoice.Recipient.Id)
+		recipient, err := s.entityService.RetrieveEntity(ctx, invoice.Recipient.ID)
 		if err != nil {
 			log.Println("Error linking invoice to recipient: ", err)
 			return nil, utils.InternalServerErr
 		}
 		invoice.Recipient = recipient
 
-		items, err := s.itemsService.ListInvoiceItems(ctx, invoice.Id)
+		items, err := s.itemsService.ListInvoiceItems(ctx, invoice.ID)
 		if err != nil {
 			log.Println("Error linking invoice to items: ", err)
 			return nil, utils.InternalServerErr
@@ -76,15 +76,15 @@ func (s *InvoiceService) CreateInvoice(ctx context.Context, invoice *models.Invo
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 		RETURNING id, req_status, req_msg`,
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
-		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.Sender.Id, invoice.Recipient.Id,
+		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.Sender.ID, invoice.Recipient.ID,
 	)
-	err := row.Scan(&invoice.Id, &invoice.ReqStatus, &invoice.ReqMsg)
+	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg)
 	if err != nil {
 		log.Println("Error when running insert invoice query: ", err)
 		return utils.InternalServerErr
 	}
 
-	err = s.itemsService.BulkCreateInvoiceItems(ctx, invoice.Items, invoice.Id)
+	err = s.itemsService.BulkCreateInvoiceItems(ctx, invoice.Items, invoice.ID)
 	if err != nil {
 		log.Println("Error running create invoice items query: ", err)
 		return utils.InternalServerErr
@@ -113,21 +113,21 @@ func (s *InvoiceService) RetrieveInvoice(ctx context.Context, invoiceId int) (*m
 
 	// TODO async data aggregation with go routines
 
-	sender, err := s.entityService.RetrieveEntity(ctx, invoice.Sender.Id)
+	sender, err := s.entityService.RetrieveEntity(ctx, invoice.Sender.ID)
 	if err != nil {
 		log.Println("Error linking invoice to sender: ", err)
 		return nil, utils.InternalServerErr
 	}
 	invoice.Sender = sender
 
-	recipient, err := s.entityService.RetrieveEntity(ctx, invoice.Recipient.Id)
+	recipient, err := s.entityService.RetrieveEntity(ctx, invoice.Recipient.ID)
 	if err != nil {
 		log.Println("Error linking invoice to recipient: ", err)
 		return nil, utils.InternalServerErr
 	}
 	invoice.Recipient = recipient
 
-	items, err := s.itemsService.ListInvoiceItems(ctx, invoice.Id)
+	items, err := s.itemsService.ListInvoiceItems(ctx, invoice.ID)
 	if err != nil {
 		log.Println("Error linking invoice to items: ", err)
 		return nil, utils.InternalServerErr
@@ -141,14 +141,14 @@ func (s *InvoiceService) UpdateInvoice(ctx context.Context, invoice *models.Invo
 	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4, invoice_pdf = $5 WHERE id = $6",
-		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.PDF, invoice.Id,
+		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.PDF, invoice.ID,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice query: ", err)
 		return utils.InternalServerErr
 	}
 	if result.RowsAffected() == 0 {
-		log.Printf("Invoice with id %v not found when running update query", invoice.Id)
+		log.Printf("Invoice with id %v not found when running update query", invoice.ID)
 		return utils.InvoiceNotFoundErr
 	}
 

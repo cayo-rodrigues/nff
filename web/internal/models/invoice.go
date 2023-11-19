@@ -4,6 +4,7 @@ import (
 	"log"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -33,7 +34,7 @@ type InvoiceFormSelectFields struct {
 }
 
 type Invoice struct {
-	Id                 int               `json:"-"`
+	ID                 int               `json:"-"`
 	Number             string            `json:"invoice_id"`
 	Protocol           string            `json:"-"`
 	Operation          string            `json:"operation"`
@@ -50,6 +51,9 @@ type Invoice struct {
 	ReqStatus          string            `json:"-"`
 	ReqMsg             string            `json:"-"`
 	PDF                string            `json:"invoice_pdf"`
+	CreatedBy          int               `json:"-"`
+	CreatedAt          time.Time         `json:"-"`
+	UpdatedAt          time.Time         `json:"-"`
 }
 
 func NewEmptyInvoice() *Invoice {
@@ -144,8 +148,8 @@ func (i *Invoice) IsValid() bool {
 
 func (i *Invoice) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&i.Id, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
-		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.Sender.Id, &i.Recipient.Id,
-		&i.ReqStatus, &i.ReqMsg, &i.PDF,
+		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
+		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
+		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
 	)
 }

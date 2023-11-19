@@ -40,10 +40,10 @@ func (s *ItemsService) ListInvoiceItems(ctx context.Context, invoiceId int) ([]*
 func (s *ItemsService) BulkCreateInvoiceItems(ctx context.Context, items []*models.InvoiceItem, invoiceId int) error {
 	rows := [][]interface{}{}
 	for _, item := range items {
-		item.InvoiceId = invoiceId
+		item.InvoiceID = invoiceId
 		rows = append(rows, []interface{}{
 			item.Group, item.Description, item.Origin, item.UnityOfMeasurement,
-			item.Quantity, item.ValuePerUnity, item.InvoiceId,
+			item.Quantity, item.ValuePerUnity, item.InvoiceID,
 		})
 	}
 	_, err := db.PG.CopyFrom(

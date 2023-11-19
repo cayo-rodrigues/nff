@@ -21,19 +21,10 @@ func NewEntitiesPage(entityService interfaces.EntityService) *EntitiesPage {
 	}
 }
 
-type EntitiesPageData struct {
-	IsAuthenticated  bool
-	Entities         []*models.Entity
-	Entity           *models.Entity
-	GeneralError     string
-	FormSelectFields *models.EntityFormSelectFields
-}
-
-func (p *EntitiesPage) NewEmptyData() *EntitiesPageData {
-	return &EntitiesPageData{
-		IsAuthenticated:  true,
-		Entity:           models.NewEmptyEntity(),
-		FormSelectFields: models.NewEntityFormSelectFields(),
+func (p *EntitiesPage) NewEmptyData() fiber.Map {
+	return fiber.Map{
+		"Entity":           models.NewEmptyEntity(),
+		"FormSelectFields": models.NewEntityFormSelectFields(),
 	}
 }
 
@@ -42,11 +33,11 @@ func (p *EntitiesPage) Render(c *fiber.Ctx) error {
 
 	entities, err := p.service.ListEntities(c.Context())
 	if err != nil {
-		pageData.GeneralError = err.Error()
+		pageData["GeneralError"] = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
 	}
 
-	pageData.Entities = entities
+	pageData["Entities"] = entities
 
 	return c.Render("entities", pageData, "layouts/base")
 }
@@ -64,8 +55,8 @@ func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	pageData.Entity = entity
-	pageData.Entity.IsSelected = true
+	entity.IsSelected = true
+	pageData["Entity"] = entity
 
 	return c.Render("partials/entity-form", pageData)
 }
@@ -75,7 +66,7 @@ func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
 
 	if !entity.IsValid() {
 		pageData := p.NewEmptyData()
-		pageData.Entity = entity
+		pageData["Entity"] = entity
 		c.Set("HX-Retarget", "#entity-form")
 		c.Set("HX-Reswap", "outerHTML")
 		return c.Render("partials/entity-form", pageData)
@@ -98,11 +89,11 @@ func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
-	entity.Id = entityId
+	entity.ID = entityId
 
 	if !entity.IsValid() {
 		pageData := p.NewEmptyData()
-		pageData.Entity = entity
+		pageData["Entity"] = entity
 		c.Set("HX-Retarget", "#entity-form")
 		c.Set("HX-Reswap", "outerHTML")
 		return c.Render("partials/entity-form", pageData)

@@ -20,7 +20,7 @@
                     <label for="entity"><strong>Entidade</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="entity" name="entity">
                         {{ range .FormSelectFields.Entities }}
-                            <option {{ if eq $.InvoicePrint.Entity.Id .Id }} selected {{ end }} value="{{ .Id }}">{{ .Name }}</option>
+                            <option {{ if eq $.InvoicePrint.Entity.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-500">{{ .InvoicePrint.Errors.Entity }}</sub>

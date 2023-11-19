@@ -36,7 +36,7 @@ func (s *PrintingService) ListInvoicePrintings(ctx context.Context) ([]*models.I
 			return nil, utils.InternalServerErr
 		}
 
-		entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.Id)
+		entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID)
 		if err != nil {
 			log.Println("Error linking invoice printing to entity: ", err)
 			return nil, utils.InternalServerErr
@@ -56,9 +56,9 @@ func (s *PrintingService) CreateInvoicePrinting(ctx context.Context, printing *m
 			(invoice_id, invoice_id_type, entity_id)
 			VALUES ($1, $2, $3)
 		RETURNING id, req_status, req_msg`,
-		printing.InvoiceId, printing.InvoiceIdType, printing.Entity.Id,
+		printing.InvoiceId, printing.InvoiceIdType, printing.Entity.ID,
 	)
-	err := row.Scan(&printing.Id, &printing.ReqStatus, &printing.ReqMsg)
+	err := row.Scan(&printing.ID, &printing.ReqStatus, &printing.ReqMsg)
 	if err != nil {
 		log.Println("Error when running insert printing query: ", err)
 		return utils.InternalServerErr
@@ -86,7 +86,7 @@ func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingI
 		return nil, utils.InternalServerErr
 	}
 
-	entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.Id)
+	entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID)
 	if err != nil {
 		log.Println("Error linking invoice printing to entity: ", err)
 		return nil, utils.InternalServerErr
@@ -100,14 +100,14 @@ func (s *PrintingService) UpdateInvoicePrinting(ctx context.Context, printing *m
 	result, err := db.PG.Exec(
 		ctx,
 		"UPDATE invoices_printings SET req_status = $1, req_msg = $2, invoice_pdf = $3 WHERE id = $4",
-		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.Id,
+		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.ID,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice printing query: ", err)
 		return utils.InternalServerErr
 	}
 	if result.RowsAffected() == 0 {
-		log.Printf("Printing with id %v not found when running update query", printing.Id)
+		log.Printf("Printing with id %v not found when running update query", printing.ID)
 		return utils.PrintingNotFoundErr
 	}
 

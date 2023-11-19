@@ -21,11 +21,14 @@ type MetricsFormErrors struct {
 }
 
 type MetricsQuery struct {
-	Id        int
+	ID        int
 	Entity    *Entity
 	StartDate time.Time
 	EndDate   time.Time
 	Results   *MetricsResult
+	CreatedBy int
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	Errors    *MetricsFormErrors
 }
 
@@ -107,10 +110,11 @@ func (q *MetricsQuery) IsValid() bool {
 
 func (q *MetricsQuery) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&q.Id, &q.StartDate, &q.EndDate,
+		&q.ID, &q.StartDate, &q.EndDate,
 		&q.Results.TotalIncome, &q.Results.TotalExpenses, &q.Results.AvgIncome,
 		&q.Results.AvgExpenses, &q.Results.Diff, &q.Results.IsPositive,
 		&q.Results.TotalRecords, &q.Results.PositiveRecords, &q.Results.NegativeRecords,
-		&q.Results.ReqStatus, &q.Results.ReqMsg, &q.Entity.Id,
+		&q.Results.ReqStatus, &q.Results.ReqMsg, &q.Entity.ID,
+		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
 	)
 }

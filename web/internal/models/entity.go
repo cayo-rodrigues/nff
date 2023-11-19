@@ -3,6 +3,7 @@ package models
 import (
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -34,7 +35,7 @@ type Address struct {
 }
 
 type Entity struct {
-	Id         int              `json:"-"`
+	ID         int              `json:"-"`
 	Name       string           `json:"-"`
 	UserType   string           `json:"user_type"`
 	Ie         string           `json:"ie"`
@@ -43,6 +44,9 @@ type Entity struct {
 	Password   string           `json:"password"`
 	IsSelected bool             `json:"-"`
 	Address    *Address         `json:"address"`
+	CreatedBy  int              `json:"-"`
+	CreatedAt  time.Time        `json:"-"`
+	UpdatedAt  time.Time        `json:"-"`
 	Errors     *EntityFormError `json:"-"`
 }
 
@@ -66,7 +70,7 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 		id = 0
 	}
 	return &Entity{
-		Id:       id,
+		ID:       id,
 		Name:     c.FormValue("name"),
 		UserType: c.FormValue("user_type"),
 		CpfCnpj:  c.FormValue("cpf_cnpj"),
@@ -86,8 +90,9 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 
 func (e *Entity) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&e.Id, &e.Name, &e.UserType, &e.CpfCnpj, &e.Ie, &e.Email, &e.Password,
+		&e.ID, &e.Name, &e.UserType, &e.CpfCnpj, &e.Ie, &e.Email, &e.Password,
 		&e.Address.PostalCode, &e.Address.Neighborhood, &e.Address.StreetType, &e.Address.StreetName, &e.Address.Number,
+		&e.CreatedBy, &e.CreatedAt, &e.UpdatedAt,
 	)
 }
 

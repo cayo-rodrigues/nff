@@ -23,7 +23,7 @@ type InvoiceCancelFormErrors struct {
 }
 
 type InvoiceCancel struct {
-	Id            int                      `json:"-"`
+	ID            int                      `json:"-"`
 	Number        string                   `json:"invoice_id"`
 	Year          int                      `json:"year"`
 	Justification string                   `json:"justification"`
@@ -31,6 +31,9 @@ type InvoiceCancel struct {
 	Errors        *InvoiceCancelFormErrors `json:"-"`
 	ReqStatus     string                   `json:"-"`
 	ReqMsg        string                   `json:"-"`
+	CreatedBy     int                      `json:"-"`
+	CreatedAt     time.Time                `json:"-"`
+	UpdatedAt     time.Time                `json:"-"`
 }
 
 func NewEmptyInvoiceCancel() *InvoiceCancel {
@@ -88,7 +91,7 @@ func (i *InvoiceCancel) IsValid() bool {
 
 func (c *InvoiceCancel) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&c.Id, &c.Number, &c.Year, &c.Justification, &c.Entity.Id,
-		&c.ReqStatus, &c.ReqMsg,
+		&c.ID, &c.Number, &c.Year, &c.Justification, &c.Entity.ID,
+		&c.ReqStatus, &c.ReqMsg, &c.CreatedBy, &c.CreatedAt, &c.UpdatedAt,
 	)
 }
