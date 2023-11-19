@@ -102,9 +102,7 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 	if !invoiceCancel.IsValid() {
 		pageData.InvoiceCancel = invoiceCancel
 		pageData.FormMsg = "Corrija os campos abaixo."
-		c.Set("HX-Retarget", "#invoice-cancel-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/invoice-cancel-form", pageData)
+		return utils.RetargetToForm(c, "invoice-cancel", pageData)
 	}
 
 	err = p.service.CreateInvoiceCanceling(c.Context(), invoiceCancel)

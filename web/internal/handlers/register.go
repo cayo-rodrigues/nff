@@ -34,9 +34,7 @@ func (p *RegisterPage) CreateUser(c *fiber.Ctx) error {
 
 	if !user.IsValid() {
 		formData["Errors"] = user.Errors
-		c.Set("HX-Retarget", "#register-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/register-form", formData)
+		return utils.RetargetToForm(c, "register", formData)
 	}
 
 	_, err := p.userService.RetrieveUser(c.Context(), user.Email)
@@ -50,9 +48,7 @@ func (p *RegisterPage) CreateUser(c *fiber.Ctx) error {
 	if userAlreadyExists {
 		user.Errors.Email = "Email indisponível"
 		formData["Errors"] = user.Errors
-		c.Set("HX-Retarget", "#register-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/register-form", formData)
+		return utils.RetargetToForm(c, "register", formData)
 	}
 
 	user.Password, err = utils.HashPassword(user.Password)

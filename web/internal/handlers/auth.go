@@ -33,18 +33,14 @@ func (p *LoginPage) Login(c *fiber.Ctx) error {
 
 	if !loginData.IsValid() {
 		formData["Errors"] = loginData.Errors
-		c.Set("HX-Retarget", "#login-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/login-form", formData)
+		return utils.RetargetToForm(c, "login", formData)
 	}
 
 	user, err := p.userService.RetrieveUser(c.Context(), loginData.Email)
 	if errors.Is(err, utils.UserNotFoundErr) {
 		loginData.Errors.Email = err.Error()
 		formData["Errors"] = loginData.Errors
-		c.Set("HX-Retarget", "#login-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/login-form", formData)
+		return utils.RetargetToForm(c, "login", formData)
 	}
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
@@ -54,9 +50,7 @@ func (p *LoginPage) Login(c *fiber.Ctx) error {
 	if !passwordsMatch {
 		loginData.Errors.Password = "Senha incorreta"
 		formData["Errors"] = loginData.Errors
-		c.Set("HX-Retarget", "#login-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/login-form", formData)
+		return utils.RetargetToForm(c, "login", formData)
 	}
 
 	sess, err := middlewares.SessionStore.Get(c)

@@ -99,9 +99,7 @@ func (p *PrintInvoicesPage) PrintInvoice(c *fiber.Ctx) error {
 	if !invoicePrint.IsValid() {
 		pageData.InvoicePrint = invoicePrint
 		pageData.FormMsg = "Corrija os campos abaixo."
-		c.Set("HX-Retarget", "#invoice-print-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/invoice-print-form", pageData)
+		return utils.RetargetToForm(c, "invoice-print", pageData)
 	}
 
 	err = p.service.CreateInvoicePrinting(c.Context(), invoicePrint)

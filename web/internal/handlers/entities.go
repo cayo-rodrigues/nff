@@ -67,9 +67,7 @@ func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
 	if !entity.IsValid() {
 		pageData := p.NewEmptyData()
 		pageData["Entity"] = entity
-		c.Set("HX-Retarget", "#entity-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/entity-form", pageData)
+		return utils.RetargetToForm(c, "entity", pageData)
 	}
 
 	err := p.service.CreateEntity(c.Context(), entity)
@@ -94,9 +92,7 @@ func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 	if !entity.IsValid() {
 		pageData := p.NewEmptyData()
 		pageData["Entity"] = entity
-		c.Set("HX-Retarget", "#entity-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/entity-form", pageData)
+		return utils.RetargetToForm(c, "entity", pageData)
 	}
 
 	err = p.service.UpdateEntity(c.Context(), entity)

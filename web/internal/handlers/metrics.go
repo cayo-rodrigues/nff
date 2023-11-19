@@ -99,9 +99,7 @@ func (p *MetricsPage) GenerateMetrics(c *fiber.Ctx) error {
 	if !query.IsValid() {
 		pageData.MetricsQuery = query
 		pageData.FormMsg = "Corrija os campos abaixo."
-		c.Set("HX-Retarget", "#metrics-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/metrics-form", pageData)
+		return utils.RetargetToForm(c, "metrics", pageData)
 	}
 
 	err = p.service.CreateMetrics(c.Context(), query)

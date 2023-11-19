@@ -119,9 +119,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 	if !invoice.IsValid() {
 		pageData.FormMsg = "Corrija os campos abaixo."
 		pageData.Invoice = invoice
-		c.Set("HX-Retarget", "#invoice-form")
-		c.Set("HX-Reswap", "outerHTML")
-		return c.Render("partials/invoice-form", pageData)
+		return utils.RetargetToForm(c, "invoice", pageData)
 	}
 
 	err = p.service.CreateInvoice(c.Context(), invoice)
@@ -201,7 +199,8 @@ func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	c.Set("HX-Retarget", "#request-card-"+c.Params("id"))
+	targetId := fmt.Sprintf("#request-card-%v", c.Params("id"))
+	c.Set("HX-Retarget", targetId)
 	c.Set("HX-Reswap", "outerHTML")
 	return c.Status(286).Render("partials/request-card", invoice)
 }
