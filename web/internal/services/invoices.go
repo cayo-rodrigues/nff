@@ -69,14 +69,15 @@ func (s *InvoiceService) ListInvoices(ctx context.Context) ([]*models.Invoice, e
 }
 
 func (s *InvoiceService) CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
+	invoice.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices
-			(number, protocol, operation, cfop, is_final_customer, is_icms_contributor, shipping, add_shipping_to_total, gta, sender_id, recipient_id)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+			(number, protocol, operation, cfop, is_final_customer, is_icms_contributor, shipping, add_shipping_to_total, gta, sender_id, recipient_id, created_by)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING id, req_status, req_msg`,
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
-		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.Sender.ID, invoice.Recipient.ID,
+		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.Sender.ID, invoice.Recipient.ID, invoice.CreatedBy,
 	)
 	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg)
 	if err != nil {

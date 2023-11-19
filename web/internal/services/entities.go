@@ -59,10 +59,11 @@ func (s *EntityService) RetrieveEntity(ctx context.Context, entityId int) (*mode
 }
 
 func (s *EntityService) CreateEntity(ctx context.Context, entity *models.Entity) error {
+	entity.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
-		`INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		`INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number, created_by)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING id
 		`,
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,

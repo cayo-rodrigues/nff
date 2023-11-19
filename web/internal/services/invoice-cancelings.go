@@ -52,13 +52,14 @@ func (s *CancelingService) ListInvoiceCancelings(ctx context.Context) ([]*models
 }
 
 func (s *CancelingService) CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
+	canceling.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices_cancelings
-			(invoice_number, year, justification, entity_id)
-			VALUES ($1, $2, $3, $4)
+			(invoice_number, year, justification, entity_id, created_by)
+			VALUES ($1, $2, $3, $4, $5)
 		RETURNING id, req_status, req_msg`,
-		canceling.Number, canceling.Year, canceling.Justification, canceling.Entity.ID,
+		canceling.Number, canceling.Year, canceling.Justification, canceling.Entity.ID, canceling.CreatedBy,
 	)
 	err := row.Scan(&canceling.ID, &canceling.ReqStatus, &canceling.ReqMsg)
 	if err != nil {

@@ -41,15 +41,16 @@ func (s *ItemsService) BulkCreateInvoiceItems(ctx context.Context, items []*mode
 	rows := [][]interface{}{}
 	for _, item := range items {
 		item.InvoiceID = invoiceId
+		item.CreatedBy = 1
 		rows = append(rows, []interface{}{
 			item.Group, item.Description, item.Origin, item.UnityOfMeasurement,
-			item.Quantity, item.ValuePerUnity, item.InvoiceID,
+			item.Quantity, item.ValuePerUnity, item.InvoiceID, item.CreatedBy,
 		})
 	}
 	_, err := db.PG.CopyFrom(
 		ctx,
 		pgx.Identifier{"invoices_items"},
-		[]string{"item_group", "description", "origin", "unity_of_measurement", "quantity", "value_per_unity", "invoice_id"},
+		[]string{"item_group", "description", "origin", "unity_of_measurement", "quantity", "value_per_unity", "invoice_id", "created_by"},
 		pgx.CopyFromRows(rows),
 	)
 	if err != nil {

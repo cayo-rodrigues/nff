@@ -50,13 +50,14 @@ func (s *MetricsService) ListMetrics(ctx context.Context) ([]*models.MetricsQuer
 }
 
 func (s *MetricsService) CreateMetrics(ctx context.Context, query *models.MetricsQuery) error {
+	query.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO metrics_history
-			(start_date, end_date, entity_id)
-			VALUES ($1, $2, $3)
+			(start_date, end_date, entity_id, created_by)
+			VALUES ($1, $2, $3, $4)
 		RETURNING *`,
-		query.StartDate, query.EndDate, query.Entity.ID,
+		query.StartDate, query.EndDate, query.Entity.ID, query.CreatedBy,
 	)
 	err := query.Scan(row)
 	if err != nil {

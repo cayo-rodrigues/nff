@@ -50,13 +50,14 @@ func (s *PrintingService) ListInvoicePrintings(ctx context.Context) ([]*models.I
 }
 
 func (s *PrintingService) CreateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) error {
+	printing.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices_printings
-			(invoice_id, invoice_id_type, entity_id)
-			VALUES ($1, $2, $3)
+			(invoice_id, invoice_id_type, entity_id, created_by)
+			VALUES ($1, $2, $3, $4)
 		RETURNING id, req_status, req_msg`,
-		printing.InvoiceId, printing.InvoiceIdType, printing.Entity.ID,
+		printing.InvoiceId, printing.InvoiceIdType, printing.Entity.ID, printing.CreatedBy,
 	)
 	err := row.Scan(&printing.ID, &printing.ReqStatus, &printing.ReqMsg)
 	if err != nil {
