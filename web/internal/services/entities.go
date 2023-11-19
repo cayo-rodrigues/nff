@@ -59,11 +59,10 @@ func (s *EntityService) RetrieveEntity(ctx context.Context, entityId int) (*mode
 }
 
 func (s *EntityService) CreateEntity(ctx context.Context, entity *models.Entity) error {
-	entity.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
-		`INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number, created_by)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+		`INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 		RETURNING id
 		`,
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
@@ -82,7 +81,11 @@ func (s *EntityService) CreateEntity(ctx context.Context, entity *models.Entity)
 func (s *EntityService) UpdateEntity(ctx context.Context, entity *models.Entity) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE entities SET name = $1, user_type = $2, cpf_cnpj = $3, ie = $4, email = $5, password = $6, postal_code = $7, neighborhood = $8, street_type = $9, street_name = $10, number = $11 WHERE id = $12",
+		`UPDATE entities
+			SET name = $1, user_type = $2, cpf_cnpj = $3, ie = $4, email = $5,
+				password = $6, postal_code = $7, neighborhood = $8, street_type = $9,
+				street_name = $10, number = $11
+		WHERE id = $12`,
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
 		entity.Address.PostalCode, entity.Address.Neighborhood, entity.Address.StreetType, entity.Address.StreetName, entity.Address.Number,
 		entity.ID,

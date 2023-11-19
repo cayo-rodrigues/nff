@@ -68,6 +68,7 @@ func main() {
 	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService, printingService)
 
 	registerPage := handlers.NewRegisterPage(userService)
+	loginPage := handlers.NewLoginPage(userService)
 	entitiesPage := handlers.NewEntitiesPage(entityService)
 	invoicesPage := handlers.NewInvoicesPage(invoiceService, entityService, siareBGWorker)
 	cancelInvoicesPage := handlers.NewCancelInvoicesPage(cancelingService, entityService, siareBGWorker)
@@ -90,7 +91,8 @@ func main() {
 	app.Get("/register", registerPage.Render)
 	app.Post("/register", registerPage.CreateUser)
 
-	app.Get("/login", handlers.Login)
+	app.Get("/login", loginPage.Render)
+	app.Post("/login", loginPage.Login)
 	app.Get("/logout", handlers.Logout)
 
 	app.Use(middlewares.AuthMiddleware)

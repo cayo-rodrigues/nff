@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
@@ -26,12 +27,39 @@ func (p *RegisterPage) Render(c *fiber.Ctx) error {
 
 func (p *RegisterPage) CreateUser(c *fiber.Ctx) error {
 	user := models.NewUserFromForm(c)
-	hash, err := utils.HashPassword(user.Password)
+	formData := fiber.Map{
+		"Email":    user.Email,
+		"Password": user.Password,
+	}
+
+	if !user.IsValid() {
+		formData["Errors"] = user.Errors
+		c.Set("HX-Retarget", "#register-form")
+		c.Set("HX-Reswap", "outerHTML")
+		return c.Render("partials/register-form", formData)
+	}
+
+	_, err := p.userService.RetrieveUser(c.Context(), user.Email)
+	userAlreadyExists := true
+	if errors.Is(err, utils.UserNotFoundErr) {
+		userAlreadyExists = false
+	}
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+	if userAlreadyExists {
+		user.Errors.Email = "Email indisponível"
+		formData["Errors"] = user.Errors
+		c.Set("HX-Retarget", "#register-form")
+		c.Set("HX-Reswap", "outerHTML")
+		return c.Render("partials/register-form", formData)
+	}
+
+	user.Password, err = utils.HashPassword(user.Password)
 	if err != nil {
 		fmt.Println("Error hashing new user password:", err)
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
-	user.Password = hash
 
 	err = p.userService.CreateUser(c.Context(), user)
 	if err != nil {

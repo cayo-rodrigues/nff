@@ -1,33 +1,75 @@
 package handlers
 
 import (
+	"errors"
+
+	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/middlewares"
+	"github.com/cayo-rodrigues/nff/web/internal/models"
+	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
-func Login(c *fiber.Ctx) error {
-	// email := c.FormValue("email")
-	// password := c.FormValue("password")
+type LoginPage struct {
+	userService interfaces.UserService
+}
 
-	// get user by email
+func NewLoginPage(userService interfaces.UserService) *LoginPage {
+	return &LoginPage{
+		userService: userService,
+	}
+}
 
-	// compare passwords
-	passwordsMatch := true
+func (p *LoginPage) Render(c *fiber.Ctx) error {
+	return c.Render("login", fiber.Map{}, "layouts/base")
+}
 
-	if passwordsMatch {
-		sess, err := middlewares.SessionStore.Get(c)
-		if err != nil {
-			return err
-		}
-		sess.Set("IsAuthenticated", true)
-		err = sess.Save()
-		if err != nil {
-			return err
-		}
-		return c.Redirect("/entities")
+func (p *LoginPage) Login(c *fiber.Ctx) error {
+	loginData := models.NewUserFromForm(c)
+	formData := fiber.Map{
+		"Email":    loginData.Email,
+		"Password": loginData.Password,
 	}
 
-	return c.Render("/login", fiber.Map{}, "layouts/base")
+	if !loginData.IsValid() {
+		formData["Errors"] = loginData.Errors
+		c.Set("HX-Retarget", "#login-form")
+		c.Set("HX-Reswap", "outerHTML")
+		return c.Render("partials/login-form", formData)
+	}
+
+	user, err := p.userService.RetrieveUser(c.Context(), loginData.Email)
+	if errors.Is(err, utils.UserNotFoundErr) {
+		loginData.Errors.Email = err.Error()
+		formData["Errors"] = loginData.Errors
+		c.Set("HX-Retarget", "#login-form")
+		c.Set("HX-Reswap", "outerHTML")
+		return c.Render("partials/login-form", formData)
+	}
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	passwordsMatch := utils.IsPasswordCorrect(loginData.Password, user.Password)
+	if !passwordsMatch {
+		loginData.Errors.Password = "Senha incorreta"
+		formData["Errors"] = loginData.Errors
+		c.Set("HX-Retarget", "#login-form")
+		c.Set("HX-Reswap", "outerHTML")
+		return c.Render("partials/login-form", formData)
+	}
+
+	sess, err := middlewares.SessionStore.Get(c)
+	if err != nil {
+		return err
+	}
+	sess.Set("IsAuthenticated", true)
+	err = sess.Save()
+	if err != nil {
+		return err
+	}
+	return c.Redirect("/entities")
+
 }
 
 func Logout(c *fiber.Ctx) error {

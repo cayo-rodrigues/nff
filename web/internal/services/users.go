@@ -17,17 +17,17 @@ func NewUserService() *UserService {
 	return &UserService{}
 }
 
-func (s *UserService) RetrieveUser(ctx context.Context, userId int) (*models.User, error) {
+func (s *UserService) RetrieveUser(ctx context.Context, email string) (*models.User, error) {
 	row := db.PG.QueryRow(
 		ctx,
-		"SELECT * FROM users WHERE users.id = $1",
-		userId,
+		"SELECT * FROM users WHERE users.email = $1",
+		email,
 	)
 
 	user := models.NewEmptyUser()
 	err := user.Scan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
-		log.Printf("User with id %v not found: %v", userId, err)
+		log.Printf("User with email %v not found: %v", email, err)
 		return nil, utils.UserNotFoundErr
 	}
 	if err != nil {
