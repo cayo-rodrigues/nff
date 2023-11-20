@@ -63,7 +63,7 @@ var InvoiceIcmsOptions = [3]string{
 
 var InvoiceBooleanField = [2]string{
 	"Sim",
-	"Nâo",
+	"Não",
 }
 
 var InvoiceIdTypes = [2]string{
