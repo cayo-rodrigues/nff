@@ -22,8 +22,8 @@ func NewPrintingService(entityService interfaces.EntityService) *PrintingService
 	}
 }
 
-func (s *PrintingService) ListInvoicePrintings(ctx context.Context) ([]*models.InvoicePrint, error) {
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_printings ORDER BY id DESC")
+func (s *PrintingService) ListInvoicePrintings(ctx context.Context, userID int) ([]*models.InvoicePrint, error) {
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_printings WHERE created_by = $1 ORDER BY id DESC", userID)
 	defer rows.Close()
 
 	printings := []*models.InvoicePrint{}
@@ -36,7 +36,7 @@ func (s *PrintingService) ListInvoicePrintings(ctx context.Context) ([]*models.I
 			return nil, utils.InternalServerErr
 		}
 
-		entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID)
+		entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID, printing.CreatedBy)
 		if err != nil {
 			log.Println("Error linking invoice printing to entity: ", err)
 			return nil, utils.InternalServerErr
@@ -50,7 +50,6 @@ func (s *PrintingService) ListInvoicePrintings(ctx context.Context) ([]*models.I
 }
 
 func (s *PrintingService) CreateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) error {
-	printing.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices_printings
@@ -68,18 +67,18 @@ func (s *PrintingService) CreateInvoicePrinting(ctx context.Context, printing *m
 	return nil
 }
 
-func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingId int) (*models.InvoicePrint, error) {
+func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingID int, userID int) (*models.InvoicePrint, error) {
 	// TODO maybe JOIN would be more efficient than two separated queries
 	row := db.PG.QueryRow(
 		ctx,
-		"SELECT * FROM invoices_printings WHERE id = $1",
-		printingId,
+		"SELECT * FROM invoices_printings WHERE id = $1 AND created_by = $2",
+		printingID, userID,
 	)
 
 	printing := models.NewEmptyInvoicePrint()
 	err := printing.Scan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
-		log.Printf("Invoice printing with id %v not found: %v", printingId, err)
+		log.Printf("Invoice printing with id %v not found: %v", printingID, err)
 		return nil, utils.PrintingNotFoundErr
 	}
 	if err != nil {
@@ -87,7 +86,7 @@ func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingI
 		return nil, utils.InternalServerErr
 	}
 
-	entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID)
+	entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID, printing.CreatedBy)
 	if err != nil {
 		log.Println("Error linking invoice printing to entity: ", err)
 		return nil, utils.InternalServerErr
@@ -100,8 +99,8 @@ func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingI
 func (s *PrintingService) UpdateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE invoices_printings SET req_status = $1, req_msg = $2, invoice_pdf = $3 WHERE id = $4",
-		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.ID,
+		"UPDATE invoices_printings SET req_status = $1, req_msg = $2, invoice_pdf = $3 WHERE id = $4 AND created_by = $5",
+		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.ID, printing.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice printing query: ", err)

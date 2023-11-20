@@ -91,7 +91,7 @@ func (i *InvoiceCancel) IsValid() bool {
 
 func (c *InvoiceCancel) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&c.ID, &c.Number, &c.Year, &c.Justification, &c.Entity.ID,
-		&c.ReqStatus, &c.ReqMsg, &c.CreatedBy, &c.CreatedAt, &c.UpdatedAt,
+		&c.ID, &c.Number, &c.Year, &c.Justification, &c.ReqStatus, &c.ReqMsg,
+		&c.Entity.ID, &c.CreatedBy, &c.CreatedAt, &c.UpdatedAt,
 	)
 }

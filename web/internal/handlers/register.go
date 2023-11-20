@@ -41,8 +41,7 @@ func (p *RegisterPage) CreateUser(c *fiber.Ctx) error {
 	userAlreadyExists := true
 	if errors.Is(err, utils.UserNotFoundErr) {
 		userAlreadyExists = false
-	}
-	if err != nil {
+	} else if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	if userAlreadyExists {
@@ -67,6 +66,7 @@ func (p *RegisterPage) CreateUser(c *fiber.Ctx) error {
 		return err
 	}
 	sess.Set("IsAuthenticated", true)
+	sess.Set("UserID", user.ID)
 	err = sess.Save()
 	if err != nil {
 		return err

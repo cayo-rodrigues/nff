@@ -58,10 +58,12 @@ func (p *LoginPage) Login(c *fiber.Ctx) error {
 		return err
 	}
 	sess.Set("IsAuthenticated", true)
+	sess.Set("UserID", user.ID)
 	err = sess.Save()
 	if err != nil {
 		return err
 	}
+
 	return c.Redirect("/entities")
 
 }
@@ -72,9 +74,11 @@ func Logout(c *fiber.Ctx) error {
 		return err
 	}
 	sess.Set("IsAuthenticated", false)
+	sess.Set("UserID", 0)
 	err = sess.Save()
 	if err != nil {
 		return err
 	}
+
 	return c.Redirect("/")
 }

@@ -8,14 +8,20 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		return err
 	}
 
-	if auth, ok := sess.Get("IsAuthenticated").(bool); !ok || !auth {
+	isAuthenticated, authOk := sess.Get("IsAuthenticated").(bool)
+	userID, idOk := sess.Get("UserID").(int)
+
+	if !authOk || !idOk || !isAuthenticated || userID == 0 {
 		c.Locals("IsAuthenticated", false)
-		if c.Path() == "/" {
-			return c.Next()
+		c.Locals("UserID", 0)
+		if c.Path() != "/" {
+			sess.Destroy()
+			return c.Redirect("/login")
 		}
-		return c.Redirect("/login")
 	}
 
-	c.Locals("IsAuthenticated", true)
+	// maybe we could refresh the user session here
+	c.Locals("IsAuthenticated", isAuthenticated)
+	c.Locals("UserID", userID)
 	return c.Next()
 }

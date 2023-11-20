@@ -30,8 +30,9 @@ func (p *EntitiesPage) NewEmptyData() fiber.Map {
 
 func (p *EntitiesPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.service.ListEntities(c.Context())
+	entities, err := p.service.ListEntities(c.Context(), userID)
 	if err != nil {
 		pageData["GeneralError"] = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -44,13 +45,14 @@ func (p *EntitiesPage) Render(c *fiber.Ctx) error {
 
 func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entityId, err := strconv.Atoi(c.Params("id"))
+	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
 
-	entity, err := p.service.RetrieveEntity(c.Context(), entityId)
+	entity, err := p.service.RetrieveEntity(c.Context(), entityID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -62,7 +64,9 @@ func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
 }
 
 func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
+	userID := c.Locals("UserID").(int)
 	entity := models.NewEntityFromForm(c)
+	entity.CreatedBy = userID
 
 	if !entity.IsValid() {
 		pageData := p.NewEmptyData()
@@ -83,11 +87,14 @@ func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 	entity := models.NewEntityFromForm(c)
 	entity.IsSelected = true
 
-	entityId, err := strconv.Atoi(c.Params("id"))
+	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
-	entity.ID = entityId
+	entity.ID = entityID
+
+	userID := c.Locals("UserID").(int)
+	entity.CreatedBy = userID
 
 	if !entity.IsValid() {
 		pageData := p.NewEmptyData()
@@ -105,16 +112,17 @@ func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
 }
 
 func (p *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
-	entityId, err := strconv.Atoi(c.Params("id"))
+	userID := c.Locals("UserID").(int)
+	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
 	}
-	err = p.service.DeleteEntity(c.Context(), entityId)
+	err = p.service.DeleteEntity(c.Context(), entityID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	eventMsg := fmt.Sprintf("{\"entity-deleted\": %v}", entityId)
+	eventMsg := fmt.Sprintf("{\"entity-deleted\": %v}", entityID)
 	c.Set("HX-Trigger-After-Settle", eventMsg)
 
 	return c.Render("partials/entity-form", p.NewEmptyData())

@@ -8,7 +8,6 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       - PORT=8080
-      - DEBUG=true
       - DB_URL=postgres://nff:nff@db:5432/nff
       - REDIS_URL=redis://rdb:6379/0
       - SS_API_BASE_URL=https://nff-ss-api-dev.up.railway.app

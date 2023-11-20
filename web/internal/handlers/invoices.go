@@ -52,9 +52,10 @@ func (p *InvoicesPage) NewEmptyData() *InvoicesPageData {
 
 func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
 	// TODO async data aggregation with go routines
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -65,7 +66,7 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.Invoice = models.NewEmptyInvoice()
 
 	// get the latest 10 invoices
-	invoices, err := p.service.ListInvoices(c.Context())
+	invoices, err := p.service.ListInvoices(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -79,31 +80,32 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 
 func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
 	// TODO async data aggregation with go routines
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	pageData.FormSelectFields.Entities = entities
 
-	senderId, err := strconv.Atoi(c.FormValue("sender"))
+	senderID, err := strconv.Atoi(c.FormValue("sender"))
 	if err != nil {
 		log.Println("Error converting sender id from string to int: ", err)
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
-	recipientId, err := strconv.Atoi(c.FormValue("recipient"))
+	recipientID, err := strconv.Atoi(c.FormValue("recipient"))
 	if err != nil {
 		log.Println("Error converting recipient id from string to int: ", err)
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	sender, err := p.entityService.RetrieveEntity(c.Context(), senderId)
+	sender, err := p.entityService.RetrieveEntity(c.Context(), senderID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	recipient, err := p.entityService.RetrieveEntity(c.Context(), recipientId)
+	recipient, err := p.entityService.RetrieveEntity(c.Context(), recipientID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -115,6 +117,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 
 	invoice.Sender = sender
 	invoice.Recipient = recipient
+	invoice.CreatedBy = userID
 
 	if !invoice.IsValid() {
 		pageData.FormMsg = "Corrija os campos abaixo."
@@ -139,11 +142,14 @@ func (p *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
 }
 
 func (p *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
-	invoiceId, err := strconv.Atoi(c.Params("id"))
+	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
-	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceId)
+
+	userID := c.Locals("UserID").(int)
+
+	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -154,20 +160,21 @@ func (p *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 
 func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
 	// TODO async data aggregation with go routines
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	pageData.FormSelectFields.Entities = entities
 
-	invoiceId, err := strconv.Atoi(c.Params("id"))
+	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
-	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceId)
+	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -179,12 +186,12 @@ func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 }
 
 func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
-	invoiceId, err := strconv.Atoi(c.Params("id"))
+	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
 	}
 
-	key := fmt.Sprintf("reqstatus:invoice:%v", invoiceId)
+	key := fmt.Sprintf("reqstatus:invoice:%v", invoiceID)
 	err = db.Redis.GetDel(c.Context(), key).Err()
 	if err == redis.Nil {
 		return c.Render("partials/request-card-status", "pending")
@@ -194,7 +201,9 @@ func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceId)
+	userID := c.Locals("UserID").(int)
+
+	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}

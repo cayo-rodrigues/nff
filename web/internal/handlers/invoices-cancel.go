@@ -49,8 +49,9 @@ func (p *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
 
 func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -60,7 +61,7 @@ func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.InvoiceCancel = models.NewEmptyInvoiceCancel()
 
 	// get the latest 10 cancelings
-	cancelings, err := p.service.ListInvoiceCancelings(c.Context())
+	cancelings, err := p.service.ListInvoiceCancelings(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -74,20 +75,21 @@ func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 
 func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	pageData.FormSelectFields.Entities = entities
 
-	entityId, err := strconv.Atoi(c.FormValue("entity"))
+	entityID, err := strconv.Atoi(c.FormValue("entity"))
 	if err != nil {
 		log.Println("Error converting entity id from string to int: ", err)
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	entity, err := p.entityService.RetrieveEntity(c.Context(), entityId)
+	entity, err := p.entityService.RetrieveEntity(c.Context(), entityID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -98,6 +100,7 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 	}
 
 	invoiceCancel.Entity = entity
+	invoiceCancel.CreatedBy = userID
 
 	if !invoiceCancel.IsValid() {
 		pageData.InvoiceCancel = invoiceCancel
@@ -117,11 +120,14 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 }
 
 func (p *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
-	cancelingId, err := strconv.Atoi(c.Params("id"))
+	cancelingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
 	}
-	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+
+	userID := c.Locals("UserID").(int)
+
+	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingID, userID)
 
 	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
 	return c.Render("partials/request-card-details", canceling)
@@ -129,18 +135,19 @@ func (p *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 
 func (p *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	pageData.FormSelectFields.Entities = entities
 
-	cancelingId, err := strconv.Atoi(c.Params("id"))
+	cancelingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
 	}
-	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -152,12 +159,12 @@ func (p *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
 }
 
 func (p *CancelInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
-	cancelingId, err := strconv.Atoi(c.Params("id"))
+	cancelingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.CancelingNotFoundErr)
 	}
 
-	key := fmt.Sprintf("reqstatus:canceling:%v", cancelingId)
+	key := fmt.Sprintf("reqstatus:canceling:%v", cancelingID)
 	err = db.Redis.GetDel(c.Context(), key).Err()
 	if err == redis.Nil {
 		return c.Render("partials/request-card-status", "pending")
@@ -167,7 +174,9 @@ func (p *CancelInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingId)
+	userID := c.Locals("UserID").(int)
+
+	canceling, err := p.service.RetrieveInvoiceCanceling(c.Context(), cancelingID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}

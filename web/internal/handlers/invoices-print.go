@@ -51,7 +51,9 @@ func (p *PrintInvoicesPage) NewEmptyData() *PrintInvoicesPageData {
 func (p *PrintInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	userID := c.Locals("UserID").(int)
+
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -61,7 +63,7 @@ func (p *PrintInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.InvoicePrint = models.NewEmptyInvoicePrint()
 
 	// get the latest 10 printings
-	printings, err := p.service.ListInvoicePrintings(c.Context())
+	printings, err := p.service.ListInvoicePrintings(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -75,26 +77,28 @@ func (p *PrintInvoicesPage) Render(c *fiber.Ctx) error {
 
 func (p *PrintInvoicesPage) PrintInvoice(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	pageData.FormSelectFields.Entities = entities
 
-	entityId, err := strconv.Atoi(c.FormValue("entity"))
+	entityID, err := strconv.Atoi(c.FormValue("entity"))
 	if err != nil {
 		log.Println("Error converting entity id from string to int: ", err)
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	entity, err := p.entityService.RetrieveEntity(c.Context(), entityId)
+	entity, err := p.entityService.RetrieveEntity(c.Context(), entityID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
 	invoicePrint := models.NewInvoicePrintFromForm(c)
 	invoicePrint.Entity = entity
+	invoicePrint.CreatedBy = userID
 
 	if !invoicePrint.IsValid() {
 		pageData.InvoicePrint = invoicePrint
@@ -118,7 +122,8 @@ func (p *PrintInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.PrintingNotFoundErr)
 	}
-	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingId)
+	userID := c.Locals("UserID").(int)
+	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingId, userID)
 
 	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
 	return c.Render("partials/request-card-details", printing)
@@ -126,18 +131,19 @@ func (p *PrintInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
 
 func (p *PrintInvoicesPage) GetInvoicePrintForm(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	pageData.FormSelectFields.Entities = entities
 
-	printingId, err := strconv.Atoi(c.Params("id"))
+	printingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.PrintingNotFoundErr)
 	}
-	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingId)
+	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -149,12 +155,12 @@ func (p *PrintInvoicesPage) GetInvoicePrintForm(c *fiber.Ctx) error {
 }
 
 func (p *PrintInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
-	printingId, err := strconv.Atoi(c.Params("id"))
+	printingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.PrintingNotFoundErr)
 	}
 
-	key := fmt.Sprintf("reqstatus:printing:%v", printingId)
+	key := fmt.Sprintf("reqstatus:printing:%v", printingID)
 	err = db.Redis.GetDel(c.Context(), key).Err()
 	if err == redis.Nil {
 		return c.Render("partials/request-card-status", "pending")
@@ -164,13 +170,15 @@ func (p *PrintInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingId)
+	userID := c.Locals("UserID").(int)
+
+	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	targetId := fmt.Sprintf("#request-card-%v", c.Params("id"))
-	c.Set("HX-Retarget", targetId)
+	targetID := fmt.Sprintf("#request-card-%v", c.Params("id"))
+	c.Set("HX-Retarget", targetID)
 	c.Set("HX-Reswap", "outerHTML")
 	return c.Status(286).Render("partials/request-card", printing)
 }

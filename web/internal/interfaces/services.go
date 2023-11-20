@@ -7,44 +7,44 @@ import (
 )
 
 type EntityService interface {
-	ListEntities(ctx context.Context) ([]*models.Entity, error)
-	RetrieveEntity(ctx context.Context, entityId int) (*models.Entity, error)
+	ListEntities(ctx context.Context, userID int) ([]*models.Entity, error)
 	CreateEntity(ctx context.Context, entity *models.Entity) error
+	RetrieveEntity(ctx context.Context, entityID int, userID int) (*models.Entity, error)
 	UpdateEntity(ctx context.Context, entity *models.Entity) error
-	DeleteEntity(ctx context.Context, entityId int) error
+	DeleteEntity(ctx context.Context, entityID int, userID int) error
 }
 
 type CancelingService interface {
-	ListInvoiceCancelings(ctx context.Context) ([]*models.InvoiceCancel, error)
+	ListInvoiceCancelings(ctx context.Context, userID int) ([]*models.InvoiceCancel, error)
 	CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error
-	RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.InvoiceCancel, error)
+	RetrieveInvoiceCanceling(ctx context.Context, cancelingID int, userID int) (*models.InvoiceCancel, error)
 	UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error
 }
 
 type InvoiceService interface {
-	ListInvoices(ctx context.Context) ([]*models.Invoice, error)
+	ListInvoices(ctx context.Context, userID int) ([]*models.Invoice, error)
 	CreateInvoice(ctx context.Context, invoice *models.Invoice) error
-	RetrieveInvoice(ctx context.Context, invoiceId int) (*models.Invoice, error)
+	RetrieveInvoice(ctx context.Context, invoiceID int, userID int) (*models.Invoice, error)
 	UpdateInvoice(ctx context.Context, invoice *models.Invoice) error
 }
 
 type ItemsService interface {
-	ListInvoiceItems(ctx context.Context, invoiceId int) ([]*models.InvoiceItem, error)
-	BulkCreateInvoiceItems(ctx context.Context, items []*models.InvoiceItem, invoiceId int) error
+	ListInvoiceItems(ctx context.Context, invoiceID int, userID int) ([]*models.InvoiceItem, error)
+	BulkCreateInvoiceItems(ctx context.Context, items []*models.InvoiceItem, invoiceID int, userID int) error
 }
 
 type MetricsService interface {
-	ListMetrics(ctx context.Context) ([]*models.MetricsQuery, error)
+	ListMetrics(ctx context.Context, userID int) ([]*models.MetricsQuery, error)
 	CreateMetrics(ctx context.Context, query *models.MetricsQuery) error
-	RetrieveMetrics(ctx context.Context, queryId int) (*models.MetricsQuery, error)
+	RetrieveMetrics(ctx context.Context, queryID int, userID int) (*models.MetricsQuery, error)
 	UpdateMetrics(ctx context.Context, query *models.MetricsQuery) error
 }
 
 type PrintingService interface {
-	ListInvoicePrintings(ctx context.Context) ([]*models.InvoicePrint, error)
-	CreateInvoicePrinting(ctx context.Context, canceling *models.InvoicePrint) error
-	RetrieveInvoicePrinting(ctx context.Context, cancelingId int) (*models.InvoicePrint, error)
-	UpdateInvoicePrinting(ctx context.Context, canceling *models.InvoicePrint) error
+	ListInvoicePrintings(ctx context.Context, userID int) ([]*models.InvoicePrint, error)
+	CreateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) error
+	RetrieveInvoicePrinting(ctx context.Context, printingID int, userID int) (*models.InvoicePrint, error)
+	UpdateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) error
 }
 
 type UserService interface {

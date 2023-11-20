@@ -23,8 +23,8 @@ func NewCancelingService(entityService interfaces.EntityService) *CancelingServi
 	}
 }
 
-func (s *CancelingService) ListInvoiceCancelings(ctx context.Context) ([]*models.InvoiceCancel, error) {
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_cancelings ORDER BY id DESC")
+func (s *CancelingService) ListInvoiceCancelings(ctx context.Context, userID int) ([]*models.InvoiceCancel, error) {
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_cancelings WHERE created_by = $1 ORDER BY id DESC", userID)
 	defer rows.Close()
 
 	cancelings := []*models.InvoiceCancel{}
@@ -37,7 +37,7 @@ func (s *CancelingService) ListInvoiceCancelings(ctx context.Context) ([]*models
 			return nil, utils.InternalServerErr
 		}
 
-		entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.ID)
+		entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.ID, canceling.CreatedBy)
 		if err != nil {
 			log.Println("Error linking invoice canceling to entity: ", err)
 			return nil, utils.InternalServerErr
@@ -52,7 +52,6 @@ func (s *CancelingService) ListInvoiceCancelings(ctx context.Context) ([]*models
 }
 
 func (s *CancelingService) CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
-	canceling.CreatedBy = 1
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices_cancelings
@@ -70,18 +69,18 @@ func (s *CancelingService) CreateInvoiceCanceling(ctx context.Context, canceling
 	return nil
 }
 
-func (s *CancelingService) RetrieveInvoiceCanceling(ctx context.Context, cancelingId int) (*models.InvoiceCancel, error) {
+func (s *CancelingService) RetrieveInvoiceCanceling(ctx context.Context, cancelingID int, userID int) (*models.InvoiceCancel, error) {
 	// TODO maybe JOIN would be more efficient than two separated queries
 	row := db.PG.QueryRow(
 		ctx,
-		"SELECT * FROM invoices_cancelings WHERE id = $1",
-		cancelingId,
+		"SELECT * FROM invoices_cancelings WHERE id = $1 AND created_by = $2",
+		cancelingID, userID,
 	)
 
 	canceling := models.NewEmptyInvoiceCancel()
 	err := canceling.Scan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
-		log.Printf("Invoice canceling with id %v not found: %v", cancelingId, err)
+		log.Printf("Invoice canceling with id %v not found: %v", cancelingID, err)
 		return nil, utils.CancelingNotFoundErr
 	}
 	if err != nil {
@@ -89,7 +88,7 @@ func (s *CancelingService) RetrieveInvoiceCanceling(ctx context.Context, canceli
 		return nil, utils.InternalServerErr
 	}
 
-	entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.ID)
+	entity, err := s.entityService.RetrieveEntity(ctx, canceling.Entity.ID, canceling.CreatedBy)
 	if err != nil {
 		log.Println("Error linking invoice canceling to entity: ", err)
 		return nil, utils.InternalServerErr
@@ -102,8 +101,8 @@ func (s *CancelingService) RetrieveInvoiceCanceling(ctx context.Context, canceli
 func (s *CancelingService) UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2 WHERE id = $3",
-		canceling.ReqStatus, canceling.ReqMsg, canceling.ID,
+		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2 WHERE id = $3 AND created_by = $4",
+		canceling.ReqStatus, canceling.ReqMsg, canceling.ID, canceling.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice canceling query: ", err)

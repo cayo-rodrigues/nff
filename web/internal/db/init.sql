@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS entities (
     street_type VARCHAR(64),
     street_name VARCHAR(64),
     number VARCHAR(6),
-    created_by BIGINT,
+    created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-    -- CONSTRAINT fk_entity_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT fk_entity_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS invoices (
@@ -41,12 +41,12 @@ CREATE TABLE IF NOT EXISTS invoices (
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     sender_id BIGINT NOT NULL,
     recipient_id BIGINT NOT NULL,
-    created_by BIGINT,
+    created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES entities(id) ON DELETE CASCADE,
-    CONSTRAINT fk_recipient FOREIGN KEY (recipient_id) REFERENCES entities(id) ON DELETE CASCADE
-    -- CONSTRAINT fk_invoice_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_recipient FOREIGN KEY (recipient_id) REFERENCES entities(id) ON DELETE CASCADE,
+    CONSTRAINT fk_invoice_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS invoices_items (
@@ -58,11 +58,11 @@ CREATE TABLE IF NOT EXISTS invoices_items (
     quantity DOUBLE PRECISION NOT NULL,
     value_per_unity DOUBLE PRECISION NOT NULL,
     invoice_id BIGINT NOT NULL,
-    created_by BIGINT,
+    created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT fk_invoice FOREIGN KEY(invoice_id) REFERENCES invoices(id) ON DELETE CASCADE
-    -- CONSTRAINT fk_item_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_invoice FOREIGN KEY(invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
+    CONSTRAINT fk_item_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS invoices_cancelings (
@@ -73,11 +73,11 @@ CREATE TABLE IF NOT EXISTS invoices_cancelings (
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,
-    created_by BIGINT,
+    created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT fk_canceling_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
-    -- CONSTRAINT fk_canceling_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_canceling_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
+    CONSTRAINT fk_canceling_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS metrics_history (
@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS metrics_history (
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,
-    created_by BIGINT,
+    created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT fk_metrics_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
-    -- CONSTRAINT fk_metrics_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_metrics_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
+    CONSTRAINT fk_metrics_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS invoices_printings (
@@ -111,9 +111,9 @@ CREATE TABLE IF NOT EXISTS invoices_printings (
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
     req_msg VARCHAR(256) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,
-    created_by BIGINT,
+    created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT fk_printing_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE
-    -- CONSTRAINT fk_printing_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_printing_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
+    CONSTRAINT fk_printing_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );

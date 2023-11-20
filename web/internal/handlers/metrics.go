@@ -48,8 +48,9 @@ func (p *MetricsPage) NewEmptyData() *MetricsPageData {
 func (p *MetricsPage) Render(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 	pageData.MetricsQuery = models.NewEmptyMetricsQuery()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -59,7 +60,7 @@ func (p *MetricsPage) Render(c *fiber.Ctx) error {
 	pageData.FormSelectFields.Entities = entities
 
 	// get the latest 10 metricsHistory
-	metricsHistory, err := p.service.ListMetrics(c.Context())
+	metricsHistory, err := p.service.ListMetrics(c.Context(), userID)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -73,10 +74,11 @@ func (p *MetricsPage) Render(c *fiber.Ctx) error {
 
 func (p *MetricsPage) GenerateMetrics(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
 	// TODO async data aggregation with go routines
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -88,13 +90,14 @@ func (p *MetricsPage) GenerateMetrics(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	entity, err := p.entityService.RetrieveEntity(c.Context(), entityId)
+	entity, err := p.entityService.RetrieveEntity(c.Context(), entityId, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
 	query := models.NewMetricsQueryFromForm(c)
 	query.Entity = entity
+	query.CreatedBy = userID
 
 	if !query.IsValid() {
 		pageData.MetricsQuery = query
@@ -114,11 +117,12 @@ func (p *MetricsPage) GenerateMetrics(c *fiber.Ctx) error {
 }
 
 func (p *MetricsPage) GetRequestCardDetails(c *fiber.Ctx) error {
-	queryId, err := strconv.Atoi(c.Params("id"))
+	queryID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.MetricsNotFoundErr)
 	}
-	query, err := p.service.RetrieveMetrics(c.Context(), queryId)
+	userID := c.Locals("UserID").(int)
+	query, err := p.service.RetrieveMetrics(c.Context(), queryID, userID)
 
 	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
 	return c.Render("partials/request-card-details", query)
@@ -126,18 +130,19 @@ func (p *MetricsPage) GetRequestCardDetails(c *fiber.Ctx) error {
 
 func (p *MetricsPage) GetMetricsForm(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
+	userID := c.Locals("UserID").(int)
 
-	entities, err := p.entityService.ListEntities(c.Context())
+	entities, err := p.entityService.ListEntities(c.Context(), userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
 	pageData.FormSelectFields.Entities = entities
 
-	queryId, err := strconv.Atoi(c.Params("id"))
+	queryID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return utils.GeneralErrorResponse(c, utils.MetricsNotFoundErr)
 	}
-	query, err := p.service.RetrieveMetrics(c.Context(), queryId)
+	query, err := p.service.RetrieveMetrics(c.Context(), queryID, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
@@ -164,7 +169,9 @@ func (p *MetricsPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
 	}
 
-	query, err := p.service.RetrieveMetrics(c.Context(), queryId)
+	userID := c.Locals("UserID").(int)
+
+	query, err := p.service.RetrieveMetrics(c.Context(), queryId, userID)
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
