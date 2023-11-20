@@ -18,26 +18,27 @@ import (
 )
 
 func main() {
-	PORT := os.Getenv("PORT")
-	if PORT == "" {
+	PORT, isThere := os.LookupEnv("PORT")
+	if !isThere || PORT == "" {
 		log.Fatal("PORT env not set or has an empty value")
 	}
 
 	DEBUG := false
-	if os.Getenv("DEBUG") == "true" {
+	_, isThere = os.LookupEnv("DEBUG")
+	if isThere {
 		DEBUG = true
 	}
 
 	PREFORK := false
-	if os.Getenv("PREFORK") == "true" {
+	_, isThere = os.LookupEnv("PREFORK")
+	if isThere {
 		PREFORK = true
 	}
 
-	SS_API_BASE_URL := os.Getenv("SS_API_BASE_URL")
-	if bgworkers.SS_API_BASE_URL == "" {
+	bgworkers.SS_API_BASE_URL, isThere = os.LookupEnv("SS_API_BASE_URL")
+	if !isThere || bgworkers.SS_API_BASE_URL == "" {
 		log.Fatal("SS_API_BASE_URL env not set or has an empty value")
 	}
-	bgworkers.SS_API_BASE_URL = SS_API_BASE_URL
 
 	dbpool := db.GetDBPool()
 	defer dbpool.Close()
