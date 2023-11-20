@@ -21,8 +21,8 @@ func GetDBPool() *pgxpool.Pool {
 		return PG
 	}
 
-	DB_URL, isThere := os.LookupEnv("DB_URL")
-	if !isThere || DB_URL == "" {
+	DB_URL := os.Getenv("DB_URL")
+	if DB_URL == "" {
 		log.Fatal("DB_URL env not set or has an empty value")
 	}
 	dbpool, err := pgxpool.New(context.Background(), DB_URL)
@@ -44,8 +44,8 @@ func GetRedisConn() *redis.Client {
 		return Redis
 	}
 
-	REDIS_URL, isThere := os.LookupEnv("REDIS_URL")
-	if !isThere || REDIS_URL == "" {
+	REDIS_URL := os.Getenv("REDIS_URL")
+	if REDIS_URL == "" {
 		log.Fatal("REDIS_URL env not set or has an empty value")
 	}
 	redis_opts, err := redis.ParseURL(REDIS_URL)

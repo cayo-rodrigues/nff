@@ -5,9 +5,11 @@ services:
     container_name: nff-web
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: ${NFF_DOCKERFILE:-Dockerfile.dev}
     environment:
       - PORT=8080
+      - DEBUG=${NFF_DEBUG:-false}
+      - PREFORK=${NFF_PREFORK:-false}
       - DB_URL=postgres://nff:nff@db:5432/nff
       - REDIS_URL=redis://rdb:6379/0
       - SS_API_BASE_URL=https://nff-ss-api-dev.up.railway.app
