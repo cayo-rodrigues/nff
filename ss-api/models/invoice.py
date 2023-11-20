@@ -16,10 +16,10 @@ class Invoice(Printable):
         self.operation: str = normalize_text(data.get("operation"))
         self.gta: str = normalize_text(data.get("gta"))
         self.cfop: str = normalize_text(data.get("cfop"), keep_case=True)
-        self.is_final_customer: bool = str_to_boolean(data.get("is_final_customer"))
+        self.is_final_customer: bool | None = str_to_boolean(data.get("is_final_customer"))
         self.icms: str = decode_icms_contributor_status(data.get("icms"))
         self.shipping: str = to_BRL(data.get("shipping"))
-        self.add_shipping_to_total_value: bool = str_to_boolean(
+        self.add_shipping_to_total_value: bool | None = str_to_boolean(
             data.get("add_shipping_to_total_value")
         )
         self.extra_notes: str = normalize_text(data.get("extra_notes"))
@@ -37,7 +37,13 @@ class Invoice(Printable):
         ]
 
     def get_missing_fields(self, mandatory_fields: list[str]):
-        return [key for key in mandatory_fields if not getattr(self, key)]
+        def is_field_missing(key: str) -> bool:
+            value = getattr(self, key)
+            is_empty = not value and not type(value) == bool
+            is_none = value is None
+            return is_empty or is_none
+
+        return [key for key in mandatory_fields if is_field_missing(key)]
 
     def is_valid(self):
         if not self.sender.is_valid_sender():

@@ -7,8 +7,16 @@ from constants.standards import FALSY_STRS, TRUTHY_STRS
 from .exceptions import NFFBaseException
 
 
-def str_to_boolean(value: str | None) -> bool:
-    return normalize_text(value) in TRUTHY_STRS
+def str_to_boolean(value: str | None) -> bool | None:
+    normalized_value = normalize_text(value)
+
+    if normalized_value in TRUTHY_STRS:
+        return True
+
+    if normalized_value in FALSY_STRS:
+        return False
+
+    return None
 
 
 def decode_icms_contributor_status(value: str | None) -> str:

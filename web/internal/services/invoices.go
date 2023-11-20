@@ -107,7 +107,7 @@ func (s *InvoiceService) RetrieveInvoice(ctx context.Context, invoiceID int, use
 		return nil, utils.InvoiceNotFoundErr
 	}
 	if err != nil {
-		log.Println("AQUI Error scaning invoice row: ", err)
+		log.Println("Error scaning invoice row: ", err)
 		return nil, utils.InternalServerErr
 	}
 

@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     gta VARCHAR(16),
     invoice_pdf VARCHAR(128) DEFAULT '',
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
-    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
+    req_msg VARCHAR(512) DEFAULT 'Em andamento...',
     sender_id BIGINT NOT NULL,
     recipient_id BIGINT NOT NULL,
     created_by BIGINT NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS invoices_cancelings (
     year INT NOT NULL,
     justification VARCHAR(128),
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
-    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
+    req_msg VARCHAR(512) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,
     created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS metrics_history (
     positive_records INT DEFAULT 0,
     negative_records INT DEFAULT 0,
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
-    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
+    req_msg VARCHAR(512) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,
     created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS invoices_printings (
     invoice_id_type VARCHAR(13),
     invoice_pdf VARCHAR(128) DEFAULT '',
     req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
-    req_msg VARCHAR(256) DEFAULT 'Em andamento...',
+    req_msg VARCHAR(512) DEFAULT 'Em andamento...',
     entity_id BIGINT NOT NULL,
     created_by BIGINT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
