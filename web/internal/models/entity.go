@@ -43,11 +43,11 @@ type Entity struct {
 	Email      string           `json:"email"`
 	Password   string           `json:"password"`
 	IsSelected bool             `json:"-"`
-	Address    *Address         `json:"address"`
 	CreatedBy  int              `json:"-"`
 	CreatedAt  time.Time        `json:"-"`
 	UpdatedAt  time.Time        `json:"-"`
 	Errors     *EntityFormError `json:"-"`
+	*Address
 }
 
 func NewEntityFormSelectFields() *EntityFormSelectFields {
