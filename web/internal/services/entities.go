@@ -79,7 +79,6 @@ func (s *EntityService) RetrieveEntity(ctx context.Context, entityID int, userID
 }
 
 func (s *EntityService) UpdateEntity(ctx context.Context, entity *models.Entity) error {
-	print("CREATED BY ", entity.CreatedBy)
 	result, err := db.PG.Exec(
 		ctx,
 		`UPDATE entities

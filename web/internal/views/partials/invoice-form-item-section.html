@@ -24,20 +24,20 @@
                         <option {{ if eq $.Group . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                     {{ end }}
                 </select>
-                <sub class="text-red-500">{{ .Errors.Group }}</sub>
+                <sub class="text-red-600">{{ .Errors.Group }}</sub>
             </div>
 
             <div class="flex flex-col gap-2 md:w-1/3">
                 <label for="description"><strong>Descrição</strong></label>
                 <input class="rounded bg-gray-100 p-2" type="text" id="description" name="description" value="{{ .Description }}">
-                <sub class="text-red-500">{{ .Errors.Description }}</sub>
+                <sub class="text-red-600">{{ .Errors.Description }}</sub>
             </div>
 
             <div class="flex flex-col gap-2 md:w-1/3">
                 <label for="quantity"><strong>Quantidade</strong></label>
                 <input class="rounded bg-gray-100 p-2" type="number" step="0.01" id="quantity" name="quantity"
                     value="{{ .Quantity }}">
-                <sub class="text-red-500">{{ .Errors.Quantity }}</sub>
+                <sub class="text-red-600">{{ .Errors.Quantity }}</sub>
             </div>
 
         </div>
@@ -48,7 +48,7 @@
                 <label class="truncate" for="value_per_unity"><strong>Valor unitário</strong></label>
                 <input class="rounded bg-gray-100 p-2" type="number" step="0.01" id="value_per_unity"
                     name="value_per_unity" value="{{ .ValuePerUnity }}">
-                <sub class="text-red-500">{{ .Errors.ValuePerUnity }}</sub>
+                <sub class="text-red-600">{{ .Errors.ValuePerUnity }}</sub>
             </div>
 
             <div class="flex flex-col gap-2 md:w-1/3">
@@ -58,7 +58,7 @@
                         <option {{ if eq $.Origin . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                     {{ end }}
                 </select>
-                <sub class="text-red-500">{{ .Errors.Origin }}</sub>
+                <sub class="text-red-600">{{ .Errors.Origin }}</sub>
             </div>
 
             <div class="flex flex-col gap-2 md:w-1/3">
@@ -68,7 +68,7 @@
                         <option {{ if eq $.UnityOfMeasurement . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                     {{ end }}
                 </select>
-                <sub class="text-red-500">{{ .Errors.UnityOfMeasurement }}</sub>
+                <sub class="text-red-600">{{ .Errors.UnityOfMeasurement }}</sub>
             </div>
 
         </div>

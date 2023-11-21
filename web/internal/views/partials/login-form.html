@@ -9,13 +9,13 @@
         <div class="flex flex-1 flex-col gap-2">
             <label for="email"><strong>Email</strong></label>
             <input class="rounded bg-gray-100 p-2 md:w-full" type="email" id="email" name="email" value="{{ .Email }}">
-            <sub class="text-red-500">{{ .Errors.Email }}</sub>
+            <sub class="text-red-600">{{ .Errors.Email }}</sub>
         </div>
 
         <div class="flex flex-1 flex-col gap-2">
             <label for="password"><strong>Senha</strong></label>
             <input class="rounded bg-gray-100 p-2 md:w-full" type="password" id="password" name="password" value="{{ .Password }}">
-            <sub class="text-red-500">{{ .Errors.Password}}</sub>
+            <sub class="text-red-600">{{ .Errors.Password}}</sub>
         </div>
 
         <div class="mt-2">

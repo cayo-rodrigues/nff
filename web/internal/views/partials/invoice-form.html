@@ -15,7 +15,7 @@
             </svg>
             <span>Usar Modelo</span>
         </button>
-        <p id="invoice-form-msg" class="flex-1 text-red-500 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
+        <p id="invoice-form-msg" class="flex-1 text-red-600 {{ if not .FormMsg }} hidden {{ end }}">{{ .FormMsg }}</p>
     </div>
 
     <section>
@@ -30,7 +30,7 @@
                             <option {{ if eq $.Invoice.Sender.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Invoice.Errors.Sender }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.Sender }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
@@ -40,7 +40,7 @@
                             <option {{ if eq $.Invoice.Recipient.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Invoice.Errors.Recipient }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.Recipient }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
@@ -50,7 +50,7 @@
                             <option {{ if eq $.Invoice.Operation . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Invoice.Errors.Operation }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.Operation }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
@@ -60,7 +60,7 @@
                             <option {{ if eq $.Invoice.Cfop . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Invoice.Errors.Cfop }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.Cfop }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
@@ -70,7 +70,7 @@
                             <option {{ if eq $.Invoice.IsIcmsContributor . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Invoice.Errors.IsIcmsContributor }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.IsIcmsContributor }}</sub>
                 </div>
 
             </div>
@@ -84,14 +84,14 @@
                             <option {{ if eq $.Invoice.IsFinalCustomer . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Invoice.Errors.IsFinalCustomer }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.IsFinalCustomer }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
                     <label for="shipping"><strong>Frete</strong></label>
                     <input class="rounded bg-gray-100 p-2 md:w-full" type="number" step="0.01" id="shipping" name="shipping"
                         value="{{ .Invoice.Shipping }}">
-                    <sub class="text-red-500">{{ .Invoice.Errors.Shipping }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.Shipping }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
@@ -102,13 +102,13 @@
                             <option {{ if eq $.Invoice.AddShippingToTotal . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Invoice.Errors.AddShippingToTotal }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.AddShippingToTotal }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
                     <label for="gta"><strong>GTA</strong></label>
                     <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="gta" name="gta" value="{{ .Invoice.Gta }}">
-                    <sub class="text-red-500">{{ .Invoice.Errors.Gta }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.Gta }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
@@ -117,7 +117,7 @@
                         class="group rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 md:w-full" type="button">
                         <div class="group-active:scale-90">Gerenciar</div>
                     </button>
-                    <sub class="text-red-500">{{ .Invoice.Errors.Items }}</sub>
+                    <sub class="text-red-600">{{ .Invoice.Errors.Items }}</sub>
                 </div>
 
             </div>

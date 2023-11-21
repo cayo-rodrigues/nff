@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (formMsgId && successMsg) {
             const formMsgElement = document.querySelector(formMsgId)
             formMsgElement.innerText = successMsg
-            formMsgElement.className = "flex-1 text-green-500"
+            formMsgElement.className = "flex-1 text-green-600"
         }
     }
     document.addEventListener('entity-created', () => clearFormErrors('#entity-form'))

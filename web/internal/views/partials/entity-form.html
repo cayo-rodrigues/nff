@@ -3,7 +3,7 @@
     <form>
         <input type="hidden" name="id" value="{{ .Entity.ID }}">
         <div class="flex flex-col py-2">
-            <sup class="text-red-500">{{ .Entity.Errors.Name }}</sup>
+            <sup class="text-red-600">{{ .Entity.Errors.Name }}</sup>
             <input class="flex-1 text-2xl font-semibold" type="text" name="name" value="{{ .Entity.Name }}"
                 placeholder="Nome">
         </div>
@@ -17,27 +17,27 @@
                             <option {{ if eq $.Entity.UserType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Entity.Errors.UserType }}</sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.UserType }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 pr-4 lg:w-1/5 xl:w-full xl:pr-0">
                     <label class="truncate" for="cpf_cnpj"><strong>CPF/CNPJ</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="cpf_cnpj" name="cpf_cnpj"
                         value="{{ .Entity.CpfCnpj }}">
-                    <sub class="text-red-500">{{ .Entity.Errors.CpfCnpj }}</sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.CpfCnpj }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 pr-4 lg:w-1/5 xl:w-full xl:pr-0">
                     <label class="truncate" for="ie"><strong>Inscrição Estadual</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="ie" name="ie" value="{{ .Entity.Ie }}">
-                    <sub class="text-red-500">{{ .Entity.Errors.Ie }}</sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.Ie }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 pr-4 lg:w-1/5 xl:w-full xl:pr-0">
                     <label class="truncate" for="email"><strong>E-mail</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="email" id="email" name="email"
                         value="{{ .Entity.Email }}">
-                    <sub class="text-red-500">{{ .Entity.Errors.Email }}</sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.Email }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 pr-4 lg:w-1/5 lg:pr-0 xl:w-full">
@@ -53,7 +53,7 @@
                     <label class="truncate" for="postal_code"><strong>CEP</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="postal_code" name="postal_code"
                         value="{{ .Entity.Address.PostalCode }}">
-                    <sub class="text-red-500">{{ .Entity.Errors.PostalCode }}</sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.PostalCode }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 lg:w-1/5 lg:pr-4 xl:w-full xl:pr-0">
@@ -70,7 +70,7 @@
                         <option {{ if eq $.Entity.Address.StreetType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-500">{{ .Entity.Errors.StreetType }}</sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.StreetType }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 lg:w-1/5 lg:pr-4 xl:w-full xl:pr-0">
