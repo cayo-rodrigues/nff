@@ -35,6 +35,9 @@ func main() {
 		PREFORK = true
 	}
 
+	CERT_FILE := os.Getenv("CERT_FILE")
+	CERT_KEY := os.Getenv("CERT_KEY")
+
 	bgworkers.SS_API_BASE_URL, isThere = os.LookupEnv("SS_API_BASE_URL")
 	if !isThere || bgworkers.SS_API_BASE_URL == "" {
 		log.Fatal("SS_API_BASE_URL env not set or has an empty value")
@@ -129,6 +132,14 @@ func main() {
 	app.Get("/metrics/:id/form", metricsPage.GetMetricsForm)
 	app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)
 	app.Get("/metrics/:id/request-card-status", metricsPage.GetRequestStatus)
+
+	if CERT_FILE != "" && CERT_KEY != "" {
+		err := app.ListenTLS(":"+PORT, CERT_FILE, CERT_KEY)
+		if err != nil {
+			log.Fatalln(">:(", err)
+		}
+		return
+	}
 
 	err := app.Listen(":" + PORT)
 	if err != nil {
