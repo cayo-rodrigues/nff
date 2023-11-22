@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"log"
 	"os"
 
@@ -35,8 +36,7 @@ func main() {
 		PREFORK = true
 	}
 
-	CERT_FILE_PATH := os.Getenv("CERT_FILE")
-	CERT_KEY_PATH := os.Getenv("CERT_KEY")
+	PRD := os.Getenv("PRD")
 
 	bgworkers.SS_API_BASE_URL, isThere = os.LookupEnv("SS_API_BASE_URL")
 	if !isThere || bgworkers.SS_API_BASE_URL == "" {
@@ -133,8 +133,15 @@ func main() {
 	app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)
 	app.Get("/metrics/:id/request-card-status", metricsPage.GetRequestStatus)
 
-	if CERT_FILE_PATH != "" && CERT_KEY_PATH != "" {
-		err := app.ListenTLS(":"+PORT, CERT_FILE_PATH, CERT_KEY_PATH)
+	if PRD == "true" {
+		caCertPath := "/etc/ssl/certs/ca-certificates.crt"
+
+		caCert, err := tls.LoadX509KeyPair(caCertPath, "")
+		if err != nil {
+			log.Fatalln("Error loading CA certificate: ", err)
+		}
+
+		err = app.ListenTLSWithCertificate(":"+PORT, caCert)
 		if err != nil {
 			log.Fatalln(">:(", err)
 		}

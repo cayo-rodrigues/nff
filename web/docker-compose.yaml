@@ -13,7 +13,6 @@ services:
       - SS_API_BASE_URL=https://nff-ss-api-dev.up.railway.app
     ports:
       - 8080:8080
-      - 80:8080
     volumes:
       - ./:/home/app
     depends_on:
