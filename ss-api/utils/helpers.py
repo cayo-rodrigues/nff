@@ -50,10 +50,13 @@ def normalize_text(
 
 
 def to_BRL(
-    value: str | float | None, symbol: bool = False, grouping: bool = False
+    value: str | float | None,
+    symbol: bool = False,
+    grouping: bool = False,
+    default: str = "0,00",
 ) -> str:
     if not value:
-        return "0,00"
+        return default
 
     try:
         value = float(value)
