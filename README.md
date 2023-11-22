@@ -6,7 +6,7 @@ Este projeto tem o objetivo de automatizar processos repetitivos que funcionári
 
 ## Demonstração
 
-### [Clique aqui para ver o projeto em produção](https://nff-web-dev.up.railway.app/)
+### [Clique aqui para ver o projeto em produção](http://ec2-18-231-107-141.sa-east-1.compute.amazonaws.com)
 
 > A nota fiscal emitida no vídeo é apenas para fins demonstrativos
 
@@ -28,10 +28,11 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [x] Possibilitar **impressão** de notas fiscais isoladamente
 - [x] Calcular **métricas** de entrada e saída em determinado período
 - [x] Histórico de operações
-- [x] Sistema de usuários (já implementado, porém sujeito a otimizações)
-- [ ] Paginação de histórico de requerimentos
-- [ ] Filtragem/Pesquisa no histórico de requerimentos
+- [x] Sistema de usuários
+- [ ] Filtros por data e entidade no histórico de requerimentos
 - [ ] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos (parcialmente implementado)
 - [ ] Cancelamento de NF através do protocolo
 - [ ] Login/Cadastro com Google
 - [ ] Bom uso de cache
+- [ ] DNS e HTTPS
+- [ ] Agregar métricas por mês
