@@ -107,7 +107,7 @@ func (i *Invoice) IsValid() bool {
 	mustHaveItemsMsg := "A NF deve ter pelo menos 1 produto"
 	invalidItemsMsg := "Dados dos produtos inválidos"
 	itemsCount := len(i.Items)
-	validationsCount := 13 + itemsCount
+	validationsCount := 14 + itemsCount
 
 	var wg sync.WaitGroup
 	wg.Add(validationsCount)
@@ -119,6 +119,7 @@ func (i *Invoice) IsValid() bool {
 	go utils.ValidateField(i.Cfop == 0, &i.Errors.Cfop, &mandatoryFieldMsg, ch, &wg)
 	go utils.ValidateField(i.IsIcmsContributor == "", &i.Errors.IsIcmsContributor, &mandatoryFieldMsg, ch, &wg)
 	go utils.ValidateField(i.IsFinalCustomer == "", &i.Errors.IsFinalCustomer, &mandatoryFieldMsg, ch, &wg)
+	go utils.ValidateField(i.Shipping == 0, &i.Errors.Shipping, &mandatoryFieldMsg, ch, &wg)
 	go utils.ValidateField(i.AddShippingToTotal == "", &i.Errors.AddShippingToTotal, &mandatoryFieldMsg, ch, &wg)
 
 	go utils.ValidateListField(i.Operation, globals.InvoiceOperations[:], &i.Errors.Operation, &unacceptableValueMsg, ch, &wg)

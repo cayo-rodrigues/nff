@@ -18,7 +18,7 @@ class Invoice(Printable):
         self.cfop: str = normalize_text(data.get("cfop"), keep_case=True)
         self.is_final_customer: bool | None = str_to_boolean(data.get("is_final_customer"))
         self.icms: str = decode_icms_contributor_status(data.get("icms"))
-        self.shipping: str = to_BRL(data.get("shipping"), default="0,01")
+        self.shipping: str = to_BRL(data.get("shipping"))
         self.add_shipping_to_total_value: bool | None = str_to_boolean(
             data.get("add_shipping_to_total_value")
         )
