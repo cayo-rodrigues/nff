@@ -53,7 +53,7 @@ def to_BRL(
     value: str | float | None, symbol: bool = False, grouping: bool = False
 ) -> str:
     if not value:
-        return ""
+        return "0,00"
 
     try:
         value = float(value)
