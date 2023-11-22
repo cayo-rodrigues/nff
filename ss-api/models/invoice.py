@@ -39,7 +39,7 @@ class Invoice(Printable):
     def get_missing_fields(self, mandatory_fields: list[str]):
         def is_field_missing(key: str) -> bool:
             value = getattr(self, key)
-            is_empty = not value and not type(value) == bool
+            is_empty = not value and not type(value) == bool and not key == "shipping"
             is_none = value is None
             return is_empty or is_none
 
