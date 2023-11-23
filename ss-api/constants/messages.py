@@ -10,9 +10,9 @@ class ErrorMessages:
 
 
 class WarningMessages:
-    INVOICE_AWAITING_ANALISYS = "A solicitação foi efetuada com sucesso. Mas a NF está em análise. Você poderá baixar o pdf provavelmente hoje mais tarde ou amanhã caso ela seja aprovada (deferida)."
+    INVOICE_AWAITING_ANALISYS = "A solicitação foi efetuada com sucesso. Mas a NFA está em análise. Você poderá baixar o PDF provavelmente hoje mais tarde ou amanhã caso ela seja aprovada (deferida)."
 
 
 class SuccessMessages:
-    INVOICE_PRINTING = "Download da nota fiscal realizado com sucesso."
+    INVOICE_PRINTING = "Impressão da NFA realizada com sucesso."
     INVOICE_QUERY = "Consulta realizada com sucesso."

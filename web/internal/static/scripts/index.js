@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const defaultFormSuccessMsg = 'Requerimento efetuado com sucesso! Acompanhe o progresso na sessão abaixo.'
+    const defaultFormSuccessMsg = 'Operação iniciada! Acompanhe o progresso na sessão abaixo.'
 
     // display general errors
     document.addEventListener('general-error', function() {
