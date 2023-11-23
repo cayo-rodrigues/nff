@@ -1,6 +1,6 @@
 from datetime import datetime
 from utils.helpers import is_valid_br_date, normalize_text, to_BRL
-from constants.db import MandatoryFields
+from constants.db import MandatoryFields, PrettyModelFields
 from models.entity import Entity
 
 
@@ -45,23 +45,23 @@ class InvoiceQuery:
 
         self.errors = {}
 
-    def get_missing_fields(self, mandatory_fields: list[str]):
-        return [key for key in mandatory_fields if not getattr(self, key)]
+    def get_missing_fields(self, mandatory_fields: list[tuple[str, str]]):
+        return [pretty_key for key, pretty_key in mandatory_fields if not getattr(self, key)]
 
     def get_invalid_fields(self):
         invalid_fields = []
         if self.start_date and not is_valid_br_date(self.start_date):
-            invalid_fields.append("start_date")
+            invalid_fields.append(PrettyModelFields.InvoiceQuery.START_DATE)
         if self.end_date and not is_valid_br_date(self.end_date):
-            invalid_fields.append("end_date")
+            invalid_fields.append(PrettyModelFields.InvoiceQuery.END_DATE)
 
         if not "start_date" in invalid_fields and not "end_date" in invalid_fields:
             start_date = datetime.strptime(self.start_date, "%d/%m/%Y")
             end_date = datetime.strptime(self.end_date, "%d/%m/%Y")
 
             if start_date > end_date or (end_date - start_date).days > 365:
-                invalid_fields.append("start_date")
-                invalid_fields.append("end_date")
+                invalid_fields.append(PrettyModelFields.InvoiceQuery.START_DATE)
+                invalid_fields.append(PrettyModelFields.InvoiceQuery.END_DATE)
 
         return invalid_fields
 

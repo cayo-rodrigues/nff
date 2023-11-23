@@ -36,14 +36,14 @@ class Invoice(Printable):
             InvoiceItem(data=item) for item in data.get("items", [])
         ]
 
-    def get_missing_fields(self, mandatory_fields: list[str]):
+    def get_missing_fields(self, mandatory_fields: list[tuple[str, str]]):
         def is_field_missing(key: str) -> bool:
             value = getattr(self, key)
             is_empty = not value and not type(value) == bool
             is_none = value is None
             return is_empty or is_none
 
-        return [key for key in mandatory_fields if is_field_missing(key)]
+        return [pretty_key for key, pretty_key in mandatory_fields if is_field_missing(key)]
 
     def is_valid(self):
         if not self.sender.is_valid_sender():

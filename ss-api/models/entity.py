@@ -20,8 +20,8 @@ class Entity:
 
         self.errors = {}
 
-    def get_missing_fields(self, mandatory_fields: list[str]):
-        return [key for key in mandatory_fields if not getattr(self, key)]
+    def get_missing_fields(self, mandatory_fields: list[tuple[str, str]]):
+        return [pretty_key for key, pretty_key in mandatory_fields if not getattr(self, key)]
 
     def is_valid_sender(self):
         missing_fields = self.get_missing_fields(MandatoryFields.SENDER_ENTITY)
