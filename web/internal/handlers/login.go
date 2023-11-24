@@ -64,7 +64,7 @@ func (p *LoginPage) Login(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/entities")
+	return c.Redirect("/entities", fiber.StatusFound)
 
 }
 

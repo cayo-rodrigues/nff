@@ -180,5 +180,5 @@ func (p *PrintInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	targetID := fmt.Sprintf("#request-card-%v", c.Params("id"))
 	c.Set("HX-Retarget", targetID)
 	c.Set("HX-Reswap", "outerHTML")
-	return c.Status(286).Render("partials/request-card", printing)
+	return c.Render("partials/request-card", printing)
 }

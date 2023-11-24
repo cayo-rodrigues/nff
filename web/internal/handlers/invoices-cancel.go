@@ -184,5 +184,5 @@ func (p *CancelInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	targetId := fmt.Sprintf("#request-card-%v", c.Params("id"))
 	c.Set("HX-Retarget", targetId)
 	c.Set("HX-Reswap", "outerHTML")
-	return c.Status(286).Render("partials/request-card", canceling)
+	return c.Render("partials/request-card", canceling)
 }
