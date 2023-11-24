@@ -138,6 +138,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 
 func (p *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
 	item := models.NewEmptyInvoiceItem()
+	c.Set("HX-Trigger-After-Settle", "enumerate-item-sections")
 	return c.Render("partials/invoice-form-item-section", item)
 }
 
