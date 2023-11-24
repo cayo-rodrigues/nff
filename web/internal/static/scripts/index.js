@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function highlightEntity(event) {
         const entityId = event.detail.value
         document.querySelector(`#entity-${entityId}`).click()
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
     }
 
     document.addEventListener('entity-created', highlightEntity)
