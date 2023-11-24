@@ -113,7 +113,7 @@
 
                 <div class="flex flex-col gap-2 md:w-1/5">
                     <strong>Produtos</strong>
-                    <button onclick="this.closest('section').querySelector('dialog').showModal(); document.dispatchEvent(new CustomEvent('enumerate-item-sections'))"
+                    <button onclick="openItemsDialog('invoice-items-dialog')"
                         class="group rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 md:w-full" type="button">
                         <div class="group-active:scale-90">Gerenciar</div>
                     </button>
@@ -125,19 +125,27 @@
         </div>
 
         <dialog id="invoice-items-dialog" class="h-2/3 rounded px-6 pb-4 outline-transparent sm:w-11/12 md:w-3/4 lg:w-2/3">
-            <div class="sticky top-0 z-10 flex items-center gap-6 border-b border-gray-300 bg-white py-2">
-                <button class="flex justify-center rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600" type="button"
-                    onclick="this.closest('dialog').close()">
-                    <svg class="mr-3 translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg>
-                    Confirmar
-                </button>
-                <button class="rounded bg-gray-200 px-4 py-2 font-bold hover:bg-gray-300 active:bg-gray-400" type="button"
-                    hx-get="/invoices/items/form-section" hx-target="#invoice-items-dialog" hx-swap="beforeend"
-                    hx-trigger="click">
-                    +
-                </button>
-                <strong>Total de itens: </strong>
-                <span id="items-count"></span>
+            <div class="sticky top-0 z-10 flex justify-between border-b border-gray-300 bg-white py-2">
+                <div class="flex items-center gap-6">
+                    <button class="flex justify-center rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600" type="button"
+                        onclick="this.closest('dialog').close()">
+                        <svg class="mr-3 translate-y-1 transform" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg>
+                        Confirmar
+                    </button>
+                    <button class="rounded bg-gray-200 px-4 py-2 font-bold hover:bg-gray-300 active:bg-gray-400" type="button"
+                        hx-get="/invoices/items/form-section" hx-target="#invoice-items-dialog" hx-swap="beforeend"
+                        hx-trigger="click">
+                        +
+                    </button>
+                    <strong>Total de itens:</strong>
+                    <span id="items-count"></span>
+                </div>
+                <div>
+                    <button class="rounded bg-gray-200 px-4 py-3 font-bold hover:bg-gray-300 active:bg-gray-400" type="button"
+                        onclick="expandOrShrinkDialog('invoice-items-dialog', this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M32 32C14.3 32 0 46.3 0 64v96c0 17.7 14.3 32 32 32s32-14.3 32-32V96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H64V352zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32h64v64c0 17.7 14.3 32 32 32s32-14.3 32-32V64c0-17.7-14.3-32-32-32H320zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v64H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32V352z"/></svg>
+                    </button>
+                </div>
             </div>
 
             {{ range .Invoice.Items }}

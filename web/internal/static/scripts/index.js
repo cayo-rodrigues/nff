@@ -71,5 +71,43 @@ document.addEventListener('DOMContentLoaded', () => {
             document.dispatchEvent(new CustomEvent('enumerate-item-sections'))
         }, 250)
     })
+
+    document.addEventListener('expand-dialog-view', (event) => {
+        const dialogId = event.detail.dialogId
+        const dialog = document.querySelector(`#${dialogId}`)
+        dialog.style.height = '100vh'
+        dialog.style.width = '100vw'
+
+        const srcElement = event.detail.srcElement
+
+        srcElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M160 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v64H32c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32V64zM32 320c-17.7 0-32 14.3-32 32s14.3 32 32 32H96v64c0 17.7 14.3 32 32 32s32-14.3 32-32V352c0-17.7-14.3-32-32-32H32zM352 64c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H352V64zM320 320c-17.7 0-32 14.3-32 32v96c0 17.7 14.3 32 32 32s32-14.3 32-32V384h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H320z"/></svg>'
+        srcElement.onclick = () => expandOrShrinkDialog(dialogId, srcElement, 'shrink')
+    })
+
+
+    document.addEventListener('shrink-dialog-view', (event) => {
+        const dialogId = event.detail.dialogId
+        const dialog = document.querySelector(`#${dialogId}`)
+        dialog.style.height = ""
+        dialog.style.width = ""
+
+        const srcElement = event.detail.srcElement
+
+        srcElement.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M32 32C14.3 32 0 46.3 0 64v96c0 17.7 14.3 32 32 32s32-14.3 32-32V96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H64V352zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32h64v64c0 17.7 14.3 32 32 32s32-14.3 32-32V64c0-17.7-14.3-32-32-32H320zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v64H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32V352z"/></svg>'
+        srcElement.onclick = () => expandOrShrinkDialog(dialogId, srcElement, 'expand')
+    })
 })
+
+function expandOrShrinkDialog(dialogId, srcElement, action = 'expand') {
+    document.dispatchEvent(new CustomEvent(`${action}-dialog-view`, { detail: { dialogId, srcElement } }))
+}
+
+function removeItemSection(sectionElement) {
+    document.dispatchEvent(new CustomEvent('smooth-remove-item-section', { detail: { element: sectionElement } }))
+}
+
+function openItemsDialog(dialogId) {
+    document.querySelector(`#${dialogId}`).showModal()
+    document.dispatchEvent(new CustomEvent('enumerate-item-sections'))
+}
 
