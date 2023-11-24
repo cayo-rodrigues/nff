@@ -39,8 +39,8 @@ var InvoiceOperations = [2]string{
 }
 
 var InvoiceCfops = [14]int{
-	5102,
 	5101,
+	5102,
 	5103,
 	5105,
 	5111,
