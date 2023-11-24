@@ -27,7 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
             formMsgElement.className = "flex-1 text-green-600"
         }
     }
-    document.addEventListener('entity-created', () => clearFormErrors('#entity-form'))
+
+    function highlightEntity(event) {
+        const entityId = event.detail.value
+        document.querySelector(`#entity-${entityId}`).click()
+    }
+
+    document.addEventListener('entity-created', highlightEntity)
     document.addEventListener('entity-updated', () => clearFormErrors('#entity-form'))
     document.addEventListener('invoice-required', () => clearFormErrors('#invoice-form', '#invoice-form-msg', defaultFormSuccessMsg))
     document.addEventListener('invoice-cancel-required', () => clearFormErrors('#invoice-cancel-form', '#invoice-cancel-form-msg', defaultFormSuccessMsg))

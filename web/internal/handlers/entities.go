@@ -43,6 +43,27 @@ func (p *EntitiesPage) Render(c *fiber.Ctx) error {
 	return c.Render("entities", pageData, "layouts/base")
 }
 
+func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
+	userID := c.Locals("UserID").(int)
+	entity := models.NewEntityFromForm(c)
+	entity.CreatedBy = userID
+
+	if !entity.IsValid() {
+		pageData := p.NewEmptyData()
+		pageData["Entity"] = entity
+		return utils.RetargetToForm(c, "entity", pageData)
+	}
+
+	err := p.service.CreateEntity(c.Context(), entity)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	eventMsg := fmt.Sprintf("{\"entity-created\": %v}", entity.ID)
+	c.Set("HX-Trigger-After-Settle", eventMsg)
+	return c.Render("partials/entity-card", entity)
+}
+
 func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
 	pageData := p.NewEmptyData()
 	userID := c.Locals("UserID").(int)
@@ -61,26 +82,6 @@ func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
 	pageData["Entity"] = entity
 
 	return c.Render("partials/entity-form", pageData)
-}
-
-func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
-	userID := c.Locals("UserID").(int)
-	entity := models.NewEntityFromForm(c)
-	entity.CreatedBy = userID
-
-	if !entity.IsValid() {
-		pageData := p.NewEmptyData()
-		pageData["Entity"] = entity
-		return utils.RetargetToForm(c, "entity", pageData)
-	}
-
-	err := p.service.CreateEntity(c.Context(), entity)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	c.Set("HX-Trigger-After-Settle", "entity-created")
-	return c.Render("partials/entity-card", entity)
 }
 
 func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
