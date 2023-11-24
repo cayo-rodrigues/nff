@@ -8,21 +8,8 @@ type InvoiceItemFormSelectFields struct {
 
 // ENTITIES
 
-var EntityUserTypes = [15]string{
+var EntityUserTypes = [2]string{
 	"Produtor Rural",
-	"Inscrição Estadual",
-	"Protocolo",
-	"Contabilista Pessoa Física",
-	"Gráfica e Outros - CNPJ",
-	"Despachante Aduaneiro Pessoa Física",
-	"Recinto Alfandegado Pessoa Jurídica",
-	"CERM/TFRM Pessoa Física",
-	"CERM/TFRM Pessoa Jurídica",
-	"VAF Especial",
-	"Contribuinte Interestadual",
-	"Pessoa Física Autuada - PTA eletrônico",
-	"Responsável Tributário - Instituição Financeira",
-	"Conselheiro",
 	"Apenas Destinatário",
 }
 var EntityAddressStreetTypes = [3]string{

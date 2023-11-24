@@ -12,7 +12,7 @@ import (
 )
 
 type EntityFormSelectFields struct {
-	UserTypes   *[15]string
+	UserTypes   *[2]string
 	StreetTypes *[3]string
 }
 
