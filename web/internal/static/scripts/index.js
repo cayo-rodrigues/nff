@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     })
 
+    // enumerate invoice form item sections and update total count
     document.addEventListener('enumerate-item-sections', () => {
         const itemsDialog = document.querySelector('#invoice-items-dialog')
 
@@ -64,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         itemsDialog.scrollTo({ top: itemsDialog.scrollHeight, behavior: 'smooth' })
     })
 
+    // smoothly remove invoice form item sections to avoid visual confusion
     document.addEventListener('smooth-remove-item-section', (event) => {
         const itemSection = event.detail.element
         itemSection.classList.add('opacity-0', '-mt-60');
@@ -73,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 250)
     })
 
+    // full screen dialog
     document.addEventListener('expand-dialog-view', (event) => {
         const dialogId = event.detail.dialogId
         const dialog = document.querySelector(`#${dialogId}`)
@@ -85,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         srcElement.onclick = () => expandOrShrinkDialog(dialogId, srcElement, 'shrink')
     })
 
-
+    // normal size dialog
     document.addEventListener('shrink-dialog-view', (event) => {
         const dialogId = event.detail.dialogId
         const dialog = document.querySelector(`#${dialogId}`)
