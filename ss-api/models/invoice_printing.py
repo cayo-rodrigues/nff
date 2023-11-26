@@ -6,14 +6,18 @@ from models.entity import Entity
 
 class InvoicePrinting(Printable):
     def __init__(self, data: dict) -> None:
-        self.invoice_id: str = normalize_text(data.get("invoice_id"))
+        self.invoice_id: str = normalize_text(
+            data.get("invoice_id"), keep_case=True, remove=[".", "NFA", "-"]
+        )
         self.invoice_id_type: str = normalize_text(data.get("invoice_id_type"))
         self.entity = Entity(data.get("entity", {}), is_sender=True)
 
         self.errors = {}
 
     def get_missing_fields(self, mandatory_fields: list[tuple[str, str]]):
-        return [pretty_key for key, pretty_key in mandatory_fields if not getattr(self, key)]
+        return [
+            pretty_key for key, pretty_key in mandatory_fields if not getattr(self, key)
+        ]
 
     def is_valid(self):
         if not self.entity.is_valid_sender():
