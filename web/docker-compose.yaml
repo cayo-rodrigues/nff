@@ -30,7 +30,6 @@ services:
       - POSTGRES_DB=nff
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./internal/db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   rdb:
     container_name: nff-rdb
@@ -39,6 +38,19 @@ services:
       - 6378:6379
     volumes:
       - redis_data:/var/lib/redis/data
+
+  migrations:
+    container_name: nff-migrations
+    build:
+      context: .
+      dockerfile: Dockerfile.goose
+    environment:
+      - DB_URL=postgres://nff:nff@db:5432/nff
+      - COMMAND=up
+    volumes:
+      - ./internal/db/migrations/:/migrations
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

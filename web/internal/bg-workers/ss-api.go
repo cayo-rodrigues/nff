@@ -32,7 +32,6 @@ type SSAPIInvoiceErrors struct {
 type SSAPIInvoiceRequest struct {
 	*models.Invoice
 	ShouldDownload  bool `json:"should_download"`
-	ShouldNotFinish bool `json:"should_not_finish"`
 }
 
 type SSAPIInvoiceResponse struct {

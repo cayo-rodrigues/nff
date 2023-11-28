@@ -1,3 +1,5 @@
+-- +goose Up
+-- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(128) UNIQUE NOT NULL,
@@ -80,6 +82,21 @@ CREATE TABLE IF NOT EXISTS invoices_cancelings (
     CONSTRAINT fk_canceling_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS invoices_printings (
+    id BIGSERIAL PRIMARY KEY,
+    invoice_id VARCHAR(13), -- number or protocol
+    invoice_id_type VARCHAR(13),
+    invoice_pdf VARCHAR(128) DEFAULT '',
+    req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
+    req_msg VARCHAR(512) DEFAULT 'Em andamento...',
+    entity_id BIGINT NOT NULL,
+    created_by BIGINT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT fk_printing_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
+    CONSTRAINT fk_printing_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS metrics_history (
     id BIGSERIAL PRIMARY KEY,
     start_date TIMESTAMPTZ NOT NULL,
@@ -102,18 +119,15 @@ CREATE TABLE IF NOT EXISTS metrics_history (
     CONSTRAINT fk_metrics_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
     CONSTRAINT fk_metrics_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
+-- +goose StatementEnd
 
-CREATE TABLE IF NOT EXISTS invoices_printings (
-    id BIGSERIAL PRIMARY KEY,
-    invoice_id VARCHAR(13), -- number or protocol
-    invoice_id_type VARCHAR(13),
-    invoice_pdf VARCHAR(128) DEFAULT '',
-    req_status VARCHAR(7) DEFAULT 'pending', -- success, warning, error, pending
-    req_msg VARCHAR(512) DEFAULT 'Em andamento...',
-    entity_id BIGINT NOT NULL,
-    created_by BIGINT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    CONSTRAINT fk_printing_entity FOREIGN KEY (entity_id) REFERENCES entities(id) ON DELETE CASCADE,
-    CONSTRAINT fk_printing_user FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
-);
+-- +goose Down
+-- +goose StatementBegin
+DROP TABLE metrics_history;
+DROP TABLE invoices_printings;
+DROP TABLE invoices_cancelings;
+DROP TABLE invoices_items;
+DROP TABLE invoices;
+DROP TABLE entities;
+DROP TABLE users;
+-- +goose StatementEnd
