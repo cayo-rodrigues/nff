@@ -68,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // smoothly remove invoice form item sections to avoid visual confusion
     document.addEventListener('smooth-remove-item-section', (event) => {
         const itemSection = event.detail.element
-        itemSection.classList.add('opacity-0', '-mt-60');
+        itemSection.style.marginTop = `-${itemSection.clientHeight}px`
+        itemSection.classList.add('opacity-0');
         setTimeout(() => {
             itemSection.remove()
             document.dispatchEvent(new CustomEvent('enumerate-item-sections'))
