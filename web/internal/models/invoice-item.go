@@ -19,6 +19,7 @@ type InvoiceItemFormError struct {
 	UnityOfMeasurement string
 	Quantity           string
 	ValuePerUnity      string
+	NCM                string
 }
 
 type InvoiceItem struct {
@@ -34,6 +35,7 @@ type InvoiceItem struct {
 	CreatedBy          int                   `json:"-"`
 	CreatedAt          time.Time             `json:"-"`
 	UpdatedAt          time.Time             `json:"-"`
+	NCM                string                `json:"ncm"`
 }
 
 func NewEmptyInvoiceItem() *InvoiceItem {
@@ -49,6 +51,7 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) ([]*InvoiceItem, error) {
 	postArgs := c.Request().PostArgs()
 
 	groups := postArgs.PeekMulti("group")
+	ncms := postArgs.PeekMulti("ncm")
 	descriptions := postArgs.PeekMulti("description")
 	origins := postArgs.PeekMulti("origin")
 	unitiesOfMeasurement := postArgs.PeekMulti("unity_of_measurement")
@@ -60,6 +63,7 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) ([]*InvoiceItem, error) {
 		item := NewEmptyInvoiceItem()
 
 		item.Group = string(groups[i])
+		item.NCM = string(ncms[i])
 		item.Description = string(descriptions[i])
 		item.Origin = string(origins[i])
 		item.UnityOfMeasurement = string(unitiesOfMeasurement[i])
@@ -120,5 +124,6 @@ func (i *InvoiceItem) Scan(rows db.Scanner) error {
 		&i.ID, &i.Group, &i.Description, &i.Origin,
 		&i.UnityOfMeasurement, &i.Quantity, &i.ValuePerUnity, &i.InvoiceID,
 		&i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
+		&i.NCM,
 	)
 }
