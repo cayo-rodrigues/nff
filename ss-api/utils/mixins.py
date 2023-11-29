@@ -29,13 +29,11 @@ class Printable:
             return encoded_bytes.decode("utf-8")
 
     def use_custom_file_name(self):
+        print("CUSTOM FILE NAME")
         invoice_file_name = self.get_file_name()
         invoice_id = invoice_file_name.removesuffix(".pdf")
-        new_file_name = (
-            INVOICES_DIR_PATH + self.custom_file_name + f" ({invoice_id})" + ".pdf"
-        )
-
-        FileManager.rename_file(old_name=invoice_file_name, new_name=new_file_name)
+        new_file_name = self.custom_file_name + f" ({invoice_id})" + ".pdf"
+        return new_file_name
 
     def erase_file(self):
         pdf_file_path = self.get_file_path()

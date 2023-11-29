@@ -32,10 +32,10 @@ def print_invoice(data: dict):
     siare.close_unfocused_windows()
 
     invoice_id = invoice_printing.get_id_from_filename()
-    if invoice_printing.custom_file_name:
-        invoice_printing.use_custom_file_name()
     invoice_file_path = invoice_printing.get_file_path()
     invoice_file_name = invoice_printing.get_file_name()
+    if invoice_printing.custom_file_name:
+        invoice_file_name = invoice_printing.use_custom_file_name()
     pdf_url = upload_to_s3(file_path=invoice_file_path, s3_file_name=invoice_file_name)
 
     invoice_printing.erase_file()
