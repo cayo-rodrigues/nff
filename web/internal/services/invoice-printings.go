@@ -100,8 +100,8 @@ func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingI
 func (s *PrintingService) UpdateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE invoices_printings SET req_status = $1, req_msg = $2, invoice_pdf = $3, updated_at = $4 WHERE id = $5 AND created_by = $6",
-		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, time.Now(), printing.ID, printing.CreatedBy,
+		"UPDATE invoices_printings SET req_status = $1, req_msg = $2, invoice_pdf = $3, custom_file_name = $4, updated_at = $5 WHERE id = $6 AND created_by = $7",
+		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.CustomFileName, time.Now(), printing.ID, printing.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice printing query: ", err)

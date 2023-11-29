@@ -142,8 +142,8 @@ func (s *InvoiceService) RetrieveInvoice(ctx context.Context, invoiceID int, use
 func (s *InvoiceService) UpdateInvoice(ctx context.Context, invoice *models.Invoice) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4, invoice_pdf = $5, updated_at = $6 WHERE id = $7 AND created_by = $8",
-		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.PDF, time.Now(), invoice.ID, invoice.CreatedBy,
+		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4, invoice_pdf = $5, custom_file_name = $6, updated_at = $7 WHERE id = $8 AND created_by = $9",
+		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.PDF, invoice.CustomFileName, time.Now(), invoice.ID, invoice.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice query: ", err)

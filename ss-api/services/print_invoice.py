@@ -46,5 +46,6 @@ def print_invoice(data: dict):
         "msg": SuccessMessages.INVOICE_PRINTING,
         "invoice_id": invoice_id,
         "invoice_pdf": pdf_url,
+        "file_name": invoice_file_name,
         "status": "success",
     }

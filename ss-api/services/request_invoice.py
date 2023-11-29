@@ -65,6 +65,7 @@ def request_invoice(invoice_data: dict):
     status = "success"
     pdf_url = ""
     invoice_id = ""
+    invoice_file_name = ""
     should_download = invoice_data.get("should_download")
 
     if is_awaiting_analisys:
@@ -91,5 +92,6 @@ def request_invoice(invoice_data: dict):
         "invoice_protocol": invoice_protocol,
         "invoice_id": invoice_id,
         "invoice_pdf": pdf_url,
+        "file_name": invoice_file_name,
         "is_awaiting_analisys": is_awaiting_analisys,
     }

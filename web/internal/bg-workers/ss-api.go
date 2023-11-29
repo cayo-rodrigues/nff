@@ -31,7 +31,7 @@ type SSAPIInvoiceErrors struct {
 
 type SSAPIInvoiceRequest struct {
 	*models.Invoice
-	ShouldDownload  bool `json:"should_download"`
+	ShouldDownload bool `json:"should_download"`
 }
 
 type SSAPIInvoiceResponse struct {
@@ -40,6 +40,7 @@ type SSAPIInvoiceResponse struct {
 	InvoiceNumber      string              `json:"invoice_id"`
 	InvoiceProtocol    string              `json:"invoice_protocol"`
 	InvoicePDF         string              `json:"invoice_pdf"`
+	FileName           string              `json:"file_name"`
 	Status             string              `json:"status"`
 	Errors             *SSAPIInvoiceErrors `json:"errors"`
 }
@@ -99,6 +100,7 @@ type SSAPIPrintingResponse struct {
 	Msg        string               `json:"msg"`
 	InvoiceId  string               `json:"invoice_id"`
 	InvoicePDF string               `json:"invoice_pdf"`
+	FileName   string               `json:"file_name"`
 	Status     string               `json:"status"`
 	Errors     *SSAPIPrintingErrors `json:"errors"`
 }
@@ -156,6 +158,9 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	invoice.ReqMsg = response.Msg
 	invoice.ReqStatus = response.Status
 	invoice.PDF = response.InvoicePDF
+	if response.FileName != "" {
+		invoice.CustomFileName = response.FileName
+	}
 
 	err := w.invoiceService.UpdateInvoice(ctx, invoice)
 	if err != nil {
@@ -276,6 +281,9 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	invoicePrint.ReqStatus = response.Status
 	invoicePrint.ReqMsg = response.Msg
 	invoicePrint.InvoicePDF = response.InvoicePDF
+	if response.FileName != "" {
+		invoicePrint.CustomFileName = response.FileName
+	}
 
 	err := w.printingService.UpdateInvoicePrinting(ctx, invoicePrint)
 	if err != nil {
