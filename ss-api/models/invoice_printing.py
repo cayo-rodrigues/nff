@@ -11,6 +11,9 @@ class InvoicePrinting(Printable):
         )
         self.invoice_id_type: str = normalize_text(data.get("invoice_id_type"))
         self.entity = Entity(data.get("entity", {}), is_sender=True)
+        self.custom_file_name: str = normalize_text(
+            data.get("custom_file_name"), keep_case=True, remove=["/", "\\"]
+        )
 
         self.errors = {}
 

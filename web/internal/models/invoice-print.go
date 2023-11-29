@@ -15,23 +15,25 @@ type InvoicePrintFormSelectFields struct {
 }
 
 type InvoicePrintFormErrors struct {
-	InvoiceId     string
-	InvoiceIdType string
-	Entity        string
+	InvoiceId      string
+	InvoiceIdType  string
+	Entity         string
+	CustomFileName string
 }
 
 type InvoicePrint struct {
-	ID            int
-	InvoiceId     string                  `json:"invoice_id"`
-	InvoiceIdType string                  `json:"invoice_id_type"`
-	InvoicePDF    string                  `json:"invoice_pdf"`
-	Entity        *Entity                 `json:"entity"`
-	Errors        *InvoicePrintFormErrors `json:"-"`
-	ReqStatus     string                  `json:"-"`
-	ReqMsg        string                  `json:"-"`
-	CreatedBy     int                     `json:"-"`
-	CreatedAt     time.Time               `json:"-"`
-	UpdatedAt     time.Time               `json:"-"`
+	ID             int
+	InvoiceId      string                  `json:"invoice_id"`
+	InvoiceIdType  string                  `json:"invoice_id_type"`
+	InvoicePDF     string                  `json:"invoice_pdf"`
+	Entity         *Entity                 `json:"entity"`
+	Errors         *InvoicePrintFormErrors `json:"-"`
+	ReqStatus      string                  `json:"-"`
+	ReqMsg         string                  `json:"-"`
+	CreatedBy      int                     `json:"-"`
+	CreatedAt      time.Time               `json:"-"`
+	UpdatedAt      time.Time               `json:"-"`
+	CustomFileName string                  `json:"custom_file_name"`
 }
 
 func NewEmptyInvoicePrint() *InvoicePrint {
@@ -46,6 +48,7 @@ func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
 
 	invoicePrint.InvoiceId = c.FormValue("invoice_id")
 	invoicePrint.InvoiceIdType = c.FormValue("invoice_id_type")
+	invoicePrint.CustomFileName = c.FormValue("custom_file_name")
 
 	return invoicePrint
 }
@@ -85,5 +88,6 @@ func (p *InvoicePrint) Scan(rows db.Scanner) error {
 		&p.ID, &p.InvoiceId, &p.InvoiceIdType, &p.InvoicePDF,
 		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
 		&p.CreatedBy, &p.CreatedAt, &p.UpdatedAt,
+		&p.CustomFileName,
 	)
 }

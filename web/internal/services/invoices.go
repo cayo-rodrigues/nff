@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
@@ -72,11 +73,12 @@ func (s *InvoiceService) CreateInvoice(ctx context.Context, invoice *models.Invo
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices
-			(number, protocol, operation, cfop, is_final_customer, is_icms_contributor, shipping, add_shipping_to_total, gta, sender_id, recipient_id, created_by)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+			(number, protocol, operation, cfop, is_final_customer, is_icms_contributor, shipping, add_shipping_to_total, gta, extra_notes, custom_file_name, sender_id, recipient_id, created_by)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 		RETURNING id, req_status, req_msg`,
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
-		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.Sender.ID, invoice.Recipient.ID, invoice.CreatedBy,
+		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.ExtraNotes, invoice.CustomFileName, invoice.Sender.ID,
+		invoice.Recipient.ID, invoice.CreatedBy,
 	)
 	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg)
 	if err != nil {
@@ -140,8 +142,8 @@ func (s *InvoiceService) RetrieveInvoice(ctx context.Context, invoiceID int, use
 func (s *InvoiceService) UpdateInvoice(ctx context.Context, invoice *models.Invoice) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4, invoice_pdf = $5 WHERE id = $6 AND created_by = $7",
-		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.PDF, invoice.ID, invoice.CreatedBy,
+		"UPDATE invoices SET number = $1, protocol = $2, req_status = $3, req_msg = $4, invoice_pdf = $5, updated_at = $6 WHERE id = $7 AND created_by = $8",
+		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg, invoice.PDF, time.Now(), invoice.ID, invoice.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice query: ", err)

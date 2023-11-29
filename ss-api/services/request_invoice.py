@@ -74,6 +74,8 @@ def request_invoice(invoice_data: dict):
         siare.download_invoice()
         siare.close_unfocused_windows()
         invoice_id = invoice.get_id_from_filename()
+        if invoice.custom_file_name:
+            invoice.use_custom_file_name()
         invoice_file_path = invoice.get_file_path()
         invoice_file_name = invoice.get_file_name()
         pdf_url = upload_to_s3(

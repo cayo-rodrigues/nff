@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
@@ -102,15 +103,14 @@ func (s *MetricsService) UpdateMetrics(ctx context.Context, query *models.Metric
 		`UPDATE metrics_history SET
 			req_status = $1, req_msg = $2, total_income = $3, total_expenses = $4,
 			avg_income = $5, avg_expenses = $6, diff = $7, is_positive = $8,
-			total_records = $9, positive_records = $10, negative_records = $11
-		WHERE id = $12 AND created_by = $13`,
+			total_records = $9, positive_records = $10, negative_records = $11, updated_at = $12
+		WHERE id = $13 AND created_by = $14`,
 		query.Results.ReqStatus, query.Results.ReqMsg, query.Results.TotalIncome, query.Results.TotalExpenses,
 		query.Results.AvgIncome, query.Results.AvgExpenses, query.Results.Diff, query.Results.IsPositive,
-		query.Results.TotalRecords, query.Results.PositiveRecords, query.Results.NegativeRecords,
+		query.Results.TotalRecords, query.Results.PositiveRecords, query.Results.NegativeRecords, time.Now(),
 		query.ID, query.CreatedBy,
 	)
 	if err != nil {
-		log.Println("REQ STATUS =", query.Results.ReqStatus, len(query.Results.ReqStatus))
 		log.Println("Error when running update metrics query: ", err)
 		return utils.InternalServerErr
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
@@ -53,10 +54,10 @@ func (s *PrintingService) CreateInvoicePrinting(ctx context.Context, printing *m
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices_printings
-			(invoice_id, invoice_id_type, entity_id, created_by)
-			VALUES ($1, $2, $3, $4)
+			(invoice_id, invoice_id_type, custom_file_name, entity_id, created_by)
+			VALUES ($1, $2, $3, $4, $5)
 		RETURNING id, req_status, req_msg`,
-		printing.InvoiceId, printing.InvoiceIdType, printing.Entity.ID, printing.CreatedBy,
+		printing.InvoiceId, printing.InvoiceIdType, printing.CustomFileName, printing.Entity.ID, printing.CreatedBy,
 	)
 	err := row.Scan(&printing.ID, &printing.ReqStatus, &printing.ReqMsg)
 	if err != nil {
@@ -99,8 +100,8 @@ func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingI
 func (s *PrintingService) UpdateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE invoices_printings SET req_status = $1, req_msg = $2, invoice_pdf = $3 WHERE id = $4 AND created_by = $5",
-		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.ID, printing.CreatedBy,
+		"UPDATE invoices_printings SET req_status = $1, req_msg = $2, invoice_pdf = $3, updated_at = $4 WHERE id = $5 AND created_by = $6",
+		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, time.Now(), printing.ID, printing.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice printing query: ", err)

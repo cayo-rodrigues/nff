@@ -49,6 +49,13 @@
                     <sub class="text-red-600">{{ .InvoicePrint.Errors.InvoiceIdType }}</sub>
                 </div>
 
+                <div class="flex flex-1 flex-col gap-2">
+                    <label for="custom_file_name"><strong>Nome do arquivo</strong></label>
+                    <input class="rounded bg-gray-100 p-2 md:w-full" id="custom_file_name" name="custom_file_name"
+                        value="{{ .InvoicePrint.CustomFileName }}">
+                    <sub class="text-red-600">{{ .InvoicePrint.Errors.CustomFileName }}</sub>
+                </div>
+
             </div>
 
         </div>

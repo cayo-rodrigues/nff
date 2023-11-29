@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 
@@ -101,8 +102,8 @@ func (s *CancelingService) RetrieveInvoiceCanceling(ctx context.Context, canceli
 func (s *CancelingService) UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
 	result, err := db.PG.Exec(
 		ctx,
-		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2 WHERE id = $3 AND created_by = $4",
-		canceling.ReqStatus, canceling.ReqMsg, canceling.ID, canceling.CreatedBy,
+		"UPDATE invoices_cancelings SET req_status = $1, req_msg = $2, updated_at = $3 WHERE id = $4 AND created_by = $5",
+		canceling.ReqStatus, canceling.ReqMsg, time.Now(), canceling.ID, canceling.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice canceling query: ", err)

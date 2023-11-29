@@ -23,6 +23,8 @@ type InvoiceFormError struct {
 	AddShippingToTotal string
 	Gta                string
 	Items              string
+	ExtraNotes         string
+	CustomFileName     string
 }
 
 type InvoiceFormSelectFields struct {
@@ -54,6 +56,8 @@ type Invoice struct {
 	CreatedBy          int               `json:"-"`
 	CreatedAt          time.Time         `json:"-"`
 	UpdatedAt          time.Time         `json:"-"`
+	ExtraNotes         string            `json:"extra_notes"`
+	CustomFileName     string            `json:"custom_file_name"`
 }
 
 func NewEmptyInvoice() *Invoice {
@@ -87,6 +91,8 @@ func NewInvoiceFromForm(c *fiber.Ctx) (*Invoice, error) {
 	}
 	invoice.AddShippingToTotal = c.FormValue("add_shipping_to_total")
 	invoice.Gta = c.FormValue("gta")
+	invoice.ExtraNotes = c.FormValue("extra_notes")
+	invoice.CustomFileName = c.FormValue("custom_file_name")
 
 	items, err := NewInvoiceItemsFromForm(c)
 	if err != nil {
@@ -152,5 +158,6 @@ func (i *Invoice) Scan(rows db.Scanner) error {
 		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
 		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
+		&i.ExtraNotes, &i.CustomFileName,
 	)
 }

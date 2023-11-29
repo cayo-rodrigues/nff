@@ -109,15 +109,15 @@
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
-                    <label class="truncate" for="description"><strong>Informações complementares</strong></label>
-                    <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="description" name="description" value="{{ .Invoice.Gta }}">
-                    <sub class="text-red-600">{{ .Invoice.Errors.Gta }}</sub>
+                    <label class="truncate" for="extra_notes"><strong>Informações complementares</strong></label>
+                    <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="extra_notes" name="extra_notes" value="{{ .Invoice.ExtraNotes }}">
+                    <sub class="text-red-600">{{ .Invoice.Errors.ExtraNotes }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
-                    <label class="truncate" for="file_name"><strong>Nome do arquivo</strong></label>
-                    <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="file_name" name="file_name" value="{{ .Invoice.Gta }}">
-                    <sub class="text-red-600">{{ .Invoice.Errors.Gta }}</sub>
+                    <label class="truncate" for="custom_file_name"><strong>Nome do arquivo</strong></label>
+                    <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="custom_file_name" name="custom_file_name" value="{{ .Invoice.CustomFileName }}">
+                    <sub class="text-red-600">{{ .Invoice.Errors.CustomFileName }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 md:w-1/5">
