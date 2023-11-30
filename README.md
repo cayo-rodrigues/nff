@@ -10,7 +10,7 @@ Este projeto tem o objetivo de automatizar processos repetitivos que funcionári
 
 > A nota fiscal emitida no vídeo é apenas para fins demonstrativos
 
-[Vídeo da web]()
+[Vídeo a ser gravado]()
 
 ## Sobre
 
@@ -36,3 +36,4 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [ ] Bom uso de cache
 - [ ] DNS e HTTPS
 - [ ] Agregar métricas por mês
+- [ ] Emissão de Notas Fiscais Especiais
