@@ -1,81 +1,41 @@
-<img src="./assets/icon.ico" width="10%" align="left" alt="NFF main icon">
+<img src="./web/internal/static/icons/icon.ico" width="10%" align="left" alt="NFF main icon">
 
 # NFF - Nota Fiscal Fácil
 
-Este programa automatiza processos repetitivos que funcionários públicos (ou qualquer pessoa na verdade) fazem para gerar notas fiscais estaduais em um site do governo chamado [Siare](https://www2.fazenda.mg.gov.br/sol/) para produtores rurais.
-
-## Download
-
-Clique [aqui](https://drive.google.com/drive/folders/180rHhnaaYthR6vMIpC66EyzB6u8MQlhP?usp=share_link) para baixar o programa. Ele vem compactado no formato `.rar` na versão para Windows, e `.zip` na versão para Linux. Basta extrair os arquivos normalmente. Não existe nenhum processo de instalação. As instruções de como usar estão logo abaixo.
+Este projeto tem o objetivo de automatizar processos repetitivos que funcionários públicos (ou qualquer pessoa na verdade) fazem para requerer/baixar/cancelar notas fiscais estaduais em um site do governo chamado [Siare](https://www2.fazenda.mg.gov.br/sol/) para produtores rurais.
 
 ## Demonstração
 
+### [Clique aqui para ver o projeto em produção](http://ec2-18-230-92-247.sa-east-1.compute.amazonaws.com/) 
+
+Pelo fato de por enquanto ainda não serem usados certificados ssl (https), o navegador pode exibir um aviso de `Não seguro`. 
+
 > A nota fiscal emitida no vídeo é apenas para fins demonstrativos
 
-https://user-images.githubusercontent.com/87717182/222856710-af0801b3-294c-43a8-8b9b-b5f0760a2e14.mp4
-
+[Vídeo a ser gravado]()
 
 ## Sobre
 
-Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. Geralmente eles recorrem à funcionários públicos para isso. Este projeto tem o objetivo de facilitar a vida destes funcionários, agilizando o seu trabalho.
+Produtores rurais sempre precisam emitir notas fiscais devido ao grande número de transferências de gado e outros produtos que fazem. As vezes também precisam cancelar notas. E todo final de ano precisam calcular o balanço de entrada e saída em notas fiscais de venda. Geralmente eles recorrem à funcionários públicos e contadores para isso. Este projeto tem o objetivo de facilitar a vida destes profissionais, agilizando o seu trabalho.
 
-Mas serve perfeitamente para qualquer pessoa que tenha o mínimo de afinidade com excel, afinal, esses funcionários públicos apenas realizam login na conta dos próprios produtores para emitir notas fiscais.
+Mas serve perfeitamente para qualquer pessoa, afinal esses funcionários públicos apenas realizam login na conta dos próprios produtores para realizar essas tarefas.
 
 Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e assim se deu.
-
-## O que o programa faz?
-
-* Quando o programa iniciar, ele vai ler a base de dados, fazer as verificações necessárias, abrir o site do _Siare_, fazer login na conta do `"remetente"` e emitir todas as notas fiscais que estiverem no excel.
-
-* As notas fiscais baixadas serão salvas em uma pasta chamada `"docs"` dentro do mesmo diretório do programa.
-
-* Caso o campo `"senha"` no excel estiver vazio na hora de fazer login na conta de algum produtor, será aberta uma janelinha onde você pode digitar a senha.
-
-## Como usar?
-
-* O primeiro passo é preencher a base de dados, que é o arquivo `"db"` (os formatos aceitos são `.xlsx` e `.ods`).
-
-* Para preencher ele corretamente, siga o exemplo mostrado no arquivo `"db.example"`.
-
-* Na aba de **"Nota Fiscal"** dentro do arquivo excel, cada linha representa uma nota fiscal que será emitida na próxima execução do programa. Sendo assim, certifique-se de verificar essa aba antes de iniciar.
-
-* Ainda dentro da aba **"Nota Fiscal"**, os campos `"remetente"` e `"destinatário"` devem ser preenchidos com o `"cpf/cnpj"` ou com a `"inscrição estadual"` das entidades correspondentes.
-
-* Caso queira, poderá dar um nome diferente para o arquivo da nota fiscal que for baixado. Para isso, use a coluna `"nome do arquivo"` na aba de **"Nota Fiscal"**. O nome será mudado, mas o número da nota, no formato _"NFA-xxx.xxx.xxx"_ ainda estará presente no final do nome do arquivo.
-
-* Na aba **"Dados de Produtos e Serviços NF"** dentro do arquivo excel, o campo `"NF"` serve para indicar a qual nota fiscal que aquele produto pertence. Por exemplo, se eu colocar `1`, isso significa que aquele produto se refere à **_primeira nota fiscal da aba "Nota Fiscal"_**.
-
-* Ainda na aba **"Dados de Produtos e Serviços NF"**, vale ressaltar que caso o campo `"ncm"` não seja preenchido, então será usado como padrão o valor `94019900`, que é uma numeração genérica para se referir a qualquer coisa.
-
-* Para iniciar, dê dois cliques no arquivo `NFF.exe`, ou então, se estiver no Linux, basta rodar o executável com `./NFF`.
-
-## IMPORTANTE
-
-* Não altere a aba **"Dados das listas"** da base de dados sem ter consciência do que está fazendo. As informações contidas ali servem para popular os campos de seleção que existem nas outras abas.
-
-* Sempre lembre de salvar suas alterações na base de dados antes de iniciar o programa.
-
-* **Se você decidir usar o campo `"senha"` no excel, garanta que ninguém mais tenha acesso à ele**.
 
 ## Próximos passos
 
 - [x] Lidar com casos de destinatário sem inscrição estadual
-- [ ] Ao final da execução, mostrar as NFs feitas com sucesso e as que não foram
-- [x] Ter um modo de mudar o nome do arquivo da nota fiscal
-- [x] Poder referenciar entidades na coluna `"remetente"` e `"destinatário"` tanto por `"cpf/cnpj"` como por `"inscrição estadual"`
+- [x] Ao final da execução, mostrar as operações feitas com sucesso e as que não foram
 - [x] Possibilitar **cancelamento** de notas fiscais
-- [ ] Aba de Histórico de notas fiscais emitidas/canceladas
-- [ ] Possibilitar o uso de templates de nota fiscal, preenchendo automaticamente os campos no excel
-
-## Detalhes Técnicos
-
-As principais tecnologias utilizadas foram:
-
-* `python`
-* `selenium`
-* `pandas`
-* `excel`
-
-## Considerações finais
-
-Acredito que tenha ficado um projeto bem massinha. Obviamente existem pontos a ser melhorados, e também é muito provável que haja uma forma melhor de se automatizar esse processo, caso seja possível se comunicar com a API do governo, ao invés de ter que depender do front deles. Mas no momento isso tudo já é incrível, e a ideia é continuar evoluindo.
+- [x] Possibilitar **impressão** de notas fiscais isoladamente
+- [x] Calcular **métricas** de entrada e saída em determinado período
+- [x] Histórico de operações
+- [x] Sistema de usuários
+- [ ] Filtros por data e entidade no histórico de requerimentos
+- [ ] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos (parcialmente implementado)
+- [ ] Cancelamento de NF através do protocolo
+- [ ] Login/Cadastro com Google
+- [ ] Bom uso de cache
+- [ ] DNS e HTTPS
+- [ ] Agregar métricas por mês
+- [ ] Emissão de Notas Fiscais Especiais

@@ -1,0 +1,11 @@
+{{ define "partials/request-card-status" }}
+    {{ if eq . "success" }}
+        <i class="fa-solid fa-circle-check text-green-600"></i>
+    {{ else if eq . "warning" }}
+        <i class="fa-solid fa-triangle-exclamation text-yellow-600"></i>
+    {{ else if eq . "error" }}
+        <i class="fa-solid fa-circle-xmark text-red-600"></i>
+    {{ else if eq . "pending" }}
+        <i class="fa-solid fa-spinner fa-spin"></i>
+    {{ end }}
+{{ end }}

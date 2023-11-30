@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hx-indicator {
+    display: none;
+    transition: all 500ms ease-in;
+}
+.htmx-request .hx-indicator {
+    display: flex;
+}
+.htmx-request.hx-indicator {
+    display: flex;
+}
+
+.icon-btn.htmx-request .hx-indicator {
+    display: inline;
+}
+.icon-btn.htmx-request .original-icon {
+    display: none;
+}
+
+.w-1\/7 {
+    width: 50%;
+}
+
+@media (min-width: 640px) {
+    .w-1\/7 {
+        width: 25%;
+    }
+}
+
+@media (min-width: 1280px) {
+    .w-1\/7 {
+        width: 14.28%;
+    }
+}

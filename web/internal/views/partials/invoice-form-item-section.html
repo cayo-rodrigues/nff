@@ -1,0 +1,80 @@
+{{ define "partials/invoice-form-item-section" }}
+
+{{ $FormSelectFields := GetInvoiceItemSelectFields }}
+
+<section class="duration-250 transition-all ease-in-out">
+    <div class="flex justify-between">
+        <h3 class="pt-2 text-xl font-bold">Produto 0</h3>
+
+        <div class="flex items-center justify-end gap-2 pr-1 pt-2">
+            <button type="button" class="rounded p-2 shadow shadow-gray-400 hover:bg-gray-100 active:bg-gray-200">
+                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M288 448H64V224h64V160H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H288c35.3 0 64-28.7 64-64V384H288v64zm-64-96H448c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H224c-35.3 0-64 28.7-64 64V288c0 35.3 28.7 64 64 64z"/></svg>
+            </button>
+            <button class="rounded p-2 shadow shadow-gray-400 hover:bg-gray-100 active:bg-gray-200" type="button"
+                onclick="removeItemSection(this.closest('section'))">
+                <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z" /> </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap border-b border-gray-400 py-4">
+
+            <div class="w-1/7 flex flex-col gap-2 pr-4">
+                <label for="group"><strong>Grupo</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="group" name="group">
+                    {{ range $FormSelectFields.Groups }}
+                        <option {{ if eq $.Group . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Errors.Group }}</sub>
+            </div>
+
+            <div class="w-1/7 flex flex-col gap-2 sm:pr-4">
+                <label for="ncm"><strong>NCM</strong></label>
+                <input class="rounded bg-gray-100 p-2" type="text" id="ncm" name="ncm" value="{{ .NCM }}">
+                <sub class="text-red-600">{{ .Errors.NCM }}</sub>
+            </div>
+
+            <div class="w-1/7 flex flex-col gap-2 pr-4">
+                <label for="description"><strong>Descrição</strong></label>
+                <input class="rounded bg-gray-100 p-2" type="text" id="description" name="description" value="{{ .Description }}">
+                <sub class="text-red-600">{{ .Errors.Description }}</sub>
+            </div>
+
+            <div class="w-1/7 flex flex-col gap-2 xl:pr-4">
+                <label for="quantity"><strong>Quantidade</strong></label>
+                <input class="rounded bg-gray-100 p-2" type="number" step="0.01" id="quantity" name="quantity"
+                    value="{{ .Quantity }}">
+                <sub class="text-red-600">{{ .Errors.Quantity }}</sub>
+            </div>
+
+            <div class="w-1/7 flex flex-col gap-2 pr-4">
+                <label class="truncate" for="value_per_unity"><strong>Valor unitário</strong></label>
+                <input class="rounded bg-gray-100 p-2" type="number" step="0.01" id="value_per_unity"
+                    name="value_per_unity" value="{{ .ValuePerUnity }}">
+                <sub class="text-red-600">{{ .Errors.ValuePerUnity }}</sub>
+            </div>
+
+            <div class="w-1/7 flex flex-col gap-2 sm:pr-4">
+                <label for="origin"><strong>Origem</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="origin" name="origin">
+                    {{ range $FormSelectFields.Origins }}
+                        <option {{ if eq $.Origin . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Errors.Origin }}</sub>
+            </div>
+
+            <div class="w-1/7 flex flex-col gap-2 pr-4 xl:pr-0">
+                <label class="truncate" for="unity_of_measurement"><strong>Unidade de medida</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="unity_of_measurement" name="unity_of_measurement">
+                    {{ range $FormSelectFields.UnitiesOfMeasurement }}
+                        <option {{ if eq $.UnityOfMeasurement . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Errors.UnityOfMeasurement }}</sub>
+            </div>
+
+    </div>
+</section>
+{{ end }}
