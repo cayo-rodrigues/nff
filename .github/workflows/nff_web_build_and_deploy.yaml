@@ -1,0 +1,27 @@
+name: nff_web_build_and_deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop # TEMP!
+    paths:
+      - "web/**"
+      - ".github/workflows/nff_web_build_and_deploy.yaml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and push image to Docker Hub
+        working-directory: ./web
+        run: |
+          docker build -t $IMAGE_TAG .
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker push $IMAGE_TAG
