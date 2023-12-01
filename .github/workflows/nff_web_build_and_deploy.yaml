@@ -44,9 +44,9 @@ jobs:
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com
-          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
           sudo docker pull $WEB_IMAGE_TAG
           sudo docker pull $MIGRATIONS_IMAGE_TAG
+          cd ~
           sudo docker compose up --build migrations
           sudo docker compose down web
           sudo docker compose up --build web
