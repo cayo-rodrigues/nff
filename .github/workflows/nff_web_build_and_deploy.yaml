@@ -46,7 +46,9 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com
           sudo docker pull $WEB_IMAGE_TAG
           sudo docker pull $MIGRATIONS_IMAGE_TAG
+          ls -a
           cd ~
+          ls -a
           sudo docker compose up --build migrations
           sudo docker compose down web
           sudo docker compose up --build web
