@@ -14,7 +14,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
+      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
+      MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,6 +23,29 @@ jobs:
       - name: Build and push image to Docker Hub
         working-directory: ./web
         run: |
-          docker build -t $IMAGE_TAG .
+          docker build -t $WEB_IMAGE_TAG .
+          docker build -t $MIGRATIONS_IMAGE_TAG .
           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker push $IMAGE_TAG
+          docker push $WEB_IMAGE_TAG
+          docker push $MIGRATIONS_IMAGE_TAG
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
+      MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
+    steps:
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+
+      - name: Connect to EC2 instance and deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_PRIVATE_KEY }} ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com
+          sudo docker pull $WEB_IMAGE_TAG
+          sudo docker pull $MIGRATIONS_IMAGE_TAG
+          sudo docker compose up --build migrations
+          sudo docker compose down web
+          sudo docker compose up --build web
