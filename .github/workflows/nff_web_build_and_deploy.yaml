@@ -45,7 +45,8 @@ jobs:
             HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
             USER_NAME: ${{ secrets.EC2_USER_NAME }}
         run: |
-          echo "$PRIVATE_KEY" > private_key.pem && chmod 600 private_key.pem
+          echo -e "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
             echo 'LS' && ls -a &&
             cd /home/ubuntu &&
