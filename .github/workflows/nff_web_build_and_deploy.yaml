@@ -46,9 +46,11 @@ jobs:
           chmod 600 ./nff-key-pair.pem
 
       - name: Copy docker-compose-prd.yaml into EC2 instance
+        working-directory: ./web
         run: scp -i ./nff-key-pair.pem -o StrictHostKeyChecking=no ./docker-compose-prd.yaml ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com:/home/runner/work/nff/nff/docker-compose.yaml
 
       - name: Connect to EC2 instance
+        working-directory: ./web
         run: ssh -o StrictHostKeyChecking=no -i ./nff-key-pair.pem ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com
 
       - name: Deploy
