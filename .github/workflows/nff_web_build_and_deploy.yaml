@@ -36,23 +36,28 @@ jobs:
       WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
       MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up SSH key
+        working-directory: ./web
         run: |
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ./nff-key-pair.pem
           chmod 600 ./nff-key-pair.pem
 
-      - name: Connect to EC2 instance and deploy
+      - name: Copy docker-compose-prd.yaml into EC2 instance
+        run: scp -i ./nff-key-pair.pem -o StrictHostKeyChecking=no ./docker-compose-prd.yaml ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com:/home/runner/work/nff/nff/docker-compose.yaml
+
+      - name: Connect to EC2 instance
+        run: ssh -o StrictHostKeyChecking=no -i ./nff-key-pair.pem ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com
+
+      - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no -i ./nff-key-pair.pem ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com
           sudo docker pull $WEB_IMAGE_TAG
           sudo docker pull $MIGRATIONS_IMAGE_TAG
           whoami
           pwd
-          echo "FIRST LS" && ls -a
-          cd /home/ubuntu
-          pwd
-          echo "THIRD LS" && ls -a
-          ls -a
+          echo "LS" && ls -a
           sudo docker compose up --build migrations
           sudo docker compose down web
           sudo docker compose up --build web
