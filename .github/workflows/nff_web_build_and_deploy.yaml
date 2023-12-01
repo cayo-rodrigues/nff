@@ -50,9 +50,6 @@ jobs:
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
-            echo 'LS' && ls -a &&
-            cd /home/ubuntu &&
-            echo 'LS AGAIN' && ls -a &&
             sudo docker pull \"$WEB_IMAGE_TAG\" &&
             sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
             sudo docker compose up --build migrations &&
