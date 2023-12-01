@@ -39,7 +39,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Connect to EC2 instance
+      - name: Connect to EC2 instance and deploy
         env:
             PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
             HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
@@ -47,9 +47,6 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key.pem && chmod 600 private_key.pem
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME}
-
-      - name: Deploy
-        run: |
           echo "LS" && ls -a
           cd /home/ubuntu
           echo "LS AGAIN" && ls -a
