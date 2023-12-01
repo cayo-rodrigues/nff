@@ -39,27 +39,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up SSH key
-        working-directory: ./web
-        run: |
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ./nff-key-pair.pem
-          chmod 600 ./nff-key-pair.pem
-
-      - name: Copy docker-compose-prd.yaml into EC2 instance
-        working-directory: ./web
-        run: scp -i ./nff-key-pair.pem -o StrictHostKeyChecking=no ./docker-compose-prd.yaml ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com:/home/runner/work/nff/nff
-
       - name: Connect to EC2 instance
-        working-directory: ./web
-        run: ssh -o StrictHostKeyChecking=no -i ./nff-key-pair.pem ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com
+        env:
+            PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+            HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
+            USER_NAME: ${{ secrets.EC2_USER_NAME }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem && chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME}
 
       - name: Deploy
         run: |
+          echo "LS" && ls -a
+          cd /home/ubuntu
+          echo "LS AGAIN" && ls -a
           sudo docker pull $WEB_IMAGE_TAG
           sudo docker pull $MIGRATIONS_IMAGE_TAG
-          whoami
-          pwd
-          echo "LS" && ls -a
-          sudo docker compose -f ./docker-compose-prd.yaml up --build migrations
-          sudo docker compose -f ./docker-compose-prd.yaml down web
-          sudo docker compose -f ./docker-compose-prd.yaml up --build web
+          sudo docker compose up --build migrations
+          sudo docker compose down web
+          sudo docker compose up --build web
