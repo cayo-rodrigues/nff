@@ -49,9 +49,13 @@ jobs:
           whoami
           pwd
           echo "FIRST LS" && ls -a
-          cd /home/ubuntu
+          su - ubuntu
+          whoami
           pwd
           echo "SECOND LS" && ls -a
+          cd /home/ubuntu
+          pwd
+          echo "THIRD LS" && ls -a
           ls -a
           sudo docker compose up --build migrations
           sudo docker compose down web
