@@ -47,7 +47,7 @@ jobs:
 
       - name: Copy docker-compose-prd.yaml into EC2 instance
         working-directory: ./web
-        run: scp -i ./nff-key-pair.pem -o StrictHostKeyChecking=no ./docker-compose-prd.yaml ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com:/home/runner/work/nff/nff/docker-compose.yaml
+        run: scp -i ./nff-key-pair.pem -o StrictHostKeyChecking=no ./docker-compose-prd.yaml ubuntu@ec2-18-230-92-247.sa-east-1.compute.amazonaws.com:/home/runner/work/nff/nff
 
       - name: Connect to EC2 instance
         working-directory: ./web
@@ -60,6 +60,6 @@ jobs:
           whoami
           pwd
           echo "LS" && ls -a
-          sudo docker compose up --build migrations
-          sudo docker compose down web
-          sudo docker compose up --build web
+          sudo docker compose -f ./docker-compose-prd.yaml up --build migrations
+          sudo docker compose -f ./docker-compose-prd.yaml down web
+          sudo docker compose -f ./docker-compose-prd.yaml up --build web
