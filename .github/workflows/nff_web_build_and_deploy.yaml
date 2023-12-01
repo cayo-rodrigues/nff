@@ -57,5 +57,5 @@ jobs:
             sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
             sudo docker compose up --build migrations &&
             sudo docker compose down web &&
-            sudo docker compose up --build web
+            sudo docker compose up --build -d web
           "
