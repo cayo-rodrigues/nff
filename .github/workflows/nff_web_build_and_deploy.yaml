@@ -35,19 +35,20 @@ jobs:
     env:
       WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
       MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
+      HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
+      USER_NAME: ${{ secrets.EC2_USER_NAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+
       - name: Connect to EC2 instance and deploy
-        env:
-            PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-            HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
-            USER_NAME: ${{ secrets.EC2_USER_NAME }}
         run: |
-          echo -e "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
+          ssh -o StrictHostKeyChecking=no ${USER_NAME}@${HOSTNAME} "
             echo 'LS' && ls -a &&
             cd /home/ubuntu &&
             echo 'LS AGAIN' && ls -a &&
