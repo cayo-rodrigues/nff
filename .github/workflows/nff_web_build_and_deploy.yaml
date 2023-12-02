@@ -47,6 +47,7 @@ jobs:
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
+            ./gen-compose \"$WEB_IMAGE_TAG\" \"$MIGRATIONS_IMAGE_TAG\" &&
             sudo docker pull \"$WEB_IMAGE_TAG\" &&
             sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
             sudo docker compose up --build migrations &&
