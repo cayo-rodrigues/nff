@@ -2,9 +2,12 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/gofiber/fiber/v2/middleware/session"
+	fredis "github.com/gofiber/storage/redis/v3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 )
@@ -13,8 +16,9 @@ type Scanner interface {
 	Scan(dest ...interface{}) error
 }
 
-var PG *pgxpool.Pool = nil
-var Redis *redis.Client = nil
+var PG *pgxpool.Pool
+var Redis *redis.Client
+var SessionStore *session.Store
 
 func GetDBPool() *pgxpool.Pool {
 	if PG != nil {
@@ -48,11 +52,11 @@ func GetRedisConn() *redis.Client {
 	if !isThere || REDIS_URL == "" {
 		log.Fatal("REDIS_URL env not set or has an empty value")
 	}
-	redis_opts, err := redis.ParseURL(REDIS_URL)
+	redisOpts, err := redis.ParseURL(REDIS_URL)
 	if err != nil {
 		log.Fatal("Could not create redis db connection: ", err)
 	}
-	rdb := redis.NewClient(redis_opts)
+	rdb := redis.NewClient(redisOpts)
 
 	err = rdb.Ping(context.Background()).Err()
 	if err != nil {
@@ -61,4 +65,27 @@ func GetRedisConn() *redis.Client {
 
 	Redis = rdb
 	return Redis
+}
+
+func GetSessionStore() *session.Store {
+	if SessionStore != nil {
+		return SessionStore
+	}
+
+	SessionStore = session.New(session.Config{
+		Storage: fredis.New(fredis.Config{
+			URL: getRedisURL(),
+		}),
+	})
+
+	return SessionStore
+}
+
+func getRedisURL() string {
+	if Redis == nil {
+		return ""
+	}
+
+	redisOpts := Redis.Options()
+	return fmt.Sprintf("redis://%s/%d", redisOpts.Addr, redisOpts.DB)
 }

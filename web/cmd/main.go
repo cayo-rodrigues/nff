@@ -46,6 +46,9 @@ func main() {
 	rdb := db.GetRedisConn()
 	defer rdb.Close()
 
+	store := db.GetSessionStore()
+	defer store.Storage.Close()
+
 	engine := html.New("internal/views", ".html")
 
 	engine.Reload(DEBUG)

@@ -1,9 +1,12 @@
 package middlewares
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/gofiber/fiber/v2"
+)
 
 func AuthMiddleware(c *fiber.Ctx) error {
-	sess, err := SessionStore.Get(c)
+	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return err
 	}

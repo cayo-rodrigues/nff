@@ -16,6 +16,9 @@ github.com/gofiber/fiber/v2/log
 github.com/gofiber/fiber/v2/middleware/logger
 github.com/gofiber/fiber/v2/middleware/session
 github.com/gofiber/fiber/v2/utils
+# github.com/gofiber/storage/redis/v3 v3.1.0
+## explicit; go 1.19
+github.com/gofiber/storage/redis/v3
 # github.com/gofiber/template v1.8.2
 ## explicit; go 1.20
 github.com/gofiber/template
@@ -66,7 +69,7 @@ github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.15
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
-# github.com/redis/go-redis/v9 v9.2.1
+# github.com/redis/go-redis/v9 v9.3.0
 ## explicit; go 1.18
 github.com/redis/go-redis/v9
 github.com/redis/go-redis/v9/internal

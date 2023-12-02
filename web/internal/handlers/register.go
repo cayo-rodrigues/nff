@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
-	"github.com/cayo-rodrigues/nff/web/internal/middlewares"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
@@ -61,7 +61,7 @@ func (p *RegisterPage) CreateUser(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	sess, err := middlewares.SessionStore.Get(c)
+	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return err
 	}

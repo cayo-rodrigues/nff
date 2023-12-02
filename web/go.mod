@@ -4,9 +4,10 @@ go 1.20
 
 require (
 	github.com/gofiber/fiber/v2 v2.51.0
+	github.com/gofiber/storage/redis/v3 v3.1.0
 	github.com/gofiber/template/html/v2 v2.0.5
 	github.com/jackc/pgx/v5 v5.4.3
-	github.com/redis/go-redis/v9 v9.2.1
+	github.com/redis/go-redis/v9 v9.3.0
 	golang.org/x/crypto v0.13.0
 )
 

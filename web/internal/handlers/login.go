@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
-	"github.com/cayo-rodrigues/nff/web/internal/middlewares"
+	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
@@ -53,7 +53,7 @@ func (p *LoginPage) Login(c *fiber.Ctx) error {
 		return utils.RetargetToForm(c, "login", formData)
 	}
 
-	sess, err := middlewares.SessionStore.Get(c)
+	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (p *LoginPage) Login(c *fiber.Ctx) error {
 }
 
 func Logout(c *fiber.Ctx) error {
-	sess, err := middlewares.SessionStore.Get(c)
+	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return err
 	}
