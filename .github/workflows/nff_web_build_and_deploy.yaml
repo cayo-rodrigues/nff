@@ -24,7 +24,7 @@ jobs:
         working-directory: ./web
         run: |
           docker build -t $WEB_IMAGE_TAG .
-          docker build -t $MIGRATIONS_IMAGE_TAG .
+          docker build -t $MIGRATIONS_IMAGE_TAG -f Dockerfile.goose .
           echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
           docker push $WEB_IMAGE_TAG
           docker push $MIGRATIONS_IMAGE_TAG
