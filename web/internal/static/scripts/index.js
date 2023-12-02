@@ -116,3 +116,8 @@ function openItemsDialog(dialogId) {
     document.dispatchEvent(new CustomEvent('enumerate-item-sections'))
 }
 
+function duplicateItemSection(sectionElement) {
+    const sectionClone = sectionElement.cloneNode(true)
+    sectionElement.parentNode.insertBefore(sectionClone, sectionElement.parentNode.lastChild)
+    document.dispatchEvent(new CustomEvent('enumerate-item-sections'))
+}
