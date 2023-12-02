@@ -20,12 +20,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build and push image to Docker Hub
+      - name: Docker login
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Build images
         working-directory: ./web
         run: |
           docker build -t $WEB_IMAGE_TAG .
           docker build -t $MIGRATIONS_IMAGE_TAG -f Dockerfile.goose .
-          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push images to Docker Hub
+        run: |
           docker push $WEB_IMAGE_TAG
           docker push $MIGRATIONS_IMAGE_TAG
 
