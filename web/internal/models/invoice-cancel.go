@@ -95,3 +95,13 @@ func (c *InvoiceCancel) Scan(rows db.Scanner) error {
 		&c.Entity.ID, &c.CreatedBy, &c.CreatedAt, &c.UpdatedAt,
 	)
 }
+func (c *InvoiceCancel) FullScan(rows db.Scanner) error {
+	return rows.Scan(
+		&c.ID, &c.Number, &c.Year, &c.Justification, &c.ReqStatus, &c.ReqMsg,
+		&c.Entity.ID, &c.CreatedBy, &c.CreatedAt, &c.UpdatedAt,
+
+		&c.Entity.ID, &c.Entity.Name, &c.Entity.UserType, &c.Entity.CpfCnpj, &c.Entity.Ie, &c.Entity.Email, &c.Entity.Password,
+		&c.Entity.Address.PostalCode, &c.Entity.Address.Neighborhood, &c.Entity.Address.StreetType, &c.Entity.Address.StreetName, &c.Entity.Address.Number,
+		&c.Entity.CreatedBy, &c.Entity.CreatedAt, &c.Entity.UpdatedAt,
+	)
+}

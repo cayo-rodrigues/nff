@@ -71,12 +71,12 @@ func (s *InvoiceService) CreateInvoice(ctx context.Context, invoice *models.Invo
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 		RETURNING id, req_status, req_msg
 	`
-	query_args := [14]any{
+	queryArgs := [14]any{
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
 		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.ExtraNotes, invoice.CustomFileName, invoice.Sender.ID,
 		invoice.Recipient.ID, invoice.CreatedBy,
 	}
-	row := db.PG.QueryRow(ctx, query, query_args)
+	row := db.PG.QueryRow(ctx, query, queryArgs[:]...)
 	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg)
 	if err != nil {
 		log.Println("Error when running insert invoice query: ", err)
@@ -130,11 +130,11 @@ func (s *InvoiceService) UpdateInvoice(ctx context.Context, invoice *models.Invo
 				invoice_pdf = $5, custom_file_name = $6, updated_at = $7
 		WHERE id = $8 AND created_by = $9
 	`
-	query_args := [9]any{
+	queryArgs := [9]any{
 		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg,
 		invoice.PDF, invoice.CustomFileName, time.Now(), invoice.ID, invoice.CreatedBy,
 	}
-	result, err := db.PG.Exec(ctx, query, query_args)
+	result, err := db.PG.Exec(ctx, query, queryArgs[:]...)
 	if err != nil {
 		log.Println("Error when running update invoice query: ", err)
 		return utils.InternalServerErr
