@@ -24,25 +24,25 @@ func NewPrintingService(entityService interfaces.EntityService) *PrintingService
 }
 
 func (s *PrintingService) ListInvoicePrintings(ctx context.Context, userID int) ([]*models.InvoicePrint, error) {
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_printings WHERE created_by = $1 ORDER BY id DESC", userID)
+	rows, _ := db.PG.Query(
+		ctx,
+		`SELECT *
+			FROM invoices_printings
+				JOIN entities ON entities.id = invoices_printings.entity_id
+		WHERE invoices_printings.created_by = $1 ORDER BY invoices_printings.id DESC`,
+		userID,
+	)
 	defer rows.Close()
 
 	printings := []*models.InvoicePrint{}
 
 	for rows.Next() {
 		printing := models.NewEmptyInvoicePrint()
-		err := printing.Scan(rows)
+		err := printing.FullScan(rows)
 		if err != nil {
 			log.Println("Error scaning invoice printing rows: ", err)
 			return nil, utils.InternalServerErr
 		}
-
-		entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID, printing.CreatedBy)
-		if err != nil {
-			log.Println("Error linking invoice printing to entity: ", err)
-			return nil, utils.InternalServerErr
-		}
-		printing.Entity = entity
 
 		printings = append(printings, printing)
 	}
@@ -69,15 +69,17 @@ func (s *PrintingService) CreateInvoicePrinting(ctx context.Context, printing *m
 }
 
 func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingID int, userID int) (*models.InvoicePrint, error) {
-	// TODO maybe JOIN would be more efficient than two separated queries
 	row := db.PG.QueryRow(
 		ctx,
-		"SELECT * FROM invoices_printings WHERE id = $1 AND created_by = $2",
+		`SELECT *
+			FROM invoices_printings
+				JOIN entities ON entities.id = invoices_printings.entity_id
+		WHERE invoices_printings.id = $1 AND invoices_printings.created_by = $2`,
 		printingID, userID,
 	)
 
 	printing := models.NewEmptyInvoicePrint()
-	err := printing.Scan(row)
+	err := printing.FullScan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("Invoice printing with id %v not found: %v", printingID, err)
 		return nil, utils.PrintingNotFoundErr
@@ -86,13 +88,6 @@ func (s *PrintingService) RetrieveInvoicePrinting(ctx context.Context, printingI
 		log.Println("Error scaning printing row: ", err)
 		return nil, utils.InternalServerErr
 	}
-
-	entity, err := s.entityService.RetrieveEntity(ctx, printing.Entity.ID, printing.CreatedBy)
-	if err != nil {
-		log.Println("Error linking invoice printing to entity: ", err)
-		return nil, utils.InternalServerErr
-	}
-	printing.Entity = entity
 
 	return printing, nil
 }

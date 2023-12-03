@@ -91,3 +91,16 @@ func (p *InvoicePrint) Scan(rows db.Scanner) error {
 		&p.CustomFileName,
 	)
 }
+
+func (p *InvoicePrint) FullScan(rows db.Scanner) error {
+	return rows.Scan(
+		&p.ID, &p.InvoiceId, &p.InvoiceIdType, &p.InvoicePDF,
+		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
+		&p.CreatedBy, &p.CreatedAt, &p.UpdatedAt,
+		&p.CustomFileName,
+
+		&p.Entity.ID, &p.Entity.Name, &p.Entity.UserType, &p.Entity.CpfCnpj, &p.Entity.Ie, &p.Entity.Email, &p.Entity.Password,
+		&p.Entity.Address.PostalCode, &p.Entity.Address.Neighborhood, &p.Entity.Address.StreetType, &p.Entity.Address.StreetName, &p.Entity.Address.Number,
+		&p.Entity.CreatedBy, &p.Entity.CreatedAt, &p.Entity.UpdatedAt,
+	)
+}
