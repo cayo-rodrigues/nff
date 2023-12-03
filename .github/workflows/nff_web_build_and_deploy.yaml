@@ -56,8 +56,9 @@ jobs:
             ./gen-compose.sh \"$WEB_IMAGE_TAG\" \"$MIGRATIONS_IMAGE_TAG\" &&
             sudo docker pull \"$WEB_IMAGE_TAG\" &&
             sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
-            sudo docker compose up --build migrations &&
+            sudo docker compose run --build --rm migrations &&
             sudo docker compose down web &&
+            sudo docker image prune --all --force &&
             sudo docker compose up --build -d web
           "
 
