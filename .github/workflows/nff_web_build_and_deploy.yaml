@@ -52,7 +52,7 @@ jobs:
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
-            sudo docker rmi \$(sudo docker image ls -q) --force &&
+            sudo docker image prune --all --force &&
             ./gen-compose.sh \"$WEB_IMAGE_TAG\" \"$MIGRATIONS_IMAGE_TAG\" &&
             sudo docker pull \"$WEB_IMAGE_TAG\" &&
             sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
