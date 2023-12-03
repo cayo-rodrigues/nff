@@ -24,25 +24,25 @@ func NewMetricsService(entityService interfaces.EntityService) *MetricsService {
 }
 
 func (s *MetricsService) ListMetrics(ctx context.Context, userID int) ([]*models.MetricsQuery, error) {
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM metrics_history WHERE created_by = $1 ORDER BY id DESC", userID)
+	rows, _ := db.PG.Query(
+		ctx,
+		`SELECT *
+			FROM metrics_history
+			JOIN entities ON entities.id = metrics_history.entity_id
+		WHERE metrics_history.created_by = $1 ORDER BY metrics_history.id DESC`,
+		userID,
+	)
 	defer rows.Close()
 
 	queriesHistory := []*models.MetricsQuery{}
 
 	for rows.Next() {
 		metricsQuery := models.NewEmptyMetricsQuery()
-		err := metricsQuery.Scan(rows)
+		err := metricsQuery.FullScan(rows)
 		if err != nil {
 			log.Println("Error scaning metrics query rows: ", err)
 			return nil, utils.InternalServerErr
 		}
-
-		entity, err := s.entityService.RetrieveEntity(ctx, metricsQuery.Entity.ID, metricsQuery.CreatedBy)
-		if err != nil {
-			log.Println("Error linking metrics query to entity: ", err)
-			return nil, utils.InternalServerErr
-		}
-		metricsQuery.Entity = entity
 
 		queriesHistory = append(queriesHistory, metricsQuery)
 	}
@@ -69,15 +69,17 @@ func (s *MetricsService) CreateMetrics(ctx context.Context, query *models.Metric
 }
 
 func (s *MetricsService) RetrieveMetrics(ctx context.Context, queryId int, userID int) (*models.MetricsQuery, error) {
-	// TODO maybe JOIN would be more efficient than two separated queries
 	row := db.PG.QueryRow(
 		ctx,
-		"SELECT * FROM metrics_history WHERE id = $1 AND created_by = $2",
+		`SELECT *
+			FROM metrics_history
+				JOIN entities ON entities.id = metrics_history.entity_id
+		WHERE metrics_history.id = $1 AND metrics_history.created_by = $2`,
 		queryId, userID,
 	)
 
 	query := models.NewEmptyMetricsQuery()
-	err := query.Scan(row)
+	err := query.FullScan(row)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("Metrics query with id %v not found: %v", queryId, err)
 		return nil, utils.MetricsNotFoundErr
@@ -86,13 +88,6 @@ func (s *MetricsService) RetrieveMetrics(ctx context.Context, queryId int, userI
 		log.Println("Error scaning metrics row: ", err)
 		return nil, utils.InternalServerErr
 	}
-
-	entity, err := s.entityService.RetrieveEntity(ctx, query.Entity.ID, query.CreatedBy)
-	if err != nil {
-		log.Println("Error linking metrics query to entity: ", err)
-		return nil, utils.InternalServerErr
-	}
-	query.Entity = entity
 
 	return query, nil
 }

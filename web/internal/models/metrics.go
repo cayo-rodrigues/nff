@@ -118,3 +118,18 @@ func (q *MetricsQuery) Scan(rows db.Scanner) error {
 		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
 	)
 }
+
+func (q *MetricsQuery) FullScan(rows db.Scanner) error {
+	return rows.Scan(
+		&q.ID, &q.StartDate, &q.EndDate,
+		&q.Results.TotalIncome, &q.Results.TotalExpenses, &q.Results.AvgIncome,
+		&q.Results.AvgExpenses, &q.Results.Diff, &q.Results.IsPositive,
+		&q.Results.TotalRecords, &q.Results.PositiveRecords, &q.Results.NegativeRecords,
+		&q.Results.ReqStatus, &q.Results.ReqMsg, &q.Entity.ID,
+		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
+
+		&q.Entity.ID, &q.Entity.Name, &q.Entity.UserType, &q.Entity.CpfCnpj, &q.Entity.Ie, &q.Entity.Email, &q.Entity.Password,
+		&q.Entity.Address.PostalCode, &q.Entity.Address.Neighborhood, &q.Entity.Address.StreetType, &q.Entity.Address.StreetName, &q.Entity.Address.Number,
+		&q.Entity.CreatedBy, &q.Entity.CreatedAt, &q.Entity.UpdatedAt,
+	)
+}
