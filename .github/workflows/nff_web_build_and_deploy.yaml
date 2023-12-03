@@ -44,6 +44,9 @@ jobs:
       HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up SSH
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
