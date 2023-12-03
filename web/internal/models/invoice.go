@@ -161,3 +161,20 @@ func (i *Invoice) Scan(rows db.Scanner) error {
 		&i.ExtraNotes, &i.CustomFileName,
 	)
 }
+
+func (i *Invoice) FullScan(rows db.Scanner) error {
+	return rows.Scan(
+		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
+		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
+		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
+		&i.ExtraNotes, &i.CustomFileName,
+
+		&i.Sender.ID, &i.Sender.Name, &i.Sender.UserType, &i.Sender.CpfCnpj, &i.Sender.Ie, &i.Sender.Email, &i.Sender.Password,
+		&i.Sender.Address.PostalCode, &i.Sender.Address.Neighborhood, &i.Sender.Address.StreetType, &i.Sender.Address.StreetName, &i.Sender.Address.Number,
+		&i.Sender.CreatedBy, &i.Sender.CreatedAt, &i.Sender.UpdatedAt,
+
+		&i.Recipient.ID, &i.Recipient.Name, &i.Recipient.UserType, &i.Recipient.CpfCnpj, &i.Recipient.Ie, &i.Recipient.Email, &i.Recipient.Password,
+		&i.Recipient.Address.PostalCode, &i.Recipient.Address.Neighborhood, &i.Recipient.Address.StreetType, &i.Recipient.Address.StreetName, &i.Recipient.Address.Number,
+		&i.Recipient.CreatedBy, &i.Recipient.CreatedAt, &i.Recipient.UpdatedAt,
+	)
+}
