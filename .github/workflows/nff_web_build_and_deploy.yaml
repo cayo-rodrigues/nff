@@ -44,17 +44,23 @@ jobs:
       HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Set up SSH
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
       - name: Connect to EC2 instance and deploy
-        working-directory: ./web
-        run: ./deploy.sh $WEB_IMAGE_TAG $MIGRATIONS_IMAGE_TAG $USER_NAME $HOSTNAME
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
+            sudo docker image prune --all --force &&
+            ./gen-compose.sh \"$WEB_IMAGE_TAG\" \"$MIGRATIONS_IMAGE_TAG\" &&
+            sudo docker pull \"$WEB_IMAGE_TAG\" &&
+            sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
+            sudo docker compose run --build --rm migrations &&
+            sudo docker compose down web &&
+            sudo docker image prune --all --force &&
+            sudo docker compose up --build -d web
+          "
 
       - name: Clean up private key
         run: rm private_key.pem
