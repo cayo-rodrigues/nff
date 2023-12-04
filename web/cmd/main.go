@@ -99,12 +99,13 @@ func main() {
 	app.Get("/logout", handlers.Logout)
 
 	app.Use(middlewares.AuthMiddleware)
+	app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/", handlers.Home)
 
 	app.Get("/entities", entitiesPage.Render)
-	app.Get("/entities/:id/form", entitiesPage.GetEntityForm)
 	app.Post("/entities", entitiesPage.CreateEntity)
+	app.Get("/entities/:id/form", entitiesPage.GetEntityForm)
 	app.Put("/entities/:id", entitiesPage.UpdateEntity)
 	app.Delete("/entities/:id", entitiesPage.DeleteEntity)
 
