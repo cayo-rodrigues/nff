@@ -18,7 +18,7 @@ func CacheMiddleware(c *fiber.Ctx) error {
 		return useOrSetCache(c)
 	}
 
-	return clearCache(c)
+	return callNextAndClearCache(c)
 }
 
 func useOrSetCache(c *fiber.Ctx) error {
@@ -51,23 +51,6 @@ func useOrSetCache(c *fiber.Ctx) error {
 	return nil
 }
 
-func clearCache(c *fiber.Ctx) error {
-	// delete all cache keys in the current namespace, not just based on this route
-
-	return c.Next()
-}
-
-func genKeys(c *fiber.Ctx) (string, string) {
-	userID := c.Locals("UserID").(int)
-	route := c.OriginalURL()
-	namespace := strings.Split(route, "/")[1]
-
-	bodyKey := fmt.Sprintf("body:%v:%v:%v", userID, route, namespace)
-	headersKey := fmt.Sprintf("headers:%v:%v:%v", userID, route, namespace)
-
-	return bodyKey, headersKey
-}
-
 func callNextAndSetCache(c *fiber.Ctx) error {
 	if err := c.Next(); err != nil {
 		return err
@@ -79,15 +62,57 @@ func callNextAndSetCache(c *fiber.Ctx) error {
 	err := db.Redis.Set(c.Context(), bodyKey, response.Body(), time.Minute).Err()
 	if err != nil {
 		log.Println("Error trying to set response body cache:", err)
-		return err
 	}
 
 	err = db.Redis.Set(c.Context(), headersKey, response.Header.Header(), time.Minute).Err()
 	if err != nil {
 		log.Println("Error trying to set response headers cache:", err)
-		return err
 	}
 
 	response.Header.Set("X-Cache", "miss")
 	return nil
+}
+
+func callNextAndClearCache(c *fiber.Ctx) error {
+	if err := c.Next(); err != nil {
+		return err
+	}
+
+	userID, _, namespace := getKeyFactors(c)
+	keysPattern := fmt.Sprintf("*:%v:*:%v", userID, namespace)
+	cacheStatus := "cleared"
+
+	keys, err := db.Redis.Keys(c.Context(), keysPattern).Result()
+	if err != nil {
+		log.Println("Error geting cache keys to clear:", err)
+		cacheStatus = "stale"
+	}
+
+	if keys != nil {
+		err := db.Redis.Del(c.Context(), keys...).Err()
+		if err != nil {
+			log.Println("Error clearing cache keys:", err)
+			cacheStatus = "stale"
+		}
+	}
+
+	c.Response().Header.Set("X-Cache", cacheStatus)
+	return nil
+}
+
+func getKeyFactors(c *fiber.Ctx) (int, string, string) {
+	userID := c.Locals("UserID").(int)
+	route := c.OriginalURL()
+	namespace := strings.Split(route, "/")[1]
+
+	return userID, route, namespace
+}
+
+func genKeys(c *fiber.Ctx) (string, string) {
+	userID, route, namespace := getKeyFactors(c)
+
+	bodyKey := fmt.Sprintf("body:%v:%v:%v", userID, route, namespace)
+	headersKey := fmt.Sprintf("headers:%v:%v:%v", userID, route, namespace)
+
+	return bodyKey, headersKey
 }
