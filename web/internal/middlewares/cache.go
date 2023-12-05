@@ -88,7 +88,7 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 		cacheStatus = "stale"
 	}
 
-	if keys != nil {
+	if keys != nil && len(keys) > 0 {
 		err := db.Redis.Del(c.Context(), keys...).Err()
 		if err != nil {
 			log.Println("Error clearing cache keys:", err)
