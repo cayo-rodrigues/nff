@@ -60,7 +60,7 @@ func clearCache(c *fiber.Ctx) error {
 func genKeys(c *fiber.Ctx) (string, string) {
 	userID := c.Locals("UserID").(int)
 	route := c.OriginalURL()
-	namespace := strings.Split(route, "/")[0]
+	namespace := strings.Split(route, "/")[1]
 
 	bodyKey := fmt.Sprintf("body:%v:%v:%v", userID, route, namespace)
 	headersKey := fmt.Sprintf("headers:%v:%v:%v", userID, route, namespace)
