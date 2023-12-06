@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -87,34 +88,38 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) ([]*InvoiceItem, error) {
 func (i *InvoiceItem) IsValid() bool {
 	isValid := true
 
-	mandatoryFieldMsg := "Campo obrigatório"
-	unacceptableValueMsg := "Valor inaceitável"
-	validationsCount := 9
+	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	unacceptableValueMsg := globals.UnacceptableValueMsg
+	valueTooLongMsg := globals.ValueTooLongMsg
+
+	hasDescription := i.Description != ""
+	hasQuantity := i.Quantity != 0.0
+	hasValuePerUnity := i.ValuePerUnity != 0.0
+	hasNCM := i.NCM != ""
+
+	descriptionTooLong := utf8.RuneCount([]byte(i.Description)) > 128
+	ncmTooLong := utf8.RuneCount([]byte(i.NCM)) > 16
+
+	fields := [5]*utils.Field{
+		{ErrCondition: !hasDescription, ErrField: &i.Errors.Description, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasQuantity, ErrField: &i.Errors.Quantity, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasValuePerUnity, ErrField: &i.Errors.ValuePerUnity, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: descriptionTooLong, ErrField: &i.Errors.Description, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: hasNCM && ncmTooLong, ErrField: &i.Errors.NCM, ErrMsg: &valueTooLongMsg},
+	}
 
 	var wg sync.WaitGroup
-	wg.Add(validationsCount)
-	ch := make(chan bool, validationsCount)
+	for _, field := range fields {
+		wg.Add(1)
+		go utils.ValidateField(field, &isValid, &wg)
+	}
 
-	go utils.ValidateField(i.Group == "", &i.Errors.Group, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Description == "", &i.Errors.Description, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Origin == "", &i.Errors.Origin, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.UnityOfMeasurement == "", &i.Errors.UnityOfMeasurement, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Quantity == 0.0, &i.Errors.Quantity, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.ValuePerUnity == 0.0, &i.Errors.ValuePerUnity, &mandatoryFieldMsg, ch, &wg)
-
-	go utils.ValidateListField(i.Group, globals.InvoiceItemGroups[:], &i.Errors.Group, &unacceptableValueMsg, ch, &wg)
-	go utils.ValidateListField(i.Origin, globals.InvoiceItemOrigins[:], &i.Errors.Origin, &unacceptableValueMsg, ch, &wg)
-	go utils.ValidateListField(i.UnityOfMeasurement, globals.InvoiceItemUnitiesOfMeaasurement[:], &i.Errors.UnityOfMeasurement, &unacceptableValueMsg, ch, &wg)
+	wg.Add(3)
+	go utils.ValidateListField(i.Group, globals.InvoiceItemGroups[:], &i.Errors.Group, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(i.Origin, globals.InvoiceItemOrigins[:], &i.Errors.Origin, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(i.UnityOfMeasurement, globals.InvoiceItemUnitiesOfMeaasurement[:], &i.Errors.UnityOfMeasurement, &unacceptableValueMsg, &isValid, &wg)
 
 	wg.Wait()
-	close(ch)
-
-	for i := 0; i < validationsCount; i++ {
-		if validationPassed := <-ch; !validationPassed {
-			isValid = false
-			break
-		}
-	}
 
 	return isValid
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -75,35 +76,31 @@ func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
 func (q *MetricsQuery) IsValid() bool {
 	isValid := true
 
-	mandatoryFieldMsg := "Campo obrigatório"
-	ilogicalDatesMsg := "Data inicial deve ser anterior à final"
-	timeRangeTooLargeMsg := "Período não pode ser maior que 365 dias"
-	validationsCount := 5
-
-	var wg sync.WaitGroup
-	wg.Add(validationsCount)
-	ch := make(chan bool, validationsCount)
+	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	ilogicalDatesMsg := globals.IlogicalDatesMsg
+	timeRangeTooLongMsg := globals.TimeRangeTooLongMsg
 
 	startDateIsEmpty := q.StartDate.IsZero()
 	endDateIsEmpty := q.EndDate.IsZero()
 	startDateGreaterThanEndDate := q.StartDate.After(q.EndDate)
-	timeRangeTooLarge := int(q.EndDate.Sub(q.StartDate).Hours()/24) > 365
+	timeRangeTooLong := int(q.EndDate.Sub(q.StartDate).Hours()/24) > 365
+	hasEntity := q.Entity != nil
 
-	go utils.ValidateField(startDateIsEmpty, &q.Errors.StartDate, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(endDateIsEmpty, &q.Errors.EndDate, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(startDateGreaterThanEndDate, &q.Errors.StartDate, &ilogicalDatesMsg, ch, &wg)
-	go utils.ValidateField(timeRangeTooLarge, &q.Errors.StartDate, &timeRangeTooLargeMsg, ch, &wg)
-	go utils.ValidateField(q.Entity == nil, &q.Errors.Entity, &mandatoryFieldMsg, ch, &wg)
+	fields := [5]*utils.Field{
+		{ErrCondition: startDateIsEmpty, ErrField: &q.Errors.StartDate, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: endDateIsEmpty, ErrField: &q.Errors.EndDate, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: startDateGreaterThanEndDate, ErrField: &q.Errors.StartDate, ErrMsg: &ilogicalDatesMsg},
+		{ErrCondition: timeRangeTooLong, ErrField: &q.Errors.StartDate, ErrMsg: &timeRangeTooLongMsg},
+		{ErrCondition: !hasEntity, ErrField: &q.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
+	}
+
+	var wg sync.WaitGroup
+	for _, field := range fields {
+		wg.Add(1)
+		go utils.ValidateField(field, &isValid, &wg)
+	}
 
 	wg.Wait()
-	close(ch)
-
-	for i := 0; i < validationsCount; i++ {
-		if validationPassed := <-ch; !validationPassed {
-			isValid = false
-			break
-		}
-	}
 
 	return isValid
 }

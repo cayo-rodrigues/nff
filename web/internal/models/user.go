@@ -3,6 +3,7 @@ package models
 import (
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -43,27 +44,31 @@ func NewUserFromForm(c *fiber.Ctx) *User {
 func (u *User) IsValid() bool {
 	isValid := true
 
-	mandatoryFieldMsg := "Campo obrigatório"
-	invalidFormatMsg := "Formato inválido"
-	validationsCount := 3
+	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	valueTooLongMsg := globals.ValueTooLongMsg
+	invalidFormatMsg := globals.InvalidFormatMsg
+
+	hasEmail := u.Email != ""
+	hasPassword := u.Password != ""
+
+	hasValidEmailFormat := globals.ReEmail.MatchString(u.Email)
+
+	emailTooLong := utf8.RuneCount([]byte(u.Email)) > 128
+
+	fields := [4]*utils.Field{
+		{ErrCondition: !hasEmail, ErrField: &u.Errors.Email, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasPassword, ErrField: &u.Errors.Password, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: hasEmail && !hasValidEmailFormat, ErrField: &u.Errors.Email, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: emailTooLong, ErrField: &u.Errors.Email, ErrMsg: &valueTooLongMsg},
+	}
 
 	var wg sync.WaitGroup
-	wg.Add(validationsCount)
-	ch := make(chan bool, validationsCount)
-
-	go utils.ValidateField(u.Email == "", &u.Errors.Email, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(!globals.ReEmail.MatchString(u.Email), &u.Errors.Email, &invalidFormatMsg, ch, &wg)
-	go utils.ValidateField(u.Password == "", &u.Errors.Password, &mandatoryFieldMsg, ch, &wg)
+	for _, field := range fields {
+		wg.Add(1)
+		go utils.ValidateField(field, &isValid, &wg)
+	}
 
 	wg.Wait()
-	close(ch)
-
-	for i := 0; i < validationsCount; i++ {
-		if validationPassed := <-ch; !validationPassed {
-			isValid = false
-			break
-		}
-	}
 
 	return isValid
 }

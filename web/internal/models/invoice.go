@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -108,47 +109,59 @@ func NewInvoiceFromForm(c *fiber.Ctx) (*Invoice, error) {
 func (i *Invoice) IsValid() bool {
 	isValid := true
 
-	mandatoryFieldMsg := "Campo obrigatório"
-	unacceptableValueMsg := "Valor inaceitável"
-	mustHaveItemsMsg := "A NF deve ter pelo menos 1 produto"
-	invalidItemsMsg := "Dados dos produtos inválidos"
-	itemsCount := len(i.Items)
-	validationsCount := 14 + itemsCount
+	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	unacceptableValueMsg := globals.UnacceptableValueMsg
+	mustHaveItemsMsg := globals.MustHaveItemsMsg
+	invalidItemsMsg := globals.InvalidItemsMsg
+	valueTooLongMsg := globals.ValueTooLongMsg
+
+	hasSender := i.Sender != nil
+	hasRecipient := i.Recipient != nil
+	hasShipping := i.Shipping != 0
+	hasItems := len(i.Items) >= 0
+	hasGta := i.Gta != ""
+	hasCustomFileName := i.CustomFileName != ""
+	hasExtraNotes := i.ExtraNotes != ""
+
+	gtaTooLong := utf8.RuneCount([]byte(i.Gta)) > 16
+	customFileNameTooLong := utf8.RuneCount([]byte(i.CustomFileName)) > 64
+	extraNotesTooLong := utf8.RuneCount([]byte(i.ExtraNotes)) > 512
+
+	fields := [7]*utils.Field{
+		{ErrCondition: !hasSender, ErrField: &i.Errors.Sender, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasRecipient, ErrField: &i.Errors.Recipient, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasShipping, ErrField: &i.Errors.Shipping, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasItems, ErrField: &i.Errors.Items, ErrMsg: &mustHaveItemsMsg},
+		{ErrCondition: hasGta && gtaTooLong, ErrField: &i.Errors.Gta, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: hasCustomFileName && customFileNameTooLong, ErrField: &i.Errors.CustomFileName, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: hasExtraNotes && extraNotesTooLong, ErrField: &i.Errors.ExtraNotes, ErrMsg: &valueTooLongMsg},
+	}
 
 	var wg sync.WaitGroup
-	wg.Add(validationsCount)
-	ch := make(chan bool, validationsCount)
 
-	go utils.ValidateField(i.Sender == nil, &i.Errors.Sender, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Recipient == nil, &i.Errors.Recipient, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Operation == "", &i.Errors.Operation, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Cfop == 0, &i.Errors.Cfop, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.IsIcmsContributor == "", &i.Errors.IsIcmsContributor, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.IsFinalCustomer == "", &i.Errors.IsFinalCustomer, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Shipping == 0, &i.Errors.Shipping, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.AddShippingToTotal == "", &i.Errors.AddShippingToTotal, &mandatoryFieldMsg, ch, &wg)
-
-	go utils.ValidateListField(i.Operation, globals.InvoiceOperations[:], &i.Errors.Operation, &unacceptableValueMsg, ch, &wg)
-	go utils.ValidateListField(i.Cfop, globals.InvoiceCfops[:], &i.Errors.Cfop, &unacceptableValueMsg, ch, &wg)
-	go utils.ValidateListField(i.IsIcmsContributor, globals.InvoiceIcmsOptions[:], &i.Errors.IsIcmsContributor, &unacceptableValueMsg, ch, &wg)
-	go utils.ValidateListField(i.IsFinalCustomer, globals.InvoiceBooleanField[:], &i.Errors.IsFinalCustomer, &unacceptableValueMsg, ch, &wg)
-	go utils.ValidateListField(i.AddShippingToTotal, globals.InvoiceBooleanField[:], &i.Errors.AddShippingToTotal, &unacceptableValueMsg, ch, &wg)
-
-	go utils.ValidateField(itemsCount == 0, &i.Errors.Items, &mustHaveItemsMsg, ch, &wg)
+	for _, field := range fields {
+		wg.Add(1)
+		go utils.ValidateField(field, &isValid, &wg)
+	}
 
 	for _, item := range i.Items {
-		go utils.ValidateField(!item.IsValid(), &i.Errors.Items, &invalidItemsMsg, ch, &wg)
+		wg.Add(1)
+		field := &utils.Field{
+			ErrCondition: !item.IsValid(),
+			ErrField:     &i.Errors.Items,
+			ErrMsg:       &invalidItemsMsg,
+		}
+		go utils.ValidateField(field, &isValid, &wg)
 	}
+
+	wg.Add(5)
+	go utils.ValidateListField(i.Operation, globals.InvoiceOperations[:], &i.Errors.Operation, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(i.Cfop, globals.InvoiceCfops[:], &i.Errors.Cfop, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(i.IsIcmsContributor, globals.InvoiceIcmsOptions[:], &i.Errors.IsIcmsContributor, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(i.IsFinalCustomer, globals.InvoiceBooleanField[:], &i.Errors.IsFinalCustomer, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(i.AddShippingToTotal, globals.InvoiceBooleanField[:], &i.Errors.AddShippingToTotal, &unacceptableValueMsg, &isValid, &wg)
 
 	wg.Wait()
-	close(ch)
-
-	for i := 0; i < validationsCount; i++ {
-		if validationPassed := <-ch; !validationPassed {
-			isValid = false
-			break
-		}
-	}
 
 	return isValid
 }

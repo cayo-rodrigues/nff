@@ -63,7 +63,7 @@
                     <label class="truncate" for="neighborhood"><strong>Bairro</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="neighborhood" name="neighborhood"
                         value="{{ .Entity.Address.Neighborhood}}">
-                    <sub></sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.Neighborhood }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 lg:w-1/5 lg:pr-4 xl:w-full xl:pr-0">
@@ -80,14 +80,14 @@
                     <label class="truncate" for="street_name"><strong>Logradouro (nome)</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="street_name" name="street_name"
                         value="{{ .Entity.Address.StreetName }}">
-                    <sub></sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.StreetName }}</sub>
                 </div>
 
                 <div class="flex flex-col gap-2 lg:w-1/5 xl:w-full">
                     <label class="truncate" for="number"><strong>Número da casa</strong></label>
                     <input class="rounded bg-gray-100 p-2" type="text" id="number" name="number"
                         value="{{ .Entity.Address.Number }}">
-                    <sub></sub>
+                    <sub class="text-red-600">{{ .Entity.Errors.Number }}</sub>
                 </div>
             </div>
         </div>

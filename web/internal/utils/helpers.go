@@ -9,35 +9,37 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 )
 
-func ValidateField(errCondition bool, errField *string, errMsg *string, result chan<- bool, wg *sync.WaitGroup) {
-	defer wg.Done()
-	isValid := true
-	if errCondition {
-		*errField = *errMsg
-		isValid = false
-	}
-	result <- isValid
+type Field struct {
+	ErrCondition bool
+	ErrField     *string
+	ErrMsg       *string
 }
 
-func ValidateListField[T string | int](val T, options []T, errField *string, errMsg *string, result chan<- bool, wg *sync.WaitGroup) {
+func ValidateField(field *Field, isValid *bool, wg *sync.WaitGroup) {
+	defer wg.Done()
+	if field.ErrCondition {
+		*field.ErrField = *field.ErrMsg
+		*isValid = false
+	}
+}
+
+func ValidateListField[T string | int](val T, options []T, errField *string, errMsg *string, isValid *bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var zeroVal T
 	if val == zeroVal {
 		*errField = *errMsg
-		result <- false
+		*isValid = false
 		return
 	}
-	isValid := false
+
 	for _, option := range options {
 		if val == option {
-			isValid = true
-			break
+			return
 		}
 	}
-	if !isValid {
-		*errField = *errMsg
-	}
-	result <- isValid
+
+	*errField = *errMsg
+	*isValid = false
 }
 
 func ParseDate(date string) (time.Time, error) {

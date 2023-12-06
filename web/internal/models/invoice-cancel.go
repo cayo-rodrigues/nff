@@ -5,8 +5,10 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -50,10 +52,12 @@ func NewInvoiceCancelFromForm(c *fiber.Ctx) (*InvoiceCancel, error) {
 	invoiceCancel := NewEmptyInvoiceCancel()
 
 	invoiceCancel.Number = c.FormValue("invoice_id")
-	invoiceCancel.Year, err = strconv.Atoi(c.FormValue("year"))
-	if err != nil {
-		log.Println("Error converting invoice canceling year from string to int: ", err)
-		return nil, utils.InternalServerErr
+	if c.FormValue("year") != "" {
+		invoiceCancel.Year, err = strconv.Atoi(c.FormValue("year"))
+		if err != nil {
+			log.Println("Error converting invoice canceling year from string to int: ", err)
+			return nil, utils.InternalServerErr
+		}
 	}
 	invoiceCancel.Justification = c.FormValue("justification")
 
@@ -63,28 +67,36 @@ func NewInvoiceCancelFromForm(c *fiber.Ctx) (*InvoiceCancel, error) {
 func (i *InvoiceCancel) IsValid() bool {
 	isValid := true
 
-	mandatoryFieldMsg := "Campo obrigatório"
-	unacceptableValueMsg := "Valor inaceitável"
-	validationsCount := 4
+	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	unacceptableValueMsg := globals.UnacceptableValueMsg
+	valueTooLongMsg := globals.ValueTooLongMsg
+
+	hasEntity := i.Entity != nil
+	hasInvoiceNumber := i.Number != ""
+	hasJustification := i.Justification != ""
+	hasYear := i.Year != 0
+	hasValidYear := i.Year <= time.Now().Year()
+
+	invoiceNumberTooLong := utf8.RuneCount([]byte(i.Number)) > 9
+	justificationTooLong := utf8.RuneCount([]byte(i.Justification)) > 128
+
+	fields := [7]*utils.Field{
+		{ErrCondition: !hasEntity, ErrField: &i.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasInvoiceNumber, ErrField: &i.Errors.Number, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasJustification, ErrField: &i.Errors.Justification, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasYear, ErrField: &i.Errors.Year, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasValidYear, ErrField: &i.Errors.Year, ErrMsg: &unacceptableValueMsg},
+		{ErrCondition: invoiceNumberTooLong, ErrField: &i.Errors.Number, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: justificationTooLong, ErrField: &i.Errors.Justification, ErrMsg: &valueTooLongMsg},
+	}
 
 	var wg sync.WaitGroup
-	wg.Add(validationsCount)
-	ch := make(chan bool, validationsCount)
-
-	go utils.ValidateField(i.Entity == nil, &i.Errors.Entity, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Number == "", &i.Errors.Number, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Justification == "", &i.Errors.Justification, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.Year == 0 || i.Year > time.Now().Year(), &i.Errors.Year, &unacceptableValueMsg, ch, &wg)
+	for _, field := range fields {
+		wg.Add(1)
+		go utils.ValidateField(field, &isValid, &wg)
+	}
 
 	wg.Wait()
-	close(ch)
-
-	for i := 0; i < validationsCount; i++ {
-		if validationPassed := <-ch; !validationPassed {
-			isValid = false
-			break
-		}
-	}
 
 	return isValid
 }

@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -17,13 +18,16 @@ type EntityFormSelectFields struct {
 }
 
 type EntityFormError struct {
-	Name       string
-	UserType   string
-	CpfCnpj    string
-	Ie         string
-	Email      string
-	PostalCode string
-	StreetType string
+	Name         string
+	UserType     string
+	CpfCnpj      string
+	Ie           string
+	Email        string
+	PostalCode   string
+	Neighborhood string
+	StreetType   string
+	StreetName   string
+	Number       string
 }
 
 type Address struct {
@@ -99,35 +103,53 @@ func (e *Entity) Scan(rows db.Scanner) error {
 func (e *Entity) IsValid() bool {
 	isValid := true
 
-	mandatoryFieldMsg := "Campo obrigatório"
-	invalidFormatMsg := "Formato inválido"
-	eitherIeOrAddrMsg := "Ie OU endereço completo obrigatórios"
-	unacceptableValueMsg := "Valor inaceitável"
-	validationsCount := 8
+	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	invalidFormatMsg := globals.InvalidFormatMsg
+	mustHaveIeOrAddressMsg := globals.MustHaveIeOrAddressMsg
+	unacceptableValueMsg := globals.UnacceptableValueMsg
+	valueTooLongMsg := globals.ValueTooLongMsg
+
+	hasName := e.Name != ""
+	hasIe := e.Ie != ""
+	hasAddress := e.Address.PostalCode != "" || e.Address.Neighborhood != "" || e.Address.StreetType != "" || e.Address.StreetName != "" || e.Address.Number != ""
+	hasCpfCnpj := e.CpfCnpj == ""
+	hasEmail := e.Email != ""
+	hasPostalCode := e.Address.PostalCode != ""
+
+	hasValidIeFormat := globals.ReIeMg.MatchString(e.Ie)
+	hasValidCpfCnpjFormat := globals.ReCpf.MatchString(e.CpfCnpj) && globals.ReCnpj.MatchString(e.CpfCnpj)
+	hasValidEmailFormat := globals.ReEmail.MatchString(e.Email)
+	hasValidPostalCodeFormat := globals.RePostalCode.MatchString(e.Address.PostalCode)
+
+	nameTooLong := utf8.RuneCount([]byte(e.Name)) > 128
+	neighborhoodTooLong := utf8.RuneCount([]byte(e.Address.Neighborhood)) > 64
+	streetNameTooLong := utf8.RuneCount([]byte(e.Address.StreetName)) > 64
+	numberTooLong := utf8.RuneCount([]byte(e.Address.Number)) > 6
+
+	fields := [10]*utils.Field{
+		{ErrCondition: !hasName, ErrField: &e.Errors.Name, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasIe && !hasAddress, ErrField: &e.Errors.Ie, ErrMsg: &mustHaveIeOrAddressMsg},
+		{ErrCondition: hasIe && !hasValidIeFormat, ErrField: &e.Errors.Ie, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: hasCpfCnpj && !hasValidCpfCnpjFormat, ErrField: &e.Errors.CpfCnpj, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: hasEmail && !hasValidEmailFormat, ErrField: &e.Errors.Email, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: hasPostalCode && !hasValidPostalCodeFormat, ErrField: &e.Errors.PostalCode, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: nameTooLong, ErrField: &e.Errors.Name, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: neighborhoodTooLong, ErrField: &e.Errors.Neighborhood, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: streetNameTooLong, ErrField: &e.Errors.StreetName, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: numberTooLong, ErrField: &e.Errors.Number, ErrMsg: &valueTooLongMsg},
+	}
 
 	var wg sync.WaitGroup
-	wg.Add(validationsCount)
-	ch := make(chan bool, validationsCount)
+	for _, field := range fields {
+		wg.Add(1)
+		go utils.ValidateField(field, &isValid, &wg)
+	}
 
-	go utils.ValidateField(e.Name == "", &e.Errors.Name, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(e.Ie == "" && (e.Address.PostalCode == "" || e.Address.Neighborhood == "" || e.Address.StreetType == "" || e.Address.StreetName == "" || e.Address.Number == ""), &e.Errors.Ie, &eitherIeOrAddrMsg, ch, &wg)
-	go utils.ValidateField(e.Ie != "" && !globals.ReIeMg.MatchString(e.Ie), &e.Errors.Ie, &invalidFormatMsg, ch, &wg)
-	go utils.ValidateField(e.CpfCnpj != "" && !globals.ReCpf.MatchString(e.CpfCnpj) && !globals.ReCnpj.MatchString(e.CpfCnpj), &e.Errors.CpfCnpj, &invalidFormatMsg, ch, &wg)
-	go utils.ValidateField(e.Email != "" && !globals.ReEmail.MatchString(e.Email), &e.Errors.Email, &invalidFormatMsg, ch, &wg)
-	go utils.ValidateField(e.Address.PostalCode != "" && !globals.RePostalCode.MatchString(e.Address.PostalCode), &e.Errors.PostalCode, &invalidFormatMsg, ch, &wg)
-
-	go utils.ValidateListField(e.UserType, globals.EntityUserTypes[:], &e.Errors.UserType, &unacceptableValueMsg, ch, &wg)
-	go utils.ValidateListField(e.Address.StreetType, globals.EntityAddressStreetTypes[:], &e.Errors.StreetType, &unacceptableValueMsg, ch, &wg)
+	wg.Add(2)
+	go utils.ValidateListField(e.UserType, globals.EntityUserTypes[:], &e.Errors.UserType, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(e.Address.StreetType, globals.EntityAddressStreetTypes[:], &e.Errors.StreetType, &unacceptableValueMsg, &isValid, &wg)
 
 	wg.Wait()
-	close(ch)
-
-	for i := 0; i < validationsCount; i++ {
-		if validationPassed := <-ch; !validationPassed {
-			isValid = false
-			break
-		}
-	}
 
 	return isValid
 }

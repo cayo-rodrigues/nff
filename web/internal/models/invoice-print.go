@@ -3,8 +3,10 @@ package models
 import (
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -56,29 +58,37 @@ func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
 func (i *InvoicePrint) IsValid() bool {
 	isValid := true
 
-	mandatoryFieldMsg := "Campo obrigatório"
+	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	valueTooLongMsg := globals.ValueTooLongMsg
 	// unacceptableValueMsg := "Valor inaceitável"
-	validationsCount := 3
-
-	var wg sync.WaitGroup
-	wg.Add(validationsCount)
-	ch := make(chan bool, validationsCount)
-
-	go utils.ValidateField(i.Entity == nil, &i.Errors.Entity, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.InvoiceId == "", &i.Errors.InvoiceId, &mandatoryFieldMsg, ch, &wg)
-	go utils.ValidateField(i.InvoiceIdType == "", &i.Errors.InvoiceIdType, &mandatoryFieldMsg, ch, &wg)
 	// TODO
 	// validate invoice id format for protocol and number
 
-	wg.Wait()
-	close(ch)
+	hasEntity := i.Entity == nil
+	hasInvoiceId := i.InvoiceId != ""
+	hasInvoiceIdType := i.InvoiceIdType != ""
+	hasCustomFileName := i.CustomFileName != ""
 
-	for i := 0; i < validationsCount; i++ {
-		if validationPassed := <-ch; !validationPassed {
-			isValid = false
-			break
-		}
+	invoiceIdTooLong := utf8.RuneCount([]byte(i.InvoiceId)) > 13
+	invoiceIdTypeTooLong := utf8.RuneCount([]byte(i.InvoiceIdType)) > 13
+	customFileNameTooLong := utf8.RuneCount([]byte(i.CustomFileName)) > 64
+
+	fields := [6]*utils.Field{
+		{ErrCondition: !hasEntity, ErrField: &i.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasInvoiceId, ErrField: &i.Errors.InvoiceId, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasInvoiceIdType, ErrField: &i.Errors.InvoiceIdType, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: invoiceIdTooLong, ErrField: &i.Errors.InvoiceId, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: invoiceIdTypeTooLong, ErrField: &i.Errors.InvoiceIdType, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: hasCustomFileName && customFileNameTooLong, ErrField: &i.Errors.CustomFileName, ErrMsg: &valueTooLongMsg},
 	}
+
+	var wg sync.WaitGroup
+	for _, field := range fields {
+		wg.Add(1)
+		go utils.ValidateField(field, &isValid, &wg)
+	}
+
+	wg.Wait()
 
 	return isValid
 }
