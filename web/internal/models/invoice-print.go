@@ -60,25 +60,28 @@ func (i *InvoicePrint) IsValid() bool {
 
 	mandatoryFieldMsg := globals.MandatoryFieldMsg
 	valueTooLongMsg := globals.ValueTooLongMsg
-	// unacceptableValueMsg := "Valor inaceitável"
-	// TODO
-	// validate invoice id format for protocol and number
+	invalidFormatMsg := globals.InvalidFormatMsg
+	unacceptableValueMsg := globals.UnacceptableValueMsg
 
 	hasEntity := i.Entity != nil
 	hasInvoiceId := i.InvoiceId != ""
 	hasInvoiceIdType := i.InvoiceIdType != ""
 	hasCustomFileName := i.CustomFileName != ""
 
-	invoiceIdTooLong := utf8.RuneCount([]byte(i.InvoiceId)) > 13
-	invoiceIdTypeTooLong := utf8.RuneCount([]byte(i.InvoiceIdType)) > 13
+	hasValidInvoiceNumberFormat := globals.ReSiareNFANumber.MatchString(i.InvoiceId)
+	hasValidInvoiceProtocolFormat := globals.ReSiareNFAProtocol.MatchString(i.InvoiceId)
+
 	customFileNameTooLong := utf8.RuneCount([]byte(i.CustomFileName)) > 64
+
+	idTypeIsNumber := i.InvoiceIdType == globals.InvoiceIdTypes[0]
+	idTypeIsProtocol := i.InvoiceIdType == globals.InvoiceIdTypes[1]
 
 	fields := [6]*utils.Field{
 		{ErrCondition: !hasEntity, ErrField: &i.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasInvoiceId, ErrField: &i.Errors.InvoiceId, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasInvoiceIdType, ErrField: &i.Errors.InvoiceIdType, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: invoiceIdTooLong, ErrField: &i.Errors.InvoiceId, ErrMsg: &valueTooLongMsg},
-		{ErrCondition: invoiceIdTypeTooLong, ErrField: &i.Errors.InvoiceIdType, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: hasInvoiceId && idTypeIsNumber && !hasValidInvoiceNumberFormat, ErrField: &i.Errors.InvoiceId, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: hasInvoiceId && idTypeIsProtocol && !hasValidInvoiceProtocolFormat, ErrField: &i.Errors.InvoiceId, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: hasCustomFileName && customFileNameTooLong, ErrField: &i.Errors.CustomFileName, ErrMsg: &valueTooLongMsg},
 	}
 
@@ -87,6 +90,9 @@ func (i *InvoicePrint) IsValid() bool {
 		wg.Add(1)
 		go utils.ValidateField(field, &isValid, &wg)
 	}
+
+	wg.Add(1)
+	go utils.ValidateListField(i.InvoiceIdType, globals.InvoiceIdTypes[:], &i.Errors.InvoiceIdType, &unacceptableValueMsg, &isValid, &wg)
 
 	wg.Wait()
 

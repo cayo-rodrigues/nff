@@ -115,28 +115,31 @@ func (e *Entity) IsValid() bool {
 	hasCpfCnpj := e.CpfCnpj == ""
 	hasEmail := e.Email != ""
 	hasPostalCode := e.Address.PostalCode != ""
+	hasNumber := e.Address.Number != ""
 
 	hasValidIeFormat := globals.ReIeMg.MatchString(e.Ie)
 	hasValidCpfCnpjFormat := globals.ReCpf.MatchString(e.CpfCnpj) && globals.ReCnpj.MatchString(e.CpfCnpj)
 	hasValidEmailFormat := globals.ReEmail.MatchString(e.Email)
 	hasValidPostalCodeFormat := globals.RePostalCode.MatchString(e.Address.PostalCode)
+	hasValidNumberFormat := globals.ReAddressNumber.MatchString(e.Address.Number)
 
 	nameTooLong := utf8.RuneCount([]byte(e.Name)) > 128
 	neighborhoodTooLong := utf8.RuneCount([]byte(e.Address.Neighborhood)) > 64
 	streetNameTooLong := utf8.RuneCount([]byte(e.Address.StreetName)) > 64
 	numberTooLong := utf8.RuneCount([]byte(e.Address.Number)) > 6
 
-	fields := [10]*utils.Field{
+	fields := [11]*utils.Field{
 		{ErrCondition: !hasName, ErrField: &e.Errors.Name, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasIe && !hasAddress, ErrField: &e.Errors.Ie, ErrMsg: &mustHaveIeOrAddressMsg},
 		{ErrCondition: hasIe && !hasValidIeFormat, ErrField: &e.Errors.Ie, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: hasCpfCnpj && !hasValidCpfCnpjFormat, ErrField: &e.Errors.CpfCnpj, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: hasEmail && !hasValidEmailFormat, ErrField: &e.Errors.Email, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: hasNumber && !hasValidNumberFormat, ErrField: &e.Errors.Number, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: hasPostalCode && !hasValidPostalCodeFormat, ErrField: &e.Errors.PostalCode, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: nameTooLong, ErrField: &e.Errors.Name, ErrMsg: &valueTooLongMsg},
 		{ErrCondition: neighborhoodTooLong, ErrField: &e.Errors.Neighborhood, ErrMsg: &valueTooLongMsg},
 		{ErrCondition: streetNameTooLong, ErrField: &e.Errors.StreetName, ErrMsg: &valueTooLongMsg},
-		{ErrCondition: numberTooLong, ErrField: &e.Errors.Number, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: hasNumber && numberTooLong, ErrField: &e.Errors.Number, ErrMsg: &valueTooLongMsg},
 	}
 
 	var wg sync.WaitGroup

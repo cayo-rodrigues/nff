@@ -69,6 +69,7 @@ func (i *InvoiceCancel) IsValid() bool {
 
 	mandatoryFieldMsg := globals.MandatoryFieldMsg
 	unacceptableValueMsg := globals.UnacceptableValueMsg
+	invalidFormatMsg := globals.InvalidFormatMsg
 	valueTooLongMsg := globals.ValueTooLongMsg
 
 	hasEntity := i.Entity != nil
@@ -77,7 +78,8 @@ func (i *InvoiceCancel) IsValid() bool {
 	hasYear := i.Year != 0
 	hasValidYear := i.Year <= time.Now().Year()
 
-	invoiceNumberTooLong := utf8.RuneCount([]byte(i.Number)) > 9
+	hasValidInvoiceNumberFormat := globals.ReSiareNFANumber.MatchString(i.Number)
+
 	justificationTooLong := utf8.RuneCount([]byte(i.Justification)) > 128
 
 	fields := [7]*utils.Field{
@@ -86,7 +88,7 @@ func (i *InvoiceCancel) IsValid() bool {
 		{ErrCondition: !hasJustification, ErrField: &i.Errors.Justification, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasYear, ErrField: &i.Errors.Year, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasValidYear, ErrField: &i.Errors.Year, ErrMsg: &unacceptableValueMsg},
-		{ErrCondition: invoiceNumberTooLong, ErrField: &i.Errors.Number, ErrMsg: &valueTooLongMsg},
+		{ErrCondition: hasInvoiceNumber && !hasValidInvoiceNumberFormat, ErrField: &i.Errors.Number, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: justificationTooLong, ErrField: &i.Errors.Justification, ErrMsg: &valueTooLongMsg},
 	}
 
