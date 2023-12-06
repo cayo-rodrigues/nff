@@ -64,7 +64,7 @@ func (i *InvoicePrint) IsValid() bool {
 	// TODO
 	// validate invoice id format for protocol and number
 
-	hasEntity := i.Entity == nil
+	hasEntity := i.Entity != nil
 	hasInvoiceId := i.InvoiceId != ""
 	hasInvoiceIdType := i.InvoiceIdType != ""
 	hasCustomFileName := i.CustomFileName != ""
