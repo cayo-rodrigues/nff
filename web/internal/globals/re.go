@@ -10,4 +10,4 @@ var RePostalCode = regexp.MustCompile(`(^\d{5})\-?(\d{3}$)`)
 var ReAddressNumber = regexp.MustCompile(`^(?:s\/n|S\/n|S\/N|s\/N)|^(\d)*$`)
 var ReSiareNFANumber = regexp.MustCompile(`^(\d{3}\.\d{3}\.\d{3}|\d{9})$`)
 var ReSiareNFAProtocol = regexp.MustCompile(`^(\d{13})$`)
-
+var ReGta = regexp.MustCompile(`^([a-zA-Z]-\d{1,6}(;\s*[a-zA-Z]-\d{1,6})*$)`)

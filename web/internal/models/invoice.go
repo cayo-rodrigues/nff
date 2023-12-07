@@ -110,6 +110,7 @@ func (i *Invoice) IsValid() bool {
 	isValid := true
 
 	mandatoryFieldMsg := globals.MandatoryFieldMsg
+	invalidFormatMsg := globals.InvalidFormatMsg
 	unacceptableValueMsg := globals.UnacceptableValueMsg
 	mustHaveItemsMsg := globals.MustHaveItemsMsg
 	invalidItemsMsg := globals.InvalidItemsMsg
@@ -123,15 +124,18 @@ func (i *Invoice) IsValid() bool {
 	hasCustomFileName := i.CustomFileName != ""
 	hasExtraNotes := i.ExtraNotes != ""
 
+	hasValidGtaFormat := globals.ReGta.MatchString(i.Gta)
+
 	gtaTooLong := utf8.RuneCount([]byte(i.Gta)) > 16
 	customFileNameTooLong := utf8.RuneCount([]byte(i.CustomFileName)) > 64
 	extraNotesTooLong := utf8.RuneCount([]byte(i.ExtraNotes)) > 512
 
-	fields := [7]*utils.Field{
+	fields := [8]*utils.Field{
 		{ErrCondition: !hasSender, ErrField: &i.Errors.Sender, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasRecipient, ErrField: &i.Errors.Recipient, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasShipping, ErrField: &i.Errors.Shipping, ErrMsg: &mandatoryFieldMsg},
 		{ErrCondition: !hasItems, ErrField: &i.Errors.Items, ErrMsg: &mustHaveItemsMsg},
+		{ErrCondition: hasGta && !hasValidGtaFormat, ErrField: &i.Errors.Gta, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: hasGta && gtaTooLong, ErrField: &i.Errors.Gta, ErrMsg: &valueTooLongMsg},
 		{ErrCondition: hasCustomFileName && customFileNameTooLong, ErrField: &i.Errors.CustomFileName, ErrMsg: &valueTooLongMsg},
 		{ErrCondition: hasExtraNotes && extraNotesTooLong, ErrField: &i.Errors.ExtraNotes, ErrMsg: &valueTooLongMsg},
