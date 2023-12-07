@@ -111,7 +111,7 @@ func (e *Entity) IsValid() bool {
 
 	hasName := e.Name != ""
 	hasIe := e.Ie != ""
-	hasAddress := e.Address.PostalCode != "" || e.Address.Neighborhood != "" || e.Address.StreetType != "" || e.Address.StreetName != "" || e.Address.Number != ""
+	hasAddress := e.Address.PostalCode != "" && e.Address.Neighborhood != "" && e.Address.StreetType != "" && e.Address.StreetName != "" && e.Address.Number != ""
 	hasCpfCnpj := e.CpfCnpj == ""
 	hasEmail := e.Email != ""
 	hasPostalCode := e.Address.PostalCode != ""
