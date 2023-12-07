@@ -98,10 +98,10 @@
                 </li>
             {{ else if eq $ReqCardData.OverviewType "printing" }}
                 <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Identificador</strong>: <span> {{ .InvoiceId }}</span>
+                    <strong>Identificador</strong>: <span> {{ .InvoiceID }}</span>
                 </li>
                 <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Tipo de identificação</strong>: <span> {{ .InvoiceIdType }}</span>
+                    <strong>Tipo de identificação</strong>: <span> {{ .InvoiceIDType }}</span>
                 </li>
                 <li class="sm:w-1/2">
                     <strong>Nome do arquivo</strong>: <span> {{ if .CustomFileName }} {{ .CustomFileName }} {{ else }} - {{ end }} </span>

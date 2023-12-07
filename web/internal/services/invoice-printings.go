@@ -57,7 +57,7 @@ func (s *PrintingService) CreateInvoicePrinting(ctx context.Context, printing *m
 			(invoice_id, invoice_id_type, custom_file_name, entity_id, created_by)
 			VALUES ($1, $2, $3, $4, $5)
 		RETURNING id, req_status, req_msg`,
-		printing.InvoiceId, printing.InvoiceIdType, printing.CustomFileName, printing.Entity.ID, printing.CreatedBy,
+		printing.InvoiceID, printing.InvoiceIDType, printing.CustomFileName, printing.Entity.ID, printing.CreatedBy,
 	)
 	err := row.Scan(&printing.ID, &printing.ReqStatus, &printing.ReqMsg)
 	if err != nil {

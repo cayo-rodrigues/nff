@@ -53,7 +53,7 @@ var InvoiceBooleanField = [2]string{
 	"Não",
 }
 
-var InvoiceIdTypes = [2]string{
+var InvoiceIDTypes = [2]string{
 	"Número da NFA",
 	"Protocolo",
 }

@@ -43,7 +43,7 @@ func (p *PrintInvoicesPage) NewEmptyData() *PrintInvoicesPageData {
 		IsAuthenticated: true,
 		FormSelectFields: &models.InvoicePrintFormSelectFields{
 			Entities:       []*models.Entity{},
-			InvoiceIdTypes: &globals.InvoiceIdTypes,
+			InvoiceIDTypes: &globals.InvoiceIDTypes,
 		},
 	}
 }

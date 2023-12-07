@@ -13,20 +13,20 @@ import (
 
 type InvoicePrintFormSelectFields struct {
 	Entities       []*Entity
-	InvoiceIdTypes *[2]string
+	InvoiceIDTypes *[2]string
 }
 
 type InvoicePrintFormErrors struct {
-	InvoiceId      string
-	InvoiceIdType  string
+	InvoiceID      string
+	InvoiceIDType  string
 	Entity         string
 	CustomFileName string
 }
 
 type InvoicePrint struct {
 	ID             int
-	InvoiceId      string                  `json:"invoice_id"`
-	InvoiceIdType  string                  `json:"invoice_id_type"`
+	InvoiceID      string                  `json:"invoice_id"`
+	InvoiceIDType  string                  `json:"invoice_id_type"`
 	InvoicePDF     string                  `json:"invoice_pdf"`
 	Entity         *Entity                 `json:"entity"`
 	Errors         *InvoicePrintFormErrors `json:"-"`
@@ -48,8 +48,8 @@ func NewEmptyInvoicePrint() *InvoicePrint {
 func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
 	invoicePrint := NewEmptyInvoicePrint()
 
-	invoicePrint.InvoiceId = c.FormValue("invoice_id")
-	invoicePrint.InvoiceIdType = c.FormValue("invoice_id_type")
+	invoicePrint.InvoiceID = c.FormValue("invoice_id")
+	invoicePrint.InvoiceIDType = c.FormValue("invoice_id_type")
 	invoicePrint.CustomFileName = c.FormValue("custom_file_name")
 
 	return invoicePrint
@@ -64,24 +64,24 @@ func (i *InvoicePrint) IsValid() bool {
 	unacceptableValueMsg := globals.UnacceptableValueMsg
 
 	hasEntity := i.Entity != nil
-	hasInvoiceId := i.InvoiceId != ""
-	hasInvoiceIdType := i.InvoiceIdType != ""
+	hasInvoiceId := i.InvoiceID != ""
+	hasInvoiceIdType := i.InvoiceIDType != ""
 	hasCustomFileName := i.CustomFileName != ""
 
-	hasValidInvoiceNumberFormat := globals.ReSiareNFANumber.MatchString(i.InvoiceId)
-	hasValidInvoiceProtocolFormat := globals.ReSiareNFAProtocol.MatchString(i.InvoiceId)
+	hasValidInvoiceNumberFormat := globals.ReSiareNFANumber.MatchString(i.InvoiceID)
+	hasValidInvoiceProtocolFormat := globals.ReSiareNFAProtocol.MatchString(i.InvoiceID)
 
 	customFileNameTooLong := utf8.RuneCount([]byte(i.CustomFileName)) > 64
 
-	idTypeIsNumber := i.InvoiceIdType == globals.InvoiceIdTypes[0]
-	idTypeIsProtocol := i.InvoiceIdType == globals.InvoiceIdTypes[1]
+	idTypeIsNumber := i.InvoiceIDType == globals.InvoiceIDTypes[0]
+	idTypeIsProtocol := i.InvoiceIDType == globals.InvoiceIDTypes[1]
 
 	fields := [6]*utils.Field{
 		{ErrCondition: !hasEntity, ErrField: &i.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: !hasInvoiceId, ErrField: &i.Errors.InvoiceId, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: !hasInvoiceIdType, ErrField: &i.Errors.InvoiceIdType, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: hasInvoiceId && idTypeIsNumber && !hasValidInvoiceNumberFormat, ErrField: &i.Errors.InvoiceId, ErrMsg: &invalidFormatMsg},
-		{ErrCondition: hasInvoiceId && idTypeIsProtocol && !hasValidInvoiceProtocolFormat, ErrField: &i.Errors.InvoiceId, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: !hasInvoiceId, ErrField: &i.Errors.InvoiceID, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: !hasInvoiceIdType, ErrField: &i.Errors.InvoiceIDType, ErrMsg: &mandatoryFieldMsg},
+		{ErrCondition: hasInvoiceId && idTypeIsNumber && !hasValidInvoiceNumberFormat, ErrField: &i.Errors.InvoiceID, ErrMsg: &invalidFormatMsg},
+		{ErrCondition: hasInvoiceId && idTypeIsProtocol && !hasValidInvoiceProtocolFormat, ErrField: &i.Errors.InvoiceID, ErrMsg: &invalidFormatMsg},
 		{ErrCondition: hasCustomFileName && customFileNameTooLong, ErrField: &i.Errors.CustomFileName, ErrMsg: &valueTooLongMsg},
 	}
 
@@ -92,7 +92,7 @@ func (i *InvoicePrint) IsValid() bool {
 	}
 
 	wg.Add(1)
-	go utils.ValidateListField(i.InvoiceIdType, globals.InvoiceIdTypes[:], &i.Errors.InvoiceIdType, &unacceptableValueMsg, &isValid, &wg)
+	go utils.ValidateListField(i.InvoiceIDType, globals.InvoiceIDTypes[:], &i.Errors.InvoiceIDType, &unacceptableValueMsg, &isValid, &wg)
 
 	wg.Wait()
 
@@ -101,7 +101,7 @@ func (i *InvoicePrint) IsValid() bool {
 
 func (p *InvoicePrint) Scan(rows db.Scanner) error {
 	return rows.Scan(
-		&p.ID, &p.InvoiceId, &p.InvoiceIdType, &p.InvoicePDF,
+		&p.ID, &p.InvoiceID, &p.InvoiceIDType, &p.InvoicePDF,
 		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
 		&p.CreatedBy, &p.CreatedAt, &p.UpdatedAt,
 		&p.CustomFileName,
@@ -110,7 +110,7 @@ func (p *InvoicePrint) Scan(rows db.Scanner) error {
 
 func (p *InvoicePrint) FullScan(rows db.Scanner) error {
 	return rows.Scan(
-		&p.ID, &p.InvoiceId, &p.InvoiceIdType, &p.InvoicePDF,
+		&p.ID, &p.InvoiceID, &p.InvoiceIDType, &p.InvoicePDF,
 		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
 		&p.CreatedBy, &p.CreatedAt, &p.UpdatedAt,
 		&p.CustomFileName,

@@ -59,8 +59,8 @@ func NewRequestCard(req any) *RequestCard {
 		overviewType = "metrics"
 	case *InvoicePrint:
 		from = r.Entity.Name
-		to = r.InvoiceId
-		if r.InvoiceIdType == "Número da NFA" {
+		to = r.InvoiceID
+		if r.InvoiceIDType == "Número da NFA" {
 			prefix = "NFA-"
 		}
 		reqStatus = r.ReqStatus

@@ -35,18 +35,18 @@
                 <div class="flex flex-1 flex-col gap-2">
                     <label for="invoice_id"><strong>Identificador da nota</strong></label>
                     <input class="rounded bg-gray-100 p-2 md:w-full" id="invoice_id" name="invoice_id"
-                        value="{{ .InvoicePrint.InvoiceId }}">
-                    <sub class="text-red-600">{{ .InvoicePrint.Errors.InvoiceId }}</sub>
+                        value="{{ .InvoicePrint.InvoiceID }}">
+                    <sub class="text-red-600">{{ .InvoicePrint.Errors.InvoiceID }}</sub>
                 </div>
 
                 <div class="flex flex-1 flex-col gap-2">
                     <label for="year"><strong>Tipo de identificação</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2" id="invoice_id_type" name="invoice_id_type">
-                        {{ range .FormSelectFields.InvoiceIdTypes }}
-                            <option {{ if eq $.InvoicePrint.InvoiceIdType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                        {{ range .FormSelectFields.InvoiceIDTypes }}
+                            <option {{ if eq $.InvoicePrint.InvoiceIDType . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
-                    <sub class="text-red-600">{{ .InvoicePrint.Errors.InvoiceIdType }}</sub>
+                    <sub class="text-red-600">{{ .InvoicePrint.Errors.InvoiceIDType }}</sub>
                 </div>
 
                 <div class="flex flex-1 flex-col gap-2">
