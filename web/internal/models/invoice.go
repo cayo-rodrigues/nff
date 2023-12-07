@@ -70,7 +70,7 @@ func NewEmptyInvoice() *Invoice {
 	}
 }
 
-func NewInvoiceFromForm(c *fiber.Ctx) (*Invoice, error) {
+func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	var err error
 
 	invoice := NewEmptyInvoice()
@@ -79,31 +79,21 @@ func NewInvoiceFromForm(c *fiber.Ctx) (*Invoice, error) {
 	invoice.Cfop, err = strconv.Atoi(c.FormValue("cfop"))
 	if err != nil {
 		log.Println("Error converting invoice cfop from string to int: ", err)
-		return nil, utils.InternalServerErr
 	}
 	invoice.IsIcmsContributor = c.FormValue("is_icms_contributor")
 	invoice.IsFinalCustomer = c.FormValue("is_final_customer")
-	if c.FormValue("shipping") != "" {
-		invoice.Shipping, err = strconv.ParseFloat(c.FormValue("shipping"), 64)
-		if err != nil {
-			log.Println("Error converting invoice shipping from string to float64: ", err)
-			return nil, utils.InternalServerErr
-		}
+	invoice.Shipping, err = strconv.ParseFloat(c.FormValue("shipping"), 64)
+	if err != nil {
+		log.Println("Error converting invoice shipping from string to float64: ", err)
 	}
 	invoice.AddShippingToTotal = c.FormValue("add_shipping_to_total")
 	invoice.Gta = c.FormValue("gta")
 	invoice.ExtraNotes = c.FormValue("extra_notes")
 	invoice.CustomFileName = c.FormValue("custom_file_name")
 
-	items, err := NewInvoiceItemsFromForm(c)
-	if err != nil {
-		log.Println("Error getting invoice items from form: ", err)
-		return nil, err
-	}
+	invoice.Items = NewInvoiceItemsFromForm(c)
 
-	invoice.Items = items
-
-	return invoice, nil
+	return invoice
 }
 
 func (i *Invoice) IsValid() bool {

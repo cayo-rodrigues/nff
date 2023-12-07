@@ -46,22 +46,19 @@ func NewEmptyInvoiceCancel() *InvoiceCancel {
 	}
 }
 
-func NewInvoiceCancelFromForm(c *fiber.Ctx) (*InvoiceCancel, error) {
+func NewInvoiceCancelFromForm(c *fiber.Ctx) *InvoiceCancel {
 	var err error
 
 	invoiceCancel := NewEmptyInvoiceCancel()
 
 	invoiceCancel.Number = c.FormValue("invoice_id")
-	if c.FormValue("year") != "" {
-		invoiceCancel.Year, err = strconv.Atoi(c.FormValue("year"))
-		if err != nil {
-			log.Println("Error converting invoice canceling year from string to int: ", err)
-			return nil, utils.InternalServerErr
-		}
+	invoiceCancel.Year, err = strconv.Atoi(c.FormValue("year"))
+	if err != nil {
+		log.Println("Error converting invoice canceling year from string to int: ", err)
 	}
 	invoiceCancel.Justification = c.FormValue("justification")
 
-	return invoiceCancel, nil
+	return invoiceCancel
 }
 
 func (i *InvoiceCancel) IsValid() bool {

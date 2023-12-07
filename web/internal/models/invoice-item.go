@@ -45,7 +45,7 @@ func NewEmptyInvoiceItem() *InvoiceItem {
 	}
 }
 
-func NewInvoiceItemsFromForm(c *fiber.Ctx) ([]*InvoiceItem, error) {
+func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
 	var err error
 
 	items := []*InvoiceItem{}
@@ -71,18 +71,16 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) ([]*InvoiceItem, error) {
 		item.Quantity, err = strconv.ParseFloat(string(quantities[i]), 64)
 		if err != nil {
 			log.Printf("Error converting invoice item %d quantity from string to float64: %v", i, err)
-			return nil, utils.InternalServerErr
 		}
 		item.ValuePerUnity, err = strconv.ParseFloat(string(valuesPerUnity[i]), 64)
 		if err != nil {
 			log.Printf("Error converting invoice item %d value_per_unity from string to float64: %v", i, err)
-			return nil, utils.InternalServerErr
 		}
 
 		items = append(items, item)
 	}
 
-	return items, nil
+	return items
 }
 
 func (i *InvoiceItem) IsValid() bool {

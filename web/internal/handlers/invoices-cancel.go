@@ -94,10 +94,7 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	invoiceCancel, err := models.NewInvoiceCancelFromForm(c)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
+	invoiceCancel := models.NewInvoiceCancelFromForm(c)
 
 	invoiceCancel.Entity = entity
 	invoiceCancel.CreatedBy = userID

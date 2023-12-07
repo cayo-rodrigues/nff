@@ -110,10 +110,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	invoice, err := models.NewInvoiceFromForm(c)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
+	invoice := models.NewInvoiceFromForm(c)
 
 	invoice.Sender = sender
 	invoice.Recipient = recipient
