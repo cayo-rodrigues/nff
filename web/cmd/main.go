@@ -115,6 +115,7 @@ func main() {
 	app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
 	app.Get("/invoices/:id/request-card-status", invoicesPage.GetRequestStatus)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
+	app.Get("/invoices/request-card-filter", invoicesPage.FilterRequests)
 
 	app.Get("/invoices/cancel", cancelInvoicesPage.Render)
 	app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)

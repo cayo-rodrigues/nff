@@ -36,6 +36,15 @@ type InvoiceFormSelectFields struct {
 	IcmsOptions  *[3]string
 }
 
+func NewInvoiceFormSelectFields() *InvoiceFormSelectFields {
+	return &InvoiceFormSelectFields{
+		Operations:   &globals.InvoiceOperations,
+		Cfops:        &globals.InvoiceCfops,
+		BooleanField: &globals.InvoiceBooleanField,
+		IcmsOptions:  &globals.InvoiceIcmsOptions,
+	}
+}
+
 type Invoice struct {
 	ID                 int               `json:"-"`
 	Number             string            `json:"invoice_id"`

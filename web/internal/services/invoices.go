@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
@@ -25,18 +27,70 @@ func NewInvoiceService(entityService interfaces.EntityService, itemsService inte
 	}
 }
 
-// TODO accept filters
-func (s *InvoiceService) ListInvoices(ctx context.Context, userID int) ([]*models.Invoice, error) {
-	rows, _ := db.PG.Query(
-		ctx,
-		`SELECT *
+func (s *InvoiceService) ListInvoices(ctx context.Context, userID int, filters map[string]string) ([]*models.Invoice, error) {
+	var query strings.Builder
+
+	query.WriteString(`
+		SELECT *
 			FROM invoices
 				JOIN entities AS senders ON invoices.sender_id = senders.id
 				JOIN entities AS recipients ON invoices.recipient_id = recipients.id
 			WHERE invoices.created_by = $1
-		ORDER BY invoices.id DESC`,
-		userID,
-	)
+	`)
+
+	params := []interface{}{userID}
+	paramCounter := 2
+
+	now := time.Now()
+	fromDate, ok := filters["from_date"]
+	if !ok || fromDate == "" {
+		fromDate = utils.FormatDate(now.Add(-10 * 24 * time.Hour))
+	}
+	toDate, ok := filters["to_date"]
+	if !ok || toDate == "" {
+		toDate = utils.FormatDate(now)
+	}
+
+	query.WriteString(" AND CAST(invoices.created_at AS DATE) BETWEEN $")
+	query.WriteString(strconv.Itoa(paramCounter))
+	params = append(params, fromDate)
+	paramCounter++
+
+	query.WriteString(" AND $")
+	query.WriteString(strconv.Itoa(paramCounter))
+	params = append(params, toDate)
+	paramCounter++
+
+	if entityID, ok := filters["entity_id"]; ok && entityID != ""{
+		counter := strconv.Itoa(paramCounter)
+
+		query.WriteString(" AND sender_id = $")
+		query.WriteString(counter)
+
+		query.WriteString(" OR recipient_id = $")
+		query.WriteString(counter)
+
+		params = append(params, entityID)
+		paramCounter++
+	}
+
+	if senderID, ok := filters["sender_id"]; ok && senderID != "" {
+		query.WriteString(" AND sender_id = $")
+		query.WriteString(strconv.Itoa(paramCounter))
+		params = append(params, senderID)
+		paramCounter++
+	}
+
+	if recipientID, ok := filters["recipient_id"]; ok && recipientID != "" {
+		query.WriteString(" AND recipient_id = $")
+		query.WriteString(strconv.Itoa(paramCounter))
+		params = append(params, recipientID)
+		paramCounter++
+	}
+
+	query.WriteString(" ORDER BY invoices.created_at DESC")
+
+	rows, _ := db.PG.Query(ctx, query.String(), params...)
 	defer rows.Close()
 
 	invoices := []*models.Invoice{}

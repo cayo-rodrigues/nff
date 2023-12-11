@@ -9,7 +9,6 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -31,6 +30,7 @@ func NewInvoicesPage(service interfaces.InvoiceService, entityService interfaces
 
 type InvoicesPageData struct {
 	IsAuthenticated  bool
+	Filters          *models.ReqCardFilters
 	Invoices         []*models.Invoice
 	Invoice          *models.Invoice
 	GeneralError     string
@@ -40,13 +40,9 @@ type InvoicesPageData struct {
 
 func (p *InvoicesPage) NewEmptyData() *InvoicesPageData {
 	return &InvoicesPageData{
-		IsAuthenticated: true,
-		FormSelectFields: &models.InvoiceFormSelectFields{
-			Operations:   &globals.InvoiceOperations,
-			Cfops:        &globals.InvoiceCfops,
-			BooleanField: &globals.InvoiceBooleanField,
-			IcmsOptions:  &globals.InvoiceIcmsOptions,
-		},
+		IsAuthenticated:  true,
+		Filters:          models.NewRequestCardFilters(),
+		FormSelectFields: models.NewInvoiceFormSelectFields(),
 	}
 }
 
@@ -65,8 +61,9 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.FormSelectFields.Entities = entities
 	pageData.Invoice = models.NewEmptyInvoice()
 
-	// get the latest 10 invoices
-	invoices, err := p.service.ListInvoices(c.Context(), userID)
+	defaultFilters := make(map[string]string)
+
+	invoices, err := p.service.ListInvoices(c.Context(), userID, defaultFilters)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -206,8 +203,20 @@ func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
-	targetId := fmt.Sprintf("#request-card-%v", c.Params("id"))
-	c.Set("HX-Retarget", targetId)
+	targetID := fmt.Sprintf("#request-card-%v", c.Params("id"))
+	c.Set("HX-Retarget", targetID)
 	c.Set("HX-Reswap", "outerHTML")
 	return c.Render("partials/request-card", invoice)
+}
+
+func (p *InvoicesPage) FilterRequests(c *fiber.Ctx) error {
+	userID := c.Locals("UserID").(int)
+	filters := c.Queries()
+
+	invoices, err := p.service.ListInvoices(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	return c.Render("partials/requests-overview", invoices)
 }

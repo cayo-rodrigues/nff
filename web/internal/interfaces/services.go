@@ -22,7 +22,7 @@ type CancelingService interface {
 }
 
 type InvoiceService interface {
-	ListInvoices(ctx context.Context, userID int) ([]*models.Invoice, error)
+	ListInvoices(ctx context.Context, userID int, filters map[string]string) ([]*models.Invoice, error)
 	CreateInvoice(ctx context.Context, invoice *models.Invoice) error
 	RetrieveInvoice(ctx context.Context, invoiceID int, userID int) (*models.Invoice, error)
 	UpdateInvoice(ctx context.Context, invoice *models.Invoice) error

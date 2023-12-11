@@ -2,9 +2,15 @@ package models
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
+
+type ReqCardFilters struct {
+	FromDate time.Time
+	ToDate   time.Time
+}
 
 type RequestCard struct {
 	From              string
@@ -101,5 +107,13 @@ func NewRequestCard(req any) *RequestCard {
 		IsDownloadable:    isDownloadable,
 		DownloadLink:      downloadLink,
 		ShouldCheckStatus: !isFinished,
+	}
+}
+
+func NewRequestCardFilters() *ReqCardFilters {
+	now := time.Now()
+	return &ReqCardFilters{
+		FromDate: now.Add(-10 * 24 * time.Hour),
+		ToDate:   now,
 	}
 }
