@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"strings"
 
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 )
@@ -50,4 +51,8 @@ type PrintingService interface {
 type UserService interface {
 	RetrieveUser(ctx context.Context, email string) (*models.User, error)
 	CreateUser(ctx context.Context, user *models.User) error
+}
+
+type FiltersService interface {
+	BuildQueryFilters(query *strings.Builder, filters map[string]string, userID int, table string) []interface{}
 }

@@ -60,6 +60,14 @@ func FormatDateAsBR(date time.Time) string {
 	return date.Format("02/01/2006")
 }
 
+func NDaysBefore(now time.Time, days int) time.Time {
+	return now.Add(-30 * 24 * time.Hour)
+}
+
+func FormatedNDaysBefore(now time.Time, days int) string {
+	return FormatDate(NDaysBefore(now, 30))
+}
+
 func RoundToTwoDecimalPlaces(num float64) float64 {
 	return math.Round(num*100) / 100
 }
