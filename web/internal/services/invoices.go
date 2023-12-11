@@ -44,7 +44,7 @@ func (s *InvoiceService) ListInvoices(ctx context.Context, userID int, filters m
 	now := time.Now()
 	fromDate, ok := filters["from_date"]
 	if !ok || fromDate == "" {
-		fromDate = utils.FormatDate(now.Add(-10 * 24 * time.Hour))
+		fromDate = utils.FormatDate(now.Add(-30 * 24 * time.Hour))
 	}
 	toDate, ok := filters["to_date"]
 	if !ok || toDate == "" {

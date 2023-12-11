@@ -113,7 +113,7 @@ func NewRequestCard(req any) *RequestCard {
 func NewRequestCardFilters() *ReqCardFilters {
 	now := time.Now()
 	return &ReqCardFilters{
-		FromDate: now.Add(-10 * 24 * time.Hour),
+		FromDate: now.Add(-30 * 24 * time.Hour),
 		ToDate:   now,
 	}
 }
