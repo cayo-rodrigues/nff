@@ -167,6 +167,8 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 		log.Printf("Something went wrong when updating invoice history. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.ID, err)
 	}
 
+	utils.ClearCache(ctx, invoice.CreatedBy, "invoices")
+
 	key := fmt.Sprintf("reqstatus:invoice:%v", invoice.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
@@ -204,6 +206,8 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	if err != nil {
 		log.Printf("Something went wrong when updating invoice canceling history. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.ID, err)
 	}
+
+	utils.ClearCache(ctx, invoiceCancel.CreatedBy, "invoices-cancel")
 
 	key := fmt.Sprintf("reqstatus:canceling:%v", invoiceCancel.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
@@ -248,6 +252,8 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
 	}
 
+	utils.ClearCache(ctx, query.CreatedBy, "metrics")
+
 	key := fmt.Sprintf("reqstatus:metrics:%v", query.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
@@ -289,6 +295,8 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	if err != nil {
 		log.Printf("Something went wrong when updating invoice printing history. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.ID, err)
 	}
+
+	utils.ClearCache(ctx, invoicePrint.CreatedBy, "invoices-print")
 
 	key := fmt.Sprintf("reqstatus:printing:%v", invoicePrint.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)

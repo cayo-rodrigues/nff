@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 )
@@ -58,18 +59,21 @@ func callNextAndSetCache(c *fiber.Ctx) error {
 	response := c.Response()
 
 	bodyKey, headersKey := genKeys(c)
+	bodyBytes := response.Body()
+	headersBytes := response.Header.Header()
 
-	err := db.Redis.Set(c.Context(), bodyKey, response.Body(), time.Minute).Err()
+	err := db.Redis.Set(c.Context(), bodyKey, bodyBytes, time.Minute).Err()
 	if err != nil {
 		log.Println("Error trying to set response body cache:", err)
 	}
 
-	err = db.Redis.Set(c.Context(), headersKey, response.Header.Header(), time.Minute).Err()
+	err = db.Redis.Set(c.Context(), headersKey, headersBytes, time.Minute).Err()
 	if err != nil {
 		log.Println("Error trying to set response headers cache:", err)
 	}
 
 	response.Header.Set("X-Cache", "miss")
+
 	return nil
 }
 
@@ -79,31 +83,29 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 	}
 
 	userID, _, namespace := getKeyFactors(c)
-	keysPattern := fmt.Sprintf("*:%v:*:%v", userID, namespace)
-	cacheStatus := "cleared"
-
-	keys, err := db.Redis.Keys(c.Context(), keysPattern).Result()
-	if err != nil {
-		log.Println("Error geting cache keys to clear:", err)
-		cacheStatus = "stale"
-	}
-
-	if keys != nil && len(keys) > 0 {
-		err := db.Redis.Del(c.Context(), keys...).Err()
-		if err != nil {
-			log.Println("Error clearing cache keys:", err)
-			cacheStatus = "stale"
-		}
-	}
+	cacheStatus := utils.ClearCache(c.Context(), userID, namespace)
 
 	c.Response().Header.Set("X-Cache", cacheStatus)
+
 	return nil
 }
 
 func getKeyFactors(c *fiber.Ctx) (int, string, string) {
 	userID := c.Locals("UserID").(int)
 	route := c.OriginalURL()
-	namespace := strings.Split(route, "/")[1]
+
+	var namespace string
+
+	switch {
+	case strings.HasPrefix(route, "/invoices/cancel"):
+		namespace = "invoices-cancel"
+	case strings.HasPrefix(route, "/invoices/print"):
+		namespace = "invoices-print"
+	case strings.HasPrefix(route, "/invoices"):
+		namespace = "invoices"
+	default:
+		namespace = strings.Split(route, "/")[1]
+	}
 
 	return userID, route, namespace
 }

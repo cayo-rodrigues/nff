@@ -80,13 +80,6 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 	userID := c.Locals("UserID").(int)
 
 	// TODO async data aggregation with go routines
-
-	entities, err := p.entityService.ListEntities(c.Context(), userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-	pageData.FormSelectFields.Entities = entities
-
 	senderID, err := strconv.Atoi(c.FormValue("sender"))
 	if err != nil {
 		log.Println("Error converting sender id from string to int: ", err)
@@ -116,6 +109,13 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 	if !invoice.IsValid() {
 		pageData.FormMsg = "Corrija os campos abaixo."
 		pageData.Invoice = invoice
+
+		entities, err := p.entityService.ListEntities(c.Context(), userID)
+		if err != nil {
+			return utils.GeneralErrorResponse(c, err)
+		}
+		pageData.FormSelectFields.Entities = entities
+
 		return utils.RetargetToForm(c, "invoice", pageData)
 	}
 
@@ -126,8 +126,18 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 
 	go p.siareBGWorker.RequestInvoice(invoice)
 
+	filters := map[string]string{
+		"from_date": c.FormValue("from_date"),
+		"to_date":   c.FormValue("to_date"),
+	}
+
+	invoices, err := p.service.ListInvoices(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
 	c.Set("HX-Trigger-After-Settle", "invoice-required")
-	return c.Render("partials/request-card", invoice)
+	return c.Render("partials/requests-overview", invoices)
 }
 
 func (p *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
