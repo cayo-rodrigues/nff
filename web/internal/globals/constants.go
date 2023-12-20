@@ -24,3 +24,7 @@ const (
 	InvalidItemsMsg        = "Dados dos produtos inválidos"
 	MustHaveIeOrAddressMsg = "Ie OU endereço completo obrigatórios"
 )
+
+const (
+	ReqCardNotVisibleMsg = "A operação foi inciada com sucesso, porém devido aos filtros não aparecerá imediatamente na lista de requerimentos."
+)

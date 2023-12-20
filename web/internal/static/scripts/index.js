@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#general-error-msg').showModal()
     }
 
+    function displayGeneralInfo() {
+        document.querySelector('#general-info-msg').showModal()
+    }
+
     function eraseEntityCard(event) {
         const entityId = event.detail.value
         const entityCard = document.querySelector(`#entity-${entityId}`)
@@ -87,6 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // display general errors
     document.addEventListener('general-error', displayGeneralError)
+
+    // display general info msg
+    document.addEventListener('general-info', displayGeneralInfo)
 
     // erase entity card after delete
     document.addEventListener('entity-deleted', eraseEntityCard);

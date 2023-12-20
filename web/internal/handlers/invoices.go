@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -136,7 +138,29 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		return utils.GeneralErrorResponse(c, err)
 	}
 
+	shouldWarnUser := false
+
+	fromDate, err := utils.ParseDate(filters["from_date"])
+	if err != nil {
+		shouldWarnUser = true
+	}
+	toDate, err := utils.ParseDate(filters["to_date"])
+	if err != nil {
+		shouldWarnUser = true
+	}
+
+	today := time.Now().Truncate(time.Hour * 24)
+	fromDate = fromDate.Truncate(time.Hour * 24)
+	toDate = toDate.Truncate(time.Hour * 24)
+	if fromDate.After(today) || toDate.Before(today) {
+		shouldWarnUser = true
+	}
+
 	c.Set("HX-Trigger-After-Settle", "invoice-required")
+
+	if shouldWarnUser {
+		return utils.GeneralInfoResponse(c, globals.ReqCardNotVisibleMsg)
+	}
 	return c.Render("partials/requests-overview", invoices)
 }
 
