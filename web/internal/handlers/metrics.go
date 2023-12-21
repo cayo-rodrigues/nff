@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -29,6 +30,7 @@ func NewMetricsPage(service interfaces.MetricsService, entityService interfaces.
 
 type MetricsPageData struct {
 	IsAuthenticated  bool
+	Filters          *models.ReqCardFilters
 	GeneralError     string
 	FormMsg          string
 	FormSelectFields *models.MetricsFormSelectFields
@@ -39,11 +41,10 @@ type MetricsPageData struct {
 
 func (p *MetricsPage) NewEmptyData() *MetricsPageData {
 	return &MetricsPageData{
-		IsAuthenticated: true,
-		FormSelectFields: &models.MetricsFormSelectFields{
-			Entities: []*models.Entity{},
-		},
-		ResourceName: "metrics",
+		IsAuthenticated:  true,
+		Filters:          models.NewRequestCardFilters(),
+		FormSelectFields: models.NewMetricsFormSelectFields(),
+		ResourceName:     "metrics",
 	}
 }
 
@@ -62,7 +63,7 @@ func (p *MetricsPage) Render(c *fiber.Ctx) error {
 	pageData.FormSelectFields.Entities = entities
 
 	// get the latest 10 metricsHistory
-	metricsHistory, err := p.service.ListMetrics(c.Context(), userID)
+	metricsHistory, err := p.service.ListMetrics(c.Context(), userID, nil)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -114,8 +115,20 @@ func (p *MetricsPage) GenerateMetrics(c *fiber.Ctx) error {
 
 	go p.siareBGWorker.GetMetrics(query)
 
+	filters := models.NewRawFiltersFromForm(c)
+
+	metrics, err := p.service.ListMetrics(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
 	c.Set("HX-Trigger-After-Settle", "metrics-query-started")
-	return c.Render("partials/request-card", query)
+
+	shouldWarnUser := utils.FiltersExcludeToday(filters)
+	if shouldWarnUser {
+		return utils.GeneralInfoResponse(c, globals.ReqCardNotVisibleMsg)
+	}
+	return c.Render("partials/requests-overview", metrics)
 }
 
 func (p *MetricsPage) GetRequestCardDetails(c *fiber.Ctx) error {
@@ -182,4 +195,16 @@ func (p *MetricsPage) GetRequestStatus(c *fiber.Ctx) error {
 	c.Set("HX-Retarget", targetId)
 	c.Set("HX-Reswap", "outerHTML")
 	return c.Render("partials/request-card", query)
+}
+
+func (p *MetricsPage) FilterRequests(c *fiber.Ctx) error {
+	userID := c.Locals("UserID").(int)
+	filters := c.Queries()
+
+	invoices, err := p.service.ListMetrics(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	return c.Render("partials/requests-overview", invoices)
 }

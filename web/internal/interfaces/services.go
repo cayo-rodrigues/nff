@@ -7,6 +7,11 @@ import (
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 )
 
+type UserService interface {
+	RetrieveUser(ctx context.Context, email string) (*models.User, error)
+	CreateUser(ctx context.Context, user *models.User) error
+}
+
 type EntityService interface {
 	ListEntities(ctx context.Context, userID int) ([]*models.Entity, error)
 	CreateEntity(ctx context.Context, entity *models.Entity) error
@@ -42,15 +47,10 @@ type PrintingService interface {
 }
 
 type MetricsService interface {
-	ListMetrics(ctx context.Context, userID int) ([]*models.MetricsQuery, error)
+	ListMetrics(ctx context.Context, userID int, filters map[string]string) ([]*models.MetricsQuery, error)
 	CreateMetrics(ctx context.Context, query *models.MetricsQuery) error
 	RetrieveMetrics(ctx context.Context, queryID int, userID int) (*models.MetricsQuery, error)
 	UpdateMetrics(ctx context.Context, query *models.MetricsQuery) error
-}
-
-type UserService interface {
-	RetrieveUser(ctx context.Context, email string) (*models.User, error)
-	CreateUser(ctx context.Context, user *models.User) error
 }
 
 type FiltersService interface {

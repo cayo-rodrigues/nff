@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
@@ -14,24 +15,29 @@ import (
 )
 
 type MetricsService struct {
-	entityService interfaces.EntityService
+	entityService  interfaces.EntityService
+	filtersService interfaces.FiltersService
 }
 
-func NewMetricsService(entityService interfaces.EntityService) *MetricsService {
+func NewMetricsService(entityService interfaces.EntityService, filtersService interfaces.FiltersService) *MetricsService {
 	return &MetricsService{
-		entityService: entityService,
+		entityService:  entityService,
+		filtersService: filtersService,
 	}
 }
 
-func (s *MetricsService) ListMetrics(ctx context.Context, userID int) ([]*models.MetricsQuery, error) {
-	rows, _ := db.PG.Query(
-		ctx,
-		`SELECT *
+func (s *MetricsService) ListMetrics(ctx context.Context, userID int, filters map[string]string) ([]*models.MetricsQuery, error) {
+	var query strings.Builder
+
+	query.WriteString(`
+		SELECT *
 			FROM metrics_history
 			JOIN entities ON entities.id = metrics_history.entity_id
-		WHERE metrics_history.created_by = $1 ORDER BY metrics_history.id DESC`,
-		userID,
-	)
+	`)
+
+	params := s.filtersService.BuildQueryFilters(&query, filters, userID, "metrics_history")
+
+	rows, _ := db.PG.Query(ctx, query.String(), params...)
 	defer rows.Close()
 
 	queriesHistory := []*models.MetricsQuery{}

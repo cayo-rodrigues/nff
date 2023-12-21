@@ -15,6 +15,12 @@ type MetricsFormSelectFields struct {
 	Entities []*Entity
 }
 
+func NewMetricsFormSelectFields() *MetricsFormSelectFields {
+	return &MetricsFormSelectFields{
+		Entities: []*Entity{},
+	}
+}
+
 type MetricsFormErrors struct {
 	Entity    string
 	StartDate string

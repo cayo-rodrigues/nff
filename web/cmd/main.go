@@ -67,7 +67,7 @@ func main() {
 	invoiceService := services.NewInvoiceService(entityService, itemsService, filtersService)
 	cancelingService := services.NewCancelingService(entityService, filtersService)
 	printingService := services.NewPrintingService(entityService, filtersService)
-	metricsService := services.NewMetricsService(entityService)
+	metricsService := services.NewMetricsService(entityService, filtersService)
 
 	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService, printingService)
 
@@ -137,6 +137,7 @@ func main() {
 	app.Get("/metrics/:id/form", metricsPage.GetMetricsForm)
 	app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)
 	app.Get("/metrics/:id/request-card-status", metricsPage.GetRequestStatus)
+	app.Get("/metrics/request-card-filter", metricsPage.FilterRequests)
 
 	err := app.Listen(":" + PORT)
 	if err != nil {
