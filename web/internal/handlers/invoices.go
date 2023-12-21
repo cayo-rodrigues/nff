@@ -127,10 +127,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 
 	go p.siareBGWorker.RequestInvoice(invoice)
 
-	filters := map[string]string{
-		"from_date": c.FormValue("from_date"),
-		"to_date":   c.FormValue("to_date"),
-	}
+	filters := models.NewRawFiltersFromForm(c)
 
 	invoices, err := p.service.ListInvoices(c.Context(), userID, filters)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ReqCardFilters struct {
@@ -116,5 +117,12 @@ func NewRequestCardFilters() *ReqCardFilters {
 	return &ReqCardFilters{
 		FromDate: utils.NDaysBefore(now, globals.DefaultFiltersDaysRange),
 		ToDate:   now,
+	}
+}
+
+func NewRawFiltersFromForm(c *fiber.Ctx) map[string]string {
+	return map[string]string{
+		"from_date": c.FormValue("from_date"),
+		"to_date":   c.FormValue("to_date"),
 	}
 }

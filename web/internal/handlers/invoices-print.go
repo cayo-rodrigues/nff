@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -113,8 +114,20 @@ func (p *PrintInvoicesPage) PrintInvoice(c *fiber.Ctx) error {
 
 	go p.siareBGWorker.RequestInvoicePrinting(invoicePrint)
 
+	filters := models.NewRawFiltersFromForm(c)
+
+	printings, err := p.service.ListInvoicePrintings(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
 	c.Set("HX-Trigger-After-Settle", "invoice-print-required")
-	return c.Render("partials/request-card", invoicePrint)
+
+	shouldWarnUser := utils.FiltersExcludeToday(filters)
+	if shouldWarnUser {
+		return utils.GeneralInfoResponse(c, globals.ReqCardNotVisibleMsg)
+	}
+	return c.Render("partials/requests-overview", printings)
 }
 
 func (p *PrintInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
