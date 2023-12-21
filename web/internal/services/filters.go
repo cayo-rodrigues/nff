@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
 
@@ -15,6 +16,10 @@ func NewFiltersService() *FiltersService {
 }
 
 func (s *FiltersService) BuildQueryFilters(query *strings.Builder, filters map[string]string, userID int, table string) []interface{} {
+	if filters == nil {
+		filters = map[string]string{}
+	}
+
 	query.WriteString("WHERE ")
 	query.WriteString(table)
 	query.WriteString(".created_by = $1")
@@ -25,7 +30,7 @@ func (s *FiltersService) BuildQueryFilters(query *strings.Builder, filters map[s
 	now := time.Now()
 	fromDate, ok := filters["from_date"]
 	if !ok || fromDate == "" {
-		fromDate = utils.FormatedNDaysBefore(now, 30)
+		fromDate = utils.FormatedNDaysBefore(now, globals.DefaultFiltersDaysRange)
 	}
 	toDate, ok := filters["to_date"]
 	if !ok || toDate == "" {

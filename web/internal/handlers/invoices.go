@@ -37,6 +37,7 @@ type InvoicesPageData struct {
 	GeneralError     string
 	FormMsg          string
 	FormSelectFields *models.InvoiceFormSelectFields
+	ResourceName     string
 }
 
 func (p *InvoicesPage) NewEmptyData() *InvoicesPageData {
@@ -44,6 +45,7 @@ func (p *InvoicesPage) NewEmptyData() *InvoicesPageData {
 		IsAuthenticated:  true,
 		Filters:          models.NewRequestCardFilters(),
 		FormSelectFields: models.NewInvoiceFormSelectFields(),
+		ResourceName:     "invoices",
 	}
 }
 
@@ -62,9 +64,7 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.FormSelectFields.Entities = entities
 	pageData.Invoice = models.NewEmptyInvoice()
 
-	defaultFilters := make(map[string]string)
-
-	invoices, err := p.service.ListInvoices(c.Context(), userID, defaultFilters)
+	invoices, err := p.service.ListInvoices(c.Context(), userID, nil)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")

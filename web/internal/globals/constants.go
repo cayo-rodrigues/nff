@@ -28,3 +28,7 @@ const (
 const (
 	ReqCardNotVisibleMsg = "A operação foi inciada com sucesso, porém devido aos filtros não aparecerá imediatamente na lista de requerimentos."
 )
+
+const (
+	DefaultFiltersDaysRange = 10
+)

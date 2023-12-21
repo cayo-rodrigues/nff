@@ -34,6 +34,7 @@ type MetricsPageData struct {
 	FormSelectFields *models.MetricsFormSelectFields
 	MetricsQuery     *models.MetricsQuery
 	QueriesHistory   []*models.MetricsQuery
+	ResourceName     string
 }
 
 func (p *MetricsPage) NewEmptyData() *MetricsPageData {
@@ -42,6 +43,7 @@ func (p *MetricsPage) NewEmptyData() *MetricsPageData {
 		FormSelectFields: &models.MetricsFormSelectFields{
 			Entities: []*models.Entity{},
 		},
+		ResourceName: "metrics",
 	}
 }
 

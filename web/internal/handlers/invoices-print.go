@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
-	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -30,21 +29,22 @@ func NewPrintInvoicesPage(service interfaces.PrintingService, entityService inte
 
 type PrintInvoicesPageData struct {
 	IsAuthenticated  bool
+	Filters          *models.ReqCardFilters
 	InvoicePrint     *models.InvoicePrint
 	InvoicePrintings []*models.InvoicePrint
 	GeneralError     string
 	FormMsg          string
 	FormSuccess      bool
 	FormSelectFields *models.InvoicePrintFormSelectFields
+	ResourceName     string
 }
 
 func (p *PrintInvoicesPage) NewEmptyData() *PrintInvoicesPageData {
 	return &PrintInvoicesPageData{
-		IsAuthenticated: true,
-		FormSelectFields: &models.InvoicePrintFormSelectFields{
-			Entities:       []*models.Entity{},
-			InvoiceIDTypes: &globals.InvoiceIDTypes,
-		},
+		IsAuthenticated:  true,
+		Filters:          models.NewRequestCardFilters(),
+		FormSelectFields: models.NewInvoicePrintFromSelectFields(),
+		ResourceName:     "invoices/print",
 	}
 }
 
@@ -63,7 +63,7 @@ func (p *PrintInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.InvoicePrint = models.NewEmptyInvoicePrint()
 
 	// get the latest 10 printings
-	printings, err := p.service.ListInvoicePrintings(c.Context(), userID)
+	printings, err := p.service.ListInvoicePrintings(c.Context(), userID, nil)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -181,4 +181,16 @@ func (p *PrintInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	c.Set("HX-Retarget", targetID)
 	c.Set("HX-Reswap", "outerHTML")
 	return c.Render("partials/request-card", printing)
+}
+
+func (p *PrintInvoicesPage) FilterRequests(c *fiber.Ctx) error {
+	userID := c.Locals("UserID").(int)
+	filters := c.Queries()
+
+	printings, err := p.service.ListInvoicePrintings(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	return c.Render("partials/requests-overview", printings)
 }

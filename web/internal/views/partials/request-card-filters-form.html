@@ -1,6 +1,6 @@
 {{ define "partials/request-card-filters-form" }}
     <form
-        hx-get="/invoices/request-card-filter"
+        hx-get="/{{ .ResourceName }}/request-card-filter"
         hx-target="#requests-overview-wrapper"
         hx-swap="outerHTML"
         class="flex gap-4"

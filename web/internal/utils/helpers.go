@@ -61,11 +61,11 @@ func FormatDateAsBR(date time.Time) string {
 }
 
 func NDaysBefore(now time.Time, days int) time.Time {
-	return now.Add(-30 * 24 * time.Hour)
+	return now.Add(-time.Duration(days) * 24 * time.Hour)
 }
 
 func FormatedNDaysBefore(now time.Time, days int) string {
-	return FormatDate(NDaysBefore(now, 30))
+	return FormatDate(NDaysBefore(now, days))
 }
 
 func RoundToTwoDecimalPlaces(num float64) float64 {

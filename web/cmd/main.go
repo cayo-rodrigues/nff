@@ -66,8 +66,8 @@ func main() {
 	filtersService := services.NewFiltersService()
 	invoiceService := services.NewInvoiceService(entityService, itemsService, filtersService)
 	cancelingService := services.NewCancelingService(entityService)
+	printingService := services.NewPrintingService(entityService, filtersService)
 	metricsService := services.NewMetricsService(entityService)
-	printingService := services.NewPrintingService(entityService)
 
 	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService, printingService)
 
@@ -129,6 +129,7 @@ func main() {
 	app.Get("/invoices/print/:id/form", printInvoicesPage.GetInvoicePrintForm)
 	app.Get("/invoices/print/:id/request-card-details", printInvoicesPage.GetRequestCardDetails)
 	app.Get("/invoices/print/:id/request-card-status", printInvoicesPage.GetRequestStatus)
+	app.Get("/invoices/print/request-card-filter", printInvoicesPage.FilterRequests)
 
 	app.Get("/metrics", metricsPage.Render)
 	app.Post("/metrics", metricsPage.GenerateMetrics)

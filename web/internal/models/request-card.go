@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
 )
 
@@ -113,7 +114,7 @@ func NewRequestCard(req any) *RequestCard {
 func NewRequestCardFilters() *ReqCardFilters {
 	now := time.Now()
 	return &ReqCardFilters{
-		FromDate: utils.NDaysBefore(now, 30),
+		FromDate: utils.NDaysBefore(now, globals.DefaultFiltersDaysRange),
 		ToDate:   now,
 	}
 }

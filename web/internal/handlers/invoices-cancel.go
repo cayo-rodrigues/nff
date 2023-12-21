@@ -36,6 +36,7 @@ type CancelInvoicesPageData struct {
 	FormMsg           string
 	FormSuccess       bool
 	FormSelectFields  *models.InvoiceCancelFormSelectFields
+	ResourceName      string
 }
 
 func (p *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
@@ -44,6 +45,7 @@ func (p *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
 		FormSelectFields: &models.InvoiceCancelFormSelectFields{
 			Entities: []*models.Entity{},
 		},
+		ResourceName: "invoices/cancel",
 	}
 }
 

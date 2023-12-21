@@ -23,6 +23,13 @@ type InvoicePrintFormErrors struct {
 	CustomFileName string
 }
 
+func NewInvoicePrintFromSelectFields() *InvoicePrintFormSelectFields {
+	return &InvoicePrintFormSelectFields{
+		Entities:       []*Entity{},
+		InvoiceIDTypes: &globals.InvoiceIDTypes,
+	}
+}
+
 type InvoicePrint struct {
 	ID             int
 	InvoiceID      string                  `json:"invoice_id"`

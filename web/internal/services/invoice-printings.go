@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
@@ -15,23 +16,28 @@ import (
 
 type PrintingService struct {
 	entityService interfaces.EntityService
+	filtersService interfaces.FiltersService
 }
 
-func NewPrintingService(entityService interfaces.EntityService) *PrintingService {
+func NewPrintingService(entityService interfaces.EntityService, filtersService interfaces.FiltersService) *PrintingService {
 	return &PrintingService{
 		entityService: entityService,
+		filtersService: filtersService,
 	}
 }
 
-func (s *PrintingService) ListInvoicePrintings(ctx context.Context, userID int) ([]*models.InvoicePrint, error) {
-	rows, _ := db.PG.Query(
-		ctx,
-		`SELECT *
+func (s *PrintingService) ListInvoicePrintings(ctx context.Context, userID int, filters map[string]string) ([]*models.InvoicePrint, error) {
+	var query strings.Builder
+
+	query.WriteString(`
+		SELECT *
 			FROM invoices_printings
 				JOIN entities ON entities.id = invoices_printings.entity_id
-		WHERE invoices_printings.created_by = $1 ORDER BY invoices_printings.id DESC`,
-		userID,
-	)
+	`)
+
+	params := s.filtersService.BuildQueryFilters(&query, filters, userID, "invoices_printings")
+
+	rows, _ := db.PG.Query(ctx, query.String(), params...)
 	defer rows.Close()
 
 	printings := []*models.InvoicePrint{}
