@@ -65,7 +65,7 @@ func main() {
 	itemsService := services.NewItemsService()
 	filtersService := services.NewFiltersService()
 	invoiceService := services.NewInvoiceService(entityService, itemsService, filtersService)
-	cancelingService := services.NewCancelingService(entityService)
+	cancelingService := services.NewCancelingService(entityService, filtersService)
 	printingService := services.NewPrintingService(entityService, filtersService)
 	metricsService := services.NewMetricsService(entityService)
 
@@ -123,6 +123,7 @@ func main() {
 	app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 	app.Get("/invoices/cancel/:id/request-card-status", cancelInvoicesPage.GetRequestStatus)
+	app.Get("/invoices/cancel/request-card-filter", cancelInvoicesPage.FilterRequests)
 
 	app.Get("/invoices/print", printInvoicesPage.Render)
 	app.Post("/invoices/print", printInvoicesPage.PrintInvoice)

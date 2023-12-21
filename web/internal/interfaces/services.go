@@ -28,7 +28,7 @@ type ItemsService interface {
 }
 
 type CancelingService interface {
-	ListInvoiceCancelings(ctx context.Context, userID int) ([]*models.InvoiceCancel, error)
+	ListInvoiceCancelings(ctx context.Context, userID int, filters map[string]string) ([]*models.InvoiceCancel, error)
 	CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error
 	RetrieveInvoiceCanceling(ctx context.Context, cancelingID int, userID int) (*models.InvoiceCancel, error)
 	UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error

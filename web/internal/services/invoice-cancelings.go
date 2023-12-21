@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -16,24 +17,28 @@ import (
 
 type CancelingService struct {
 	entityService interfaces.EntityService
+	filtersService interfaces.FiltersService
 }
 
-func NewCancelingService(entityService interfaces.EntityService) *CancelingService {
+func NewCancelingService(entityService interfaces.EntityService, filtersService interfaces.FiltersService) *CancelingService {
 	return &CancelingService{
 		entityService: entityService,
+		filtersService: filtersService,
 	}
 }
 
-func (s *CancelingService) ListInvoiceCancelings(ctx context.Context, userID int) ([]*models.InvoiceCancel, error) {
-	rows, _ := db.PG.Query(
-		ctx,
-		`SELECT *
+func (s *CancelingService) ListInvoiceCancelings(ctx context.Context, userID int, filters map[string]string) ([]*models.InvoiceCancel, error) {
+	var query strings.Builder
+
+	query.WriteString(`
+		SELECT *
 			FROM invoices_cancelings
 				JOIN entities ON entities.id = invoices_cancelings.entity_id
-		WHERE invoices_cancelings.created_by = $1
-		ORDER BY invoices_cancelings.id DESC`,
-		userID,
-	)
+	`)
+
+	params := s.filtersService.BuildQueryFilters(&query, filters, userID, "invoices_cancelings")
+
+	rows, _ := db.PG.Query(ctx, query.String(), params...)
 	defer rows.Close()
 
 	cancelings := []*models.InvoiceCancel{}

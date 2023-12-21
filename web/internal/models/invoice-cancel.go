@@ -24,6 +24,12 @@ type InvoiceCancelFormErrors struct {
 	Entity        string
 }
 
+func NewInvoiceCancelFormSelectFields() *InvoiceCancelFormSelectFields {
+	return &InvoiceCancelFormSelectFields{
+		Entities: []*Entity{},
+	}
+}
+
 type InvoiceCancel struct {
 	ID            int                      `json:"-"`
 	Number        string                   `json:"invoice_id"`

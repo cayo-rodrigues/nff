@@ -9,6 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
+	"github.com/cayo-rodrigues/nff/web/internal/globals"
 	"github.com/cayo-rodrigues/nff/web/internal/interfaces"
 	"github.com/cayo-rodrigues/nff/web/internal/models"
 	"github.com/cayo-rodrigues/nff/web/internal/utils"
@@ -30,6 +31,7 @@ func NewCancelInvoicesPage(service interfaces.CancelingService, entityService in
 
 type CancelInvoicesPageData struct {
 	IsAuthenticated   bool
+	Filters           *models.ReqCardFilters
 	InvoiceCancel     *models.InvoiceCancel
 	InvoiceCancelings []*models.InvoiceCancel
 	GeneralError      string
@@ -41,11 +43,10 @@ type CancelInvoicesPageData struct {
 
 func (p *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
 	return &CancelInvoicesPageData{
-		IsAuthenticated: true,
-		FormSelectFields: &models.InvoiceCancelFormSelectFields{
-			Entities: []*models.Entity{},
-		},
-		ResourceName: "invoices/cancel",
+		IsAuthenticated:  true,
+		Filters:          models.NewRequestCardFilters(),
+		FormSelectFields: models.NewInvoiceCancelFormSelectFields(),
+		ResourceName:     "invoices/cancel",
 	}
 }
 
@@ -63,7 +64,7 @@ func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 	pageData.InvoiceCancel = models.NewEmptyInvoiceCancel()
 
 	// get the latest 10 cancelings
-	cancelings, err := p.service.ListInvoiceCancelings(c.Context(), userID)
+	cancelings, err := p.service.ListInvoiceCancelings(c.Context(), userID, nil)
 	if err != nil {
 		pageData.GeneralError = err.Error()
 		c.Set("HX-Trigger-After-Settle", "general-error")
@@ -114,8 +115,20 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 
 	go p.siareBGWorker.RequestInvoiceCanceling(invoiceCancel)
 
+	filters := models.NewRawFiltersFromForm(c)
+
+	cancelings, err := p.service.ListInvoiceCancelings(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
 	c.Set("HX-Trigger-After-Settle", "invoice-cancel-required")
-	return c.Render("partials/request-card", invoiceCancel)
+
+	shouldWarnUser := utils.FiltersExcludeToday(filters)
+	if shouldWarnUser {
+		return utils.GeneralInfoResponse(c, globals.ReqCardNotVisibleMsg)
+	}
+	return c.Render("partials/requests-overview", cancelings)
 }
 
 func (p *CancelInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
@@ -184,4 +197,16 @@ func (p *CancelInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	c.Set("HX-Retarget", targetId)
 	c.Set("HX-Reswap", "outerHTML")
 	return c.Render("partials/request-card", canceling)
+}
+
+func (p *CancelInvoicesPage) FilterRequests(c *fiber.Ctx) error {
+	userID := c.Locals("UserID").(int)
+	filters := c.Queries()
+
+	printings, err := p.service.ListInvoiceCancelings(c.Context(), userID, filters)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	return c.Render("partials/requests-overview", printings)
 }
