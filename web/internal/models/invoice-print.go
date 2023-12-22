@@ -2,7 +2,6 @@ package models
 
 import (
 	"strings"
-	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -93,16 +92,11 @@ func (i *InvoicePrint) IsValid() bool {
 		{ErrCondition: hasCustomFileName && customFileNameTooLong, ErrField: &i.Errors.CustomFileName, ErrMsg: &valueTooLongMsg},
 	}
 
-	var wg sync.WaitGroup
 	for _, field := range fields {
-		wg.Add(1)
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
 
-	wg.Add(1)
-	go utils.ValidateListField(i.InvoiceIDType, globals.InvoiceIDTypes[:], &i.Errors.InvoiceIDType, &unacceptableValueMsg, &isValid, &wg)
-
-	wg.Wait()
+	utils.ValidateListField(i.InvoiceIDType, globals.InvoiceIDTypes[:], &i.Errors.InvoiceIDType, &unacceptableValueMsg, &isValid)
 
 	return isValid
 }

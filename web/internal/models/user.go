@@ -2,7 +2,6 @@ package models
 
 import (
 	"strings"
-	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -63,13 +62,9 @@ func (u *User) IsValid() bool {
 		{ErrCondition: emailTooLong, ErrField: &u.Errors.Email, ErrMsg: &valueTooLongMsg},
 	}
 
-	var wg sync.WaitGroup
 	for _, field := range fields {
-		wg.Add(1)
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
-
-	wg.Wait()
 
 	return isValid
 }

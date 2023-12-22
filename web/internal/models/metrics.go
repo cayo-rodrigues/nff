@@ -3,7 +3,6 @@ package models
 import (
 	"log"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/db"
@@ -101,13 +100,9 @@ func (q *MetricsQuery) IsValid() bool {
 		{ErrCondition: !hasEntity, ErrField: &q.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
 	}
 
-	var wg sync.WaitGroup
 	for _, field := range fields {
-		wg.Add(1)
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
-
-	wg.Wait()
 
 	return isValid
 }

@@ -5,7 +5,6 @@ import (
 	"math"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -17,16 +16,14 @@ type Field struct {
 	ErrMsg       *string
 }
 
-func ValidateField(field *Field, isValid *bool, wg *sync.WaitGroup) {
-	defer wg.Done()
+func ValidateField(field *Field, isValid *bool) {
 	if field.ErrCondition {
 		*field.ErrField = *field.ErrMsg
 		*isValid = false
 	}
 }
 
-func ValidateListField[T string | int](val T, options []T, errField *string, errMsg *string, isValid *bool, wg *sync.WaitGroup) {
-	defer wg.Done()
+func ValidateListField[T string | int](val T, options []T, errField *string, errMsg *string, isValid *bool) {
 	var zeroVal T
 	if val == zeroVal {
 		*errField = *errMsg

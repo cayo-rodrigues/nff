@@ -3,7 +3,6 @@ package models
 import (
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -143,17 +142,12 @@ func (e *Entity) IsValid() bool {
 		{ErrCondition: hasNumber && numberTooLong, ErrField: &e.Errors.Number, ErrMsg: &valueTooLongMsg},
 	}
 
-	var wg sync.WaitGroup
 	for _, field := range fields {
-		wg.Add(1)
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
 
-	wg.Add(2)
-	go utils.ValidateListField(e.UserType, globals.EntityUserTypes[:], &e.Errors.UserType, &unacceptableValueMsg, &isValid, &wg)
-	go utils.ValidateListField(e.Address.StreetType, globals.EntityAddressStreetTypes[:], &e.Errors.StreetType, &unacceptableValueMsg, &isValid, &wg)
-
-	wg.Wait()
+	utils.ValidateListField(e.UserType, globals.EntityUserTypes[:], &e.Errors.UserType, &unacceptableValueMsg, &isValid)
+	utils.ValidateListField(e.Address.StreetType, globals.EntityAddressStreetTypes[:], &e.Errors.StreetType, &unacceptableValueMsg, &isValid)
 
 	return isValid
 }

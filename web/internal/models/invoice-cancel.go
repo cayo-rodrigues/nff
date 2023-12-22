@@ -3,7 +3,6 @@ package models
 import (
 	"log"
 	"strings"
-	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -95,13 +94,9 @@ func (i *InvoiceCancel) IsValid() bool {
 		{ErrCondition: justificationTooLong, ErrField: &i.Errors.Justification, ErrMsg: &valueTooLongMsg},
 	}
 
-	var wg sync.WaitGroup
 	for _, field := range fields {
-		wg.Add(1)
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
-
-	wg.Wait()
 
 	return isValid
 }

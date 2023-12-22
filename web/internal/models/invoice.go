@@ -3,7 +3,6 @@ package models
 import (
 	"log"
 	"strings"
-	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -140,31 +139,24 @@ func (i *Invoice) IsValid() bool {
 		{ErrCondition: hasExtraNotes && extraNotesTooLong, ErrField: &i.Errors.ExtraNotes, ErrMsg: &valueTooLongMsg},
 	}
 
-	var wg sync.WaitGroup
-
 	for _, field := range fields {
-		wg.Add(1)
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
 
 	for _, item := range i.Items {
-		wg.Add(1)
 		field := &utils.Field{
 			ErrCondition: !item.IsValid(),
 			ErrField:     &i.Errors.Items,
 			ErrMsg:       &invalidItemsMsg,
 		}
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
 
-	wg.Add(5)
-	go utils.ValidateListField(i.Operation, globals.InvoiceOperations[:], &i.Errors.Operation, &unacceptableValueMsg, &isValid, &wg)
-	go utils.ValidateListField(i.Cfop, globals.InvoiceCfops[:], &i.Errors.Cfop, &unacceptableValueMsg, &isValid, &wg)
-	go utils.ValidateListField(i.IsIcmsContributor, globals.InvoiceIcmsOptions[:], &i.Errors.IsIcmsContributor, &unacceptableValueMsg, &isValid, &wg)
-	go utils.ValidateListField(i.IsFinalCustomer, globals.InvoiceBooleanField[:], &i.Errors.IsFinalCustomer, &unacceptableValueMsg, &isValid, &wg)
-	go utils.ValidateListField(i.AddShippingToTotal, globals.InvoiceBooleanField[:], &i.Errors.AddShippingToTotal, &unacceptableValueMsg, &isValid, &wg)
-
-	wg.Wait()
+	utils.ValidateListField(i.Operation, globals.InvoiceOperations[:], &i.Errors.Operation, &unacceptableValueMsg, &isValid)
+	utils.ValidateListField(i.Cfop, globals.InvoiceCfops[:], &i.Errors.Cfop, &unacceptableValueMsg, &isValid)
+	utils.ValidateListField(i.IsIcmsContributor, globals.InvoiceIcmsOptions[:], &i.Errors.IsIcmsContributor, &unacceptableValueMsg, &isValid)
+	utils.ValidateListField(i.IsFinalCustomer, globals.InvoiceBooleanField[:], &i.Errors.IsFinalCustomer, &unacceptableValueMsg, &isValid)
+	utils.ValidateListField(i.AddShippingToTotal, globals.InvoiceBooleanField[:], &i.Errors.AddShippingToTotal, &unacceptableValueMsg, &isValid)
 
 	return isValid
 }

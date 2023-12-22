@@ -2,7 +2,6 @@ package models
 
 import (
 	"log"
-	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -105,18 +104,13 @@ func (i *InvoiceItem) IsValid() bool {
 		{ErrCondition: hasNCM && ncmTooLong, ErrField: &i.Errors.NCM, ErrMsg: &valueTooLongMsg},
 	}
 
-	var wg sync.WaitGroup
 	for _, field := range fields {
-		wg.Add(1)
-		go utils.ValidateField(field, &isValid, &wg)
+		utils.ValidateField(field, &isValid)
 	}
 
-	wg.Add(3)
-	go utils.ValidateListField(i.Group, globals.InvoiceItemGroups[:], &i.Errors.Group, &unacceptableValueMsg, &isValid, &wg)
-	go utils.ValidateListField(i.Origin, globals.InvoiceItemOrigins[:], &i.Errors.Origin, &unacceptableValueMsg, &isValid, &wg)
-	go utils.ValidateListField(i.UnityOfMeasurement, globals.InvoiceItemUnitiesOfMeaasurement[:], &i.Errors.UnityOfMeasurement, &unacceptableValueMsg, &isValid, &wg)
-
-	wg.Wait()
+	utils.ValidateListField(i.Group, globals.InvoiceItemGroups[:], &i.Errors.Group, &unacceptableValueMsg, &isValid)
+	utils.ValidateListField(i.Origin, globals.InvoiceItemOrigins[:], &i.Errors.Origin, &unacceptableValueMsg, &isValid)
+	utils.ValidateListField(i.UnityOfMeasurement, globals.InvoiceItemUnitiesOfMeaasurement[:], &i.Errors.UnityOfMeasurement, &unacceptableValueMsg, &isValid)
 
 	return isValid
 }
