@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
@@ -55,9 +56,9 @@ func NewEmptyInvoicePrint() *InvoicePrint {
 func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
 	invoicePrint := NewEmptyInvoicePrint()
 
-	invoicePrint.InvoiceID = c.FormValue("invoice_id")
-	invoicePrint.InvoiceIDType = c.FormValue("invoice_id_type")
-	invoicePrint.CustomFileName = c.FormValue("custom_file_name")
+	invoicePrint.InvoiceID = strings.TrimSpace(c.FormValue("invoice_id"))
+	invoicePrint.InvoiceIDType = strings.TrimSpace(c.FormValue("invoice_id_type"))
+	invoicePrint.CustomFileName = strings.TrimSpace(c.FormValue("custom_file_name"))
 
 	return invoicePrint
 }

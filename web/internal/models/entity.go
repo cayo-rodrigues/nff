@@ -2,6 +2,7 @@ package models
 
 import (
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
@@ -75,18 +76,18 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 	}
 	return &Entity{
 		ID:       id,
-		Name:     c.FormValue("name"),
-		UserType: c.FormValue("user_type"),
-		CpfCnpj:  c.FormValue("cpf_cnpj"),
-		Ie:       c.FormValue("ie"),
-		Email:    c.FormValue("email"),
-		Password: c.FormValue("password"),
+		Name:     strings.TrimSpace(c.FormValue("name")),
+		UserType: strings.TrimSpace(c.FormValue("user_type")),
+		CpfCnpj:  strings.TrimSpace(c.FormValue("cpf_cnpj")),
+		Ie:       strings.TrimSpace(c.FormValue("ie")),
+		Email:    strings.TrimSpace(c.FormValue("email")),
+		Password: strings.TrimSpace(c.FormValue("password")),
 		Address: &Address{
-			PostalCode:   c.FormValue("postal_code"),
-			Neighborhood: c.FormValue("neighborhood"),
-			StreetType:   c.FormValue("street_type"),
-			StreetName:   c.FormValue("street_name"),
-			Number:       c.FormValue("number"),
+			PostalCode:   strings.TrimSpace(c.FormValue("postal_code")),
+			Neighborhood: strings.TrimSpace(c.FormValue("neighborhood")),
+			StreetType:   strings.TrimSpace(c.FormValue("street_type")),
+			StreetName:   strings.TrimSpace(c.FormValue("street_name")),
+			Number:       strings.TrimSpace(c.FormValue("number")),
 		},
 		Errors: &EntityFormError{},
 	}

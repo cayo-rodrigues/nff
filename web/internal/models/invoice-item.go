@@ -2,7 +2,6 @@ package models
 
 import (
 	"log"
-	"strconv"
 	"sync"
 	"time"
 	"unicode/utf8"
@@ -63,16 +62,16 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
 	for i := 0; i < itemsQuantity; i++ {
 		item := NewEmptyInvoiceItem()
 
-		item.Group = string(groups[i])
-		item.NCM = string(ncms[i])
-		item.Description = string(descriptions[i])
-		item.Origin = string(origins[i])
-		item.UnityOfMeasurement = string(unitiesOfMeasurement[i])
-		item.Quantity, err = strconv.ParseFloat(string(quantities[i]), 64)
+		item.Group = utils.TrimSpaceBytes(groups[i])
+		item.NCM = utils.TrimSpaceBytes(ncms[i])
+		item.Description = utils.TrimSpaceBytes(descriptions[i])
+		item.Origin = utils.TrimSpaceBytes(origins[i])
+		item.UnityOfMeasurement = utils.TrimSpaceBytes(unitiesOfMeasurement[i])
+		item.Quantity, err = utils.TrimSpaceFromBytesToFloat64(quantities[i])
 		if err != nil {
 			log.Printf("Error converting invoice item %d quantity from string to float64: %v", i, err)
 		}
-		item.ValuePerUnity, err = strconv.ParseFloat(string(valuesPerUnity[i]), 64)
+		item.ValuePerUnity, err = utils.TrimSpaceFromBytesToFloat64(valuesPerUnity[i])
 		if err != nil {
 			log.Printf("Error converting invoice item %d value_per_unity from string to float64: %v", i, err)
 		}

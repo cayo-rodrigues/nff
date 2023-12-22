@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bytes"
 	"math"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -83,4 +85,24 @@ func GetInvoiceItemSelectFields() *globals.InvoiceItemFormSelectFields {
 		Origins:              &globals.InvoiceItemOrigins,
 		UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
 	}
+}
+
+func TrimSpace(s string) string {
+	return strings.TrimSpace(s)
+}
+
+func TrimSpaceBytes(b []byte) string {
+	return string(bytes.TrimSpace(b))
+}
+
+func TrimSpaceInt(i string) (int, error) {
+	return strconv.Atoi(strings.TrimSpace(i))
+}
+
+func TrimSpaceFloat64(f string) (float64, error) {
+	return strconv.ParseFloat(strings.TrimSpace(f), 64)
+}
+
+func TrimSpaceFromBytesToFloat64(f []byte) (float64, error) {
+	return TrimSpaceFloat64(TrimSpaceBytes(f))
 }

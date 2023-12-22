@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/internal/globals"
@@ -122,7 +123,7 @@ func NewRequestCardFilters() *ReqCardFilters {
 
 func NewRawFiltersFromForm(c *fiber.Ctx) map[string]string {
 	return map[string]string{
-		"from_date": c.FormValue("from_date"),
-		"to_date":   c.FormValue("to_date"),
+		"from_date": strings.TrimSpace(c.FormValue("from_date")),
+		"to_date":   strings.TrimSpace(c.FormValue("to_date")),
 	}
 }

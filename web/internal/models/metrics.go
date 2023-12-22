@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -63,11 +64,11 @@ func NewEmptyMetricsQuery() *MetricsQuery {
 }
 
 func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
-	startDate, err := utils.ParseDate(c.FormValue("start_date"))
+	startDate, err := utils.ParseDate(strings.TrimSpace(c.FormValue("start_date")))
 	if err != nil {
 		log.Println("Error converting input start date string to time.Time:", err)
 	}
-	endDate, err := utils.ParseDate(c.FormValue("end_date"))
+	endDate, err := utils.ParseDate(strings.TrimSpace(c.FormValue("end_date")))
 	if err != nil {
 		log.Println("Error converting input end date string to time.Time:", err)
 	}

@@ -2,7 +2,7 @@ package models
 
 import (
 	"log"
-	"strconv"
+	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
@@ -84,21 +84,21 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 
 	invoice := NewEmptyInvoice()
 
-	invoice.Operation = c.FormValue("operation")
-	invoice.Cfop, err = strconv.Atoi(c.FormValue("cfop"))
+	invoice.Operation = strings.TrimSpace(c.FormValue("operation"))
+	invoice.Cfop, err = utils.TrimSpaceInt(c.FormValue("cfop"))
 	if err != nil {
 		log.Println("Error converting invoice cfop from string to int: ", err)
 	}
-	invoice.IsIcmsContributor = c.FormValue("is_icms_contributor")
-	invoice.IsFinalCustomer = c.FormValue("is_final_customer")
-	invoice.Shipping, err = strconv.ParseFloat(c.FormValue("shipping"), 64)
+	invoice.IsIcmsContributor = strings.TrimSpace(c.FormValue("is_icms_contributor"))
+	invoice.IsFinalCustomer = strings.TrimSpace(c.FormValue("is_final_customer"))
+	invoice.Shipping, err = utils.TrimSpaceFloat64(c.FormValue("shipping"))
 	if err != nil {
 		log.Println("Error converting invoice shipping from string to float64: ", err)
 	}
-	invoice.AddShippingToTotal = c.FormValue("add_shipping_to_total")
-	invoice.Gta = c.FormValue("gta")
-	invoice.ExtraNotes = c.FormValue("extra_notes")
-	invoice.CustomFileName = c.FormValue("custom_file_name")
+	invoice.AddShippingToTotal = strings.TrimSpace(c.FormValue("add_shipping_to_total"))
+	invoice.Gta = strings.TrimSpace(c.FormValue("gta"))
+	invoice.ExtraNotes = strings.TrimSpace(c.FormValue("extra_notes"))
+	invoice.CustomFileName = strings.TrimSpace(c.FormValue("custom_file_name"))
 
 	invoice.Items = NewInvoiceItemsFromForm(c)
 

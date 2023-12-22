@@ -1,6 +1,7 @@
 package models
 
 import (
+	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
@@ -35,8 +36,8 @@ func NewEmptyUser() *User {
 
 func NewUserFromForm(c *fiber.Ctx) *User {
 	return &User{
-		Email:    c.FormValue("email"),
-		Password: c.FormValue("password"),
+		Email:    strings.TrimSpace(c.FormValue("email")),
+		Password: strings.TrimSpace(c.FormValue("password")),
 		Errors:   &UserFormErrors{},
 	}
 }
