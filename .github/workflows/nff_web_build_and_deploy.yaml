@@ -55,8 +55,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
             sudo docker image prune --all --force &&
             ./gen-compose.sh \"$WEB_IMAGE_TAG\" \"$MIGRATIONS_IMAGE_TAG\" \"$RDS_DB_URL\" &&
-            sudo docker pull \"$WEB_IMAGE_TAG\" &&
-            sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
             sudo docker compose run --build --rm migrations &&
             sudo docker compose down web &&
             sudo docker image prune --all --force &&
