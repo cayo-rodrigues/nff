@@ -43,6 +43,7 @@ jobs:
       PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
+      RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
     steps:
       - name: Set up SSH
         run: |
@@ -53,9 +54,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
             sudo docker image prune --all --force &&
-            ./gen-compose.sh \"$WEB_IMAGE_TAG\" \"$MIGRATIONS_IMAGE_TAG\" &&
-            sudo docker pull \"$WEB_IMAGE_TAG\" &&
-            sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
+            ./gen-compose.sh \"$WEB_IMAGE_TAG\" \"$MIGRATIONS_IMAGE_TAG\" \"$RDS_DB_URL\" &&
             sudo docker compose run --build --rm migrations &&
             sudo docker compose down web &&
             sudo docker image prune --all --force &&

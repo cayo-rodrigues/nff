@@ -21,7 +21,10 @@ var Redis *redis.Client
 var SessionStore *session.Store
 
 func GetDBPool() *pgxpool.Pool {
+	fmt.Println("Initiating Database connection...")
+
 	if PG != nil {
+		fmt.Println("Reusing existing Database connection")
 		return PG
 	}
 
@@ -39,12 +42,17 @@ func GetDBPool() *pgxpool.Pool {
 		log.Fatal("Database connection is not OK, ping failed: ", err)
 	}
 
+	fmt.Println("New Database connection OK")
+
 	PG = dbpool
 	return PG
 }
 
 func GetRedisConn() *redis.Client {
+	fmt.Println("Initiating Redis connection...")
+
 	if Redis != nil {
+		fmt.Println("Reusing existing Redis connection")
 		return Redis
 	}
 
@@ -63,12 +71,17 @@ func GetRedisConn() *redis.Client {
 		log.Fatal("Redis db connection is not OK, ping failed: ", err)
 	}
 
+	fmt.Println("New Redis connection OK")
+
 	Redis = rdb
 	return Redis
 }
 
 func GetSessionStore() *session.Store {
+	fmt.Println("Initiating SessionStore connection...")
+
 	if SessionStore != nil {
+		fmt.Println("Reusing existing SessionStore connection")
 		return SessionStore
 	}
 
@@ -77,6 +90,8 @@ func GetSessionStore() *session.Store {
 			URL: getRedisURL(),
 		}),
 	})
+
+	fmt.Println("New SessionStore connection OK")
 
 	return SessionStore
 }
