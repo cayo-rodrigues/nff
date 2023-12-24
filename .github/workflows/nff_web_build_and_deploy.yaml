@@ -49,7 +49,7 @@ jobs:
 
       - name: Run Migrations
         run: |
-          docker run --rm -e CMD=up -e DB_URL=$RDS_DB_URL migrations
+          docker run --rm -e CMD=up -e DB_URL=$RDS_DB_URL $MIGRATIONS_IMAGE_TAG
 
   # deploy:
   #   needs: migrate
