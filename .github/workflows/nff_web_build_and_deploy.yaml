@@ -38,10 +38,15 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
       MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
       RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
     steps:
+      - name: Docker login
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Pull Migrations image
+        run: docker pull $MIGRATIONS_IMAGE_TAG
+
       - name: Run Migrations
         run: |
           ls
