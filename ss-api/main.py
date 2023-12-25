@@ -26,7 +26,7 @@ def request_invoice_handler():
     except exceptions.DownloadTimeoutError as e:
         response, status_code = error_response(e)
     except exceptions.WebdriverTimeoutError as e:
-        print("@wait_for_it exausted:", e, file=sys.stderr)
+        print(f"{e.decorator} exausted:", e, file=sys.stderr)
         traceback.print_exc()
         response, status_code = error_response(e)
     except Exception:
