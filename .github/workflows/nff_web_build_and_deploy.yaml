@@ -44,6 +44,8 @@ jobs:
       HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
       RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
+      ELASTICACHE_URL: ${{ secrets.ELASTICACHE_URL }}
+      SS_API_BASE_URL: ${{ secrets.SS_API_BASE_URL }}
     steps:
       - name: Set up SSH
         run: |
@@ -54,12 +56,22 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
             sudo docker system prune -af --volumes &&
-            ./gen-compose.sh \"$WEB_IMAGE_TAG\" \"$RDS_DB_URL\" &&
-            sudo docker pull \"$WEB_IMAGE_TAG\" &&
-            sudo docker pull \"$MIGRATIONS_IMAGE_TAG\" &&
-            sudo docker run --rm -e CMD=up -e DB_URL=$RDS_DB_URL $MIGRATIONS_IMAGE_TAG &&
-            sudo docker compose down web &&
-            sudo docker compose up -d web &&
+            sudo docker run \
+              --rm \
+              --name nff-migrations \
+              -e CMD=up \
+              -e DB_URL=$RDS_DB_URL \
+              $MIGRATIONS_IMAGE_TAG &&
+            sudo docker stop nff-web &&
+            sudo docker run \
+              --rm \
+              --detach \
+              --name nff-web \
+              -e PORT=8080 \
+              -e DB_URL=$RDS_DB_URL \
+              -e REDIS_URL=$ELASTICACHE_URL \
+              -e SS_API_BASE_URL=$SS_API_BASE_URL \
+              $WEB_IMAGE_TAG &&
             sudo docker system prune -af --volumes
           "
 
