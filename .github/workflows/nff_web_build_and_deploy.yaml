@@ -62,8 +62,8 @@ jobs:
               -e CMD=up \
               -e DB_URL=$RDS_DB_URL \
               $MIGRATIONS_IMAGE_TAG &&
-            sudo docker stop nff-web &&
-            sudo docker rm nff-web &&
+            docker stop \$(docker ps -q) >/dev/null 2>&1 &&
+            docker rm \$(docker ps -aq) >/dev/null 2>&1 &&
             sudo docker run \
               --rm \
               --detach \
