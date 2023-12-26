@@ -118,7 +118,7 @@ func (e *Entity) IsValid() bool {
 	hasNumber := e.Address.Number != ""
 
 	hasValidIeFormat := globals.ReIeMg.MatchString(e.Ie)
-	hasValidCpfCnpjFormat := globals.ReCpf.MatchString(e.CpfCnpj) && globals.ReCnpj.MatchString(e.CpfCnpj)
+	hasValidCpfCnpjFormat := globals.ReCpf.MatchString(e.CpfCnpj) || globals.ReCnpj.MatchString(e.CpfCnpj)
 	hasValidEmailFormat := globals.ReEmail.MatchString(e.Email)
 	hasValidPostalCodeFormat := globals.RePostalCode.MatchString(e.Address.PostalCode)
 	hasValidNumberFormat := globals.ReAddressNumber.MatchString(e.Address.Number)
