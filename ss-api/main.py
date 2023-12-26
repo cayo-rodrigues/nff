@@ -1,21 +1,39 @@
+import json
 import sys
 import traceback
-
-from flask import Flask, request, jsonify
-from asgiref.wsgi import WsgiToAsgi
 
 from services import cancel_invoice, request_invoice, print_invoice, get_overal_balance
 from utils import exceptions
 from utils.helpers import error_response
 
-app = Flask(__name__)
-asgi_app = WsgiToAsgi(app)
+
+def main(event: dict, context):
+    path = event.get("rawPath")
+    query = event.get("queryStringParameters", "{}")
+    method = event.get("http", {}).get("method", "")
+    body = json.loads(event.get("body", {}))
+
+    response = {}
+    status_code = 200
+
+    if path == "/invoice/request" and method == "POST":
+        response, status_code = request_invoice_handler(data=body)
+    elif path == "/invoice/cancel" and method == "POST":
+        response, status_code = cancel_invoice_handler(data=body)
+    elif path == "/invoice/print" and method == "POST":
+        response, status_code = print_invoice_handler(data=body)
+    elif path == "/metrics" and method == "GET":
+        response, status_code = get_overal_balance(data={**query, **body})
+
+    return {
+        "statusCode": status_code,
+        "body": response,
+    }
 
 
-@app.route("/invoice/request", methods=["POST"])
-def request_invoice_handler():
+def request_invoice_handler(data: dict):
     try:
-        response = request_invoice(invoice_data=request.get_json())
+        response = request_invoice(invoice_data=data)
         status_code = 201
     except exceptions.InvalidInvoiceDataError as e:
         response, status_code = error_response(e)
@@ -33,13 +51,12 @@ def request_invoice_handler():
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
 
-    return jsonify(response), status_code
+    return json.dumps(response), status_code
 
 
-@app.route("/invoice/cancel", methods=["POST"])
-def cancel_invoice_handler():
+def cancel_invoice_handler(data):
     try:
-        response = cancel_invoice(canceling_data=request.get_json())
+        response = cancel_invoice(canceling_data=data)
         status_code = 200
     except exceptions.InvalidCancelingDataError as e:
         response, status_code = error_response(e)
@@ -55,13 +72,12 @@ def cancel_invoice_handler():
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
 
-    return jsonify(response), status_code
+    return json.dumps(response), status_code
 
 
-@app.route("/invoice/print", methods=["POST"])
-def print_invoice_handler():
+def print_invoice_handler(data):
     try:
-        response = print_invoice(data=request.get_json())
+        response = print_invoice(data=data)
         status_code = 200
     except exceptions.InvalidPrintingDataError as e:
         response, status_code = error_response(e)
@@ -79,13 +95,12 @@ def print_invoice_handler():
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
 
-    return jsonify(response), status_code
+    return json.dumps(response), status_code
 
 
-@app.route("/invoice/overal-balance", methods=["GET"])
-def overal_balance_handler():
+def overal_balance_handler(data):
     try:
-        response = get_overal_balance(data={**request.args, **request.get_json()})
+        response = get_overal_balance(data=data)
         status_code = 200
     except exceptions.InvalidQueryDataError as e:
         response, status_code = error_response(e)
@@ -100,8 +115,5 @@ def overal_balance_handler():
     except Exception:
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
-    return jsonify(response), status_code
 
-
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    return json.dumps(response), status_code
