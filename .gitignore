@@ -12,3 +12,4 @@ docs
 bin
 tmp
 secrets.txt
+**/lambda/selenium/python/lib/python3.10/site-packages/**
