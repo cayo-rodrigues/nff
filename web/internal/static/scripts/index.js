@@ -141,8 +141,19 @@ function openItemsDialog(dialogId) {
     document.dispatchEvent(new CustomEvent('enumerate-item-sections'))
 }
 
+function copySelectInputValue({ src, dst, inputId }) {
+    const originalValue = src.querySelector(inputId).value
+    dst.querySelector(inputId).value = originalValue
+}
+
 function duplicateItemSection(sectionElement) {
     const sectionClone = sectionElement.cloneNode(true)
+
+    const selectFieldsIds = ['#group', '#origin', '#unity_of_measurement']
+    for (let id of selectFieldsIds) {
+        copySelectInputValue({ src: sectionElement, dst: sectionClone, inputId: id })
+    }
+
     sectionElement.parentNode.insertBefore(sectionClone, sectionElement.parentNode.lastChild)
     document.dispatchEvent(new CustomEvent('enumerate-item-sections'))
 }
