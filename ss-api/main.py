@@ -2,7 +2,7 @@ import json
 import sys
 import traceback
 
-from services import cancel_invoice, request_invoice, print_invoice, get_overal_balance
+from services import cancel_invoice, request_invoice, print_invoice, get_metrics
 from utils import exceptions
 from utils.helpers import error_response
 
@@ -23,7 +23,7 @@ def main(event: dict, context):
     elif path == "/invoice/print" and method == "POST":
         response, status_code = print_invoice_handler(data=body)
     elif path == "/metrics" and method == "GET":
-        response, status_code = get_overal_balance(data={**query, **body})
+        response, status_code = get_metrics(data={**query, **body})
 
     return {
         "statusCode": status_code,
@@ -98,9 +98,9 @@ def print_invoice_handler(data):
     return json.dumps(response), status_code
 
 
-def overal_balance_handler(data):
+def metrics_handler(data):
     try:
-        response = get_overal_balance(data=data)
+        response = get_metrics(data=data)
         status_code = 200
     except exceptions.InvalidQueryDataError as e:
         response, status_code = error_response(e)

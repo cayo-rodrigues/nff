@@ -5,7 +5,7 @@ from utils import exceptions
 from utils.exceptions import InvalidQueryDataError
 
 
-def get_overal_balance(data: dict):
+def get_metrics(data: dict):
     query = InvoiceQuery(data=data)
     if not query.is_valid():
         raise InvalidQueryDataError(errors=query.errors)
