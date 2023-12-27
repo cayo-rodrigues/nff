@@ -96,7 +96,7 @@
                     <label class="truncate" for="add_shipping_to_total"><strong>Adicionar Frete ao Total</strong></label>
                     <select class="h-10 rounded bg-gray-100 p-2 md:w-full" id="add_shipping_to_total"
                         name="add_shipping_to_total">
-                        {{ range .FormSelectFields.BooleanField }}
+                        {{ range .FormSelectFields.BooleanField.Reverse }}
                             <option {{ if eq $.Invoice.AddShippingToTotal . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>

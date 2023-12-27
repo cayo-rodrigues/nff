@@ -48,7 +48,13 @@ var InvoiceIcmsOptions = [3]string{
 	"Isento",
 }
 
-var InvoiceBooleanField = [2]string{
+type BooleanField [2]string
+
+func (f *BooleanField) Reverse() *BooleanField {
+	return &BooleanField{f[1], f[0]}
+}
+
+var InvoiceBooleanField = BooleanField{
 	"Sim",
 	"Não",
 }
