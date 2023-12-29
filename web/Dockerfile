@@ -4,12 +4,12 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o nff ./cmd/main.go
+RUN go build -o nff ./main.go
 
 FROM scratch
 
 COPY --from=builder /app/nff /
-COPY --from=builder /app/internal/views /internal/views/
-COPY --from=builder /app/internal/static /internal/static/
+COPY --from=builder /app/views /views/
+COPY --from=builder /app/static /static/
 
 CMD [ "./nff" ]
