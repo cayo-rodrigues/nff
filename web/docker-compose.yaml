@@ -48,7 +48,7 @@ services:
       - DB_URL=postgres://nff:nff@db:5432/nff
       - CMD=up
     volumes:
-      - ./internal/db/migrations/:/migrations
+      - ./db/migrations/:/migrations
     depends_on:
       - db
 
