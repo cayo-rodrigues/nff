@@ -137,8 +137,6 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	}
 
 	agent := fiber.Post(w.SS_API_BASE_URL + "/invoice/request")
-	// TEMP!
-	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
@@ -183,8 +181,6 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	}
 
 	agent := fiber.Post(w.SS_API_BASE_URL + "/invoice/cancel")
-	// TEMP!
-	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
@@ -228,14 +224,13 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		},
 	}
 
-	agent := fiber.Get(w.SS_API_BASE_URL + "/invoice/overal-balance")
+	agent := fiber.Get(w.SS_API_BASE_URL + "/metrics")
 	agent.QueryString(fmt.Sprintf("start_date=%v&end_date=%v", reqData.Query.StartDate, reqData.Query.EndDate))
-	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/overal-balance for metrics query with id %v: %v\n", query.ID, err)
+			log.Printf("Something went wrong with the request at /metrics for metrics query with id %v: %v\n", query.ID, err)
 		}
 	}
 
@@ -268,8 +263,6 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	}
 
 	agent := fiber.Post(w.SS_API_BASE_URL + "/invoice/print")
-	// TEMP!
-	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
