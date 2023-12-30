@@ -137,6 +137,8 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	}
 
 	agent := fiber.Post(w.SS_API_BASE_URL + "/invoice/request")
+	// TEMP!
+	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
@@ -181,6 +183,8 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	}
 
 	agent := fiber.Post(w.SS_API_BASE_URL + "/invoice/cancel")
+	// TEMP!
+	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
@@ -226,6 +230,7 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 
 	agent := fiber.Get(w.SS_API_BASE_URL + "/metrics")
 	agent.QueryString(fmt.Sprintf("start_date=%v&end_date=%v", reqData.Query.StartDate, reqData.Query.EndDate))
+	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
 
 	for _, err := range errs {
@@ -263,6 +268,8 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	}
 
 	agent := fiber.Post(w.SS_API_BASE_URL + "/invoice/print")
+	// TEMP!
+	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
