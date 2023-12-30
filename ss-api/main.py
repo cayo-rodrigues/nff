@@ -7,14 +7,14 @@ from utils import exceptions
 from utils.helpers import error_response
 
 
-def main(event: dict, context):
-    path = event.get("rawPath")
-    query = event.get("queryStringParameters", "{}")
-    method = event.get("http", {}).get("method", "")
-    body = json.loads(event.get("body", {}))
+def main(event: dict, _):
+    path = event.get("rawPath", "")
+    query = event.get("queryStringParameters", {})
+    method = event.get("requestContext", {}).get("http", {}).get("method", "")
+    body = json.loads(event.get("body", "{}"))
 
     response = {}
-    status_code = 200
+    status_code = 404
 
     if path == "/invoice/request" and method == "POST":
         response, status_code = request_invoice_handler(data=body)
@@ -23,7 +23,7 @@ def main(event: dict, context):
     elif path == "/invoice/print" and method == "POST":
         response, status_code = print_invoice_handler(data=body)
     elif path == "/metrics" and method == "GET":
-        response, status_code = get_metrics(data={**query, **body})
+        response, status_code = metrics_handler(data={**query, **body})
 
     return {
         "statusCode": status_code,
@@ -51,7 +51,7 @@ def request_invoice_handler(data: dict):
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
 
-    return json.dumps(response), status_code
+    return response, status_code
 
 
 def cancel_invoice_handler(data):
@@ -72,7 +72,7 @@ def cancel_invoice_handler(data):
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
 
-    return json.dumps(response), status_code
+    return response, status_code
 
 
 def print_invoice_handler(data):
@@ -95,7 +95,7 @@ def print_invoice_handler(data):
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
 
-    return json.dumps(response), status_code
+    return response, status_code
 
 
 def metrics_handler(data):
@@ -116,4 +116,4 @@ def metrics_handler(data):
         traceback.print_exc()
         response, status_code = error_response(exceptions.UnexpectedError())
 
-    return json.dumps(response), status_code
+    return response, status_code

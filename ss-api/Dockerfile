@@ -1,28 +1,31 @@
-ARG PORT=5000
+FROM public.ecr.aws/lambda/python@sha256:5f59359f025e159ac53ba7bc94d2d724b4d8fc0d5d17375b4b27fb70ae4fa15d as build
 
-FROM ubuntu:22.04
+RUN dnf install -y unzip && \
+    curl -Lo "/tmp/chromedriver-linux64.zip" "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/linux64/chromedriver-linux64.zip" && \
+    curl -Lo "/tmp/chrome-linux64.zip" "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/linux64/chrome-linux64.zip" && \
+    unzip /tmp/chromedriver-linux64.zip -d /opt/ && \
+    unzip /tmp/chrome-linux64.zip -d /opt/
 
-WORKDIR /app
+FROM public.ecr.aws/lambda/python@sha256:5f59359f025e159ac53ba7bc94d2d724b4d8fc0d5d17375b4b27fb70ae4fa15d
 
-RUN apt update -y && \
-    apt upgrade -y && \
-    apt install -y wget locales
+RUN dnf install -y atk cups-libs gtk3 libXcomposite alsa-lib \
+    libXcursor libXdamage libXext libXi libXrandr libXScrnSaver \
+    libXtst pango at-spi2-atk libXt xorg-x11-server-Xvfb \
+    xorg-x11-xauth dbus-glib dbus-glib-devel nss mesa-libgbm
 
-RUN locale-gen pt_BR.UTF-8
+# setup pt-BR locale (used for curreny formatting)
+RUN dnf -y install glibc-locale-source && dnf clean all
+
+RUN localedef -i pt_BR -f UTF-8 pt_BR.UTF-8
 ENV LC_ALL pt_BR.UTF-8
 ENV LANG pt_BR.UTF-8
 
-RUN wget --no-verbose -O /tmp/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_114.0.5735.198-1_amd64.deb \
-    && apt install -y /tmp/chrome.deb \
-    && rm /tmp/chrome.deb
-
-RUN apt install python3 -y
-
 COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-RUN apt install -y python3-pip && \
-    pip install -r requirements.txt
+COPY --from=build /opt/chrome-linux64 /opt/chrome
+COPY --from=build /opt/chromedriver-linux64 /opt/
 
 COPY . .
 
-CMD uvicorn --host 0.0.0.0 --port $PORT main:asgi_app --timeout-keep-alive 600
+CMD [ "main.main" ]
