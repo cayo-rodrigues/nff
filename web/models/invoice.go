@@ -27,7 +27,7 @@ type InvoiceFormError struct {
 	CustomFileName     string
 }
 
-type InvoicectFields struct {
+type InvoiceSelectFields struct {
 	Entities     []*Entity
 	BooleanField *globals.BooleanField
 	Cfops        *[14]int
@@ -35,8 +35,8 @@ type InvoicectFields struct {
 	IcmsOptions  *[3]string
 }
 
-func NewInvoicectFields() *InvoicectFields {
-	return &InvoicectFields{
+func NewInvoiceSelectFields() *InvoiceSelectFields {
+	return &InvoiceSelectFields{
 		Operations:   &globals.InvoiceOperations,
 		Cfops:        &globals.InvoiceCfops,
 		BooleanField: &globals.InvoiceBooleanField,

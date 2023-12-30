@@ -33,7 +33,7 @@ type MetricsPageData struct {
 	Filters          *models.ReqCardFilters
 	GeneralError     string
 	FormMsg          string
-	ctFields *models.MetricsctFields
+	FormSelectFields *models.MetricsSelectFields
 	MetricsQuery     *models.MetricsQuery
 	QueriesHistory   []*models.MetricsQuery
 	ResourceName     string
@@ -43,7 +43,7 @@ func (p *MetricsPage) NewEmptyData() *MetricsPageData {
 	return &MetricsPageData{
 		IsAuthenticated:  true,
 		Filters:          models.NewRequestCardFilters(),
-		ctFields: models.NewMetricsctFields(),
+		FormSelectFields: models.NewMetricsSelectFields(),
 		ResourceName:     "metrics",
 	}
 }
@@ -60,7 +60,7 @@ func (p *MetricsPage) Render(c *fiber.Ctx) error {
 		return c.Render("metrics", pageData, "layouts/base")
 	}
 
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	// get the latest 10 metricsHistory
 	metricsHistory, err := p.service.ListMetrics(c.Context(), userID, nil)
@@ -85,7 +85,7 @@ func (p *MetricsPage) GenerateMetrics(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	entityId, err := strconv.Atoi(c.FormValue("entity"))
 	if err != nil {
@@ -151,7 +151,7 @@ func (p *MetricsPage) GetMetricsForm(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	queryID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

@@ -11,12 +11,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type MetricsctFields struct {
+type MetricsSelectFields struct {
 	Entities []*Entity
 }
 
-func NewMetricsctFields() *MetricsctFields {
-	return &MetricsctFields{
+func NewMetricsSelectFields() *MetricsSelectFields {
+	return &MetricsSelectFields{
 		Entities: []*Entity{},
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type InvoiceCancelctFields struct {
+type InvoiceCancelSelectFields struct {
 	Entities []*Entity
 }
 
@@ -23,8 +23,8 @@ type InvoiceCancelFormErrors struct {
 	Entity        string
 }
 
-func NewInvoiceCancelctFields() *InvoiceCancelctFields {
-	return &InvoiceCancelctFields{
+func NewInvoiceCancelSelectFields() *InvoiceCancelSelectFields {
+	return &InvoiceCancelSelectFields{
 		Entities: []*Entity{},
 	}
 }

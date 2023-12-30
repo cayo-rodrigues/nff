@@ -36,7 +36,7 @@ type InvoicesPageData struct {
 	Invoice          *models.Invoice
 	GeneralError     string
 	FormMsg          string
-	ctFields *models.InvoicectFields
+	FormSelectFields *models.InvoiceSelectFields
 	ResourceName     string
 }
 
@@ -44,7 +44,7 @@ func (p *InvoicesPage) NewEmptyData() *InvoicesPageData {
 	return &InvoicesPageData{
 		IsAuthenticated:  true,
 		Filters:          models.NewRequestCardFilters(),
-		ctFields: models.NewInvoicectFields(),
+		FormSelectFields: models.NewInvoiceSelectFields(),
 		ResourceName:     "invoices",
 	}
 }
@@ -61,7 +61,7 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 		return c.Render("invoices", pageData, "layouts/base")
 	}
 
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 	pageData.Invoice = models.NewEmptyInvoice()
 
 	invoices, err := p.service.ListInvoices(c.Context(), userID, nil)
@@ -115,7 +115,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 		if err != nil {
 			return utils.GeneralErrorResponse(c, err)
 		}
-		pageData.ctFields.Entities = entities
+		pageData.FormSelectFields.Entities = entities
 
 		return utils.RetargetToForm(c, "invoice", pageData)
 	}
@@ -176,7 +176,7 @@ func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

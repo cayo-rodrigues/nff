@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type InvoicePrintctFields struct {
+type InvoicePrintSelectFields struct {
 	Entities       []*Entity
 	InvoiceIDTypes *[2]string
 }
@@ -23,8 +23,8 @@ type InvoicePrintFormErrors struct {
 	CustomFileName string
 }
 
-func NewInvoicePrintFromSelectFields() *InvoicePrintctFields {
-	return &InvoicePrintctFields{
+func NewInvoicePrintSelectFields() *InvoicePrintSelectFields {
+	return &InvoicePrintSelectFields{
 		Entities:       []*Entity{},
 		InvoiceIDTypes: &globals.InvoiceIDTypes,
 	}
