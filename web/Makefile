@@ -3,7 +3,7 @@ PWD :=
 ENDPOINT := nff-db.ckwjgza1fp4o.sa-east-1.rds.amazonaws.com
 DB_NAME := nff
 
-DIR_PATH := internal/db/migrations
+DIR_PATH := db/migrations
 NAME :=
 
 db_prod:

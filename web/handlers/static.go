@@ -10,7 +10,7 @@ import (
 func ServeStyles(ctx *fiber.Ctx) error {
 	stylesheet := ctx.Params("stylesheet")
 
-	filepath := fmt.Sprintf("internal/static/styles/%s", stylesheet)
+	filepath := fmt.Sprintf("static/styles/%s", stylesheet)
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
 		msg := fmt.Sprintf("File '%s' does not exist.\n", filepath)
@@ -23,7 +23,7 @@ func ServeStyles(ctx *fiber.Ctx) error {
 func ServeJS(ctx *fiber.Ctx) error {
 	script := ctx.Params("script")
 
-	filepath := fmt.Sprintf("internal/static/scripts/%s", script)
+	filepath := fmt.Sprintf("static/scripts/%s", script)
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
 		msg := fmt.Sprintf("File '%s' does not exist.\n", filepath)
@@ -36,7 +36,7 @@ func ServeJS(ctx *fiber.Ctx) error {
 func ServeIcons(ctx *fiber.Ctx) error {
 	icon := ctx.Params("icon")
 
-	filepath := fmt.Sprintf("internal/static/icons/%s", icon)
+	filepath := fmt.Sprintf("static/icons/%s", icon)
 	_, err := os.Stat(filepath)
 	if os.IsNotExist(err) {
 		msg := fmt.Sprintf("File '%s' does not exist.\n", filepath)
