@@ -12,7 +12,7 @@ provider:
 
 functions:
   main:
-    timeout: 60
+    timeout: 600
     memorySize: 2048
     image:
       name: img
