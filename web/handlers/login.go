@@ -3,8 +3,8 @@ package handlers
 import (
 	"errors"
 
-	"github.com/cayo-rodrigues/nff/web/interfaces"
 	"github.com/cayo-rodrigues/nff/web/db"
+	"github.com/cayo-rodrigues/nff/web/interfaces"
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
@@ -21,7 +21,7 @@ func NewLoginPage(userService interfaces.UserService) *LoginPage {
 }
 
 func (p *LoginPage) Render(c *fiber.Ctx) error {
-	return c.Render("login", fiber.Map{}, "layouts/base")
+	return c.Render("login", nil, "layouts/base")
 }
 
 func (p *LoginPage) Login(c *fiber.Ctx) error {
@@ -65,7 +65,6 @@ func (p *LoginPage) Login(c *fiber.Ctx) error {
 	}
 
 	return c.Redirect("/entities", fiber.StatusFound)
-
 }
 
 func Logout(c *fiber.Ctx) error {

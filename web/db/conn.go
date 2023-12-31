@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 	fredis "github.com/gofiber/storage/redis/v3"
@@ -89,6 +90,9 @@ func GetSessionStore() *session.Store {
 		Storage: fredis.New(fredis.Config{
 			URL: getRedisURL(),
 		}),
+		CookieSecure:   true,
+		CookieHTTPOnly: true,
+		Expiration:     7 * 24 * time.Hour,
 	})
 
 	fmt.Println("New SessionStore connection OK")
