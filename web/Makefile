@@ -10,5 +10,9 @@ rds:
 	docker run -it --rm postgres psql "postgres://$(USER):$(PWD)@$(ENDPOINT):5432/$(DB_NAME)"
 
 new_migration:
-	dc run migrations -e CMD='create $(NAME) sql'
-	chmod o+w $(DIR_PATH)/$(NAME).sql
+	docker compose run -e CMD='create $(NAME) sql' migrations
+	sudo chmod o+w $(call get_latest_migration_file)
+
+define get_latest_migration_file
+	$(DIR_PATH)/$$(ls -lt $(DIR_PATH) | awk 'NR==2{print $$9}')
+endef
