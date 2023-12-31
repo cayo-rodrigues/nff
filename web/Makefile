@@ -6,7 +6,7 @@ DB_NAME := nff
 DIR_PATH := db/migrations
 NAME :=
 
-db_prod:
+rds:
 	docker run -it --rm postgres psql "postgres://$(USER):$(PWD)@$(ENDPOINT):5432/$(DB_NAME)"
 
 new_migration:

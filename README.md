@@ -1,4 +1,4 @@
-<img src="./web/internal/static/icons/icon.ico" width="10%" align="left" alt="NFF main icon">
+<img src="./web/static/icons/icon.ico" width="10%" align="left" alt="NFF main icon">
 
 # NFF - Nota Fiscal Fácil
 
@@ -6,9 +6,9 @@ Este projeto tem o objetivo de automatizar processos repetitivos que funcionári
 
 ## Demonstração
 
-### [Clique aqui para ver o projeto em produção](http://ec2-18-230-92-247.sa-east-1.compute.amazonaws.com/) 
+### [Clique aqui para ver o projeto em produção](http://ec2-18-230-92-247.sa-east-1.compute.amazonaws.com/)
 
-Pelo fato de por enquanto ainda não serem usados certificados ssl (https), o navegador pode exibir um aviso de `Não seguro`. 
+Pelo fato de por enquanto ainda não serem usados certificados ssl (https), o navegador pode exibir um aviso de `Não seguro`.
 
 > A nota fiscal emitida no vídeo é apenas para fins demonstrativos
 
@@ -31,7 +31,8 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [x] Calcular **métricas** de entrada e saída em determinado período
 - [x] Histórico de operações
 - [x] Sistema de usuários
-- [ ] Filtros por data e entidade no histórico de requerimentos
+- [x] Filtros por data no histórico de requerimentos
+- [ ] Filtros por entidade no histórico de requerimentos
 - [ ] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos (parcialmente implementado)
 - [ ] Cancelamento de NF através do protocolo
 - [ ] Login/Cadastro com Google
