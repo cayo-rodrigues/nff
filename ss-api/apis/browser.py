@@ -114,7 +114,7 @@ class Browser:
                 self.prev_num_files = num_files
                 return
 
-        raise DownloadTimeoutError
+        raise DownloadTimeoutError(req_status="warning")
 
     @try_it()
     def get_element_if_exists(
