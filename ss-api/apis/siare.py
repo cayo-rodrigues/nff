@@ -1,5 +1,4 @@
 from datetime import date
-from concurrent.futures import ThreadPoolExecutor
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -466,8 +465,8 @@ class Siare(Browser):
             tbody = self.get_element_when_exists(xpath)
 
             rows = self.filter_elements(By.TAG_NAME, "tr", tbody)
-            with ThreadPoolExecutor() as executor:
-                executor.map(lambda row: self.process_invoice_query_row(row, query), rows)
+            for row in rows:
+                self.process_invoice_query_row(row, query)
 
             xpath = XPaths.QUERY_INVOICE_RESULTS_CURRENT_PAGE
             current_page = int(self.get_element(xpath).text)
