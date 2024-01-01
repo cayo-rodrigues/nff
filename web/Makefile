@@ -7,7 +7,7 @@ DIR_PATH := db/migrations
 NAME :=
 
 rds:
-	docker run -it --rm postgres psql "postgres://$(USER):$(PWD)@$(ENDPOINT):5432/$(DB_NAME)"
+	docker run -it --rm -e PGPASSWORD=$(PWD) postgres psql "postgres://$(USER)@$(ENDPOINT):5432/$(DB_NAME)"
 
 new_migration:
 	docker compose run -e CMD='create $(NAME) sql' migrations
