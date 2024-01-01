@@ -33,7 +33,8 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [x] Sistema de usuários
 - [x] Filtros por data no histórico de requerimentos
 - [ ] Filtros por entidade no histórico de requerimentos
-- [ ] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos (parcialmente implementado)
+- [x] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos
+- [ ] Gerenciamento de modelos de nota fiscal
 - [ ] Cancelamento de NF através do protocolo
 - [ ] Login/Cadastro com Google
 - [ ] Bom uso de cache

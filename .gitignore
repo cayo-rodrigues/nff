@@ -13,3 +13,4 @@ bin
 tmp
 secrets.txt
 .serverless
+chromedriver-linux64

@@ -5,7 +5,7 @@ class NFFBaseException(Exception):
     def __init__(
         self,
         errors: dict = {},
-        msg: str = "",
+        msg: str | None = "",
         status_code=500,
         req_status="error",
         *args,
