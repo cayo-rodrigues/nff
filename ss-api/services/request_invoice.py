@@ -72,17 +72,21 @@ def request_invoice(invoice_data: dict):
         msg = WarningMessages.INVOICE_AWAITING_ANALISYS
         status = "warning"
     elif should_download:
-        siare.download_invoice()
-        siare.close_unfocused_windows()
-        invoice_id = invoice.get_id_from_filename()
-        invoice_file_path = invoice.get_file_path()
-        invoice_file_name = invoice.get_file_name()
-        if invoice.custom_file_name:
-            invoice_file_name = invoice.use_custom_file_name()
-        pdf_url = upload_to_s3(
-            file_path=invoice_file_path, s3_file_name=invoice_file_name
-        )
-        invoice.erase_file()
+        try:
+            siare.download_invoice()
+            siare.close_unfocused_windows()
+            invoice_id = invoice.get_id_from_filename()
+            invoice_file_path = invoice.get_file_path()
+            invoice_file_name = invoice.get_file_name()
+            if invoice.custom_file_name:
+                invoice_file_name = invoice.use_custom_file_name()
+            pdf_url = upload_to_s3(
+                file_path=invoice_file_path, s3_file_name=invoice_file_name
+            )
+            invoice.erase_file()
+        except exceptions.DownloadTimeoutError as e:
+            msg = e.msg
+            status = e.req_status
 
     siare.close()
 

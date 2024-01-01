@@ -37,7 +37,7 @@ type CancelInvoicesPageData struct {
 	GeneralError      string
 	FormMsg           string
 	FormSuccess       bool
-	ctFields  *models.InvoiceCancelctFields
+	FormSelectFields  *models.InvoiceCancelSelectFields
 	ResourceName      string
 }
 
@@ -45,7 +45,7 @@ func (p *CancelInvoicesPage) NewEmptyData() *CancelInvoicesPageData {
 	return &CancelInvoicesPageData{
 		IsAuthenticated:  true,
 		Filters:          models.NewRequestCardFilters(),
-		ctFields: models.NewInvoiceCancelctFields(),
+		FormSelectFields: models.NewInvoiceCancelSelectFields(),
 		ResourceName:     "invoices/cancel",
 	}
 }
@@ -60,7 +60,7 @@ func (p *CancelInvoicesPage) Render(c *fiber.Ctx) error {
 		c.Set("HX-Trigger-After-Settle", "general-error")
 	}
 
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 	pageData.InvoiceCancel = models.NewEmptyInvoiceCancel()
 
 	// get the latest 10 cancelings
@@ -84,7 +84,7 @@ func (p *CancelInvoicesPage) CancelInvoice(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	entityID, err := strconv.Atoi(c.FormValue("entity"))
 	if err != nil {
@@ -153,7 +153,7 @@ func (p *CancelInvoicesPage) GetInvoiceCancelForm(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	cancelingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

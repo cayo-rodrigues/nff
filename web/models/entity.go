@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type EntityctFields struct {
+type EntitySelectFields struct {
 	UserTypes   *[2]string
 	StreetTypes *[3]string
 }
@@ -54,8 +54,8 @@ type Entity struct {
 	*Address
 }
 
-func NewEntityctFields() *EntityctFields {
-	return &EntityctFields{
+func NewEntitySelectFields() *EntitySelectFields {
+	return &EntitySelectFields{
 		UserTypes:   &globals.EntityUserTypes,
 		StreetTypes: &globals.EntityAddressStreetTypes,
 	}

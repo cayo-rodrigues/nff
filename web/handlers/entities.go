@@ -24,7 +24,7 @@ func NewEntitiesPage(entityService interfaces.EntityService) *EntitiesPage {
 func (p *EntitiesPage) NewEmptyData() fiber.Map {
 	return fiber.Map{
 		"Entity":           models.NewEmptyEntity(),
-		"ctFields": models.NewEntityctFields(),
+		"FormSelectFields": models.NewEntitySelectFields(),
 	}
 }
 

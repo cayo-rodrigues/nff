@@ -43,6 +43,8 @@ class InvoiceQuery:
         self.end_date: str = normalize_text(data.get("end_date"), keep_case=True)
         self.entity = Entity(data.get("entity", {}), is_sender=True)
 
+        self.results = InvoiceQueryResults()
+
         self.errors = {}
 
     def get_missing_fields(self, mandatory_fields: list[tuple[str, str]]):

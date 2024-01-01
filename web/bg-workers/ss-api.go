@@ -148,7 +148,10 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	}
 
 	var response SSAPIInvoiceResponse
-	json.Unmarshal(body, &response)
+	err := json.Unmarshal(body, &response)
+	if err != nil {
+		log.Printf("Something went wrong trying to unmarshal ss-api /invoice/request json response. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.ID, err)
+	}
 
 	if response.Errors != nil {
 		response.Msg = fmt.Sprintf("%s\n%s", response.Msg, formatInvoiceErrs(&response))
@@ -163,9 +166,11 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 		invoice.CustomFileName = response.FileName
 	}
 
-	err := w.invoiceService.UpdateInvoice(ctx, invoice)
-	if err != nil {
-		log.Printf("Something went wrong when updating invoice history. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.ID, err)
+	if err == nil {
+		err = w.invoiceService.UpdateInvoice(ctx, invoice)
+		if err != nil {
+			log.Printf("Something went wrong when updating invoice history. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.ID, err)
+		}
 	}
 
 	utils.ClearCache(ctx, invoice.CreatedBy, "invoices")
@@ -194,7 +199,10 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	}
 
 	var response SSAPICancelingResponse
-	json.Unmarshal(body, &response)
+	err := json.Unmarshal(body, &response)
+	if err != nil {
+		log.Printf("Something went wrong trying to unmarshal ss-api /invoice/cancel json response. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.ID, err)
+	}
 
 	if response.Errors != nil {
 		response.Msg = fmt.Sprintf("%s\n%s", response.Msg, formatCancelingErrs(&response))
@@ -203,59 +211,16 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	invoiceCancel.ReqStatus = response.Status
 	invoiceCancel.ReqMsg = response.Msg
 
-	err := w.cancelingService.UpdateInvoiceCanceling(ctx, invoiceCancel)
-	if err != nil {
-		log.Printf("Something went wrong when updating invoice canceling history. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.ID, err)
+	if err == nil {
+		err = w.cancelingService.UpdateInvoiceCanceling(ctx, invoiceCancel)
+		if err != nil {
+			log.Printf("Something went wrong when updating invoice canceling history. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.ID, err)
+		}
 	}
 
 	utils.ClearCache(ctx, invoiceCancel.CreatedBy, "invoices-cancel")
 
 	key := fmt.Sprintf("reqstatus:canceling:%v", invoiceCancel.ID)
-	db.Redis.Set(ctx, key, true, time.Minute)
-}
-
-func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
-	defer cancel()
-
-	reqData := SSAPIMetricsRequest{
-		Body: &SSAPIMetricsRequestBody{
-			Entity: query.Entity,
-		},
-		Query: &SSAPIMetricsRequestQuery{
-			StartDate: utils.FormatDateAsBR(query.StartDate),
-			EndDate:   utils.FormatDateAsBR(query.EndDate),
-		},
-	}
-
-	agent := fiber.Get(w.SS_API_BASE_URL + "/invoice/overal-balance")
-	agent.QueryString(fmt.Sprintf("start_date=%v&end_date=%v", reqData.Query.StartDate, reqData.Query.EndDate))
-	agent.InsecureSkipVerify() // TEMP!
-	_, body, errs := agent.JSON(reqData.Body).Bytes()
-
-	for _, err := range errs {
-		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/overal-balance for metrics query with id %v: %v\n", query.ID, err)
-		}
-	}
-
-	var response SSAPIMetricsResponse
-	json.Unmarshal(body, &response)
-
-	if response.Errors != nil {
-		response.ReqMsg = fmt.Sprintf("%s\n%s", response.ReqMsg, formatMetricsErrs(&response))
-	}
-
-	query.Results = response.MetricsResult
-
-	err := w.metricsService.UpdateMetrics(ctx, query)
-	if err != nil {
-		log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
-	}
-
-	utils.ClearCache(ctx, query.CreatedBy, "metrics")
-
-	key := fmt.Sprintf("reqstatus:metrics:%v", query.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 
@@ -279,7 +244,10 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	}
 
 	var response SSAPIPrintingResponse
-	json.Unmarshal(body, &response)
+	err := json.Unmarshal(body, &response)
+	if err != nil {
+		log.Printf("Something went wrong trying to unmarshal ss-api /invoice/print json response. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.ID, err)
+	}
 
 	if response.Errors != nil {
 		response.Msg = fmt.Sprintf("%s\n%s", response.Msg, formatPrintingErrs(&response))
@@ -292,14 +260,66 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 		invoicePrint.CustomFileName = response.FileName
 	}
 
-	err := w.printingService.UpdateInvoicePrinting(ctx, invoicePrint)
-	if err != nil {
-		log.Printf("Something went wrong when updating invoice printing history. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.ID, err)
+	if err == nil {
+		err = w.printingService.UpdateInvoicePrinting(ctx, invoicePrint)
+		if err != nil {
+			log.Printf("Something went wrong when updating invoice printing history. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.ID, err)
+		}
 	}
 
 	utils.ClearCache(ctx, invoicePrint.CreatedBy, "invoices-print")
 
 	key := fmt.Sprintf("reqstatus:printing:%v", invoicePrint.ID)
+	db.Redis.Set(ctx, key, true, time.Minute)
+}
+
+func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
+	defer cancel()
+
+	reqData := SSAPIMetricsRequest{
+		Body: &SSAPIMetricsRequestBody{
+			Entity: query.Entity,
+		},
+		Query: &SSAPIMetricsRequestQuery{
+			StartDate: utils.FormatDateAsBR(query.StartDate),
+			EndDate:   utils.FormatDateAsBR(query.EndDate),
+		},
+	}
+
+	agent := fiber.Get(w.SS_API_BASE_URL + "/metrics")
+	agent.QueryString(fmt.Sprintf("start_date=%v&end_date=%v", reqData.Query.StartDate, reqData.Query.EndDate))
+	agent.InsecureSkipVerify() // TEMP!
+	_, body, errs := agent.JSON(reqData.Body).Bytes()
+
+	for _, err := range errs {
+		if err != nil {
+			log.Printf("Something went wrong with the request at /metrics for metrics query with id %v: %v\n", query.ID, err)
+		}
+	}
+
+	var response SSAPIMetricsResponse
+	err := json.Unmarshal(body, &response)
+	if err != nil {
+		log.Printf("Something went wrong trying to unmarshal ss-api /metrics json response. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
+	}
+
+	if response.Errors != nil {
+		response.ReqMsg = fmt.Sprintf("%s\n%s", response.ReqMsg, formatMetricsErrs(&response))
+	}
+
+	query.Results = response.MetricsResult
+
+	if err == nil {
+		err = w.metricsService.UpdateMetrics(ctx, query)
+		if err != nil {
+			log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
+		}
+	}
+
+	utils.ClearCache(ctx, query.CreatedBy, "metrics")
+
+	key := fmt.Sprintf("reqstatus:metrics:%v", query.ID)
 	db.Redis.Set(ctx, key, true, time.Minute)
 }
 
@@ -360,7 +380,7 @@ func formatCancelingErrs(response *SSAPICancelingResponse) string {
 	return clientErrs.String()
 }
 
-func formatMetricsErrs(response *SSAPIMetricsResponse) string {
+func formatPrintingErrs(response *SSAPIPrintingResponse) string {
 	invalidFields := "Campos inválidos:\n"
 	missingFields := "Campos faltando:\n"
 	entityInvalidFields := "Campos inválidos na entidade:\n"
@@ -378,7 +398,7 @@ func formatMetricsErrs(response *SSAPIMetricsResponse) string {
 	return clientErrs.String()
 }
 
-func formatPrintingErrs(response *SSAPIPrintingResponse) string {
+func formatMetricsErrs(response *SSAPIMetricsResponse) string {
 	invalidFields := "Campos inválidos:\n"
 	missingFields := "Campos faltando:\n"
 	entityInvalidFields := "Campos inválidos na entidade:\n"

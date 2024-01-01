@@ -36,7 +36,7 @@ type PrintInvoicesPageData struct {
 	GeneralError     string
 	FormMsg          string
 	FormSuccess      bool
-	ctFields *models.InvoicePrintctFields
+	FormSelectFields *models.InvoicePrintSelectFields
 	ResourceName     string
 }
 
@@ -44,7 +44,7 @@ func (p *PrintInvoicesPage) NewEmptyData() *PrintInvoicesPageData {
 	return &PrintInvoicesPageData{
 		IsAuthenticated:  true,
 		Filters:          models.NewRequestCardFilters(),
-		ctFields: models.NewInvoicePrintFromSelectFields(),
+		FormSelectFields: models.NewInvoicePrintSelectFields(),
 		ResourceName:     "invoices/print",
 	}
 }
@@ -60,7 +60,7 @@ func (p *PrintInvoicesPage) Render(c *fiber.Ctx) error {
 		c.Set("HX-Trigger-After-Settle", "general-error")
 	}
 
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 	pageData.InvoicePrint = models.NewEmptyInvoicePrint()
 
 	// get the latest 10 printings
@@ -84,7 +84,7 @@ func (p *PrintInvoicesPage) PrintInvoice(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	entityID, err := strconv.Atoi(c.FormValue("entity"))
 	if err != nil {
@@ -150,7 +150,7 @@ func (p *PrintInvoicesPage) GetInvoicePrintForm(c *fiber.Ctx) error {
 	if err != nil {
 		return utils.GeneralErrorResponse(c, err)
 	}
-	pageData.ctFields.Entities = entities
+	pageData.FormSelectFields.Entities = entities
 
 	printingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {

@@ -7,9 +7,8 @@ from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
-from webdriver_manager.chrome import ChromeDriverManager
 
-from constants.paths import INVOICES_DIR_PATH
+from constants.paths import CHROMEDRIVER_PATH, HEADLESS_CHROMIUM_PATH, INVOICES_DIR_PATH
 from constants.standards import STANDARD_SLEEP_TIME
 from utils.decorators import believe_in_it, try_it, wait_for_it
 from utils.exceptions import DownloadTimeoutError
@@ -33,8 +32,10 @@ class Browser:
 
     def open(self) -> None:
         options = webdriver.ChromeOptions()
+        options.binary_location = HEADLESS_CHROMIUM_PATH
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
+        options.add_argument("--single-process")
         options.add_argument("--disable-dev-shm-usage")
         options.add_experimental_option(
             "prefs",
@@ -47,10 +48,10 @@ class Browser:
         )
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
-        self._browser = webdriver.Chrome(
-            options=options,
-            service=ChromeService(executable_path=ChromeDriverManager().install()),
-        )
+        service = ChromeService(executable_path=CHROMEDRIVER_PATH)
+
+        self._browser = webdriver.Chrome(options=options, service=service)
+
         self.prev_num_files = FileManager.count_files(INVOICES_DIR_PATH)
 
     def close(self) -> None:
@@ -113,7 +114,7 @@ class Browser:
                 self.prev_num_files = num_files
                 return
 
-        raise DownloadTimeoutError
+        raise DownloadTimeoutError(req_status="warning")
 
     @try_it()
     def get_element_if_exists(

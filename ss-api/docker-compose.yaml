@@ -11,6 +11,8 @@ services:
     ports:
       - 5000:5000
     tty: true
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
       - ./:/app

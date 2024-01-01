@@ -3,6 +3,7 @@ from datetime import date
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.select import Select
 
 from constants.paths import Urls, XPaths
@@ -13,7 +14,6 @@ from models import (
     InvoiceItem,
     InvoicePrinting,
     InvoiceQuery,
-    InvoiceQueryResults,
 )
 from utils.helpers import (
     binary_search_html,
@@ -446,26 +446,27 @@ class Siare(Browser):
 
         return None
 
-    def aggregate_invoice_query_results(self, query: InvoiceQuery):
-        query.results = InvoiceQueryResults()
+    def process_invoice_query_row(self, row: WebElement, query: InvoiceQuery):
+        data = self.filter_elements(By.TAG_NAME, "td", row)
+        invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
+        invoice_value = from_BRL_to_float(data[-2].text)
 
+        is_income = query.entity.ie == invoice_sender_ie
+        if is_income:
+            query.results.total_income += invoice_value
+            query.results.positive_entries += 1
+        else:
+            query.results.total_expenses += invoice_value
+            query.results.negative_entries += 1
+
+    def aggregate_invoice_query_results(self, query: InvoiceQuery):
         while True:
             xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
             tbody = self.get_element_when_exists(xpath)
 
             rows = self.filter_elements(By.TAG_NAME, "tr", tbody)
             for row in rows:
-                data = self.filter_elements(By.TAG_NAME, "td", row)
-                invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
-                invoice_value = from_BRL_to_float(data[-2].text)
-
-                is_income = query.entity.ie == invoice_sender_ie
-                if is_income:
-                    query.results.total_income += invoice_value
-                    query.results.positive_entries += 1
-                else:
-                    query.results.total_expenses += invoice_value
-                    query.results.negative_entries += 1
+                self.process_invoice_query_row(row, query)
 
             xpath = XPaths.QUERY_INVOICE_RESULTS_CURRENT_PAGE
             current_page = int(self.get_element(xpath).text)

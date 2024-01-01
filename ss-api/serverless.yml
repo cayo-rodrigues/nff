@@ -1,0 +1,18 @@
+service: nff-ss-api
+
+provider:
+  name: aws
+  stage: ${opt:stage, 'prod'}
+  region: ${env:AWS_REGION, 'sa-east-1'}
+  ecr:
+    images:
+      img:
+        path: ./
+        platform: linux/amd64
+
+functions:
+  main:
+    timeout: 600
+    memorySize: 2048
+    image:
+      name: img
