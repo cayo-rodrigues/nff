@@ -12,11 +12,11 @@ def test_metrics_handler():
         "start_date": "01/01/2023",
         "end_date": "31/12/2023",
         "entity": {
-            "ie": "0026905850039",
+            "ie": "",
             "user_type": "Produtor Rural",
-            "email": "pav@piranguinho.mg.gov.br",
-            "password": "068845076",
-            "cpf_cnpj": "06884507683",
+            "email": "",
+            "password": "",
+            "cpf_cnpj": "",
         },
     }
     result, status_code = handlers.metrics_handler(metrics_handler_input)

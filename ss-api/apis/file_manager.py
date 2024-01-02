@@ -31,8 +31,12 @@ class FileManager:
 
     @classmethod
     def get_latest_file_name(cls, dir_path: str) -> str:
+        file_names = cls.list_file_names(dir_path)
+        if not file_names:
+            return ""
+
         return max(
-            [dir_path + name for name in cls.list_file_names(dir_path)],
+            [dir_path + name for name in file_names],
             key=os.path.getctime,
         )
 
