@@ -1,3 +1,5 @@
+import sys
+import traceback
 from apis import Siare
 from models import Invoice
 from utils import exceptions
@@ -85,8 +87,15 @@ def request_invoice(invoice_data: dict):
             )
             invoice.erase_file()
         except exceptions.DownloadTimeoutError as e:
+            traceback.print_exc()
+            print(f"Something went wrong trying to download invoice: {e}", file=sys.stderr)
             msg = e.msg
             status = e.req_status
+        except Exception as e:
+            traceback.print_exc()
+            print(f"Something went wrong trying to download invoice or upload pdf to s3: {e}", file=sys.stderr)
+            msg = ErrorMessages.DOWNLOAD_ERROR
+            status = "warning"
 
     siare.close()
 
