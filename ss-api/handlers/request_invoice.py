@@ -28,10 +28,4 @@ def request_invoice_handler(data: dict):
         traceback.print_exc()
         response, status_code = error_response(e)
 
-    except Exception as e:
-        traceback.print_exc()
-        print(f"Something went wrong: {e}", file=sys.stderr)
-        response, status_code = error_response(exceptions.UnexpectedError())
-
-
     return response, status_code
