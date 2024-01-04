@@ -62,12 +62,12 @@ func callNextAndSetCache(c *fiber.Ctx) error {
 	bodyBytes := response.Body()
 	headersBytes := response.Header.Header()
 
-	err := db.Redis.Set(c.Context(), bodyKey, bodyBytes, time.Minute).Err()
+	err := db.Redis.Set(c.Context(), bodyKey, bodyBytes, time.Hour).Err()
 	if err != nil {
 		log.Println("Error trying to set response body cache:", err)
 	}
 
-	err = db.Redis.Set(c.Context(), headersKey, headersBytes, time.Minute).Err()
+	err = db.Redis.Set(c.Context(), headersKey, headersBytes, time.Hour).Err()
 	if err != nil {
 		log.Println("Error trying to set response headers cache:", err)
 	}
