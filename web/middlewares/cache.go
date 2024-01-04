@@ -83,6 +83,9 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 	}
 
 	userID, _, namespace := getKeyFactors(c)
+	if namespace == "entities" {
+		namespace = "*" // all other routes use entities, so we gotta clear all pages cache in this case
+	}
 	cacheStatus := utils.ClearCache(c.Context(), userID, namespace)
 
 	c.Response().Header.Set("X-Cache", cacheStatus)
