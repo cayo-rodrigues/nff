@@ -26,9 +26,9 @@ def main(event: dict, _):
         elif path == "/metrics" and method == "GET":
             response, status_code = handlers.metrics_handler(data={**query, **body})
 
-    except Exception as e:
+    except:
+        print(f"Something went wrong:", file=sys.stderr)
         traceback.print_exc()
-        print(f"Something went wrong: {e}", file=sys.stderr)
         response, status_code = error_response(UnexpectedError())
 
     return {
