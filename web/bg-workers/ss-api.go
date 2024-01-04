@@ -141,6 +141,8 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
+    log.Printf("Response got from ss-api: %v\n", string(body))
+
 	for _, err := range errs {
 		if err != nil {
 			log.Printf("Something went wrong with the request at /invoice/request for invoice with id %v: %v\n", invoice.ID, err)
@@ -192,6 +194,8 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
+    log.Printf("Response got from ss-api: %v\n", string(body))
+
 	for _, err := range errs {
 		if err != nil {
 			log.Printf("Something went wrong with the request at /invoice/cancel for canceling with id %v: %v\n", invoiceCancel.ID, err)
@@ -236,6 +240,8 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	// TEMP!
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
+
+    log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -291,6 +297,8 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 	agent.QueryString(fmt.Sprintf("start_date=%v&end_date=%v", reqData.Query.StartDate, reqData.Query.EndDate))
 	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
+
+    log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
