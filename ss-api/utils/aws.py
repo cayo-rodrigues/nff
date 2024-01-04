@@ -12,8 +12,8 @@ def upload_to_s3(file_path: str, s3_file_name: str) -> str:
         resource_url = f"https://{bucket_name}.s3.amazonaws.com/{s3_file_name}"
         return resource_url
     except FileNotFoundError as e:
-        print("The file was not found", e)
+        print("The file was not found:", e)
     except NoCredentialsError as e:
-        print("Credentials not available", e)
+        print("Credentials not available:", e)
 
     return ""
