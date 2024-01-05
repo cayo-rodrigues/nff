@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/db"
 	"github.com/cayo-rodrigues/nff/web/models"
@@ -17,12 +18,16 @@ func NewEntityService() *EntityService {
 	return &EntityService{}
 }
 
-// TODO accept filters
-func (s *EntityService) ListEntities(ctx context.Context, userID int) ([]*models.Entity, error) {
+
+func (s *EntityService) ListEntities(ctx context.Context, userID int) (entities []*models.Entity, err error) {
+    namespace := "entities"
+
+	if utils.GetDecodedCache(ctx, userID, namespace, &entities); entities != nil {
+        return entities, nil
+    }
+
 	rows, _ := db.PG.Query(ctx, "SELECT * FROM entities WHERE created_by = $1 ORDER BY id", userID)
 	defer rows.Close()
-
-	entities := []*models.Entity{}
 
 	for rows.Next() {
 		entity := models.NewEmptyEntity()
@@ -33,6 +38,8 @@ func (s *EntityService) ListEntities(ctx context.Context, userID int) ([]*models
 		}
 		entities = append(entities, entity)
 	}
+
+	utils.SetEncodedCache(ctx, userID, namespace, entities, time.Hour)
 
 	return entities, nil
 }
