@@ -11,14 +11,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type InvoiceItemctFields struct {
-	Groups               *[82]string
-	Origins              *[3]string
-	UnitiesOfMeasurement *[23]string
+type InvoiceItemSelectFields struct {
+	Groups               *globals.SiareInvoiceItemGroups
+	Origins              *globals.SiareInvoiceItemOrigins
+	UnitiesOfMeasurement *globals.SiareUnitiesOfMeasurement
 }
 
-func NewInvoiceItemSelectFields() *InvoiceItemctFields {
-	return &InvoiceItemctFields{
+func NewInvoiceItemSelectFields() *InvoiceItemSelectFields {
+	return &InvoiceItemSelectFields{
 		Groups:               &globals.InvoiceItemGroups,
 		Origins:              &globals.InvoiceItemOrigins,
 		UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,

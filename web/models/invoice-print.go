@@ -13,14 +13,7 @@ import (
 
 type InvoicePrintSelectFields struct {
 	Entities       []*Entity
-	InvoiceIDTypes *[2]string
-}
-
-type InvoicePrintFormErrors struct {
-	InvoiceID      string
-	InvoiceIDType  string
-	Entity         string
-	CustomFileName string
+	InvoiceIDTypes *globals.SiareInvoiceIDTypes
 }
 
 func NewInvoicePrintSelectFields() *InvoicePrintSelectFields {
@@ -28,6 +21,13 @@ func NewInvoicePrintSelectFields() *InvoicePrintSelectFields {
 		Entities:       []*Entity{},
 		InvoiceIDTypes: &globals.InvoiceIDTypes,
 	}
+}
+
+type InvoicePrintFormErrors struct {
+	InvoiceID      string
+	InvoiceIDType  string
+	Entity         string
+	CustomFileName string
 }
 
 type InvoicePrint struct {

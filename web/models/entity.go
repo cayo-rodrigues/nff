@@ -13,8 +13,15 @@ import (
 )
 
 type EntitySelectFields struct {
-	UserTypes   *[2]string
-	StreetTypes *[3]string
+	UserTypes   *globals.SiareUserTypes
+	StreetTypes *globals.SiareAddressStreetTypes
+}
+
+func NewEntitySelectFields() *EntitySelectFields {
+	return &EntitySelectFields{
+		UserTypes:   &globals.EntityUserTypes,
+		StreetTypes: &globals.EntityAddressStreetTypes,
+	}
 }
 
 type EntityFormError struct {
@@ -52,13 +59,6 @@ type Entity struct {
 	UpdatedAt  time.Time        `json:"-"`
 	Errors     *EntityFormError `json:"-"`
 	*Address
-}
-
-func NewEntitySelectFields() *EntitySelectFields {
-	return &EntitySelectFields{
-		UserTypes:   &globals.EntityUserTypes,
-		StreetTypes: &globals.EntityAddressStreetTypes,
-	}
 }
 
 func NewEmptyEntity() *Entity {

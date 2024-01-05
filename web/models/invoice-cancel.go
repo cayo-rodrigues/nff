@@ -16,17 +16,17 @@ type InvoiceCancelSelectFields struct {
 	Entities []*Entity
 }
 
+func NewInvoiceCancelSelectFields() *InvoiceCancelSelectFields {
+	return &InvoiceCancelSelectFields{
+		Entities: []*Entity{},
+	}
+}
+
 type InvoiceCancelFormErrors struct {
 	Number        string
 	Year          string
 	Justification string
 	Entity        string
-}
-
-func NewInvoiceCancelSelectFields() *InvoiceCancelSelectFields {
-	return &InvoiceCancelSelectFields{
-		Entities: []*Entity{},
-	}
 }
 
 type InvoiceCancel struct {
