@@ -26,7 +26,7 @@ func (s *EntityService) ListEntities(ctx context.Context, userID int) (entities 
         return entities, nil
     }
 
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM entities WHERE created_by = $1 ORDER BY id", userID)
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM entities WHERE created_by = $1 ORDER BY name", userID)
 	defer rows.Close()
 
 	for rows.Next() {
