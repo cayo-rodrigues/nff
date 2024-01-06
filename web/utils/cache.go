@@ -76,3 +76,28 @@ func SetEncodedCache(ctx context.Context, userID int, namespace string, value in
 	fmt.Printf("Set %s cache at db level with success\n", namespace)
 	return nil
 }
+
+func PurgeAllCachedData(ctx context.Context) string {
+	fmt.Println("Purging all cached data, but preserving user sessions...")
+
+	keysPattern := "*:*:*:*"
+	cacheStatus := "cleared"
+
+	keys, err := db.Redis.Keys(ctx, keysPattern).Result()
+	if err != nil {
+		log.Println("Error geting cache keys to clear:", err)
+		cacheStatus = "stale"
+	}
+
+	if keys != nil && len(keys) > 0 {
+		err := db.Redis.Del(ctx, keys...).Err()
+		if err != nil {
+			log.Println("Error clearing cache keys:", err)
+			cacheStatus = "stale"
+		}
+	}
+
+	fmt.Println("Cache status is:", cacheStatus)
+
+	return cacheStatus
+}

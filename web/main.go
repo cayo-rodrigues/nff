@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
@@ -18,27 +19,19 @@ import (
 )
 
 func main() {
-	PORT, isThere := os.LookupEnv("PORT")
-	if !isThere || PORT == "" {
+	PORT := os.Getenv("PORT")
+	if PORT == "" {
 		log.Fatal("PORT env not set or has an empty value")
 	}
 
-	DEBUG := false
-	_, isThere = os.LookupEnv("DEBUG")
-	if isThere {
-		DEBUG = true
-	}
-
-	PREFORK := false
-	_, isThere = os.LookupEnv("PREFORK")
-	if isThere {
-		PREFORK = true
-	}
-
-    SS_API_BASE_URL, isThere := os.LookupEnv("SS_API_BASE_URL")
-	if !isThere || SS_API_BASE_URL == "" {
+	SS_API_BASE_URL := os.Getenv("SS_API_BASE_URL")
+	if SS_API_BASE_URL == "" {
 		log.Fatal("SS_API_BASE_URL env not set or has an empty value")
 	}
+
+	DEBUG := os.Getenv("DEBUG") == "true"
+	PREFORK := os.Getenv("PREFORK") == "true"
+	START_FRESH := os.Getenv("START_FRESH") == "true"
 
 	dbpool := db.GetDBPool()
 	defer dbpool.Close()
@@ -48,6 +41,10 @@ func main() {
 
 	store := db.GetSessionStore()
 	defer store.Storage.Close()
+
+    if START_FRESH {
+        utils.PurgeAllCachedData(context.Background())
+    }
 
 	engine := html.New("views", ".html")
 
