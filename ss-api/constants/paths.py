@@ -1,6 +1,8 @@
+import os
+
 INVOICES_DIR_PATH = "/tmp/docs/"
-CHROMEDRIVER_PATH = "/opt/chromedriver"
-HEADLESS_CHROMIUM_PATH = "/opt/chrome/chrome"
+CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH", "")
+HEADLESS_CHROMIUM_PATH = os.environ.get("HEADLESS_CHROMIUM_PATH", "")
 
 
 class Urls:

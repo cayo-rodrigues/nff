@@ -32,7 +32,9 @@ class Browser:
 
     def open(self) -> None:
         options = webdriver.ChromeOptions()
-        options.binary_location = HEADLESS_CHROMIUM_PATH
+        if HEADLESS_CHROMIUM_PATH:
+            options.binary_location = HEADLESS_CHROMIUM_PATH
+
         options.add_argument("--headless")
         options.add_argument("--no-sandbox")
         options.add_argument("--single-process")

@@ -1,31 +1,47 @@
 from datetime import datetime
+from typing import Self
 from utils.helpers import is_valid_br_date, normalize_text, to_BRL
 from constants.db import MandatoryFields, PrettyModelFields
 from models.entity import Entity
 
 
 class InvoiceQueryResults:
-    def __init__(self, data: dict = {}) -> None:
+    def __init__(self, **data) -> None:
         self.positive_entries: int = data.get("positive_entries", 0)
         self.negative_entries: int = data.get("negative_entries", 0)
 
         self.total_income: float = 0.0
         self.total_expenses: float = 0.0
 
+        self.average_income: float = 0.0
+        self.average_expenses: float = 0.0
+
+        self.total_records: int = 0
+
+        self.is_positive: bool = False
+        self.diff: float = 0.0
+
+        self.months: list[InvoiceQueryResults] = []
+        self.json_serializable_months: list[dict] = []
+
+        self.month_name: str = data.get("month_name", "")
+
+        self.is_child: bool = data.get("is_child", False)
+
     def do_the_math(self):
-        self.is_positive: bool = self.total_income > self.total_expenses
-        self.diff: float = self.total_income - self.total_expenses
+        self.is_positive = self.total_income > self.total_expenses
+        self.diff = self.total_income - self.total_expenses
 
         try:
-            self.average_income: float = self.total_income / self.positive_entries
+            self.average_income = self.total_income / self.positive_entries
         except ZeroDivisionError:
             self.average_income = 0.0
         try:
-            self.average_expenses: float = self.total_expenses / self.negative_entries
+            self.average_expenses = self.total_expenses / self.negative_entries
         except ZeroDivisionError:
             self.average_expenses = 0.0
 
-        self.total_records: int = self.positive_entries + self.negative_entries
+        self.total_records = self.positive_entries + self.negative_entries
 
     def format_values(self):
         self.pretty_total_income: str = to_BRL(self.total_income, grouping=True)
@@ -34,10 +50,43 @@ class InvoiceQueryResults:
         self.pretty_avg_expenses: str = to_BRL(self.average_expenses, grouping=True)
         self.pretty_diff: str = to_BRL(self.diff, grouping=True)
 
+    def include_month_in_total(self, month: Self):
+        self.total_income += month.total_income
+        self.total_expenses += month.total_expenses
+
+        self.is_positive = self.total_income > self.total_expenses
+        self.diff = self.total_income - self.total_expenses
+
+        try:
+            self.average_income += month.total_income / month.positive_entries
+        except ZeroDivisionError:
+            self.average_income += 0.0
+        try:
+            self.average_expenses += month.total_expenses / month.negative_entries
+        except ZeroDivisionError:
+            self.average_expenses += 0.0
+
+        self.positive_entries += month.positive_entries
+        self.negative_entries += month.negative_entries
+
+        self.total_records += month.positive_entries + month.negative_entries
+
+    def json_serializable_format(self):
+        return {
+            "total_income": self.pretty_total_income,
+            "total_expenses": self.pretty_total_expenses,
+            "average_income": self.pretty_avg_income,
+            "average_expenses": self.pretty_avg_expenses,
+            "diff": self.pretty_diff,
+            "is_positive": self.is_positive,
+            "total_records": self.total_records,
+            "positive_records": self.positive_entries,
+            "negative_records": self.negative_entries,
+            "month_name": self.month_name,
+        }
+
 
 class InvoiceQuery:
-    results: InvoiceQueryResults
-
     def __init__(self, data: dict) -> None:
         self.start_date: str = normalize_text(data.get("start_date"), keep_case=True)
         self.end_date: str = normalize_text(data.get("end_date"), keep_case=True)
@@ -48,7 +97,9 @@ class InvoiceQuery:
         self.errors = {}
 
     def get_missing_fields(self, mandatory_fields: list[tuple[str, str]]):
-        return [pretty_key for key, pretty_key in mandatory_fields if not getattr(self, key)]
+        return [
+            pretty_key for key, pretty_key in mandatory_fields if not getattr(self, key)
+        ]
 
     def get_invalid_fields(self):
         invalid_fields = []

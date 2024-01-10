@@ -15,6 +15,7 @@ from models import (
     InvoicePrinting,
     InvoiceQuery,
 )
+from models.invoice_query import InvoiceQueryResults
 from utils.helpers import (
     binary_search_html,
     from_BRL_to_float,
@@ -446,27 +447,27 @@ class Siare(Browser):
 
         return None
 
-    def process_invoice_query_row(self, row: WebElement, query: InvoiceQuery):
+    def process_invoice_query_row(self, row: WebElement, results: InvoiceQueryResults, entity_ie: str):
         data = self.filter_elements(By.TAG_NAME, "td", row)
         invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
         invoice_value = from_BRL_to_float(data[-2].text)
 
-        is_income = query.entity.ie == invoice_sender_ie
+        is_income = entity_ie == invoice_sender_ie
         if is_income:
-            query.results.total_income += invoice_value
-            query.results.positive_entries += 1
+            results.total_income += invoice_value
+            results.positive_entries += 1
         else:
-            query.results.total_expenses += invoice_value
-            query.results.negative_entries += 1
+            results.total_expenses += invoice_value
+            results.negative_entries += 1
 
-    def aggregate_invoice_query_results(self, query: InvoiceQuery):
+    def aggregate_invoice_query_results(self, results: InvoiceQueryResults, entity_ie: str):
         while True:
             xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
             tbody = self.get_element_when_exists(xpath)
 
             rows = self.filter_elements(By.TAG_NAME, "tr", tbody)
             for row in rows:
-                self.process_invoice_query_row(row, query)
+                self.process_invoice_query_row(row, results, entity_ie)
 
             xpath = XPaths.QUERY_INVOICE_RESULTS_CURRENT_PAGE
             current_page = int(self.get_element(xpath).text)
