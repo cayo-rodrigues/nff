@@ -1,11 +1,13 @@
 {{ define "partials/request-card-printing-details" }}
-    <li class="sm:w-1/2 sm:pr-2">
-        <strong>Identificador</strong>: <span> {{ .InvoiceID }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pl-2">
-        <strong>Tipo de identificação</strong>: <span> {{ .InvoiceIDType }}</span>
-    </li>
-    <li class="sm:w-1/2">
-        <strong>Nome do arquivo</strong>: <span> {{ if .CustomFileName }} {{ .CustomFileName }} {{ else }} - {{ end }} </span>
-    </li>
+    <ul class="flex flex-col gap-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+        <li class="sm:w-1/2 sm:pr-2">
+            <strong>Identificador</strong>: <span> {{ .InvoiceID }}</span>
+        </li>
+        <li class="sm:w-1/2 sm:pl-2">
+            <strong>Tipo de identificação</strong>: <span> {{ .InvoiceIDType }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Nome do arquivo</strong>: <span> {{ if .CustomFileName }} {{ .CustomFileName }} {{ else }} - {{ end }} </span>
+        </li>
+    </ul>
 {{ end }}

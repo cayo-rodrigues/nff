@@ -34,17 +34,16 @@
             {{- $ReqCardData.ReqMsg -}}
         </pre>
         <hr>
-        <ul class="flex flex-col gap-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
-            {{ if eq $ReqCardData.OverviewType "invoice" }}
-                {{ template "partials/request-card-invoice-details" . }}
-            {{ else if eq $ReqCardData.OverviewType "canceling" }}
-                {{ template "partials/request-card-canceling-details" . }}
-            {{ else if eq $ReqCardData.OverviewType "metrics" }}
-                {{ template "partials/request-card-metrics-details" . }}
-            {{ else if eq $ReqCardData.OverviewType "printing" }}
-                {{ template "partials/request-card-printing-details" . }}
-            {{ end }}
-        </ul>
+        {{ if eq $ReqCardData.OverviewType "invoice" }}
+            {{ template "partials/request-card-invoice-details" . }}
+        {{ else if eq $ReqCardData.OverviewType "canceling" }}
+            {{ template "partials/request-card-canceling-details" . }}
+        {{ else if eq $ReqCardData.OverviewType "metrics" }}
+            {{ template "partials/request-card-metrics-details" . }}
+        {{ else if eq $ReqCardData.OverviewType "printing" }}
+            {{ template "partials/request-card-printing-details" . }}
+        {{ end }}
+
         {{ if $ReqCardData.HasItems }}
             {{ template "partials/request-card-items-details" . }}
         {{ end }}
