@@ -164,7 +164,7 @@ func (p *PrintInvoicesPage) GetInvoicePrintForm(c *fiber.Ctx) error {
 	pageData.InvoicePrint = printing
 
 	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
-	return c.Render("partials/invoice-print-form", pageData)
+	return c.Render("partials/forms/invoice-print-form", pageData)
 }
 
 func (p *PrintInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {

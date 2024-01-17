@@ -146,7 +146,7 @@ func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
 func (p *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
 	item := models.NewEmptyInvoiceItem()
 	c.Set("HX-Trigger-After-Settle", "enumerate-item-sections")
-	return c.Render("partials/invoice-form-item-section", item)
+	return c.Render("partials/forms/invoice-form-item-section", item)
 }
 
 func (p *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
@@ -190,7 +190,7 @@ func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 	pageData.Invoice = invoice
 
 	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
-	return c.Render("partials/invoice-form", pageData)
+	return c.Render("partials/forms/invoice-form", pageData)
 }
 
 func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {

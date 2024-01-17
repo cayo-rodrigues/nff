@@ -165,7 +165,7 @@ func (p *MetricsPage) GetMetricsForm(c *fiber.Ctx) error {
 	pageData.MetricsQuery = query
 
 	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
-	return c.Render("partials/metrics-form", pageData)
+	return c.Render("partials/forms/metrics-form", pageData)
 }
 
 func (p *MetricsPage) GetRequestStatus(c *fiber.Ctx) error {

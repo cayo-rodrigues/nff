@@ -81,7 +81,7 @@ func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
 	entity.IsSelected = true
 	pageData["Entity"] = entity
 
-	return c.Render("partials/entity-form", pageData)
+	return c.Render("partials/forms/entity-form", pageData)
 }
 
 func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
@@ -126,5 +126,5 @@ func (p *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
 	eventMsg := fmt.Sprintf("{\"entity-deleted\": %v}", entityID)
 	c.Set("HX-Trigger-After-Settle", eventMsg)
 
-	return c.Render("partials/entity-form", p.NewEmptyData())
+	return c.Render("partials/forms/entity-form", p.NewEmptyData())
 }

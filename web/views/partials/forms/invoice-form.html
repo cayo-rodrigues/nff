@@ -1,4 +1,4 @@
-{{ define "partials/invoice-form" }}
+{{ define "partials/forms/invoice-form" }}
 
 <form id="invoice-form">
     <div class="flex items-center gap-6 border-b border-gray-300 bg-white pb-2">
@@ -159,7 +159,7 @@
             </div>
 
             {{ range .Invoice.Items }}
-                {{ template "partials/invoice-form-item-section" . }}
+                {{ template "partials/forms/invoice-form-item-section" . }}
             {{ end }}
         </dialog>
     </section>
