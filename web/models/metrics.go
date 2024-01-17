@@ -40,17 +40,19 @@ type MetricsQuery struct {
 }
 
 type MetricsResult struct {
-	TotalIncome     string `json:"total_income"`
-	TotalExpenses   string `json:"total_expenses"`
-	AvgIncome       string `json:"average_income"`
-	AvgExpenses     string `json:"average_expenses"`
-	Diff            string `json:"diff"`
-	IsPositive      bool   `json:"is_positive"`
-	TotalRecords    int    `json:"total_records"`
-	PositiveRecords int    `json:"positive_records"`
-	NegativeRecords int    `json:"negative_records"`
-	ReqStatus       string `json:"status"`
-	ReqMsg          string `json:"msg"`
+	TotalIncome     string          `json:"total_income"`
+	TotalExpenses   string          `json:"total_expenses"`
+	AvgIncome       string          `json:"average_income"`
+	AvgExpenses     string          `json:"average_expenses"`
+	Diff            string          `json:"diff"`
+	IsPositive      bool            `json:"is_positive"`
+	TotalRecords    int             `json:"total_records"`
+	PositiveRecords int             `json:"positive_records"`
+	NegativeRecords int             `json:"negative_records"`
+	ReqStatus       string          `json:"status"`
+	ReqMsg          string          `json:"msg"`
+	MonthName       string          `json:"month_name"`
+	Months          []MetricsResult `json:"months"`
 }
 
 func NewEmptyMetricsQuery() *MetricsQuery {

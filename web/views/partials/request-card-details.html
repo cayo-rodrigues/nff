@@ -28,116 +28,17 @@
         <hr>
         <ul class="flex flex-col gap-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
             {{ if eq $ReqCardData.OverviewType "invoice" }}
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Número</strong>: <span> {{ if .Number }} {{ .Number }} {{ else }} - {{ end }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Protocolo</strong>: <span> {{ if .Protocol }} {{ .Protocol }} {{ else }} - {{ end }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Operação</strong>: <span> {{ .Operation }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>CFOP</strong>: <span> {{ .Cfop }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Contribuinte ICMS</strong>: <span> {{ .IsIcmsContributor }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Consumidor Final</strong>: <span> {{ .IsFinalCustomer }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Frete</strong>: <span> {{ .Shipping }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Adicionar frete ao total</strong>: <span> {{ .AddShippingToTotal }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>GTA</strong>: <span> {{ if .Gta }} {{ .Gta }} {{ else }} - {{ end }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Informações complementares</strong>: <span> {{ if .ExtraNotes }} {{ .ExtraNotes }} {{ else }} - {{ end }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Nome do arquivo</strong>: <span> {{ if .CustomFileName }} {{ .CustomFileName }} {{ else }} - {{ end }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Quantidade de itens</strong>: <span> {{ len .Items }} </span>
-                </li>
+                {{ template "partials/request-card-invoice-details" . }}
             {{ else if eq $ReqCardData.OverviewType "canceling" }}
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Ano</strong>: <span> {{ .Year }} </span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Justificativa</strong>: <span> {{ .Justification }} </span>
-                </li>
+                {{ template "partials/request-card-canceling-details" . }}
             {{ else if eq $ReqCardData.OverviewType "metrics" }}
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Lucro total</strong>: <span class="text-green-600"> R$ {{ .Results.TotalIncome }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Lucro médio</strong>: <span class="text-green-600"> R$ {{ .Results.AvgIncome }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Despesa total</strong>: <span class="text-red-600"> R$ {{ .Results.TotalExpenses }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Despesa média</strong>: <span class="text-red-600"> R$ {{ .Results.AvgExpenses }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Diferença</strong>: <span class="text-{{ if .Results.IsPositive}}green{{ else }}red{{ end }}-600"> R$ {{ .Results.Diff }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Total de transações</strong>: <span> {{ .Results.TotalRecords }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Vendas</strong>: <span> {{ .Results.PositiveRecords }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Compras</strong>: <span> {{ .Results.NegativeRecords }}</span>
-                </li>
+                {{ template "partials/request-card-metrics-details" . }}
             {{ else if eq $ReqCardData.OverviewType "printing" }}
-                <li class="sm:w-1/2 sm:pr-2">
-                    <strong>Identificador</strong>: <span> {{ .InvoiceID }}</span>
-                </li>
-                <li class="sm:w-1/2 sm:pl-2">
-                    <strong>Tipo de identificação</strong>: <span> {{ .InvoiceIDType }}</span>
-                </li>
-                <li class="sm:w-1/2">
-                    <strong>Nome do arquivo</strong>: <span> {{ if .CustomFileName }} {{ .CustomFileName }} {{ else }} - {{ end }} </span>
-                </li>
+                {{ template "partials/request-card-printing-details" . }}
             {{ end }}
         </ul>
         {{ if $ReqCardData.HasItems }}
-            <hr>
-            <h4 class="py-4 text-xl">Produtos</h4>
-            <div class="flex flex-col gap-4">
-                {{ range .Items }}
-                    <ul class="flex flex-col gap-4 rounded border border-gray-400 p-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
-                        <li class="sm:w-1/2 sm:pr-2">
-                            <strong>Grupo</strong>: <span> {{ .Group }} </span>
-                        </li>
-                        <li class="sm:w-1/2 sm:pl-2">
-                            <strong>NCM</strong>: <span> {{ .NCM }} </span>
-                        </li>
-                        <li class="sm:w-1/2 sm:pr-2">
-                            <strong>Descrição</strong>: <span> {{ .Description }} </span>
-                        </li>
-                        <li class="sm:w-1/2 sm:pl-2">
-                            <strong>Quantidade</strong>: <span> {{ .Quantity }} </span>
-                        </li>
-                        <li class="sm:w-1/2 sm:pr-2">
-                            <strong>Valor Unitário</strong>: <span> {{ .ValuePerUnity }} </span>
-                        </li>
-                        <li class="sm:w-1/2 sm:pl-2">
-                            <strong>Origem</strong>: <span> {{ .Origin }} </span>
-                        </li>
-                        <li class="sm:w-1/2">
-                            <strong>Unidade de medida</strong>: <span> {{ .UnityOfMeasurement }} </span>
-                        </li>
-                    </ul>
-                {{ end }}
-            </div>
+            {{ template "partials/request-card-items-details" . }}
         {{ end }}
     {{ end }}
 </dialog>

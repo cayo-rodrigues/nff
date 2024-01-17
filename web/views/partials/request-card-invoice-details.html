@@ -1,0 +1,38 @@
+{{ define "partials/request-card-invoice-details" }}
+    <li class="sm:w-1/2 sm:pr-2">
+        <strong>Número</strong>: <span> {{ if .Number }} {{ .Number }} {{ else }} - {{ end }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pl-2">
+        <strong>Protocolo</strong>: <span> {{ if .Protocol }} {{ .Protocol }} {{ else }} - {{ end }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pr-2">
+        <strong>Operação</strong>: <span> {{ .Operation }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pl-2">
+        <strong>CFOP</strong>: <span> {{ .Cfop }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pr-2">
+        <strong>Contribuinte ICMS</strong>: <span> {{ .IsIcmsContributor }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pl-2">
+        <strong>Consumidor Final</strong>: <span> {{ .IsFinalCustomer }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pr-2">
+        <strong>Frete</strong>: <span> {{ .Shipping }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pl-2">
+        <strong>Adicionar frete ao total</strong>: <span> {{ .AddShippingToTotal }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pr-2">
+        <strong>GTA</strong>: <span> {{ if .Gta }} {{ .Gta }} {{ else }} - {{ end }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pl-2">
+        <strong>Informações complementares</strong>: <span> {{ if .ExtraNotes }} {{ .ExtraNotes }} {{ else }} - {{ end }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pr-2">
+        <strong>Nome do arquivo</strong>: <span> {{ if .CustomFileName }} {{ .CustomFileName }} {{ else }} - {{ end }} </span>
+    </li>
+    <li class="sm:w-1/2 sm:pl-2">
+        <strong>Quantidade de itens</strong>: <span> {{ len .Items }} </span>
+    </li>
+{{ end }}
