@@ -1,7 +1,7 @@
 import os
 
 INVOICES_DIR_PATH = "/tmp/docs/"
-CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH", "")
+CHROMEDRIVER_PATH = os.environ.get("CHROMEDRIVER_PATH", "chromedriver-linux64/chromedriver")
 HEADLESS_CHROMIUM_PATH = os.environ.get("HEADLESS_CHROMIUM_PATH", "")
 
 
