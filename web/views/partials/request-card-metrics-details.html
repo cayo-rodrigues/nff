@@ -1,10 +1,14 @@
 {{ define "partials/request-card-metrics-details" }}
-    <section class="mt-4 border border-gray-400 rounded">
-        <header onclick="toggleAccordion('total-metrics-results', 'chevron-total')" class="p-4 flex cursor-pointer rounded border-b border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors justify-between items-center active:bg-gray-200">
+    <section class="mt-4 rounded border border-gray-400">
+        <header
+            onclick="toggleAccordion('total-metrics-results', 'chevron-total')"
+            class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 active:bg-gray-200"
+        >
             <h3 class="text-xl">Total Geral</h3>
             <svg id="chevron-total" xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 86.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"/></svg>
         </header>
-        <ul id="total-metrics-results" class="flex flex-col gap-4 py-4 px-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+
+        <ul id="total-metrics-results" class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
             <li class="sm:w-1/2 sm:pr-2">
                 <strong>Lucro total</strong>: <span class="text-green-600"> R$ {{ .Results.TotalIncome }}</span>
             </li>
@@ -32,12 +36,16 @@
         </ul>
     </section>
 
-    <section onclick="toggleAccordion('monthly-metrics-results', 'chevron-monthly')" class="hover:bg-gray-50 mt-4 border border-gray-400 rounded">
-        <header class="p-4 flex cursor-pointer border-b rounded border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors justify-between items-center active:bg-gray-200">
+    <section class="mt-4 rounded border border-gray-400 hover:bg-gray-50">
+        <header
+            onclick="toggleAccordion('monthly-metrics-results', 'chevron-monthly')"
+            class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 active:bg-gray-200"
+        >
             <h3 class="text-xl">Total Mensal</h3>
             <svg id="chevron-monthly" xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
         </header>
-        <ul id="monthly-metrics-results" class="hidden flex-col gap-4 py-4 px-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+
+        <ul id="monthly-metrics-results" class="hidden flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
         </ul>
     </section>
 {{ end }}
