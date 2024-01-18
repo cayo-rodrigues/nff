@@ -23,7 +23,7 @@
             <svg id="chevron-monthly" xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
         </header>
 
-        <ul id="monthly-metrics-results" class="hidden flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+        <ul id="monthly-metrics-results" class="hidden flex-col gap-4 px-4 py-4">
             <li>
                 <h4 class="text-lg">Janeiro</h4>
                 <ul class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
@@ -34,6 +34,14 @@
 
             <li>
                 <h4 class="text-lg">Fevereiro</h4>
+                <ul class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+                    {{ template "partials/request-card-metrics-results-details" . }}
+                </ul>
+                <hr>
+            </li>
+
+            <li>
+                <h4 class="text-lg">Março</h4>
                 <ul class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
                     {{ template "partials/request-card-metrics-results-details" . }}
                 </ul>
