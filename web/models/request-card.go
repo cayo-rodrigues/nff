@@ -58,14 +58,6 @@ func NewRequestCard(req any) *RequestCard {
 		resourceName = "invoices/cancel"
 		targetForm = "#invoice-cancel-form"
 		overviewType = "canceling"
-	case *MetricsQuery:
-		from = r.Entity.Name
-		to = fmt.Sprintf("%v - %v", utils.FormatDateAsBR(r.StartDate), utils.FormatDateAsBR(r.EndDate))
-		reqStatus = r.Results.ReqStatus
-		reqMsg = r.Results.ReqMsg
-		resourceName = "metrics"
-		targetForm = "#metrics-form"
-		overviewType = "metrics"
 	case *InvoicePrint:
 		from = r.Entity.Name
 		to = r.InvoiceID
@@ -79,6 +71,14 @@ func NewRequestCard(req any) *RequestCard {
 		overviewType = "printing"
 		isDownloadable = true
 		downloadLink = r.InvoicePDF
+	case *MetricsQuery:
+		from = r.Entity.Name
+		to = fmt.Sprintf("%v - %v", utils.FormatDateAsBR(r.StartDate), utils.FormatDateAsBR(r.EndDate))
+		reqStatus = r.Results.ReqStatus
+		reqMsg = r.Results.ReqMsg
+		resourceName = "metrics"
+		targetForm = "#metrics-form"
+		overviewType = "metrics"
 	}
 
 	feedbackColor := ""

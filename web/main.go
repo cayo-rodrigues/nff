@@ -60,11 +60,12 @@ func main() {
 	userService := services.NewUserService()
 	entityService := services.NewEntityService()
 	itemsService := services.NewItemsService()
+	resultsService := services.NewMetricsResultService()
 	filtersService := services.NewFiltersService()
-	invoiceService := services.NewInvoiceService(entityService, itemsService, filtersService)
-	cancelingService := services.NewCancelingService(entityService, filtersService)
-	printingService := services.NewPrintingService(entityService, filtersService)
-	metricsService := services.NewMetricsService(entityService, filtersService)
+	invoiceService := services.NewInvoiceService(itemsService, filtersService)
+	cancelingService := services.NewCancelingService(filtersService)
+	printingService := services.NewPrintingService(filtersService)
+	metricsService := services.NewMetricsService(resultsService, filtersService)
 
 	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService, printingService, SS_API_BASE_URL)
 

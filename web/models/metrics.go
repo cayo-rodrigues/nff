@@ -40,19 +40,24 @@ type MetricsQuery struct {
 }
 
 type MetricsResult struct {
-	TotalIncome     string          `json:"total_income"`
-	TotalExpenses   string          `json:"total_expenses"`
-	AvgIncome       string          `json:"average_income"`
-	AvgExpenses     string          `json:"average_expenses"`
-	Diff            string          `json:"diff"`
-	IsPositive      bool            `json:"is_positive"`
-	TotalRecords    int             `json:"total_records"`
-	PositiveRecords int             `json:"positive_records"`
-	NegativeRecords int             `json:"negative_records"`
-	ReqStatus       string          `json:"status"`
-	ReqMsg          string          `json:"msg"`
-	MonthName       string          `json:"month_name"`
-	Months          []MetricsResult `json:"months"`
+	ID              int
+	Type            string           `json:"type"`
+	TotalIncome     string           `json:"total_income"`
+	TotalExpenses   string           `json:"total_expenses"`
+	AvgIncome       string           `json:"average_income"`
+	AvgExpenses     string           `json:"average_expenses"`
+	Diff            string           `json:"diff"`
+	IsPositive      bool             `json:"is_positive"`
+	TotalRecords    int              `json:"total_records"`
+	PositiveRecords int              `json:"positive_records"`
+	NegativeRecords int              `json:"negative_records"`
+	ReqStatus       string           `json:"status"`
+	ReqMsg          string           `json:"msg"`
+	MonthName       string           `json:"month_name"`
+	Months          []*MetricsResult `json:"months"`
+	MetricsID       int
+	CreatedBy       int
+	CreatedAt       time.Time
 }
 
 func NewEmptyMetricsQuery() *MetricsQuery {
@@ -132,5 +137,15 @@ func (q *MetricsQuery) FullScan(rows db.Scanner) error {
 		&q.Entity.ID, &q.Entity.Name, &q.Entity.UserType, &q.Entity.CpfCnpj, &q.Entity.Ie, &q.Entity.Email, &q.Entity.Password,
 		&q.Entity.Address.PostalCode, &q.Entity.Address.Neighborhood, &q.Entity.Address.StreetType, &q.Entity.Address.StreetName, &q.Entity.Address.Number,
 		&q.Entity.CreatedBy, &q.Entity.CreatedAt, &q.Entity.UpdatedAt,
+	)
+}
+
+func (r *MetricsResult) Scan(rows db.Scanner) error {
+	return rows.Scan(
+		&r.ID, &r.Type, &r.MonthName,
+		&r.TotalIncome, &r.TotalExpenses, &r.AvgIncome,
+		&r.AvgExpenses, &r.Diff, &r.IsPositive,
+		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
+		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
 	)
 }

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -15,13 +16,13 @@ import (
 )
 
 type MetricsService struct {
-	entityService  interfaces.EntityService
+	resultsService interfaces.MetricsResultService
 	filtersService interfaces.FiltersService
 }
 
-func NewMetricsService(entityService interfaces.EntityService, filtersService interfaces.FiltersService) *MetricsService {
+func NewMetricsService(resultsService interfaces.MetricsResultService, filtersService interfaces.FiltersService) *MetricsService {
 	return &MetricsService{
-		entityService:  entityService,
+		resultsService: resultsService,
 		filtersService: filtersService,
 	}
 }
@@ -93,6 +94,16 @@ func (s *MetricsService) RetrieveMetrics(ctx context.Context, queryId int, userI
 	if err != nil {
 		log.Println("Error scaning metrics row: ", err)
 		return nil, utils.InternalServerErr
+	}
+
+	results, err := s.resultsService.ListResults(ctx, query.ID, userID)
+	if err != nil {
+		log.Println("Error linking metrics to results: ", err)
+		return nil, utils.InternalServerErr
+	}
+	for _, result := range results {
+		// append to months when type is "month", set to total when type is "total", append to rows (or records) when type is "row" (or "record")
+		fmt.Println("RESULT:", result.ID, result.Type)
 	}
 
 	return query, nil

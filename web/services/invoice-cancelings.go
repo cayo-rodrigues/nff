@@ -16,13 +16,11 @@ import (
 )
 
 type CancelingService struct {
-	entityService interfaces.EntityService
 	filtersService interfaces.FiltersService
 }
 
-func NewCancelingService(entityService interfaces.EntityService, filtersService interfaces.FiltersService) *CancelingService {
+func NewCancelingService(filtersService interfaces.FiltersService) *CancelingService {
 	return &CancelingService{
-		entityService: entityService,
 		filtersService: filtersService,
 	}
 }

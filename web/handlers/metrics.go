@@ -22,8 +22,8 @@ type MetricsPage struct {
 
 func NewMetricsPage(service interfaces.MetricsService, entityService interfaces.EntityService, siareBGWorker interfaces.SiareBGWorker) *MetricsPage {
 	return &MetricsPage{
-		entityService: entityService,
 		service:       service,
+		entityService: entityService,
 		siareBGWorker: siareBGWorker,
 	}
 }
