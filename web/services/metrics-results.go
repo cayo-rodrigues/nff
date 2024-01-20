@@ -7,6 +7,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/db"
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/jackc/pgx/v5"
 )
 
 type MetricsResultService struct{}
@@ -33,4 +34,37 @@ func (s *MetricsResultService) ListResults(ctx context.Context, metricsID int, u
 	}
 
 	return results, nil
+}
+
+func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []*models.MetricsResult, resultType string, metricsID int, userID int) error {
+	rows := [][]interface{}{}
+	for _, result := range results {
+		result.MetricsID = metricsID
+		result.CreatedBy = userID
+		result.Type = resultType
+
+		rows = append(rows, []interface{}{
+			result.Type, result.MonthName, result.TotalIncome, result.TotalExpenses,
+			result.AvgIncome, result.AvgExpenses, result.Diff, result.IsPositive,
+			result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
+			result.MetricsID, result.CreatedBy,
+		})
+	}
+	_, err := db.PG.CopyFrom(
+		ctx,
+		pgx.Identifier{"metrics_results"},
+		[]string{
+			"type", "month_name", "total_income", "total_expenses",
+			"avg_income", "avg_expenses", "diff", "is_positive",
+			"total_records", "positive_records", "negative_records",
+			"metrics_id", "created_by",
+		},
+		pgx.CopyFromRows(rows),
+	)
+	if err != nil {
+		log.Println("Error when running bulk insert metrics results query: ", err)
+		return utils.InternalServerErr
+	}
+
+	return nil
 }

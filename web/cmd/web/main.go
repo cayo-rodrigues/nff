@@ -67,7 +67,7 @@ func main() {
 	printingService := services.NewPrintingService(filtersService)
 	metricsService := services.NewMetricsService(resultsService, filtersService)
 
-	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, metricsService, printingService, SS_API_BASE_URL)
+	siareBGWorker := bgworkers.NewSiareBGWorker(invoiceService, cancelingService, printingService, metricsService, resultsService, SS_API_BASE_URL)
 
 	registerPage := handlers.NewRegisterPage(userService)
 	loginPage := handlers.NewLoginPage(userService)

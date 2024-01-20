@@ -106,23 +106,26 @@ type SSAPIPrintingResponse struct {
 type SiareBGWorker struct {
 	invoiceService   interfaces.InvoiceService
 	cancelingService interfaces.CancelingService
-	metricsService   interfaces.MetricsService
 	printingService  interfaces.PrintingService
+	metricsService   interfaces.MetricsService
+	resultsService   interfaces.MetricsResultService
 	SS_API_BASE_URL  string
 }
 
 func NewSiareBGWorker(
 	invoiceService interfaces.InvoiceService,
 	cancelingService interfaces.CancelingService,
-	metricsService interfaces.MetricsService,
 	printingService interfaces.PrintingService,
+	metricsService interfaces.MetricsService,
+	resultsService interfaces.MetricsResultService,
 	SS_API_BASE_URL string,
 ) *SiareBGWorker {
 	return &SiareBGWorker{
 		invoiceService:   invoiceService,
 		cancelingService: cancelingService,
-		metricsService:   metricsService,
 		printingService:  printingService,
+		metricsService:   metricsService,
+		resultsService:   resultsService,
 		SS_API_BASE_URL:  SS_API_BASE_URL,
 	}
 }
@@ -141,7 +144,7 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
-    log.Printf("Response got from ss-api: %v\n", string(body))
+	log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -194,7 +197,7 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
-    log.Printf("Response got from ss-api: %v\n", string(body))
+	log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -241,7 +244,7 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
-    log.Printf("Response got from ss-api: %v\n", string(body))
+	log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -298,7 +301,7 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
 
-    log.Printf("Response got from ss-api: %v\n", string(body))
+	log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -322,6 +325,10 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		err = w.metricsService.UpdateMetrics(ctx, query)
 		if err != nil {
 			log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
+		}
+		err = w.resultsService.BulkCreateResults(ctx, query.Months, "month", query.ID, query.CreatedBy)
+		if err != nil {
+			log.Printf("Something went wrong when creating metrics monthly results. Metrics query with id %v will have no monthly results: %v\n", query.ID, err)
 		}
 	}
 
