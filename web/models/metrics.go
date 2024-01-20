@@ -32,7 +32,7 @@ type MetricsQuery struct {
 	Entity    *Entity
 	StartDate time.Time
 	EndDate   time.Time
-	Results   *MetricsResult
+	*MetricsResult
 	CreatedBy int
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -63,7 +63,7 @@ type MetricsResult struct {
 func NewEmptyMetricsQuery() *MetricsQuery {
 	return &MetricsQuery{
 		Entity:  NewEmptyEntity(),
-		Results: &MetricsResult{},
+		MetricsResult: &MetricsResult{},
 		Errors:  &MetricsFormErrors{},
 	}
 
@@ -81,7 +81,7 @@ func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
 	return &MetricsQuery{
 		StartDate: startDate,
 		EndDate:   endDate,
-		Results:   &MetricsResult{},
+		MetricsResult: &MetricsResult{},
 		Errors:    &MetricsFormErrors{},
 	}
 }
@@ -117,10 +117,10 @@ func (q *MetricsQuery) IsValid() bool {
 func (q *MetricsQuery) Scan(rows db.Scanner) error {
 	return rows.Scan(
 		&q.ID, &q.StartDate, &q.EndDate,
-		&q.Results.TotalIncome, &q.Results.TotalExpenses, &q.Results.AvgIncome,
-		&q.Results.AvgExpenses, &q.Results.Diff, &q.Results.IsPositive,
-		&q.Results.TotalRecords, &q.Results.PositiveRecords, &q.Results.NegativeRecords,
-		&q.Results.ReqStatus, &q.Results.ReqMsg, &q.Entity.ID,
+		&q.TotalIncome, &q.TotalExpenses, &q.AvgIncome,
+		&q.AvgExpenses, &q.Diff, &q.IsPositive,
+		&q.TotalRecords, &q.PositiveRecords, &q.NegativeRecords,
+		&q.ReqStatus, &q.ReqMsg, &q.Entity.ID,
 		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
 	)
 }
@@ -128,10 +128,10 @@ func (q *MetricsQuery) Scan(rows db.Scanner) error {
 func (q *MetricsQuery) FullScan(rows db.Scanner) error {
 	return rows.Scan(
 		&q.ID, &q.StartDate, &q.EndDate,
-		&q.Results.TotalIncome, &q.Results.TotalExpenses, &q.Results.AvgIncome,
-		&q.Results.AvgExpenses, &q.Results.Diff, &q.Results.IsPositive,
-		&q.Results.TotalRecords, &q.Results.PositiveRecords, &q.Results.NegativeRecords,
-		&q.Results.ReqStatus, &q.Results.ReqMsg, &q.Entity.ID,
+		&q.TotalIncome, &q.TotalExpenses, &q.AvgIncome,
+		&q.AvgExpenses, &q.Diff, &q.IsPositive,
+		&q.TotalRecords, &q.PositiveRecords, &q.NegativeRecords,
+		&q.ReqStatus, &q.ReqMsg, &q.Entity.ID,
 		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
 
 		&q.Entity.ID, &q.Entity.Name, &q.Entity.UserType, &q.Entity.CpfCnpj, &q.Entity.Ie, &q.Entity.Email, &q.Entity.Password,

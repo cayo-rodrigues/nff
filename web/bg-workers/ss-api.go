@@ -316,7 +316,7 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		response.ReqMsg = fmt.Sprintf("%s\n%s", response.ReqMsg, formatMetricsErrs(&response))
 	}
 
-	query.Results = response.MetricsResult
+	query.MetricsResult = response.MetricsResult
 
 	if err == nil {
 		err = w.metricsService.UpdateMetrics(ctx, query)

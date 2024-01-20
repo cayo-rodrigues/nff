@@ -74,8 +74,8 @@ func NewRequestCard(req any) *RequestCard {
 	case *MetricsQuery:
 		from = r.Entity.Name
 		to = fmt.Sprintf("%v - %v", utils.FormatDateAsBR(r.StartDate), utils.FormatDateAsBR(r.EndDate))
-		reqStatus = r.Results.ReqStatus
-		reqMsg = r.Results.ReqMsg
+		reqStatus = r.ReqStatus
+		reqMsg = r.ReqMsg
 		resourceName = "metrics"
 		targetForm = "#metrics-form"
 		overviewType = "metrics"

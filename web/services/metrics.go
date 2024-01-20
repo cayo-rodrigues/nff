@@ -102,8 +102,10 @@ func (s *MetricsService) RetrieveMetrics(ctx context.Context, queryId int, userI
 		return nil, utils.InternalServerErr
 	}
 	for _, result := range results {
-		// append to months when type is "month", set to total when type is "total", append to rows (or records) when type is "row" (or "record")
-		fmt.Println("RESULT:", result.ID, result.Type)
+		switch result.Type {
+		case "month":
+			query.Months = append(query.Months, result)
+		}
 	}
 
 	return query, nil
@@ -117,9 +119,9 @@ func (s *MetricsService) UpdateMetrics(ctx context.Context, query *models.Metric
 			avg_income = $5, avg_expenses = $6, diff = $7, is_positive = $8,
 			total_records = $9, positive_records = $10, negative_records = $11, updated_at = $12
 		WHERE id = $13 AND created_by = $14`,
-		query.Results.ReqStatus, query.Results.ReqMsg, query.Results.TotalIncome, query.Results.TotalExpenses,
-		query.Results.AvgIncome, query.Results.AvgExpenses, query.Results.Diff, query.Results.IsPositive,
-		query.Results.TotalRecords, query.Results.PositiveRecords, query.Results.NegativeRecords, time.Now(),
+		query.ReqStatus, query.ReqMsg, query.TotalIncome, query.TotalExpenses,
+		query.AvgIncome, query.AvgExpenses, query.Diff, query.IsPositive,
+		query.TotalRecords, query.PositiveRecords, query.NegativeRecords, time.Now(),
 		query.ID, query.CreatedBy,
 	)
 	if err != nil {
