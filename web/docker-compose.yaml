@@ -53,6 +53,17 @@ services:
     depends_on:
       - db
 
+  seeds:
+    container_name: nff-seeds
+    build:
+      context: .
+      dockerfile: Dockerfile.seeds
+    environment:
+      - DB_URL=postgres://nff:nff@db:5432/nff
+    depends_on:
+      - db
+
+
 volumes:
   postgres_data:
   redis_data:
