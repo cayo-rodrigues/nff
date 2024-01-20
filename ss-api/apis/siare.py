@@ -447,7 +447,9 @@ class Siare(Browser):
 
         return None
 
-    def process_invoice_query_row(self, row: WebElement, results: InvoiceQueryResults, entity_ie: str):
+    def process_invoice_query_row(
+        self, row: WebElement, results: InvoiceQueryResults, entity_ie: str
+    ):
         data = self.filter_elements(By.TAG_NAME, "td", row)
         invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
         invoice_value = from_BRL_to_float(data[-2].text)
@@ -460,7 +462,38 @@ class Siare(Browser):
             results.total_expenses += invoice_value
             results.negative_entries += 1
 
-    def aggregate_invoice_query_results(self, results: InvoiceQueryResults, entity_ie: str):
+        if results.include_records:
+            self.include_individual_record(results, data, is_income, invoice_value)
+
+    def include_individual_record(
+        self,
+        results: InvoiceQueryResults,
+        row_data: list[WebElement],
+        is_income: bool,
+        invoice_value: float,
+    ):
+        individual_record = InvoiceQueryResults(
+            issue_date=normalize_text(row_data[5].text),
+            is_child=True,
+            kind="record",
+        )
+
+        if is_income:
+            individual_record.total_income = invoice_value
+        else:
+            individual_record.total_expenses = invoice_value
+
+        individual_record.do_the_math()
+        individual_record.format_values()
+
+        results.records.append(individual_record)
+        results.json_serializable_records.append(
+            individual_record.json_serializable_format()
+        )
+
+    def aggregate_invoice_query_results(
+        self, results: InvoiceQueryResults, entity_ie: str
+    ):
         while True:
             xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
             tbody = self.get_element_when_exists(xpath)

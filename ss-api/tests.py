@@ -6,7 +6,9 @@ import random
 import handlers
 
 
-def test_metrics_handler(entity_id: str, start_date: str, end_date: str):
+def test_metrics_handler(
+    entity_id: str, start_date: str, end_date: str, include_records: bool = False
+):
     samples = json.load(open("./test_samples.json"))
     number_of_entities = len(samples["entities"])
 
@@ -26,6 +28,7 @@ def test_metrics_handler(entity_id: str, start_date: str, end_date: str):
         "start_date": start_date,
         "end_date": end_date,
         "entity": entity,
+        "include_records": include_records,
     }
 
     start = datetime.now()
@@ -54,17 +57,24 @@ if __name__ == "__main__":
     if sys.argv[1] == "metrics":
         if len(sys.argv) < 5:
             print(
-                "Usage:\n\tpython tests.py metrics <entity_id> <start_date> <end_date>\n\n"
+                "Usage:\n\tpython tests.py metrics <entity_id> <start_date> <end_date> [include_records = false]\n\n"
                 "Args:\n"
-                "\t- entity_id: int. Use \"x\" for a random entity id\n"
+                '\t- entity_id: int. Use "x" for a random entity id\n'
                 "\t- start_date: str. Format dd/mm/yyyy\n"
                 "\t- end_date: str. Format dd/mm/yyyy\n"
+                "\t- include_records: bool. Optional. Input \"true\" in case you want individual records included in the response\n"
             )
             sys.exit()
 
         entity_id = sys.argv[2]
         start_date = sys.argv[3]
         end_date = sys.argv[4]
-        test_metrics_handler(entity_id, start_date, end_date)
+
+        try:
+            include_records = sys.argv[5] == "true"
+        except IndexError:
+            include_records = False
+
+        test_metrics_handler(entity_id, start_date, end_date, include_records)
 
     print(":)")

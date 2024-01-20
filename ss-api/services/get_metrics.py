@@ -55,6 +55,8 @@ def get_metrics(data: dict):
         month_results = InvoiceQueryResults(
             month_name=current_month_start.strftime("%B").title(),
             is_child=True,
+            kind="month",
+            include_records=data.get("include_records", False),
         )
         query.results.months.append(month_results)
 
@@ -73,9 +75,12 @@ def get_metrics(data: dict):
             month_results.do_the_math()
             month_results.format_values()
 
-            query.results.include_month_in_total(month_results)
+            query.results.include_child_in_total(month_results)
             query.results.json_serializable_months.append(
                 month_results.json_serializable_format()
+            )
+            query.results.json_serializable_records += (
+                month_results.json_serializable_records
             )
 
         # Move to the next month
@@ -104,4 +109,5 @@ def get_metrics(data: dict):
         "positive_records": query.results.positive_entries,
         "negative_records": query.results.negative_entries,
         "months": query.results.json_serializable_months,
+        "records": query.results.json_serializable_records,
     }

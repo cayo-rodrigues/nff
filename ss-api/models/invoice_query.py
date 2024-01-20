@@ -21,12 +21,20 @@ class InvoiceQueryResults:
         self.is_positive: bool = False
         self.diff: float = 0.0
 
-        self.months: list[InvoiceQueryResults] = []
-        self.json_serializable_months: list[dict] = []
-
         self.month_name: str = data.get("month_name", "")
 
         self.is_child: bool = data.get("is_child", False)
+        self.kind: str = data.get("kind", "total")
+
+        self.issue_date: str = data.get("issue_date", "")
+
+        self.include_records: bool = data.get("include_records", False)
+
+        self.months: list[InvoiceQueryResults] = []
+        self.json_serializable_months: list[dict] = []
+
+        self.records: list[InvoiceQueryResults] = []
+        self.json_serializable_records: list[dict] = []
 
     def do_the_math(self):
         self.is_positive = self.total_income > self.total_expenses
@@ -50,40 +58,50 @@ class InvoiceQueryResults:
         self.pretty_avg_expenses: str = to_BRL(self.average_expenses, grouping=True)
         self.pretty_diff: str = to_BRL(self.diff, grouping=True)
 
-    def include_month_in_total(self, month: Self):
-        self.total_income += month.total_income
-        self.total_expenses += month.total_expenses
+    def include_child_in_total(self, child: Self):
+        self.total_income += child.total_income
+        self.total_expenses += child.total_expenses
 
         self.is_positive = self.total_income > self.total_expenses
         self.diff = self.total_income - self.total_expenses
 
         try:
-            self.average_income += month.total_income / month.positive_entries
+            self.average_income += child.total_income / child.positive_entries
         except ZeroDivisionError:
             self.average_income += 0.0
         try:
-            self.average_expenses += month.total_expenses / month.negative_entries
+            self.average_expenses += child.total_expenses / child.negative_entries
         except ZeroDivisionError:
             self.average_expenses += 0.0
 
-        self.positive_entries += month.positive_entries
-        self.negative_entries += month.negative_entries
+        self.positive_entries += child.positive_entries
+        self.negative_entries += child.negative_entries
 
-        self.total_records += month.positive_entries + month.negative_entries
+        self.total_records += child.positive_entries + child.negative_entries
 
     def json_serializable_format(self):
-        return {
+        results = {
             "total_income": self.pretty_total_income,
             "total_expenses": self.pretty_total_expenses,
-            "average_income": self.pretty_avg_income,
-            "average_expenses": self.pretty_avg_expenses,
             "diff": self.pretty_diff,
             "is_positive": self.is_positive,
-            "total_records": self.total_records,
-            "positive_records": self.positive_entries,
-            "negative_records": self.negative_entries,
-            "month_name": self.month_name,
         }
+
+        if self.kind == "month":
+            results.update({"month_name": self.month_name})
+
+        if self.kind != "record":
+            results.update(
+                {
+                    "average_income": self.pretty_avg_income,
+                    "average_expenses": self.pretty_avg_expenses,
+                    "total_records": self.total_records,
+                    "positive_records": self.positive_entries,
+                    "negative_records": self.negative_entries,
+                }
+            )
+
+        return results
 
 
 class InvoiceQuery:
@@ -92,7 +110,9 @@ class InvoiceQuery:
         self.end_date: str = normalize_text(data.get("end_date"), keep_case=True)
         self.entity = Entity(data.get("entity", {}), is_sender=True)
 
-        self.results = InvoiceQueryResults()
+        self.results = InvoiceQueryResults(
+            include_records=data.get("include_records", False)
+        )
 
         self.errors = {}
 
