@@ -472,13 +472,13 @@ class Siare(Browser):
         is_income: bool,
         invoice_value: float,
     ):
-        raw_issue_date = row_data[5].text
+        raw_issue_date = normalize_text(row_data[5].text)
         formated_issue_date = datetime.strptime(raw_issue_date, "%d/%m/%Y").strftime(
-            "%Y-%d-%m"
+            "%Y-%m-%dT%H:%M:%SZ"
         )
 
         individual_record = InvoiceQueryResults(
-            issue_date=normalize_text(formated_issue_date),
+            issue_date=formated_issue_date,
             is_child=True,
             kind="record",
         )

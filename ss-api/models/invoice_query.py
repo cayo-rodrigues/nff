@@ -83,8 +83,6 @@ class InvoiceQueryResults:
         results = {
             "total_income": self.pretty_total_income,
             "total_expenses": self.pretty_total_expenses,
-            "diff": self.pretty_diff,
-            "is_positive": self.is_positive,
         }
 
         if self.kind == "month":
@@ -101,7 +99,9 @@ class InvoiceQueryResults:
                     "total_records": self.total_records,
                     "positive_records": self.positive_entries,
                     "negative_records": self.negative_entries,
-                }
+                    "diff": self.pretty_diff,
+                    "is_positive": self.is_positive,
+                }.items()
             )
 
         return results
