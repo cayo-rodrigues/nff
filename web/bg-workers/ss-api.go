@@ -294,14 +294,18 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		Query: &SSAPIMetricsRequestQuery{
 			StartDate:      utils.FormatDateAsBR(query.StartDate),
 			EndDate:        utils.FormatDateAsBR(query.EndDate),
-			IncludeRecords: true,
+			IncludeRecords: query.IncludeRecords,
 		},
 	}
 
 	queryString := fmt.Sprintf(
-		"start_date=%v&end_date=%v&include_records=%v",
-		reqData.Query.StartDate, reqData.Query.EndDate, reqData.Query.IncludeRecords,
+		"start_date=%v&end_date=%v",
+		reqData.Query.StartDate, reqData.Query.EndDate,
 	)
+
+	if reqData.Query.IncludeRecords {
+		queryString += fmt.Sprintf("&include_records=%v", reqData.Query.IncludeRecords)
+	}
 
 	agent := fiber.Get(w.SS_API_BASE_URL + "/metrics")
 	agent.QueryString(queryString)

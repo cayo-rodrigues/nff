@@ -20,7 +20,7 @@
         <div class="flex gap-6 border-b border-gray-400 py-4 md:flex-col">
 
 
-            <div class="flex w-full flex-initial flex-col gap-4 sm:flex-row lg:w-1/2">
+            <div class="flex w-full flex-initial flex-col gap-4 sm:flex-row">
 
                 <div class="flex flex-1 flex-col gap-2">
                     <label for="entity"><strong>Entidade</strong></label>
@@ -44,6 +44,12 @@
                     <input class="rounded bg-gray-100 p-2 md:w-full" id="end_date" name="end_date"
                         value='{{ FormatDate .MetricsQuery.EndDate }}' type="date">
                     <sub class="text-red-600">{{ .MetricsQuery.Errors.EndDate }}</sub>
+                </div>
+
+                <div class="flex flex-1 flex-col items-center gap-2">
+                    <label for="include_records"><strong>Incluir registros individuais?</strong></label>
+                    <input class="h-10 w-6 rounded bg-gray-100 p-2" id="include_records" name="include_records" type="checkbox">
+                    <sub class="text-red-600"></sub>
                 </div>
 
             </div>
