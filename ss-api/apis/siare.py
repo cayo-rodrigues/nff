@@ -474,7 +474,7 @@ class Siare(Browser):
     ):
         raw_issue_date = row_data[5].text
         formated_issue_date = datetime.strptime(raw_issue_date, "%d/%m/%Y").strftime(
-            "%Y-%m-%d"
+            "%Y-%d-%m"
         )
 
         individual_record = InvoiceQueryResults(
