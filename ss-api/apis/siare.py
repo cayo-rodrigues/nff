@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -472,8 +472,13 @@ class Siare(Browser):
         is_income: bool,
         invoice_value: float,
     ):
+        raw_issue_date = row_data[5].text
+        formated_issue_date = datetime.strptime(raw_issue_date, "%d/%m/%Y").strftime(
+            "%Y-%m-%d"
+        )
+
         individual_record = InvoiceQueryResults(
-            issue_date=normalize_text(row_data[5].text),
+            issue_date=normalize_text(formated_issue_date),
             is_child=True,
             kind="record",
         )

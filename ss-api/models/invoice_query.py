@@ -90,6 +90,9 @@ class InvoiceQueryResults:
         if self.kind == "month":
             results.update({"month_name": self.month_name})
 
+        if self.kind == "record":
+            results.update({"issue_date": self.issue_date})
+
         if self.kind != "record":
             results.update(
                 {
