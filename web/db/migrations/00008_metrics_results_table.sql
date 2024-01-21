@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS metrics_results (
     id BIGSERIAL PRIMARY KEY,
-    type VARCHAR(5), -- total, month, row
+    type VARCHAR(5), -- total, month, record (size increases to 6 in the next migration)
     month_name VARCHAR(9),
     total_income VARCHAR(16) DEFAULT '0,00',
     total_expenses VARCHAR(16) DEFAULT '0,00',

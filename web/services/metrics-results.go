@@ -17,7 +17,7 @@ func NewMetricsResultService() *MetricsResultService {
 }
 
 func (s *MetricsResultService) ListResults(ctx context.Context, metricsID int, userID int) ([]*models.MetricsResult, error) {
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM metrics_results WHERE metrics_id = $1 AND created_by = $2 ORDER BY type", metricsID, userID)
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM metrics_results WHERE metrics_id = $1 AND created_by = $2 ORDER BY issue_date", metricsID, userID)
 	defer rows.Close()
 
 	results := []*models.MetricsResult{}
@@ -48,6 +48,7 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 			result.AvgIncome, result.AvgExpenses, result.Diff, result.IsPositive,
 			result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
 			result.MetricsID, result.CreatedBy,
+			result.IssueDate,
 		})
 	}
 	_, err := db.PG.CopyFrom(
@@ -58,6 +59,7 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 			"avg_income", "avg_expenses", "diff", "is_positive",
 			"total_records", "positive_records", "negative_records",
 			"metrics_id", "created_by",
+			"issue_date",
 		},
 		pgx.CopyFromRows(rows),
 	)

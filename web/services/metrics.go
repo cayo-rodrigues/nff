@@ -104,6 +104,8 @@ func (s *MetricsService) RetrieveMetrics(ctx context.Context, queryId int, userI
 		switch result.Type {
 		case "month":
 			query.Months = append(query.Months, result)
+		case "record":
+			query.Records = append(query.Records, result)
 		}
 	}
 

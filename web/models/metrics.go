@@ -32,11 +32,11 @@ type MetricsQuery struct {
 	Entity    *Entity
 	StartDate time.Time
 	EndDate   time.Time
-	*MetricsResult
 	CreatedBy int
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Errors    *MetricsFormErrors
+	*MetricsResult
+	Errors *MetricsFormErrors
 }
 
 type MetricsResult struct {
@@ -54,7 +54,9 @@ type MetricsResult struct {
 	ReqStatus       string           `json:"status"`
 	ReqMsg          string           `json:"msg"`
 	MonthName       string           `json:"month_name"`
+	IssueDate       time.Time        `json:"issue_date"`
 	Months          []*MetricsResult `json:"months"`
+	Records         []*MetricsResult `json:"records"`
 	MetricsID       int
 	CreatedBy       int
 	CreatedAt       time.Time
@@ -62,9 +64,9 @@ type MetricsResult struct {
 
 func NewEmptyMetricsQuery() *MetricsQuery {
 	return &MetricsQuery{
-		Entity:  NewEmptyEntity(),
+		Entity:        NewEmptyEntity(),
 		MetricsResult: &MetricsResult{},
-		Errors:  &MetricsFormErrors{},
+		Errors:        &MetricsFormErrors{},
 	}
 
 }
@@ -79,10 +81,10 @@ func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
 		log.Println("Error converting input end date string to time.Time:", err)
 	}
 	return &MetricsQuery{
-		StartDate: startDate,
-		EndDate:   endDate,
+		StartDate:     startDate,
+		EndDate:       endDate,
 		MetricsResult: &MetricsResult{},
-		Errors:    &MetricsFormErrors{},
+		Errors:        &MetricsFormErrors{},
 	}
 }
 
@@ -141,11 +143,20 @@ func (q *MetricsQuery) FullScan(rows db.Scanner) error {
 }
 
 func (r *MetricsResult) Scan(rows db.Scanner) error {
-	return rows.Scan(
+	var issueDate any
+
+	err := rows.Scan(
 		&r.ID, &r.Type, &r.MonthName,
 		&r.TotalIncome, &r.TotalExpenses, &r.AvgIncome,
 		&r.AvgExpenses, &r.Diff, &r.IsPositive,
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
+		&issueDate,
 	)
+
+	if v, ok := issueDate.(time.Time); ok {
+		r.IssueDate = v
+	}
+
+	return err
 }

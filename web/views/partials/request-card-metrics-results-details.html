@@ -1,26 +1,44 @@
 {{ define "partials/request-card-metrics-results-details" }}
-    <li class="sm:w-1/2 sm:pr-2">
-        <strong>Lucro total</strong>: <span class="text-green-600"> R$ {{ .TotalIncome }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pl-2">
-        <strong>Lucro médio</strong>: <span class="text-green-600"> R$ {{ .AvgIncome }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pr-2">
-        <strong>Despesa total</strong>: <span class="text-red-600"> R$ {{ .TotalExpenses }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pl-2">
-        <strong>Despesa média</strong>: <span class="text-red-600"> R$ {{ .AvgExpenses }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pr-2">
-        <strong>Diferença</strong>: <span class="text-{{ if .IsPositive}}green{{ else }}red{{ end }}-600"> R$ {{ .Diff }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pl-2">
-        <strong>Total de transações</strong>: <span> {{ .TotalRecords }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pr-2">
-        <strong>Vendas</strong>: <span> {{ .PositiveRecords }}</span>
-    </li>
-    <li class="sm:w-1/2 sm:pl-2">
-        <strong>Compras</strong>: <span> {{ .NegativeRecords }}</span>
-    </li>
+    {{ if eq .Type "record" }}
+        <li class="sm:w-1/2">
+            <strong>Lucro</strong>: <span class="text-green-600"> R$ {{ .TotalIncome }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Despesa</strong>: <span class="text-red-600"> R$ {{ .TotalExpenses }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Remetente</strong>: <span> Nome do remetente (em breve) </span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Destinatário</strong>: <span> IE ou nome do destinatário (em breve) </span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>NFA</strong>: <span> link do pdf (em breve) </span>
+        </li>
+    {{ else }}
+        <li class="sm:w-1/2">
+            <strong>Lucro total</strong>: <span class="text-green-600"> R$ {{ .TotalIncome }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Lucro médio</strong>: <span class="text-green-600"> R$ {{ .AvgIncome }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Despesa total</strong>: <span class="text-red-600"> R$ {{ .TotalExpenses }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Despesa média</strong>: <span class="text-red-600"> R$ {{ .AvgExpenses }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Diferença</strong>: <span class="text-{{ if .IsPositive}}green{{ else }}red{{ end }}-600"> R$ {{ .Diff }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Total de transações</strong>: <span> {{ .TotalRecords }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Vendas</strong>: <span> {{ .PositiveRecords }}</span>
+        </li>
+        <li class="sm:w-1/2">
+            <strong>Compras</strong>: <span> {{ .NegativeRecords }}</span>
+        </li>
+    {{ end }}
 {{ end }}

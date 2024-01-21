@@ -71,8 +71,9 @@ type SSAPIMetricsRequest struct {
 }
 
 type SSAPIMetricsRequestQuery struct {
-	StartDate string
-	EndDate   string
+	StartDate      string
+	EndDate        string
+	IncludeRecords bool
 }
 
 type SSAPIMetricsRequestBody struct {
@@ -291,13 +292,19 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 			Entity: query.Entity,
 		},
 		Query: &SSAPIMetricsRequestQuery{
-			StartDate: utils.FormatDateAsBR(query.StartDate),
-			EndDate:   utils.FormatDateAsBR(query.EndDate),
+			StartDate:      utils.FormatDateAsBR(query.StartDate),
+			EndDate:        utils.FormatDateAsBR(query.EndDate),
+			IncludeRecords: true,
 		},
 	}
 
+	queryString := fmt.Sprintf(
+		"start_date=%v&end_date=%v&include_records=%v",
+		reqData.Query.StartDate, reqData.Query.EndDate, reqData.Query.IncludeRecords,
+	)
+
 	agent := fiber.Get(w.SS_API_BASE_URL + "/metrics")
-	agent.QueryString(fmt.Sprintf("start_date=%v&end_date=%v", reqData.Query.StartDate, reqData.Query.EndDate))
+	agent.QueryString(queryString)
 	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
 
@@ -329,6 +336,10 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		err = w.resultsService.BulkCreateResults(ctx, query.Months, "month", query.ID, query.CreatedBy)
 		if err != nil {
 			log.Printf("Something went wrong when creating metrics monthly results. Metrics query with id %v will have no monthly results: %v\n", query.ID, err)
+		}
+		err = w.resultsService.BulkCreateResults(ctx, query.Records, "record", query.ID, query.CreatedBy)
+		if err != nil {
+			log.Printf("Something went wrong when creating metrics results by individual record. Metrics query with id %v will have no invidual record results: %v\n", query.ID, err)
 		}
 	}
 

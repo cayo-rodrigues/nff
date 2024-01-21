@@ -10,7 +10,7 @@ var EntityUserTypes = SiareUserTypes{
 	"Apenas Destinatário",
 }
 
-type SiareAddressStreetTypes = [3]string
+type SiareAddressStreetTypes [3]string
 
 var EntityAddressStreetTypes = SiareAddressStreetTypes{
 	"Rua",
