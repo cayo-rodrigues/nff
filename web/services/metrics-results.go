@@ -48,7 +48,7 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 			result.AvgIncome, result.AvgExpenses, result.Diff, result.IsPositive,
 			result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
 			result.MetricsID, result.CreatedBy,
-			result.IssueDate,
+			result.IssueDate, result.InvoiceNumber,
 		})
 	}
 	_, err := db.PG.CopyFrom(
@@ -59,7 +59,7 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 			"avg_income", "avg_expenses", "diff", "is_positive",
 			"total_records", "positive_records", "negative_records",
 			"metrics_id", "created_by",
-			"issue_date",
+			"issue_date", "invoice_id",
 		},
 		pgx.CopyFromRows(rows),
 	)

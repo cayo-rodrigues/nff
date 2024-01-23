@@ -55,6 +55,7 @@ type MetricsResult struct {
 	ReqStatus       string           `json:"status"`
 	ReqMsg          string           `json:"msg"`
 	MonthName       string           `json:"month_name"`
+	InvoiceNumber   string           `json:"invoice_id"`
 	IssueDate       time.Time        `json:"issue_date"`
 	Months          []*MetricsResult `json:"months"`
 	Records         []*MetricsResult `json:"records"`
@@ -159,7 +160,7 @@ func (r *MetricsResult) Scan(rows db.Scanner) error {
 		&r.AvgExpenses, &r.Diff, &r.IsPositive,
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
-		&issueDate,
+		&issueDate, &r.InvoiceNumber,
 	)
 
 	if v, ok := issueDate.(time.Time); ok {

@@ -7,14 +7,12 @@
             <strong>Despesa</strong>: <span class="text-red-600"> R$ {{ .TotalExpenses }}</span>
         </li>
         <li class="sm:w-1/2">
-            <strong>Remetente</strong>: <span> Nome do remetente (em breve) </span>
+            <strong>Data de emissão</strong>: <span> {{ FormatDateAsBR .IssueDate }} </span>
         </li>
         <li class="sm:w-1/2">
-            <strong>Destinatário</strong>: <span> IE ou nome do destinatário (em breve) </span>
+            <strong>Baixar NFA</strong>: <a class="cursor-pointer text-blue-700 underline"> (em breve) </a>
         </li>
-        <li class="sm:w-1/2">
-            <strong>NFA</strong>: <span> link do pdf (em breve) </span>
-        </li>
+
     {{ else }}
         <li class="sm:w-1/2">
             <strong>Lucro total</strong>: <span class="text-green-600"> R$ {{ .TotalIncome }}</span>
