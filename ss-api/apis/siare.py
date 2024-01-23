@@ -448,13 +448,13 @@ class Siare(Browser):
         return None
 
     def process_invoice_query_row(
-        self, row: WebElement, results: InvoiceQueryResults, entity_ie: str
+        self, row: WebElement, results: InvoiceQueryResults, entity: Entity
     ):
         data = self.filter_elements(By.TAG_NAME, "td", row)
         invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
         invoice_value = from_BRL_to_float(data[-2].text)
 
-        is_income = entity_ie == invoice_sender_ie
+        is_income = entity.ie == invoice_sender_ie
         if is_income:
             results.total_income += invoice_value
             results.positive_entries += 1
@@ -477,10 +477,13 @@ class Siare(Browser):
             "%Y-%m-%dT%H:%M:%SZ"
         )
 
+        invoice_id = normalize_text(row_data[1].text)
+
         individual_record = InvoiceQueryResults(
             issue_date=formated_issue_date,
             is_child=True,
             kind="record",
+            invoice_id=invoice_id,
         )
 
         if is_income:
@@ -497,7 +500,7 @@ class Siare(Browser):
         )
 
     def aggregate_invoice_query_results(
-        self, results: InvoiceQueryResults, entity_ie: str
+        self, results: InvoiceQueryResults, entity: Entity
     ):
         while True:
             xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
@@ -505,13 +508,16 @@ class Siare(Browser):
 
             rows = self.filter_elements(By.TAG_NAME, "tr", tbody)
             for row in rows:
-                self.process_invoice_query_row(row, results, entity_ie)
+                self.process_invoice_query_row(row, results, entity)
+
+            # upload all files to s3 (also concurrent)
 
             xpath = XPaths.QUERY_INVOICE_RESULTS_CURRENT_PAGE
             current_page = int(self.get_element(xpath).text)
 
             xpath = XPaths.QUERY_INVOICE_RESULTS_INFO_DATA
-            total_pages = int(self.get_element(xpath).text.split(" ")[-3])
+            results_info_data = self.get_element(xpath).text.split(" ")
+            total_pages = int(results_info_data[-3])
 
             if current_page < total_pages:
                 xpath = XPaths.QUERY_INVOICE_RESULTS_NEXT_PAGE

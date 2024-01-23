@@ -5,7 +5,7 @@ from constants.db import MandatoryFields, PrettyModelFields
 from models.entity import Entity
 
 
-class InvoiceQueryResults:
+class InvoiceQueryResults():
     def __init__(self, **data) -> None:
         self.positive_entries: int = data.get("positive_entries", 0)
         self.negative_entries: int = data.get("negative_entries", 0)
@@ -27,6 +27,8 @@ class InvoiceQueryResults:
         self.kind: str = data.get("kind", "total")
 
         self.issue_date: str = data.get("issue_date", "")
+        self.pdf_url: str = data.get("pdf_url", "")
+        self.invoice_id: str = data.get("invoice_id", "")
 
         self.include_records: bool = data.get("include_records", False)
 
@@ -89,7 +91,10 @@ class InvoiceQueryResults:
             results.update({"month_name": self.month_name})
 
         if self.kind == "record":
-            results.update({"issue_date": self.issue_date})
+            results.update({
+                "issue_date": self.issue_date,
+                "invoice_id": self.invoice_id,
+            })
 
         if self.kind != "record":
             results.update(

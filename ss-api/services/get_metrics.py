@@ -70,7 +70,7 @@ def get_metrics(data: dict):
             months_without_results_count += 1
         else:
             siare.wait_until_document_is_ready()
-            siare.aggregate_invoice_query_results(month_results, query.entity.ie)
+            siare.aggregate_invoice_query_results(month_results, query.entity)
 
             month_results.do_the_math()
             month_results.format_values()
