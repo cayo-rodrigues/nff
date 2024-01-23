@@ -294,7 +294,7 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		Query: &SSAPIMetricsRequestQuery{
 			StartDate:      utils.FormatDateAsBR(query.StartDate),
 			EndDate:        utils.FormatDateAsBR(query.EndDate),
-			IncludeRecords: query.IncludeRecords,
+			IncludeRecords: true,
 		},
 	}
 

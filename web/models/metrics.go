@@ -35,7 +35,6 @@ type MetricsQuery struct {
 	CreatedBy      int
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	IncludeRecords bool
 	Errors         *MetricsFormErrors
 	*MetricsResult
 }
@@ -83,15 +82,9 @@ func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
 		log.Println("Error converting input end date string to time.Time:", err)
 	}
 
-	includeRecords := false
-	if c.FormValue("include_records") != "" {
-		includeRecords = true
-	}
-
 	return &MetricsQuery{
 		StartDate:      startDate,
 		EndDate:        endDate,
-		IncludeRecords: includeRecords,
 		MetricsResult:  &MetricsResult{},
 		Errors:         &MetricsFormErrors{},
 	}
