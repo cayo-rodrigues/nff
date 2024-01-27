@@ -71,8 +71,9 @@ type SSAPIMetricsRequest struct {
 }
 
 type SSAPIMetricsRequestQuery struct {
-	StartDate string
-	EndDate   string
+	StartDate      string
+	EndDate        string
+	IncludeRecords bool
 }
 
 type SSAPIMetricsRequestBody struct {
@@ -106,23 +107,26 @@ type SSAPIPrintingResponse struct {
 type SiareBGWorker struct {
 	invoiceService   interfaces.InvoiceService
 	cancelingService interfaces.CancelingService
-	metricsService   interfaces.MetricsService
 	printingService  interfaces.PrintingService
+	metricsService   interfaces.MetricsService
+	resultsService   interfaces.MetricsResultService
 	SS_API_BASE_URL  string
 }
 
 func NewSiareBGWorker(
 	invoiceService interfaces.InvoiceService,
 	cancelingService interfaces.CancelingService,
-	metricsService interfaces.MetricsService,
 	printingService interfaces.PrintingService,
+	metricsService interfaces.MetricsService,
+	resultsService interfaces.MetricsResultService,
 	SS_API_BASE_URL string,
 ) *SiareBGWorker {
 	return &SiareBGWorker{
 		invoiceService:   invoiceService,
 		cancelingService: cancelingService,
-		metricsService:   metricsService,
 		printingService:  printingService,
+		metricsService:   metricsService,
+		resultsService:   resultsService,
 		SS_API_BASE_URL:  SS_API_BASE_URL,
 	}
 }
@@ -140,6 +144,8 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	// TEMP!
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
+
+	log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -192,6 +198,8 @@ func (w *SiareBGWorker) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCan
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
+	log.Printf("Response got from ss-api: %v\n", string(body))
+
 	for _, err := range errs {
 		if err != nil {
 			log.Printf("Something went wrong with the request at /invoice/cancel for canceling with id %v: %v\n", invoiceCancel.ID, err)
@@ -236,6 +244,8 @@ func (w *SiareBGWorker) RequestInvoicePrinting(invoicePrint *models.InvoicePrint
 	// TEMP!
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
+
+	log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -282,15 +292,27 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 			Entity: query.Entity,
 		},
 		Query: &SSAPIMetricsRequestQuery{
-			StartDate: utils.FormatDateAsBR(query.StartDate),
-			EndDate:   utils.FormatDateAsBR(query.EndDate),
+			StartDate:      utils.FormatDateAsBR(query.StartDate),
+			EndDate:        utils.FormatDateAsBR(query.EndDate),
+			IncludeRecords: true,
 		},
 	}
 
+	queryString := fmt.Sprintf(
+		"start_date=%v&end_date=%v",
+		reqData.Query.StartDate, reqData.Query.EndDate,
+	)
+
+	if reqData.Query.IncludeRecords {
+		queryString += fmt.Sprintf("&include_records=%v", reqData.Query.IncludeRecords)
+	}
+
 	agent := fiber.Get(w.SS_API_BASE_URL + "/metrics")
-	agent.QueryString(fmt.Sprintf("start_date=%v&end_date=%v", reqData.Query.StartDate, reqData.Query.EndDate))
+	agent.QueryString(queryString)
 	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
+
+	log.Printf("Response got from ss-api: %v\n", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -308,12 +330,20 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		response.ReqMsg = fmt.Sprintf("%s\n%s", response.ReqMsg, formatMetricsErrs(&response))
 	}
 
-	query.Results = response.MetricsResult
+	query.MetricsResult = response.MetricsResult
 
 	if err == nil {
 		err = w.metricsService.UpdateMetrics(ctx, query)
 		if err != nil {
 			log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
+		}
+		err = w.resultsService.BulkCreateResults(ctx, query.Months, "month", query.ID, query.CreatedBy, query.Entity.ID)
+		if err != nil {
+			log.Printf("Something went wrong when creating metrics monthly results. Metrics query with id %v will have no monthly results: %v\n", query.ID, err)
+		}
+		err = w.resultsService.BulkCreateResults(ctx, query.Records, "record", query.ID, query.CreatedBy, query.Entity.ID)
+		if err != nil {
+			log.Printf("Something went wrong when creating metrics results by individual record. Metrics query with id %v will have no invidual record results: %v\n", query.ID, err)
 		}
 	}
 

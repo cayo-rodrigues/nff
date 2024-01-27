@@ -6,6 +6,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from constants.standards import FALSY_STRS, TRUTHY_STRS
 from .exceptions import NFFBaseException
 
+locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
+
 
 def str_to_boolean(value: str | None) -> bool | None:
     normalized_value = normalize_text(value)
@@ -62,7 +64,6 @@ def to_BRL(
         value = float(value)
     except (ValueError, TypeError):
         value = 0.0
-    locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
     return locale.currency(value, symbol=symbol, grouping=grouping)
 
 

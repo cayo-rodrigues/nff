@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -15,6 +15,7 @@ from models import (
     InvoicePrinting,
     InvoiceQuery,
 )
+from models.invoice_query import InvoiceQueryResults
 from utils.helpers import (
     binary_search_html,
     from_BRL_to_float,
@@ -446,33 +447,77 @@ class Siare(Browser):
 
         return None
 
-    def process_invoice_query_row(self, row: WebElement, query: InvoiceQuery):
+    def process_invoice_query_row(
+        self, row: WebElement, results: InvoiceQueryResults, entity: Entity
+    ):
         data = self.filter_elements(By.TAG_NAME, "td", row)
         invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
         invoice_value = from_BRL_to_float(data[-2].text)
 
-        is_income = query.entity.ie == invoice_sender_ie
+        is_income = entity.ie == invoice_sender_ie
         if is_income:
-            query.results.total_income += invoice_value
-            query.results.positive_entries += 1
+            results.total_income += invoice_value
+            results.positive_entries += 1
         else:
-            query.results.total_expenses += invoice_value
-            query.results.negative_entries += 1
+            results.total_expenses += invoice_value
+            results.negative_entries += 1
 
-    def aggregate_invoice_query_results(self, query: InvoiceQuery):
+        if results.include_records:
+            self.include_individual_record(results, data, is_income, invoice_value)
+
+    def include_individual_record(
+        self,
+        results: InvoiceQueryResults,
+        row_data: list[WebElement],
+        is_income: bool,
+        invoice_value: float,
+    ):
+        raw_issue_date = normalize_text(row_data[5].text)
+        formated_issue_date = datetime.strptime(raw_issue_date, "%d/%m/%Y").strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+
+        invoice_id = normalize_text(row_data[1].text)
+
+        individual_record = InvoiceQueryResults(
+            issue_date=formated_issue_date,
+            is_child=True,
+            kind="record",
+            invoice_id=invoice_id,
+        )
+
+        if is_income:
+            individual_record.total_income = invoice_value
+        else:
+            individual_record.total_expenses = invoice_value
+
+        individual_record.do_the_math()
+        individual_record.format_values()
+
+        results.records.append(individual_record)
+        results.json_serializable_records.append(
+            individual_record.json_serializable_format()
+        )
+
+    def aggregate_invoice_query_results(
+        self, results: InvoiceQueryResults, entity: Entity
+    ):
         while True:
             xpath = XPaths.QUERY_INVOICE_RESULTS_TBODY
             tbody = self.get_element_when_exists(xpath)
 
             rows = self.filter_elements(By.TAG_NAME, "tr", tbody)
             for row in rows:
-                self.process_invoice_query_row(row, query)
+                self.process_invoice_query_row(row, results, entity)
+
+            # upload all files to s3 (also concurrent)
 
             xpath = XPaths.QUERY_INVOICE_RESULTS_CURRENT_PAGE
             current_page = int(self.get_element(xpath).text)
 
             xpath = XPaths.QUERY_INVOICE_RESULTS_INFO_DATA
-            total_pages = int(self.get_element(xpath).text.split(" ")[-3])
+            results_info_data = self.get_element(xpath).text.split(" ")
+            total_pages = int(results_info_data[-3])
 
             if current_page < total_pages:
                 xpath = XPaths.QUERY_INVOICE_RESULTS_NEXT_PAGE

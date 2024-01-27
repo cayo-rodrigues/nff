@@ -62,12 +62,12 @@ func callNextAndSetCache(c *fiber.Ctx) error {
 	bodyBytes := response.Body()
 	headersBytes := response.Header.Header()
 
-	err := db.Redis.Set(c.Context(), bodyKey, bodyBytes, time.Minute).Err()
+	err := db.Redis.Set(c.Context(), bodyKey, bodyBytes, time.Hour).Err()
 	if err != nil {
 		log.Println("Error trying to set response body cache:", err)
 	}
 
-	err = db.Redis.Set(c.Context(), headersKey, headersBytes, time.Minute).Err()
+	err = db.Redis.Set(c.Context(), headersKey, headersBytes, time.Hour).Err()
 	if err != nil {
 		log.Println("Error trying to set response headers cache:", err)
 	}
@@ -83,6 +83,9 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 	}
 
 	userID, _, namespace := getKeyFactors(c)
+	if namespace == "entities" {
+		namespace = "*" // all other routes use entities, so we gotta clear all pages cache in this case
+	}
 	cacheStatus := utils.ClearCache(c.Context(), userID, namespace)
 
 	c.Response().Header.Set("X-Cache", cacheStatus)

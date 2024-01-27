@@ -1,4 +1,4 @@
-{{ define "partials/invoice-form" }}
+{{ define "partials/forms/invoice-form" }}
 
 <form id="invoice-form">
     <div class="flex items-center gap-6 border-b border-gray-300 bg-white pb-2">
@@ -150,16 +150,23 @@
                     <strong>Total de itens:</strong>
                     <span id="items-count"></span>
                 </div>
-                <div>
-                    <button id="expand-or-shrink-dialog-btn" class="rounded bg-gray-200 px-4 py-3 font-bold hover:bg-gray-300 active:bg-gray-400" type="button"
+                <div class="flex gap-2">
+                    <button id="expand-or-shrink-dialog-btn" class="rounded bg-gray-200 px-4 py-3 hover:bg-gray-300 active:bg-gray-400" type="button"
                         onclick="expandOrShrinkDialog('invoice-items-dialog', this)">
                         <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M32 32C14.3 32 0 46.3 0 64v96c0 17.7 14.3 32 32 32s32-14.3 32-32V96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H64V352zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32h64v64c0 17.7 14.3 32 32 32s32-14.3 32-32V64c0-17.7-14.3-32-32-32H320zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v64H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32V352z"/></svg>
+                    </button>
+
+                    <button onclick="this.closest('dialog').close()" class="rounded px-4 py-3 transition-colors bg-gray-200 hover:bg-gray-300 active:bg-gray-400" type="button">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
+                            <path
+                                    d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                        </svg>
                     </button>
                 </div>
             </div>
 
             {{ range .Invoice.Items }}
-                {{ template "partials/invoice-form-item-section" . }}
+                {{ template "partials/forms/invoice-form-item-section" . }}
             {{ end }}
         </dialog>
     </section>

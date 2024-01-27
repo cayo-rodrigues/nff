@@ -32,32 +32,44 @@ type MetricsQuery struct {
 	Entity    *Entity
 	StartDate time.Time
 	EndDate   time.Time
-	Results   *MetricsResult
 	CreatedBy int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Errors    *MetricsFormErrors
+	*MetricsResult
 }
 
 type MetricsResult struct {
-	TotalIncome     string `json:"total_income"`
-	TotalExpenses   string `json:"total_expenses"`
-	AvgIncome       string `json:"average_income"`
-	AvgExpenses     string `json:"average_expenses"`
-	Diff            string `json:"diff"`
-	IsPositive      bool   `json:"is_positive"`
-	TotalRecords    int    `json:"total_records"`
-	PositiveRecords int    `json:"positive_records"`
-	NegativeRecords int    `json:"negative_records"`
-	ReqStatus       string `json:"status"`
-	ReqMsg          string `json:"msg"`
+	ID              int
+	Type            string           `json:"type"`
+	TotalIncome     string           `json:"total_income"`
+	TotalExpenses   string           `json:"total_expenses"`
+	AvgIncome       string           `json:"average_income"`
+	AvgExpenses     string           `json:"average_expenses"`
+	Diff            string           `json:"diff"`
+	IsPositive      bool             `json:"is_positive"`
+	TotalRecords    int              `json:"total_records"`
+	PositiveRecords int              `json:"positive_records"`
+	NegativeRecords int              `json:"negative_records"`
+	ReqStatus       string           `json:"status"`
+	ReqMsg          string           `json:"msg"`
+	MonthName       string           `json:"month_name"`
+	InvoiceNumber   string           `json:"invoice_id"`
+	InvoicePDF      string           `json:"invoice_pdf"`
+	IssueDate       time.Time        `json:"issue_date"`
+	Months          []*MetricsResult `json:"months"`
+	Records         []*MetricsResult `json:"records"`
+	MetricsID       int
+	EntityID        int
+	CreatedBy       int
+	CreatedAt       time.Time
 }
 
 func NewEmptyMetricsQuery() *MetricsQuery {
 	return &MetricsQuery{
-		Entity:  NewEmptyEntity(),
-		Results: &MetricsResult{},
-		Errors:  &MetricsFormErrors{},
+		Entity:        NewEmptyEntity(),
+		MetricsResult: &MetricsResult{},
+		Errors:        &MetricsFormErrors{},
 	}
 
 }
@@ -71,11 +83,12 @@ func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
 	if err != nil {
 		log.Println("Error converting input end date string to time.Time:", err)
 	}
+
 	return &MetricsQuery{
-		StartDate: startDate,
-		EndDate:   endDate,
-		Results:   &MetricsResult{},
-		Errors:    &MetricsFormErrors{},
+		StartDate:     startDate,
+		EndDate:       endDate,
+		MetricsResult: &MetricsResult{},
+		Errors:        &MetricsFormErrors{},
 	}
 }
 
@@ -110,10 +123,10 @@ func (q *MetricsQuery) IsValid() bool {
 func (q *MetricsQuery) Scan(rows db.Scanner) error {
 	return rows.Scan(
 		&q.ID, &q.StartDate, &q.EndDate,
-		&q.Results.TotalIncome, &q.Results.TotalExpenses, &q.Results.AvgIncome,
-		&q.Results.AvgExpenses, &q.Results.Diff, &q.Results.IsPositive,
-		&q.Results.TotalRecords, &q.Results.PositiveRecords, &q.Results.NegativeRecords,
-		&q.Results.ReqStatus, &q.Results.ReqMsg, &q.Entity.ID,
+		&q.TotalIncome, &q.TotalExpenses, &q.AvgIncome,
+		&q.AvgExpenses, &q.Diff, &q.IsPositive,
+		&q.TotalRecords, &q.PositiveRecords, &q.NegativeRecords,
+		&q.ReqStatus, &q.ReqMsg, &q.Entity.ID,
 		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
 	)
 }
@@ -121,14 +134,33 @@ func (q *MetricsQuery) Scan(rows db.Scanner) error {
 func (q *MetricsQuery) FullScan(rows db.Scanner) error {
 	return rows.Scan(
 		&q.ID, &q.StartDate, &q.EndDate,
-		&q.Results.TotalIncome, &q.Results.TotalExpenses, &q.Results.AvgIncome,
-		&q.Results.AvgExpenses, &q.Results.Diff, &q.Results.IsPositive,
-		&q.Results.TotalRecords, &q.Results.PositiveRecords, &q.Results.NegativeRecords,
-		&q.Results.ReqStatus, &q.Results.ReqMsg, &q.Entity.ID,
+		&q.TotalIncome, &q.TotalExpenses, &q.AvgIncome,
+		&q.AvgExpenses, &q.Diff, &q.IsPositive,
+		&q.TotalRecords, &q.PositiveRecords, &q.NegativeRecords,
+		&q.ReqStatus, &q.ReqMsg, &q.Entity.ID,
 		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
 
 		&q.Entity.ID, &q.Entity.Name, &q.Entity.UserType, &q.Entity.CpfCnpj, &q.Entity.Ie, &q.Entity.Email, &q.Entity.Password,
 		&q.Entity.Address.PostalCode, &q.Entity.Address.Neighborhood, &q.Entity.Address.StreetType, &q.Entity.Address.StreetName, &q.Entity.Address.Number,
 		&q.Entity.CreatedBy, &q.Entity.CreatedAt, &q.Entity.UpdatedAt,
 	)
+}
+
+func (r *MetricsResult) Scan(rows db.Scanner) error {
+	var issueDate any
+
+	err := rows.Scan(
+		&r.ID, &r.Type, &r.MonthName,
+		&r.TotalIncome, &r.TotalExpenses, &r.AvgIncome,
+		&r.AvgExpenses, &r.Diff, &r.IsPositive,
+		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
+		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
+		&issueDate, &r.InvoiceNumber, &r.EntityID,
+	)
+
+	if v, ok := issueDate.(time.Time); ok {
+		r.IssueDate = v
+	}
+
+	return err
 }

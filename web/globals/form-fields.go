@@ -2,11 +2,17 @@ package globals
 
 // ENTITIES
 
-var EntityUserTypes = [2]string{
+type SiareUserTypes [3]string
+
+var EntityUserTypes = SiareUserTypes{
 	"Produtor Rural",
+	"Inscrição Estadual",
 	"Apenas Destinatário",
 }
-var EntityAddressStreetTypes = [3]string{
+
+type SiareAddressStreetTypes [3]string
+
+var EntityAddressStreetTypes = SiareAddressStreetTypes{
 	"Rua",
 	"Estrada",
 	"Avenida",
@@ -14,12 +20,16 @@ var EntityAddressStreetTypes = [3]string{
 
 // INVOICE
 
-var InvoiceOperations = [2]string{
+type SiareInvoiceOperations [2]string
+
+var InvoiceOperations = SiareInvoiceOperations{
 	"VENDA",
 	"REMESSA",
 }
 
-var InvoiceCfops = [14]int{
+type SiareInvoiceCfops [14]int
+
+var InvoiceCfops = SiareInvoiceCfops{
 	5101,
 	5102,
 	5103,
@@ -36,7 +46,9 @@ var InvoiceCfops = [14]int{
 	5551,
 }
 
-var InvoiceIcmsOptions = [3]string{
+type SiareInvoiceIcmsOptions [3]string
+
+var InvoiceIcmsOptions = SiareInvoiceIcmsOptions{
 	"Sim",
 	"Não",
 	"Isento",
@@ -53,14 +65,18 @@ var InvoiceBooleanField = BooleanField{
 	"Não",
 }
 
-var InvoiceIDTypes = [2]string{
+type SiareInvoiceIDTypes [2]string
+
+var InvoiceIDTypes = SiareInvoiceIDTypes{
 	"Número da NFA",
 	"Protocolo",
 }
 
 // INVOICE ITEMS
 
-var InvoiceItemGroups = [82]string{
+type SiareInvoiceItemGroups [82]string
+
+var InvoiceItemGroups = SiareInvoiceItemGroups{
 	"Adubo",
 	"Algodão",
 	"Animais silvestres",
@@ -145,13 +161,17 @@ var InvoiceItemGroups = [82]string{
 	"Suplementos",
 }
 
-var InvoiceItemOrigins = [3]string{
+type SiareInvoiceItemOrigins [3]string
+
+var InvoiceItemOrigins = SiareInvoiceItemOrigins{
 	"Nacional",
 	"Estrangeira - Importação direta",
 	"Estrangeira - Adquirida no mercado interno",
 }
 
-var InvoiceItemUnitiesOfMeaasurement = [23]string{
+type SiareUnitiesOfMeasurement [23]string
+
+var InvoiceItemUnitiesOfMeaasurement = SiareUnitiesOfMeasurement{
 	"CB",
 	"CT",
 	"CX",

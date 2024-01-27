@@ -15,13 +15,11 @@ import (
 )
 
 type PrintingService struct {
-	entityService interfaces.EntityService
 	filtersService interfaces.FiltersService
 }
 
-func NewPrintingService(entityService interfaces.EntityService, filtersService interfaces.FiltersService) *PrintingService {
+func NewPrintingService(filtersService interfaces.FiltersService) *PrintingService {
 	return &PrintingService{
-		entityService: entityService,
 		filtersService: filtersService,
 	}
 }

@@ -1,5 +1,5 @@
 <section>
-    {{ template "partials/invoice-form" . }}
+    {{ template "partials/forms/invoice-form" . }}
 </section>
 
 <section class="pt-6" id="requests-overview-section">
@@ -7,7 +7,7 @@
     <div class="flex flex-col justify-between md:flex-row">
         <h3 class="text-xl font-semibold">Requerimentos</h3>
 
-        {{ template "partials/request-card-filters-form" . }}
+        {{ template "partials/forms/request-card-filters-form" . }}
     </div>
 
     {{ template "partials/requests-overview" .Invoices }}

@@ -30,9 +30,9 @@ type InvoiceFormError struct {
 type InvoiceSelectFields struct {
 	Entities     []*Entity
 	BooleanField *globals.BooleanField
-	Cfops        *[14]int
-	Operations   *[2]string
-	IcmsOptions  *[3]string
+	Cfops        *globals.SiareInvoiceCfops
+	Operations   *globals.SiareInvoiceOperations
+	IcmsOptions  *globals.SiareInvoiceIcmsOptions
 }
 
 func NewInvoiceSelectFields() *InvoiceSelectFields {

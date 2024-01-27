@@ -1,9 +1,10 @@
 import json
+import sys
 import traceback
 
 import handlers
-from utils.helpers import error_response
 from utils.exceptions import UnexpectedError
+from utils.helpers import error_response
 
 
 def main(event: dict, _):
@@ -25,7 +26,8 @@ def main(event: dict, _):
         elif path == "/metrics" and method == "GET":
             response, status_code = handlers.metrics_handler(data={**query, **body})
 
-    except Exception:
+    except:
+        print(f"Something went wrong:", file=sys.stderr)
         traceback.print_exc()
         response, status_code = error_response(UnexpectedError())
 

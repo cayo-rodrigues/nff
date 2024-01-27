@@ -15,16 +15,23 @@ import (
 )
 
 type MetricsPage struct {
-	service       interfaces.MetricsService
-	entityService interfaces.EntityService
-	siareBGWorker interfaces.SiareBGWorker
+	service         interfaces.MetricsService
+	entityService   interfaces.EntityService
+	printingService interfaces.PrintingService
+	siareBGWorker   interfaces.SiareBGWorker
 }
 
-func NewMetricsPage(service interfaces.MetricsService, entityService interfaces.EntityService, siareBGWorker interfaces.SiareBGWorker) *MetricsPage {
+func NewMetricsPage(
+	service interfaces.MetricsService,
+	entityService interfaces.EntityService,
+	printingService interfaces.PrintingService,
+	siareBGWorker interfaces.SiareBGWorker,
+) *MetricsPage {
 	return &MetricsPage{
-		entityService: entityService,
-		service:       service,
-		siareBGWorker: siareBGWorker,
+		service:         service,
+		entityService:   entityService,
+		printingService: printingService,
+		siareBGWorker:   siareBGWorker,
 	}
 }
 
@@ -165,7 +172,7 @@ func (p *MetricsPage) GetMetricsForm(c *fiber.Ctx) error {
 	pageData.MetricsQuery = query
 
 	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
-	return c.Render("partials/metrics-form", pageData)
+	return c.Render("partials/forms/metrics-form", pageData)
 }
 
 func (p *MetricsPage) GetRequestStatus(c *fiber.Ctx) error {
@@ -207,4 +214,36 @@ func (p *MetricsPage) FilterRequests(c *fiber.Ctx) error {
 	}
 
 	return c.Render("partials/requests-overview", invoices)
+}
+
+func (p *MetricsPage) PrintInvoice(c *fiber.Ctx) error {
+	userID := c.Locals("UserID").(int)
+
+	entityID, err := strconv.Atoi(c.Query("entity_id"))
+	if err != nil {
+		log.Println("Error converting entity id from string to int: ", err)
+		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
+	}
+
+	entity, err := p.entityService.RetrieveEntity(c.Context(), entityID, userID)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	invoiceNumber := c.Query("invoice_id")
+
+	invoicePrint := models.NewEmptyInvoicePrint()
+	invoicePrint.InvoiceIDType = globals.InvoiceIDTypes[0]
+	invoicePrint.InvoiceID = invoiceNumber
+	invoicePrint.Entity = entity
+	invoicePrint.CreatedBy = userID
+
+	err = p.printingService.CreateInvoicePrinting(c.Context(), invoicePrint)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
+	p.siareBGWorker.RequestInvoicePrinting(invoicePrint)
+
+	return c.Render("partials/request-card-metrics-results-details-download-invoice-button", invoicePrint)
 }

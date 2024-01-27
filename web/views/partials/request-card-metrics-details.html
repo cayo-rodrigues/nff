@@ -1,0 +1,65 @@
+{{ define "partials/request-card-metrics-details" }}
+    <section class="mt-4 rounded border border-gray-400">
+        <header
+            onclick="toggleAccordion('total-metrics-results', 'chevron-total')"
+            class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 active:bg-gray-200"
+        >
+            <h3 class="text-xl">Geral</h3>
+            <svg id="chevron-total" xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+        </header>
+
+        <ul id="total-metrics-results" class="hidden flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+            {{ template "partials/request-card-metrics-results-details" . }}
+        </ul>
+
+    </section>
+
+    <section class="mt-4 rounded border border-gray-400">
+        <header
+            onclick="toggleAccordion('monthly-metrics-results', 'chevron-monthly')"
+            class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 active:bg-gray-200"
+        >
+            <h3 class="text-xl">Mensal</h3>
+            <svg id="chevron-monthly" xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+        </header>
+
+        <ul id="monthly-metrics-results" class="hidden flex-col gap-4 px-4 py-4">
+            {{ range .Months }}
+                <li>
+                    <h4 class="text-lg">{{ .MonthName }}</h4>
+                    <ul class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+                        {{ template "partials/request-card-metrics-results-details" . }}
+                    </ul>
+                    <hr>
+                </li>
+            {{ else }}
+                Nada por aqui :)
+            {{ end }}
+        </ul>
+
+    </section>
+
+    <section class="mt-4 rounded border border-gray-400">
+        <header
+            onclick="toggleAccordion('by-record-metrics-results', 'chevron-by-record')"
+            class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 p-4 transition-colors hover:bg-gray-100 active:bg-gray-200"
+        >
+            <h3 class="text-xl">Individual</h3>
+            <svg id="chevron-by-record" xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><path d="M201.4 342.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 274.7 86.6 137.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+        </header>
+
+        <ul id="by-record-metrics-results" class="hidden flex-col gap-4 px-4 py-4">
+            {{ range .Records }}
+                <li>
+                    <h4 class="text-lg">NFA - {{ .InvoiceNumber }}</h4>
+                    <ul class="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:gap-x-0">
+                        {{ template "partials/request-card-metrics-results-details" . }}
+                    </ul>
+                    <hr>
+                </li>
+            {{ else }}
+                Nada por aqui :)
+            {{ end }}
+        </ul>
+    </section>
+{{ end }}

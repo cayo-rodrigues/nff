@@ -15,14 +15,12 @@ import (
 )
 
 type InvoiceService struct {
-	entityService  interfaces.EntityService
 	itemsService   interfaces.ItemsService
 	filtersService interfaces.FiltersService
 }
 
-func NewInvoiceService(entityService interfaces.EntityService, itemsService interfaces.ItemsService, filtersService interfaces.FiltersService) *InvoiceService {
+func NewInvoiceService(itemsService interfaces.ItemsService, filtersService interfaces.FiltersService) *InvoiceService {
 	return &InvoiceService{
-		entityService:  entityService,
 		itemsService:   itemsService,
 		filtersService: filtersService,
 	}
@@ -52,13 +50,6 @@ func (s *InvoiceService) ListInvoices(ctx context.Context, userID int, filters m
 			log.Println("Error scaning invoice rows: ", err)
 			return nil, utils.InternalServerErr
 		}
-
-		items, err := s.itemsService.ListInvoiceItems(ctx, invoice.ID, invoice.CreatedBy)
-		if err != nil {
-			log.Println("Error linking invoice to items: ", err)
-			return nil, utils.InternalServerErr
-		}
-		invoice.Items = items
 
 		invoices = append(invoices, invoice)
 	}

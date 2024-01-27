@@ -8,13 +8,13 @@
                     <th class="flex-1 text-center">Nome</th>
                     <th class="flex-1 text-center">CPF/CNPJ</th>
                     <th class="hidden flex-1 text-center sm:block">IE</th>
-                    <th class="hidden flex-1 text-center sm:block">Bairro</th>
+                    <th class="hidden flex-1 text-center sm:block">Tipo</th>
                 </tr>
             </thead>
             {{ template "partials/entity-list" . }}
         </table>
     </section>
     <aside class="xl:w-2/5">
-        {{ template "partials/entity-form" . }}
+        {{ template "partials/forms/entity-form" . }}
     </aside>
 </div>

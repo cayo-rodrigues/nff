@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+   min-width: 0;
+}
+
 .hx-indicator {
     display: none;
     transition: all 500ms ease-in;

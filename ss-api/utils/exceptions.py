@@ -59,7 +59,7 @@ class CouldNotFinishQueryError(NFFBaseException):
 
 
 class DownloadTimeoutError(NFFBaseException):
-    msg = ErrorMessages.DOWNLOAD_TIMEOUT
+    msg = ErrorMessages.DOWNLOAD_ERROR
     status_code = 418  # I'm a teapot
 
 

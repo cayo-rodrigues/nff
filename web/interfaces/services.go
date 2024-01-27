@@ -53,6 +53,11 @@ type MetricsService interface {
 	UpdateMetrics(ctx context.Context, query *models.MetricsQuery) error
 }
 
+type MetricsResultService interface {
+	ListResults(ctx context.Context, metricsID int, userID int) ([]*models.MetricsResult, error)
+	BulkCreateResults(ctx context.Context, results []*models.MetricsResult, resultType string, metricsID, userID, entityID int) error
+}
+
 type FiltersService interface {
 	BuildQueryFilters(query *strings.Builder, filters map[string]string, userID int, table string) []interface{}
 }

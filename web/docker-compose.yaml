@@ -11,6 +11,7 @@ services:
       - DB_URL=postgres://nff:nff@db:5432/nff
       - REDIS_URL=redis://rdb:6379/0
       - SS_API_BASE_URL=
+      - START_FRESH=true
     ports:
       - 8080:8080
     volumes:

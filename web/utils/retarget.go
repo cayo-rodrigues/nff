@@ -13,7 +13,7 @@ func RetargetResponse(c *fiber.Ctx, tmplName string, tmplData any, hxTarget stri
 }
 
 func RetargetToForm(c *fiber.Ctx, resourceName string, tmplData any) error {
-	tmplName := fmt.Sprintf("partials/%s-form", resourceName)
+	tmplName := fmt.Sprintf("partials/forms/%s-form", resourceName)
 	hxTarget := fmt.Sprintf("#%s-form", resourceName)
 	return RetargetResponse(c, tmplName, tmplData, hxTarget, "outerHTML")
 }
