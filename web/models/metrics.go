@@ -28,14 +28,14 @@ type MetricsFormErrors struct {
 }
 
 type MetricsQuery struct {
-	ID             int
-	Entity         *Entity
-	StartDate      time.Time
-	EndDate        time.Time
-	CreatedBy      int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	Errors         *MetricsFormErrors
+	ID        int
+	Entity    *Entity
+	StartDate time.Time
+	EndDate   time.Time
+	CreatedBy int
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Errors    *MetricsFormErrors
 	*MetricsResult
 }
 
@@ -55,10 +55,12 @@ type MetricsResult struct {
 	ReqMsg          string           `json:"msg"`
 	MonthName       string           `json:"month_name"`
 	InvoiceNumber   string           `json:"invoice_id"`
+	InvoicePDF      string           `json:"invoice_pdf"`
 	IssueDate       time.Time        `json:"issue_date"`
 	Months          []*MetricsResult `json:"months"`
 	Records         []*MetricsResult `json:"records"`
 	MetricsID       int
+	EntityID        int
 	CreatedBy       int
 	CreatedAt       time.Time
 }
@@ -83,10 +85,10 @@ func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
 	}
 
 	return &MetricsQuery{
-		StartDate:      startDate,
-		EndDate:        endDate,
-		MetricsResult:  &MetricsResult{},
-		Errors:         &MetricsFormErrors{},
+		StartDate:     startDate,
+		EndDate:       endDate,
+		MetricsResult: &MetricsResult{},
+		Errors:        &MetricsFormErrors{},
 	}
 }
 
@@ -153,7 +155,7 @@ func (r *MetricsResult) Scan(rows db.Scanner) error {
 		&r.AvgExpenses, &r.Diff, &r.IsPositive,
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
-		&issueDate, &r.InvoiceNumber,
+		&issueDate, &r.InvoiceNumber, &r.EntityID,
 	)
 
 	if v, ok := issueDate.(time.Time); ok {

@@ -337,11 +337,11 @@ func (w *SiareBGWorker) GetMetrics(query *models.MetricsQuery) {
 		if err != nil {
 			log.Printf("Something went wrong when updating metrics history. Metrics query with id %v will be on 'pending' state for ever: %v\n", query.ID, err)
 		}
-		err = w.resultsService.BulkCreateResults(ctx, query.Months, "month", query.ID, query.CreatedBy)
+		err = w.resultsService.BulkCreateResults(ctx, query.Months, "month", query.ID, query.CreatedBy, query.Entity.ID)
 		if err != nil {
 			log.Printf("Something went wrong when creating metrics monthly results. Metrics query with id %v will have no monthly results: %v\n", query.ID, err)
 		}
-		err = w.resultsService.BulkCreateResults(ctx, query.Records, "record", query.ID, query.CreatedBy)
+		err = w.resultsService.BulkCreateResults(ctx, query.Records, "record", query.ID, query.CreatedBy, query.Entity.ID)
 		if err != nil {
 			log.Printf("Something went wrong when creating metrics results by individual record. Metrics query with id %v will have no invidual record results: %v\n", query.ID, err)
 		}

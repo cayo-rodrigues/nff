@@ -74,7 +74,7 @@ func main() {
 	entitiesPage := handlers.NewEntitiesPage(entityService)
 	invoicesPage := handlers.NewInvoicesPage(invoiceService, entityService, siareBGWorker)
 	cancelInvoicesPage := handlers.NewCancelInvoicesPage(cancelingService, entityService, siareBGWorker)
-	metricsPage := handlers.NewMetricsPage(metricsService, entityService, siareBGWorker)
+	metricsPage := handlers.NewMetricsPage(metricsService, entityService, printingService, siareBGWorker)
 	printInvoicesPage := handlers.NewPrintInvoicesPage(printingService, entityService, siareBGWorker)
 
 	app := fiber.New(fiber.Config{
@@ -136,6 +136,7 @@ func main() {
 	app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)
 	app.Get("/metrics/:id/request-card-status", metricsPage.GetRequestStatus)
 	app.Get("/metrics/request-card-filter", metricsPage.FilterRequests)
+	app.Get("/metrics/results/records/print", metricsPage.PrintInvoice)
 
 	err := app.Listen(":" + PORT)
 	if err != nil {

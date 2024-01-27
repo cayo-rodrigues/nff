@@ -10,7 +10,7 @@
             <strong>Data de emissão</strong>: <span> {{ FormatDateAsBR .IssueDate }} </span>
         </li>
         <li class="sm:w-1/2">
-            <strong>Baixar NFA</strong>: <a class="cursor-pointer text-blue-700 underline"> (em breve) </a>
+            {{ template "partials/request-card-metrics-results-details-download-invoice-button" . }}
         </li>
 
     {{ else }}

@@ -55,7 +55,7 @@ type MetricsService interface {
 
 type MetricsResultService interface {
 	ListResults(ctx context.Context, metricsID int, userID int) ([]*models.MetricsResult, error)
-	BulkCreateResults(ctx context.Context, results []*models.MetricsResult, resultType string, metricsID int, userID int) error
+	BulkCreateResults(ctx context.Context, results []*models.MetricsResult, resultType string, metricsID, userID, entityID int) error
 }
 
 type FiltersService interface {

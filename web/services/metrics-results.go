@@ -36,19 +36,20 @@ func (s *MetricsResultService) ListResults(ctx context.Context, metricsID int, u
 	return results, nil
 }
 
-func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []*models.MetricsResult, resultType string, metricsID int, userID int) error {
+func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []*models.MetricsResult, resultType string, metricsID, userID, entityID int) error {
 	rows := [][]interface{}{}
 	for _, result := range results {
 		result.MetricsID = metricsID
 		result.CreatedBy = userID
 		result.Type = resultType
+		result.EntityID = entityID
 
 		rows = append(rows, []interface{}{
 			result.Type, result.MonthName, result.TotalIncome, result.TotalExpenses,
 			result.AvgIncome, result.AvgExpenses, result.Diff, result.IsPositive,
 			result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
 			result.MetricsID, result.CreatedBy,
-			result.IssueDate, result.InvoiceNumber,
+			result.IssueDate, result.InvoiceNumber, result.EntityID,
 		})
 	}
 	_, err := db.PG.CopyFrom(
@@ -59,7 +60,7 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 			"avg_income", "avg_expenses", "diff", "is_positive",
 			"total_records", "positive_records", "negative_records",
 			"metrics_id", "created_by",
-			"issue_date", "invoice_id",
+			"issue_date", "invoice_id", "entity_id",
 		},
 		pgx.CopyFromRows(rows),
 	)
