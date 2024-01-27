@@ -37,7 +37,7 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [ ] Gerenciamento de modelos de nota fiscal
 - [ ] Cancelamento de NF através do protocolo
 - [ ] Login/Cadastro com Google
-- [ ] Bom uso de cache
+- [x] Bom uso de cache
 - [ ] DNS e HTTPS
-- [ ] Agregar métricas por mês
+- [x] Agregar métricas por mês
 - [ ] Emissão de Notas Fiscais Especiais
