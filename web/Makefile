@@ -1,6 +1,7 @@
 USER := postgres
 PWD :=
 ENDPOINT := nff-db.ckwjgza1fp4o.sa-east-1.rds.amazonaws.com
+PORT := 5432
 DB_NAME := nff
 
 DIR_PATH := db/migrations
@@ -10,7 +11,7 @@ TAILWIND_INPUT := ./static/styles/custom.css
 TAILWIND_OUTPUT := ./static/styles/tailwind.css
 
 rds:
-	docker run -it --rm -e PGPASSWORD=$(PWD) postgres psql "postgres://$(USER)@$(ENDPOINT):5432/$(DB_NAME)"
+	docker run -it --rm -e PGPASSWORD=$(PWD) postgres psql "postgres://$(USER)@$(ENDPOINT):$(PORT)/$(DB_NAME)"
 
 new_migration:
 	docker compose run -e CMD='create $(NAME) sql' migrations
