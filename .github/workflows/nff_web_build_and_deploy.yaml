@@ -34,12 +34,21 @@ jobs:
           docker push $WEB_IMAGE_TAG
           docker push $MIGRATIONS_IMAGE_TAG
 
+  migrate:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
+      RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
+    steps:
+      - name: Apply migrations
+        run: docker run -e CMD=up -e DB_URL=$RDS_DB_URL $MIGRATIONS_IMAGE_TAG
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
     env:
       WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
-      MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
       PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
@@ -56,12 +65,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
             sudo docker system prune -af --volumes &&
-            sudo docker run \
-              --rm \
-              --name nff-migrations \
-              -e CMD=up \
-              -e DB_URL=$RDS_DB_URL \
-              $MIGRATIONS_IMAGE_TAG &&
             sudo docker ps -q | xargs -r sudo docker stop &&
             sudo docker ps -q | xargs -r sudo docker rm &&
             sudo docker run \
