@@ -23,11 +23,13 @@ jobs:
       - name: Docker login
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build images
+      - name: Build project image
         working-directory: ./web
-        run: |
-          docker build -t $WEB_IMAGE_TAG .
-          docker build -t $MIGRATIONS_IMAGE_TAG -f Dockerfile.goose .
+        run: docker build -t $WEB_IMAGE_TAG .
+
+      - name: Build goose image
+        working-directory: ./web
+        run: docker build -t $MIGRATIONS_IMAGE_TAG -f Dockerfile.goose .
 
       - name: Push images to Docker Hub
         run: |
