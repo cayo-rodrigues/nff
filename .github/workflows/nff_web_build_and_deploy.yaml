@@ -34,7 +34,7 @@ jobs:
           docker push $WEB_IMAGE_TAG
           docker push $MIGRATIONS_IMAGE_TAG
 
-  migration:
+  migrate:
     needs: build
     runs-on: ubuntu-latest
     env:
