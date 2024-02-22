@@ -6,7 +6,7 @@ Este projeto tem o objetivo de automatizar processos repetitivos que funcionári
 
 ## Demonstração
 
-### [Clique aqui para ver o projeto em produção](http://ec2-18-230-92-247.sa-east-1.compute.amazonaws.com/)
+### [Clique aqui para ver o projeto em produção](http://ec2-52-67-84-134.sa-east-1.compute.amazonaws.com/)
 
 Pelo fato de por enquanto ainda não serem usados certificados ssl (https), o navegador pode exibir um aviso de `Não seguro`.
 
