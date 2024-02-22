@@ -45,7 +45,7 @@ jobs:
         run: docker run -e CMD=up -e DB_URL=$RDS_DB_URL $MIGRATIONS_IMAGE_TAG
 
   deploy:
-    needs: build
+    needs: migrate
     runs-on: ubuntu-latest
     env:
       WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
