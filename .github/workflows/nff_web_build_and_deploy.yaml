@@ -76,6 +76,7 @@ jobs:
               --detach \
               --name nff-web \
               -p 80:8080 \
+              -p 443:8080 \
               -p 8080:8080 \
               -e PORT=8080 \
               -e START_FRESH=true \
