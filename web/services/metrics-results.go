@@ -49,7 +49,7 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 			result.AvgIncome, result.AvgExpenses, result.Diff, result.IsPositive,
 			result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
 			result.MetricsID, result.CreatedBy,
-			result.IssueDate, result.InvoiceNumber, result.EntityID,
+			result.IssueDate, result.InvoiceID, result.EntityID, result.InvoicePDF,
 		})
 	}
 	_, err := db.PG.CopyFrom(
@@ -60,7 +60,7 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 			"avg_income", "avg_expenses", "diff", "is_positive",
 			"total_records", "positive_records", "negative_records",
 			"metrics_id", "created_by",
-			"issue_date", "invoice_id", "entity_id",
+			"issue_date", "invoice_id", "entity_id", "invoice_pdf",
 		},
 		pgx.CopyFromRows(rows),
 	)
@@ -69,5 +69,22 @@ func (s *MetricsResultService) BulkCreateResults(ctx context.Context, results []
 		return utils.InternalServerErr
 	}
 
+	return nil
+}
+
+func (s *MetricsResultService) UpdateResult(ctx context.Context, invoicePDFUrl string, resultID int, userID int) error {
+	result, err := db.PG.Exec(
+		ctx,
+		`UPDATE metrics_results SET invoice_pdf = $1 WHERE id = $2 AND created_by = $3`,
+		invoicePDFUrl, resultID, userID,
+	)
+	if err != nil {
+		log.Println("Error when running update metrics results query: ", err)
+		return utils.InternalServerErr
+	}
+	if result.RowsAffected() == 0 {
+		log.Printf("Metrics result with id %v not found when running update query", resultID)
+		return utils.MetricsNotFoundErr
+	}
 	return nil
 }

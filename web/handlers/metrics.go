@@ -9,20 +9,21 @@ import (
 	"github.com/cayo-rodrigues/nff/web/globals"
 	"github.com/cayo-rodrigues/nff/web/interfaces"
 	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 )
 
 type MetricsPage struct {
-	service         interfaces.MetricsService
+	service         *services.MetricsService
 	entityService   interfaces.EntityService
 	printingService interfaces.PrintingService
 	siareBGWorker   interfaces.SiareBGWorker
 }
 
 func NewMetricsPage(
-	service interfaces.MetricsService,
+	service *services.MetricsService,
 	entityService interfaces.EntityService,
 	printingService interfaces.PrintingService,
 	siareBGWorker interfaces.SiareBGWorker,
@@ -219,6 +220,11 @@ func (p *MetricsPage) FilterRequests(c *fiber.Ctx) error {
 func (p *MetricsPage) PrintInvoice(c *fiber.Ctx) error {
 	userID := c.Locals("UserID").(int)
 
+	resultID, err := strconv.Atoi(c.Query("result_id"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+
 	entityID, err := strconv.Atoi(c.Query("entity_id"))
 	if err != nil {
 		log.Println("Error converting entity id from string to int: ", err)
@@ -244,6 +250,9 @@ func (p *MetricsPage) PrintInvoice(c *fiber.Ctx) error {
 	}
 
 	p.siareBGWorker.RequestInvoicePrinting(invoicePrint)
+	fmt.Println("INVOICE PDF", invoicePrint.InvoicePDF)
+	p.service.ResultsService.UpdateResult(c.Context(), invoicePrint.InvoicePDF, resultID, userID)
 
+	c.Set("HX-Trigger-After-Settle", fmt.Sprintf(`"click": "download-invoice-%s"`, invoiceNumber))
 	return c.Render("partials/request-card-metrics-results-details-download-invoice-button", invoicePrint)
 }

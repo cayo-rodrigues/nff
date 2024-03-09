@@ -15,14 +15,14 @@ import (
 )
 
 type MetricsService struct {
-	resultsService interfaces.MetricsResultService
-	filtersService interfaces.FiltersService
+	ResultsService interfaces.MetricsResultService
+	FiltersService interfaces.FiltersService
 }
 
 func NewMetricsService(resultsService interfaces.MetricsResultService, filtersService interfaces.FiltersService) *MetricsService {
 	return &MetricsService{
-		resultsService: resultsService,
-		filtersService: filtersService,
+		ResultsService: resultsService,
+		FiltersService: filtersService,
 	}
 }
 
@@ -35,7 +35,7 @@ func (s *MetricsService) ListMetrics(ctx context.Context, userID int, filters ma
 			JOIN entities ON entities.id = metrics_history.entity_id
 	`)
 
-	params := s.filtersService.BuildQueryFilters(&query, filters, userID, "metrics_history")
+	params := s.FiltersService.BuildQueryFilters(&query, filters, userID, "metrics_history")
 
 	rows, _ := db.PG.Query(ctx, query.String(), params...)
 	defer rows.Close()
@@ -95,7 +95,7 @@ func (s *MetricsService) RetrieveMetrics(ctx context.Context, queryId int, userI
 		return nil, utils.InternalServerErr
 	}
 
-	results, err := s.resultsService.ListResults(ctx, query.ID, userID)
+	results, err := s.ResultsService.ListResults(ctx, query.ID, userID)
 	if err != nil {
 		log.Println("Error linking metrics to results: ", err)
 		return nil, utils.InternalServerErr
