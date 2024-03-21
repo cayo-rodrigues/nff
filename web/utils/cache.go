@@ -52,7 +52,6 @@ func GetDecodedCache(ctx context.Context, userID int, namespace string, dest int
 		return err
 	}
 
-	fmt.Printf("Returing %s cache at db level with success\n", namespace)
 	return nil
 }
 
@@ -73,7 +72,6 @@ func SetEncodedCache(ctx context.Context, userID int, namespace string, value in
 		return err
 	}
 
-	fmt.Printf("Set %s cache at db level with success\n", namespace)
 	return nil
 }
 
