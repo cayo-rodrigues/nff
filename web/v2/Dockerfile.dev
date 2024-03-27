@@ -1,0 +1,14 @@
+FROM golang:1.22
+
+RUN apt update -y && \
+    apt upgrade -y
+
+WORKDIR /home/app
+
+RUN go install github.com/cosmtrek/air@latest
+
+COPY . .
+
+RUN go mod vendor
+
+CMD [ "air" ]

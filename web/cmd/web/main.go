@@ -42,9 +42,9 @@ func main() {
 	store := db.GetSessionStore()
 	defer store.Storage.Close()
 
-    if START_FRESH {
-        utils.PurgeAllCachedData(context.Background())
-    }
+	if START_FRESH {
+		utils.PurgeAllCachedData(context.Background())
+	}
 
 	engine := html.New("views", ".html")
 
