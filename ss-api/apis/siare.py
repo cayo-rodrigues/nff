@@ -280,8 +280,10 @@ class Siare(Browser):
         self.wait_until_document_is_ready()
 
     def fill_invoice_transport_data(self):
-        xpath = XPaths.INVOICE_TRANSPORT_THIRD_PARTY_RADIO_INPUT
+        xpath = XPaths.INVOICE_TRANSPORT_HIRED_SHIPPING_TYPE_RADIO_INPUT
         self.get_and_click(xpath)
+
+        self.wait_until_document_is_ready()
 
         xpath = XPaths.INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE
         self.get_and_click(xpath)

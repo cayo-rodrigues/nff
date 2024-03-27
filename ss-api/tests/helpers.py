@@ -22,19 +22,16 @@ def get_sample(sample_id: str, sample_type: str):
         sys.exit()
 
 
-def perform_e2e_test(f):
-    def wrapper(*args, **kwargs):
-        start = datetime.now()
-        print("start:", start.time())
+def perform_e2e_test(f, *args, **kwargs):
+    start = datetime.now()
+    print("start:", start.time())
 
-        result, status_code = f(*args, **kwargs)
+    result, status_code = f(*args, **kwargs)
 
-        end = datetime.now()
-        print("end:", end.time())
+    end = datetime.now()
+    print("end:", end.time())
 
-        print("elapsed:", end - start)
+    print("elapsed:", end - start)
 
-        print("result:", json.dumps(result, indent=4))
-        print("status_code:", status_code)
-
-    return wrapper
+    print("result:", json.dumps(result, indent=4))
+    print("status_code:", status_code)

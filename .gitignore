@@ -14,4 +14,4 @@ tmp
 secrets.txt
 .serverless
 chromedriver-linux64*
-test_samples*
+ss-api/tests/samples.json

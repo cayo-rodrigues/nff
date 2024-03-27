@@ -14,4 +14,4 @@ def e2e_test(
         "entity": entity,
         "include_records": include_records,
     }
-    helpers.perform_e2e_test(handlers.metrics_handler)(metrics_handler_input)
+    helpers.perform_e2e_test(handlers.metrics_handler, metrics_handler_input)
