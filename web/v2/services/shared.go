@@ -1,14 +1,14 @@
-package models
+package services
 
-type Scanner interface {
+type scanner interface {
 	Scan(args ...any) error
 }
 
-type ScannableModel interface {
+type scannableModel interface {
 	Values() []any
 }
 
-func Scan(row Scanner, models ...ScannableModel) error {
+func scan(row scanner, models ...scannableModel) error {
 	values := []any{}
 	for _, model := range models {
 		values = append(values, model.Values()...)

@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/cayo-rodrigues/nff/web/database"
-	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -29,7 +28,7 @@ func main() {
 	defer db.Close()
 
 	if START_FRESH {
-		utils.PurgeAllCachedData(context.Background())
+		db.Redis.PurgeAllCachedData(context.Background())
 	}
 
 	app := fiber.New(fiber.Config{

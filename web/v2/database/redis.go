@@ -1,4 +1,4 @@
-package utils
+package database
 
 import (
 	"bytes"
@@ -8,24 +8,25 @@ import (
 	"log"
 	"time"
 
-	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/redis/go-redis/v9"
 )
 
-func ClearCache(ctx context.Context, userID int, namespace string) string {
+type Redis struct {
+	*redis.Client
+}
+
+func (r *Redis) ClearCache(ctx context.Context, userID int, namespace string) string {
 	keysPattern := fmt.Sprintf("*:%v:*:%v", userID, namespace)
 	cacheStatus := "cleared"
 
-	db := database.GetDB()
-
-	keys, err := db.Redis.Keys(ctx, keysPattern).Result()
+	keys, err := r.Keys(ctx, keysPattern).Result()
 	if err != nil {
 		log.Println("Error geting cache keys to clear:", err)
 		cacheStatus = "stale"
 	}
 
 	if keys != nil && len(keys) > 0 {
-		err := db.Redis.Del(ctx, keys...).Err()
+		err := r.Del(ctx, keys...).Err()
 		if err != nil {
 			log.Println("Error clearing cache keys:", err)
 			cacheStatus = "stale"
@@ -35,12 +36,10 @@ func ClearCache(ctx context.Context, userID int, namespace string) string {
 	return cacheStatus
 }
 
-func GetDecodedCache(ctx context.Context, userID int, namespace string, dest interface{}) error {
+func (r *Redis) GetDecodedCache(ctx context.Context, userID int, namespace string, dest interface{}) error {
 	key := fmt.Sprintf("db:%v:the-route-doesnt-matter-here:%v", userID, namespace)
 
-	db := database.GetDB()
-
-	cachedValue, err := db.Redis.Get(ctx, key).Bytes()
+	cachedValue, err := r.Get(ctx, key).Bytes()
 	if err == redis.Nil {
 		return err
 	}
@@ -59,7 +58,7 @@ func GetDecodedCache(ctx context.Context, userID int, namespace string, dest int
 	return nil
 }
 
-func SetEncodedCache(ctx context.Context, userID int, namespace string, value interface{}, exp time.Duration) error {
+func (r *Redis) SetEncodedCache(ctx context.Context, userID int, namespace string, value interface{}, exp time.Duration) error {
 	key := fmt.Sprintf("db:%v:the-route-doesnt-matter-here:%v", userID, namespace)
 
 	var buf bytes.Buffer
@@ -70,9 +69,7 @@ func SetEncodedCache(ctx context.Context, userID int, namespace string, value in
 		return err
 	}
 
-	db := database.GetDB()
-
-	err = db.Redis.Set(ctx, key, buf.Bytes(), exp).Err()
+	err = r.Set(ctx, key, buf.Bytes(), exp).Err()
 	if err != nil {
 		log.Printf("Error trying to set %s cache at db level: %v\n", namespace, err)
 		return err
@@ -81,22 +78,20 @@ func SetEncodedCache(ctx context.Context, userID int, namespace string, value in
 	return nil
 }
 
-func PurgeAllCachedData(ctx context.Context) string {
+func (r *Redis) PurgeAllCachedData(ctx context.Context) string {
 	fmt.Println("Purging all cached data, but preserving user sessions...")
 
 	keysPattern := "*:*:*:*"
 	cacheStatus := "cleared"
 
-	db := database.GetDB()
-
-	keys, err := db.Redis.Keys(ctx, keysPattern).Result()
+	keys, err := r.Keys(ctx, keysPattern).Result()
 	if err != nil {
 		log.Println("Error geting cache keys to clear:", err)
 		cacheStatus = "stale"
 	}
 
 	if keys != nil && len(keys) > 0 {
-		err := db.Redis.Del(ctx, keys...).Err()
+		err := r.Del(ctx, keys...).Err()
 		if err != nil {
 			log.Println("Error clearing cache keys:", err)
 			cacheStatus = "stale"

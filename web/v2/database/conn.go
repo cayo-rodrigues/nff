@@ -17,7 +17,7 @@ var instance *Database
 
 type Database struct {
 	PG    *pgxpool.Pool
-	Redis *redis.Client
+	Redis *Redis
 	Store *session.Store
 }
 
@@ -99,7 +99,7 @@ func initRedis() error {
 		return errors.New(fmt.Sprintf("Redis connection is not OK, ping failed: %v", err))
 	}
 
-	instance.Redis = rdb
+	instance.Redis.Client = rdb
 
 	fmt.Println("New Redis connection OK!")
 	return nil
