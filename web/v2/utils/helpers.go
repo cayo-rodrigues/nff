@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func TrimSpaceBytes(b []byte) string {
@@ -20,4 +21,22 @@ func TrimSpaceFloat64(f string) (float64, error) {
 
 func TrimSpaceFromBytesToFloat64(f []byte) (float64, error) {
 	return TrimSpaceFloat64(TrimSpaceBytes(f))
+}
+
+func ParseDate(date string) (time.Time, error) {
+	return time.Parse("2006-01-02", date)
+}
+
+func FormatDate(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.Format("2006-01-02")
+}
+
+func FormatDateAsBR(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
+	return date.Format("02/01/2006")
 }

@@ -253,7 +253,7 @@ func NotOneOf(vals ...any) RuleFunc {
 	}
 }
 
-func RequiredUnlessAtLeastOneIsPresent(vals ...any) RuleFunc {
+func RequiredUnless(vals ...any) RuleFunc {
 	return func() *RuleSet {
 		return &RuleSet{
 			MessageFunc: func(rs *RuleSet) string {
@@ -268,6 +268,42 @@ func RequiredUnlessAtLeastOneIsPresent(vals ...any) RuleFunc {
 						return true
 					}
 				}
+				return false
+			},
+		}
+	}
+}
+
+func NotAfter(dt time.Time) RuleFunc {
+	return func() *RuleSet {
+		return &RuleSet{
+			MessageFunc: func(rs *RuleSet) string {
+				return utils.IlogicalDatesMsg
+			},
+			ValidateFunc: func(rs *RuleSet) bool {
+				switch val := rs.FieldValue.(type) {
+				case time.Time:
+					return !val.After(dt)
+				}
+
+				return false
+			},
+		}
+	}
+}
+
+func MaxTimeRange(dt time.Time, days int) RuleFunc {
+	return func() *RuleSet {
+		return &RuleSet{
+			MessageFunc: func(rs *RuleSet) string {
+				return utils.TimeRangeTooLongMsg
+			},
+			ValidateFunc: func(rs *RuleSet) bool {
+				switch val := rs.FieldValue.(type) {
+				case time.Time:
+					return int(dt.Sub(val).Hours()/24) > days
+				}
+
 				return false
 			},
 		}

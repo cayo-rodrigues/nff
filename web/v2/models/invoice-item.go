@@ -104,9 +104,9 @@ func (i *InvoiceItem) IsValid() bool {
 			Rules: Rules(Required),
 		},
 	}
-	errors, isValid := Validate(fields)
+	errors, ok := Validate(fields)
 	i.Errors = errors
-	return isValid
+	return ok
 }
 
 func (i *InvoiceItem) Values() []any {

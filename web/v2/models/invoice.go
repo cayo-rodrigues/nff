@@ -117,14 +117,14 @@ func (i *Invoice) Validate() bool {
 			Rules: Rules(Max(64)),
 		},
 	}
-	errors, isValid := Validate(fields)
+	errors, ok := Validate(fields)
 	i.Errors = errors
 
 	for _, item := range i.Items {
-		isValid = item.IsValid()
+		ok = item.IsValid()
 	}
 
-	return isValid
+	return ok
 }
 
 func (i *Invoice) Values() []any {

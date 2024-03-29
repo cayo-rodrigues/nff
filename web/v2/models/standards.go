@@ -13,6 +13,7 @@ var AddressNumberRegex = regexp.MustCompile(`^(?:s\/n|S\/n|S\/N|s\/N)|^(\d)*$`)
 var SiareNFANumberRegex = regexp.MustCompile(`^(\d{3}\.\d{3}\.\d{3}|\d{9})$`)
 var SiareNFAProtocolRegex = regexp.MustCompile(`^(\d{13})$`)
 var GTARegex = regexp.MustCompile(`^([a-zA-Z]-\d{1,6}(;\s*[a-zA-Z]-\d{1,6})*$)`)
+var StrongPasswordRegex = regexp.MustCompile(`^(?=.*[A-Za-z])(?=.*\d).{8,}$`)
 
 // ENTITIES
 

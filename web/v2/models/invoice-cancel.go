@@ -63,9 +63,9 @@ func (c *InvoiceCancel) IsValid() bool {
 			Rules: Rules(Required, Max(128)),
 		},
 	}
-	errors, isValid := Validate(fields)
+	errors, ok := Validate(fields)
 	c.Errors = errors
-	return isValid
+	return ok
 }
 
 func (c *InvoiceCancel) Values() []any {

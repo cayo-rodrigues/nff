@@ -23,6 +23,8 @@ type Database struct {
 
 func (db *Database) Close() {
 	db.PG.Close()
+	db.Redis.Close()
+	db.Store.Storage.Close()
 }
 
 // Estabilishes and returns a new DB connection

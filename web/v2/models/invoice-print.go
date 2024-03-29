@@ -45,12 +45,12 @@ func (p *InvoicePrint) IsValid() bool {
 		{
 			Name:  "InvoiceNumber",
 			Value: p.InvoiceNumber,
-			Rules: Rules(RequiredUnlessAtLeastOneIsPresent(p.InvoiceProtocol), Match(SiareNFANumberRegex)),
+			Rules: Rules(RequiredUnless(p.InvoiceProtocol), Match(SiareNFANumberRegex)),
 		},
 		{
 			Name:  "InvoiceProtocol",
 			Value: p.InvoiceProtocol,
-			Rules: Rules(RequiredUnlessAtLeastOneIsPresent(p.InvoiceNumber), Match(SiareNFAProtocolRegex)),
+			Rules: Rules(RequiredUnless(p.InvoiceNumber), Match(SiareNFAProtocolRegex)),
 		},
 		{
 			Name:  "CustomFileNamePrefix",
@@ -58,9 +58,9 @@ func (p *InvoicePrint) IsValid() bool {
 			Rules: Rules(Max(64)),
 		},
 	}
-	errors, isValid := Validate(fields)
+	errors, ok := Validate(fields)
 	p.Errors = &errors
-	return isValid
+	return ok
 }
 
 func (p *InvoicePrint) Values() []any {
