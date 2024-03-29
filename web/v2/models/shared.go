@@ -4,12 +4,14 @@ type Scanner interface {
 	Scan(args ...any) error
 }
 
-type ValuesFunc func() []any
+type ScannableModel interface {
+	Values() []any
+}
 
-func Scan(row Scanner, funcs ...ValuesFunc) error {
+func Scan(row Scanner, models ...ScannableModel) error {
 	values := []any{}
-	for _, fn := range funcs {
-		values = append(values, fn()...)
+	for _, model := range models {
+		values = append(values, model.Values()...)
 	}
 	return row.Scan(values...)
 }

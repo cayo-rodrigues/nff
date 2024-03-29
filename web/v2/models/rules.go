@@ -7,7 +7,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/cayo-rodrigues/nff/web/utils"
-	"github.com/google/uuid"
 )
 
 type RuleSet struct {
@@ -28,12 +27,12 @@ func (rs *RuleSet) WithMessage(msg string) RuleFunc {
 
 type RuleFunc func() *RuleSet
 
-type Field struct {
+type Fields []*struct {
 	Name  string
 	Value any
 	Rules []*RuleSet
 }
-type Messages map[string]string
+type ErrorMessages map[string]string
 
 func Rules(ruleFuncs ...RuleFunc) []*RuleSet {
 	ruleSets := make([]*RuleSet, len(ruleFuncs))
@@ -44,8 +43,8 @@ func Rules(ruleFuncs ...RuleFunc) []*RuleSet {
 	return ruleSets
 }
 
-func Validate(fields []*Field) (Messages, bool) {
-	var messages Messages
+func Validate(fields Fields) (ErrorMessages, bool) {
+	var messages ErrorMessages
 
 	for _, field := range fields {
 		for _, rs := range field.Rules {
@@ -54,7 +53,7 @@ func Validate(fields []*Field) (Messages, bool) {
 				isValid := rs.ValidateFunc(rs)
 				if !isValid {
 					if messages == nil {
-						messages = make(Messages)
+						messages = make(ErrorMessages)
 					}
 					msg := rs.MessageFunc(rs)
 					messages[field.Name] = msg
@@ -67,22 +66,28 @@ func Validate(fields []*Field) (Messages, bool) {
 	return messages, len(messages) == 0
 }
 
+func HasValue(val any) bool {
+	switch val := val.(type) {
+	case string:
+		return utf8.RuneCountInString(val) > 0
+	case int:
+		return val != 0
+	case float64:
+		return val != 0
+	case time.Time:
+		return !val.IsZero()
+	}
+
+	return false
+}
+
 func Required() *RuleSet {
 	return &RuleSet{
 		MessageFunc: func(rs *RuleSet) string {
 			return utils.MandatoryFieldMsg
 		},
 		ValidateFunc: func(rs *RuleSet) bool {
-			switch val := rs.FieldValue.(type) {
-			case string:
-				return utf8.RuneCountInString(val) > 0
-			case time.Time:
-				return !val.IsZero()
-			case uuid.UUID:
-				return val != uuid.Nil
-			}
-
-			return false
+			return HasValue(rs.FieldValue)
 		},
 	}
 }
@@ -127,7 +132,7 @@ func Phone() *RuleSet {
 	}
 }
 
-func Format(format string) RuleFunc {
+func Match(regexes ...*regexp.Regexp) RuleFunc {
 	return func() *RuleSet {
 		return &RuleSet{
 			MessageFunc: func(rs *RuleSet) string {
@@ -143,18 +148,14 @@ func Format(format string) RuleFunc {
 					return true
 				}
 
-				var regex *regexp.Regexp
-
-				switch format {
-				case EmailFormat:
-					regex = EmailRegex
-				case PhoneFormat:
-					regex = PhoneRegex
-				default:
-					regex = WhateverRegex
+				for _, regex := range regexes {
+					match := regex.MatchString(str)
+					if match {
+						return true
+					}
 				}
 
-				return regex.MatchString(str)
+				return false
 			},
 		}
 	}
@@ -216,24 +217,6 @@ func Max(maxValue int) RuleFunc {
 	}
 }
 
-func NotOneOf(vals ...any) RuleFunc {
-	return func() *RuleSet {
-		return &RuleSet{
-			MessageFunc: func(rs *RuleSet) string {
-				return utils.UnacceptableValueMsg
-			},
-			ValidateFunc: func(rs *RuleSet) bool {
-				for _, val := range vals {
-					if val == rs.FieldValue {
-						return false
-					}
-				}
-				return true
-			},
-		}
-	}
-}
-
 func OneOf(vals ...any) RuleFunc {
 	return func() *RuleSet {
 		return &RuleSet{
@@ -252,14 +235,41 @@ func OneOf(vals ...any) RuleFunc {
 	}
 }
 
-func Datetime() *RuleSet {
-	return &RuleSet{
-		MessageFunc: func(rs *RuleSet) string {
-			return utils.UnacceptableValueMsg
-		},
-		ValidateFunc: func(rs *RuleSet) bool {
-			_, isDatetime := rs.FieldValue.(time.Time)
-			return isDatetime
-		},
+func NotOneOf(vals ...any) RuleFunc {
+	return func() *RuleSet {
+		return &RuleSet{
+			MessageFunc: func(rs *RuleSet) string {
+				return utils.UnacceptableValueMsg
+			},
+			ValidateFunc: func(rs *RuleSet) bool {
+				for _, val := range vals {
+					if val == rs.FieldValue {
+						return false
+					}
+				}
+				return true
+			},
+		}
+	}
+}
+
+func RequiredUnlessAtLeastOneIsPresent(vals ...any) RuleFunc {
+	return func() *RuleSet {
+		return &RuleSet{
+			MessageFunc: func(rs *RuleSet) string {
+				return utils.MandatoryFieldMsg
+			},
+			ValidateFunc: func(rs *RuleSet) bool {
+				if HasValue(rs) {
+					return true
+				}
+				for _, val := range vals {
+					if HasValue(val) {
+						return true
+					}
+				}
+				return false
+			},
+		}
 	}
 }
