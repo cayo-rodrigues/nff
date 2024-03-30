@@ -25,7 +25,10 @@ func main() {
 	PREFORK := os.Getenv("PREFORK") == "true"
 	START_FRESH := os.Getenv("START_FRESH") == "true"
 
-	db := database.GetDB()
+	db, err := database.NewDatabase()
+	if err != nil {
+		log.Fatal("Error initializing database connection: ", err)
+	}
 	defer db.Close()
 
 	if START_FRESH {
@@ -48,8 +51,8 @@ func main() {
 	// app.Post("/login", loginPage.Login)
 	// app.Get("/logout", handlers.Logout)
 
-	app.Use(middlewares.AuthMiddleware)
-	app.Use(middlewares.CacheMiddleware)
+	// app.Use(middlewares.AuthMiddleware)
+	// app.Use(middlewares.CacheMiddleware)
 
 	// app.Get("/", handlers.Home)
 
@@ -89,9 +92,9 @@ func main() {
 	// app.Get("/metrics/request-card-filter", metricsPage.FilterRequests)
 	// app.Get("/metrics/results/records/print", metricsPage.PrintInvoice)
 
-	// app.Use(middlewares.NotFoundMiddleware)
+	app.Use(middlewares.NotFoundMiddleware)
 
-	err := app.Listen(":" + PORT)
+	err = app.Listen(":" + PORT)
 	if err != nil {
 		log.Fatalln(">:(", err)
 	}

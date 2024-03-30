@@ -5,7 +5,8 @@ RUN apt update -y && \
 
 WORKDIR /home/app
 
-RUN go install github.com/cosmtrek/air@latest
+RUN go install github.com/cosmtrek/air@latest && \
+    go install github.com/a-h/templ/cmd/templ@latest
 
 COPY . .
 

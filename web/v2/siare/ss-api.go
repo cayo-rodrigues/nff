@@ -253,19 +253,19 @@ func formatErrResponseField(fieldErrs []string, prefix string) string {
 func formatErrResponse(response *SSApiErrorResponse) string {
 	var clientErrs strings.Builder
 
-	clientErrs.WriteString(formatErrResponseField(response.InvalidFields, InvalidFields))
-	clientErrs.WriteString(formatErrResponseField(response.MissingFields, MissingFields))
+	clientErrs.WriteString(formatErrResponseField(response.InvalidFields, InvalidFieldsPrefix))
+	clientErrs.WriteString(formatErrResponseField(response.MissingFields, MissingFieldsPrefix))
 	if response.Entity != nil {
-		clientErrs.WriteString(formatErrResponseField(response.Entity.InvalidFields, EntityInvalidFields))
-		clientErrs.WriteString(formatErrResponseField(response.Entity.MissingFields, EntityMissingFields))
+		clientErrs.WriteString(formatErrResponseField(response.Entity.InvalidFields, EntityInvalidFieldsPrefix))
+		clientErrs.WriteString(formatErrResponseField(response.Entity.MissingFields, EntityMissingFieldsPrefix))
 	}
 	if response.Sender != nil {
-		clientErrs.WriteString(formatErrResponseField(response.Sender.InvalidFields, SenderInvalidFields))
-		clientErrs.WriteString(formatErrResponseField(response.Sender.MissingFields, SenderMissingFields))
+		clientErrs.WriteString(formatErrResponseField(response.Sender.InvalidFields, SenderInvalidFieldsPrefix))
+		clientErrs.WriteString(formatErrResponseField(response.Sender.MissingFields, SenderMissingFieldsPrefix))
 	}
 	if response.Recipient != nil {
-		clientErrs.WriteString(formatErrResponseField(response.Recipient.InvalidFields, RecipientInvalidFields))
-		clientErrs.WriteString(formatErrResponseField(response.Recipient.MissingFields, RecipientMissingFields))
+		clientErrs.WriteString(formatErrResponseField(response.Recipient.InvalidFields, RecipientInvalidFieldsPrefix))
+		clientErrs.WriteString(formatErrResponseField(response.Recipient.MissingFields, RecipientMissingFieldsPrefix))
 	}
 
 	return clientErrs.String()

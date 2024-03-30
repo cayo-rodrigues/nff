@@ -22,9 +22,15 @@ type Database struct {
 }
 
 func (db *Database) Close() {
-	db.PG.Close()
-	db.Redis.Close()
-	db.SessionStore.Storage.Close()
+	if db.PG != nil {
+		db.PG.Close()
+	}
+	if db.Redis.Client != nil {
+		db.Redis.Close()
+	}
+	if db.SessionStore != nil {
+		db.SessionStore.Storage.Close()
+	}
 }
 
 // Estabilishes and returns a new DB connection
@@ -33,8 +39,17 @@ func NewDatabase() (*Database, error) {
 		instance.Close()
 	}
 	instance = new(Database)
+	instance.Redis = new(Redis)
 
 	err := initPG()
+	if err != nil {
+		return nil, err
+	}
+	err = initRedis()
+	if err != nil {
+		return nil, err
+	}
+	err = initSessionStore()
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +94,7 @@ func initPG() error {
 func initRedis() error {
 	fmt.Println("Initiating Redis connection...")
 
-	if instance.Redis != nil {
+	if instance.Redis.Client != nil {
 		fmt.Println("Reusing existing instance.Redis connection")
 		return nil
 	}
@@ -105,7 +120,7 @@ func initRedis() error {
 	return nil
 }
 
-func initStore() error {
+func initSessionStore() error {
 	fmt.Println("Initiating SessionStore connection...")
 
 	if instance.SessionStore != nil {

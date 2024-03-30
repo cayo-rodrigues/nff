@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN go build -o nff ./cmd/web/main.go
+RUN go build -o nff ./main.go
 
 FROM scratch
 
