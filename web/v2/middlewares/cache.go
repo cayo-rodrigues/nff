@@ -8,8 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 )
@@ -24,6 +23,8 @@ func CacheMiddleware(c *fiber.Ctx) error {
 
 func useOrSetCache(c *fiber.Ctx) error {
 	bodyKey, headersKey := genKeys(c)
+
+	db := database.GetDB()
 
 	cachedBody, err := db.Redis.Get(c.Context(), bodyKey).Bytes()
 	if err == redis.Nil {
@@ -62,6 +63,8 @@ func callNextAndSetCache(c *fiber.Ctx) error {
 	bodyBytes := response.Body()
 	headersBytes := response.Header.Header()
 
+	db := database.GetDB()
+
 	err := db.Redis.Set(c.Context(), bodyKey, bodyBytes, time.Hour).Err()
 	if err != nil {
 		log.Println("Error trying to set response body cache:", err)
@@ -86,7 +89,10 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 	if namespace == "entities" {
 		namespace = "*" // all other routes use entities, so we gotta clear all pages cache in this case
 	}
-	cacheStatus := utils.ClearCache(c.Context(), userID, namespace)
+
+	db := database.GetDB()
+
+	cacheStatus := db.Redis.ClearCache(c.Context(), userID, namespace)
 
 	c.Response().Header.Set("X-Cache", cacheStatus)
 

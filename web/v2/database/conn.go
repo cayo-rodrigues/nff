@@ -16,15 +16,15 @@ import (
 var instance *Database
 
 type Database struct {
-	PG    *pgxpool.Pool
-	Redis *Redis
-	Store *session.Store
+	PG           *pgxpool.Pool
+	Redis        *Redis
+	SessionStore *session.Store
 }
 
 func (db *Database) Close() {
 	db.PG.Close()
 	db.Redis.Close()
-	db.Store.Storage.Close()
+	db.SessionStore.Storage.Close()
 }
 
 // Estabilishes and returns a new DB connection
@@ -51,7 +51,7 @@ func initPG() error {
 	fmt.Println("Initializing PG connection...")
 
 	if instance.PG != nil {
-		fmt.Println("PG connection already exists OK!")
+		fmt.Println("Reusing existing instance.PG connection")
 		return nil
 	}
 
@@ -72,7 +72,7 @@ func initPG() error {
 
 	instance.PG = dbpool
 
-	fmt.Println("New PG connection OK!")
+	fmt.Println("New instance.PG connection OK")
 	return nil
 }
 
@@ -80,7 +80,7 @@ func initRedis() error {
 	fmt.Println("Initiating Redis connection...")
 
 	if instance.Redis != nil {
-		fmt.Println("Redis connection already exists OK!")
+		fmt.Println("Reusing existing instance.Redis connection")
 		return nil
 	}
 
@@ -101,19 +101,19 @@ func initRedis() error {
 
 	instance.Redis.Client = rdb
 
-	fmt.Println("New Redis connection OK!")
+	fmt.Println("New instance.Redis connection OK")
 	return nil
 }
 
 func initStore() error {
 	fmt.Println("Initiating SessionStore connection...")
 
-	if instance.Store != nil {
-		fmt.Println("Reusing existing instance.Store connection")
+	if instance.SessionStore != nil {
+		fmt.Println("Reusing existing instance.SessionStore connection")
 		return nil
 	}
 
-	instance.Store = session.New(session.Config{
+	instance.SessionStore = session.New(session.Config{
 		Storage: fredis.New(fredis.Config{
 			URL: getRedisURL(),
 		}),
@@ -121,7 +121,7 @@ func initStore() error {
 		Expiration:     7 * 24 * time.Hour,
 	})
 
-	fmt.Println("New instance.Store connection OK")
+	fmt.Println("New instance.SessionStore connection OK")
 
 	return nil
 }

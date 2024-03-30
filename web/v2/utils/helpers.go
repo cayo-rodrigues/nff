@@ -40,3 +40,11 @@ func FormatDateAsBR(date time.Time) string {
 	}
 	return date.Format("02/01/2006")
 }
+
+func NDaysBefore(now time.Time, days int) time.Time {
+	return now.Add(-time.Duration(days) * 24 * time.Hour)
+}
+
+func FormatedNDaysBefore(now time.Time, days int) string {
+	return FormatDate(NDaysBefore(now, days))
+}

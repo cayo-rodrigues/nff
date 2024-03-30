@@ -16,7 +16,7 @@ type User struct {
 	Errors    ErrorMessages
 }
 
-func NewEmptyUser() *User {
+func NewUser() *User {
 	return &User{}
 }
 

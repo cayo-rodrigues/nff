@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/cayo-rodrigues/nff/web/database"
+	"github.com/cayo-rodrigues/nff/web/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -47,8 +48,8 @@ func main() {
 	// app.Post("/login", loginPage.Login)
 	// app.Get("/logout", handlers.Logout)
 
-	// app.Use(middlewares.AuthMiddleware)
-	// app.Use(middlewares.CacheMiddleware)
+	app.Use(middlewares.AuthMiddleware)
+	app.Use(middlewares.CacheMiddleware)
 
 	// app.Get("/", handlers.Home)
 
