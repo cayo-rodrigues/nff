@@ -9,8 +9,8 @@ RDS_URL_WITH_PWD := postgres://$(USER):$(PWD)@$(ENDPOINT):$(PORT)/$(DB_NAME)
 DIR_PATH := db/migrations
 NAME :=
 
-TAILWIND_INPUT := ./static/styles/custom.css
-TAILWIND_OUTPUT := ./static/styles/tailwind.css
+TAILWIND_INPUT := ./static/css/custom.css
+TAILWIND_OUTPUT := ./static/css/tailwind.css
 
 rds:
 	docker run -it --rm -e PGPASSWORD=$(PWD) postgres psql $(RDS_URL)
