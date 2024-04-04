@@ -1,17 +1,9 @@
 package components
 
-type IconOpts struct {
-	Name    string
-	Classes string
-}
-
-templ Icon(opts *IconOpts) {
-	<i data-feather={ opts.Name } class={ opts.Classes }></i>
+templ Icon(name string) {
+	<i data-feather={ name }></i>
 }
 
 templ LoadingIcon() {
-	@Icon(&IconOpts{
-		Name:    "loader",
-		Classes: "hx-indicator animate-spin text-5xl opacity-70",
-	})
+	<i data-feather="loader" class="hx-indicator animate-spin text-5xl opacity-70"></i>
 }

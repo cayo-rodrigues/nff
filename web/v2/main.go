@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/cayo-rodrigues/nff/web/database"
-	"github.com/cayo-rodrigues/nff/web/middlewares"
+	"github.com/cayo-rodrigues/nff/web/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -44,8 +44,8 @@ func main() {
 
 	app.Static("/static", "./static")
 
-	// app.Get("/register", registerPage.Render)
-	// app.Post("/register", registerPage.CreateUser)
+	app.Get("/register", handlers.RegisterPage)
+	app.Post("/register", handlers.RegisterUser)
 
 	// app.Get("/login", loginPage.Render)
 	// app.Post("/login", loginPage.Login)
@@ -56,7 +56,7 @@ func main() {
 
 	// app.Get("/", handlers.Home)
 
-	// app.Get("/entities", entitiesPage.Render)
+	app.Get("/entities", handlers.EntitiesPage)
 	// app.Post("/entities", entitiesPage.CreateEntity)
 	// app.Get("/entities/:id/form", entitiesPage.GetEntityForm)
 	// app.Put("/entities/:id", entitiesPage.UpdateEntity)
@@ -92,7 +92,7 @@ func main() {
 	// app.Get("/metrics/request-card-filter", metricsPage.FilterRequests)
 	// app.Get("/metrics/results/records/print", metricsPage.PrintInvoice)
 
-	app.Use(middlewares.NotFoundMiddleware)
+	app.Use(handlers.NotFoundPage)
 
 	err = app.Listen(":" + PORT)
 	if err != nil {

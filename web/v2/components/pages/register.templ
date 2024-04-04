@@ -1,5 +1,8 @@
 package pages
 
-templ RegisterPage() {
+import "github.com/cayo-rodrigues/nff/web/components/forms"
+import "github.com/cayo-rodrigues/nff/web/models"
 
+templ RegisterPage(u *models.User) {
+	@forms.RegisterForm(u)
 }

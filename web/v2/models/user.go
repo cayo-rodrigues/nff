@@ -37,7 +37,7 @@ func (u *User) IsValid() bool {
 		{
 			Name:  "Password",
 			Value: u.Password,
-			Rules: Rules(Required, Match(StrongPasswordRegex)),
+			Rules: Rules(Required),
 		},
 	}
 	errors, ok := Validate(fields)
