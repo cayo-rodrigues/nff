@@ -18,11 +18,11 @@ templ Base(page templ.Component) {
 			@scripts.ApplyIcons()
 			<title>NFF</title>
 		</head>
-		<body class="bg-gray-100">
+		<body class="flex h-screen flex-col bg-gray-100">
 			<header>
 				@shared.Nav()
 			</header>
-			<main id="main" class="px-4 pb-20 pt-4 sm:px-8 sm:py-6">
+			<main id="main" class="flex-1 px-4 pb-20 pt-4 sm:px-8 sm:py-6">
 				@page
 			</main>
 			@shared.Footer()
