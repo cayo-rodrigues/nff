@@ -1,5 +1,10 @@
 package pages
 
-templ EntitiesPage() {
-	<h1>Entidades</h1>
+import "github.com/cayo-rodrigues/nff/web/components"
+import "github.com/cayo-rodrigues/nff/web/models"
+
+templ EntitiesPage(entities []*models.Entity) {
+	<div>
+		@components.EntityList(entities)
+	</div>
 }

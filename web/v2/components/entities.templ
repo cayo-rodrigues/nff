@@ -1,0 +1,22 @@
+package components
+
+import "github.com/cayo-rodrigues/nff/web/models"
+
+templ EntityList(entities []*models.Entity) {
+	<ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+		for _, entity := range entities {
+			@EntityCard(entity)
+		}
+	</ul>
+}
+
+templ EntityCard(e *models.Entity) {
+	<li class="cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400">
+		<h3 class="rounded border border-gray-300 p-2 text-lg font-bold">{ e.Name }</h3>
+		<ul class="flex flex-col gap-1 p-2">
+			<li>{ e.UserType }</li>
+			<li><span class="font-medium">IE:</span> { e.Ie }</li>
+			<li><span class="font-medium">CPF/CNPJ:</span> { e.CpfCnpj }</li>
+		</ul>
+	</li>
+}
