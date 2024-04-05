@@ -10,5 +10,13 @@ func SaveUserSession(c *fiber.Ctx, userID int) error {
 		{Key: "IsAuthenticated", Val: true},
 		{Key: "UserID", Val: userID},
 	}
-	return storage.SaveSession(c, sessionOpts...)
+	return storage.SetSessionKVs(c, sessionOpts...)
+}
+
+func DestroyUserSession(c *fiber.Ctx) error {
+	sessionOpts := []*storage.SessionOpts{
+		{Key: "IsAuthenticated"},
+		{Key: "UserID"},
+	}
+	return storage.DeleteSessionKeys(c, sessionOpts...)
 }

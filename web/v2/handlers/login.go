@@ -31,3 +31,12 @@ func LoginUser(c *fiber.Ctx) error {
 
 	return c.Redirect("/entities")
 }
+
+func LogoutUser(c *fiber.Ctx) error {
+	err := services.DestroyUserSession(c)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect("/")
+}

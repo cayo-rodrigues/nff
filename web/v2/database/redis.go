@@ -19,19 +19,26 @@ func (r *Redis) ClearCache(ctx context.Context, userID int, namespace string) st
 	keysPattern := fmt.Sprintf("*:%v:*:%v", userID, namespace)
 	cacheStatus := "cleared"
 
-	keys, err := r.Keys(ctx, keysPattern).Result()
+	err := r.DelMany(ctx, keysPattern)
 	if err != nil {
-		log.Println("Error geting cache keys to clear:", err)
 		cacheStatus = "stale"
 	}
 
-	if keys != nil && len(keys) > 0 {
-		err := r.Del(ctx, keys...).Err()
-		if err != nil {
-			log.Println("Error clearing cache keys:", err)
-			cacheStatus = "stale"
-		}
+	return cacheStatus
+}
+
+func (r *Redis) DestroyAllCachedData(ctx context.Context) string {
+	fmt.Println("Destroying all cached data, but preserving user sessions...")
+
+	keysPattern := "*:*:*:*"
+	cacheStatus := "cleared"
+
+	err := r.DelMany(ctx, keysPattern)
+	if err != nil {
+		cacheStatus = "stale"
 	}
+
+	fmt.Println("Cache status is:", cacheStatus)
 
 	return cacheStatus
 }
@@ -78,27 +85,29 @@ func (r *Redis) SetEncodedCache(ctx context.Context, userID int, namespace strin
 	return nil
 }
 
-func (r *Redis) PurgeAllCachedData(ctx context.Context) string {
-	fmt.Println("Purging all cached data, but preserving user sessions...")
+func (r *Redis) DelMany(ctx context.Context, keysPattern string) error {
+	var cursor uint64
+	var batchSize int64 = 100
 
-	keysPattern := "*:*:*:*"
-	cacheStatus := "cleared"
+	scanner := r.Scan(ctx, cursor, keysPattern, batchSize).Iterator()
 
-	keys, err := r.Keys(ctx, keysPattern).Result()
+	keys := []string{}
+
+	for scanner.Next(ctx) {
+		keys = append(keys, scanner.Val())
+	}
+
+	err := scanner.Err()
 	if err != nil {
-		log.Println("Error geting cache keys to clear:", err)
-		cacheStatus = "stale"
+		log.Println("Error scanning cache keys:", err)
+		return err
 	}
 
-	if keys != nil && len(keys) > 0 {
-		err := r.Del(ctx, keys...).Err()
-		if err != nil {
-			log.Println("Error clearing cache keys:", err)
-			cacheStatus = "stale"
-		}
+	err = r.Del(ctx, keys...).Err()
+	if err != nil {
+		log.Println("Error clearing cache key:", scanner.Val(), err)
+		return err
 	}
 
-	fmt.Println("Cache status is:", cacheStatus)
-
-	return cacheStatus
+	return nil
 }

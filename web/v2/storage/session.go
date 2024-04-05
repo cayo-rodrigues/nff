@@ -10,7 +10,7 @@ type SessionOpts struct {
 	Val any
 }
 
-func SaveSession(c *fiber.Ctx, opts ...*SessionOpts) error {
+func SetSessionKVs(c *fiber.Ctx, opts ...*SessionOpts) error {
 	db := database.GetDB()
 
 	sess, err := db.SessionStore.Get(c)
@@ -20,10 +20,18 @@ func SaveSession(c *fiber.Ctx, opts ...*SessionOpts) error {
 	for _, opt := range opts {
 		sess.Set(opt.Key, opt.Val)
 	}
-	err = sess.Save()
+	return sess.Save()
+}
+
+func DeleteSessionKeys(c *fiber.Ctx, opts ...*SessionOpts) error {
+	db := database.GetDB()
+
+	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return err
 	}
-
-	return nil
+	for _, opt := range opts {
+		sess.Delete(opt.Key)
+	}
+	return sess.Save()
 }

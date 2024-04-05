@@ -7,6 +7,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/handlers"
+	"github.com/cayo-rodrigues/nff/web/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -32,7 +33,7 @@ func main() {
 	defer db.Close()
 
 	if START_FRESH {
-		db.Redis.PurgeAllCachedData(context.Background())
+		db.Redis.DestroyAllCachedData(context.Background())
 	}
 
 	app := fiber.New(fiber.Config{
@@ -49,12 +50,12 @@ func main() {
 
 	app.Get("/login", handlers.LoginPage)
 	app.Post("/login", handlers.LoginUser)
-	// app.Get("/logout", handlers.Logout)
+	app.Get("/logout", handlers.LogoutUser)
 
-	// app.Use(middlewares.AuthMiddleware)
+	app.Use(middlewares.AuthMiddleware)
 	// app.Use(middlewares.CacheMiddleware)
 
-	// app.Get("/", handlers.Home)
+	app.Get("/", handlers.HomePage)
 
 	app.Get("/entities", handlers.EntitiesPage)
 	// app.Post("/entities", entitiesPage.CreateEntity)
