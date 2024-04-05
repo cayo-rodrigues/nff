@@ -103,10 +103,12 @@ func (r *Redis) DelMany(ctx context.Context, keysPattern string) error {
 		return err
 	}
 
-	err = r.Del(ctx, keys...).Err()
-	if err != nil {
-		log.Println("Error clearing cache key:", scanner.Val(), err)
-		return err
+	if len(keys) > 0 {
+		err = r.Del(ctx, keys...).Err()
+		if err != nil {
+			log.Println("Error clearing cache keys:", keys, err)
+			return err
+		}
 	}
 
 	return nil

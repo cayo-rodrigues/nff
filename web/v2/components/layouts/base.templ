@@ -1,6 +1,6 @@
 package layouts
 
-import "github.com/cayo-rodrigues/nff/web/components"
+import "github.com/cayo-rodrigues/nff/web/components/shared"
 import "github.com/cayo-rodrigues/nff/web/components/scripts"
 
 templ Base(page templ.Component) {
@@ -19,11 +19,11 @@ templ Base(page templ.Component) {
 			<title>NFF</title>
 		</head>
 		<body>
-			@components.Nav()
+			@shared.Nav()
 			<main id="main" class="px-4 pb-20 pt-4 sm:px-8 sm:py-6">
 				@page
 			</main>
-			@components.Footer()
+			@shared.Footer()
 		</body>
 	</html>
 }

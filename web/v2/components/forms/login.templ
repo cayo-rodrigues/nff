@@ -1,6 +1,6 @@
 package forms
 
-import "github.com/cayo-rodrigues/nff/web/components"
+import "github.com/cayo-rodrigues/nff/web/components/shared"
 import "github.com/cayo-rodrigues/nff/web/models"
 
 templ LoginForm(u *models.User) {
@@ -28,8 +28,8 @@ templ LoginForm(u *models.User) {
 			<sub class="min-h-3 break-words leading-3 text-red-500">{ u.Errors["Password"] }</sub>
 		</div>
 		<div class="mt-2">
-			@components.SubmitButton() {
-				@components.Icon("log-in")
+			@shared.SubmitButton() {
+				@shared.Icon("log-in")
 				<span>Entrar</span>
 			}
 		</div>
