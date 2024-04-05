@@ -23,6 +23,7 @@ const (
 	MustHaveItemsMsg       = "A NF deve ter pelo menos 1 produto"
 	InvalidItemsMsg        = "Dados dos produtos inválidos"
 	MustHaveIeOrAddressMsg = "Ie OU endereço completo obrigatórios"
+	EmailNotAvailableMsg   = "Email indisponível"
 )
 
 const (

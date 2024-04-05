@@ -28,5 +28,10 @@ func RegisterUser(c *fiber.Ctx) error {
 		return err
 	}
 
+	err = services.SaveUserSession(c, user.ID)
+	if err != nil {
+		return err
+	}
+
 	return c.Redirect("/entities")
 }

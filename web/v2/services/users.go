@@ -10,8 +10,8 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func CreateUser(ctx context.Context, user *models.User) (err error) {
-	_, err = storage.RetrieveUser(ctx, user.Email)
+func CreateUser(ctx context.Context, user *models.User) error {
+	_, err := storage.RetrieveUser(ctx, user.Email)
 	userAlreadyExists := true
 	if errors.Is(err, pgx.ErrNoRows) {
 		userAlreadyExists = false
@@ -19,7 +19,7 @@ func CreateUser(ctx context.Context, user *models.User) (err error) {
 		return err
 	}
 	if userAlreadyExists {
-		user.Errors["Email"] = "Email indisponível"
+		user.Errors["Email"] = utils.EmailNotAvailableMsg
 		return err
 	}
 
