@@ -12,6 +12,7 @@ var CancelingNotFoundErr = errors.New(CancelingNotFoundMsg)
 var MetricsNotFoundErr = errors.New(MetricsNotFoundMsg)
 var PrintingNotFoundErr = errors.New(PrintingNotFoundMsg)
 var UserNotFoundErr = errors.New(UserNotFoundMsg)
+var InvalidLoginDataErr = errors.New(InvalidLoginDataMsg)
 
 var InternalServerErr = errors.New(InternalServerErrMsg)
 

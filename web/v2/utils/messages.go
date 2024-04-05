@@ -7,6 +7,7 @@ const (
 	MetricsNotFoundMsg   = "Registro de métricas não encontrado"
 	PrintingNotFoundMsg  = "Impressão de NFA não encontrada"
 	UserNotFoundMsg      = "Usuário não encontrado"
+	InvalidLoginDataMsg  = "Dados de login inválidos"
 )
 
 const (

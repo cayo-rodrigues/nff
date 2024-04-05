@@ -48,3 +48,10 @@ func (u *User) IsValid() bool {
 func (u *User) Values() []any {
 	return []any{&u.ID, &u.Email, &u.Password, &u.CreatedAt, &u.UpdatedAt}
 }
+
+func (u *User) SetError(key, val string) {
+	if u.Errors == nil {
+		u.Errors = make(ErrorMessages)
+	}
+	u.Errors[key] = val
+}

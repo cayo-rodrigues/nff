@@ -47,8 +47,8 @@ func main() {
 	app.Get("/register", handlers.RegisterPage)
 	app.Post("/register", handlers.RegisterUser)
 
-	// app.Get("/login", loginPage.Render)
-	// app.Post("/login", loginPage.Login)
+	app.Get("/login", handlers.LoginPage)
+	app.Post("/login", handlers.LoginUser)
 	// app.Get("/logout", handlers.Logout)
 
 	// app.Use(middlewares.AuthMiddleware)

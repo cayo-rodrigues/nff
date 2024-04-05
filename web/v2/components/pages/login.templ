@@ -1,5 +1,8 @@
 package pages
 
-templ LoginPage() {
-	
+import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/components/forms"
+
+templ LoginPage(u *models.User) {
+	@forms.LoginForm(u)
 }

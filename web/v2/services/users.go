@@ -19,7 +19,7 @@ func CreateUser(ctx context.Context, user *models.User) error {
 		return err
 	}
 	if userAlreadyExists {
-		user.Errors["Email"] = utils.EmailNotAvailableMsg
+		user.SetError("Email", utils.EmailNotAvailableMsg)
 		return err
 	}
 
@@ -34,4 +34,24 @@ func CreateUser(ctx context.Context, user *models.User) error {
 	}
 
 	return nil
+}
+
+func IsLoginDataValid(ctx context.Context, user *models.User) bool {
+	userFromDB, err := storage.RetrieveUser(ctx, user.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			user.SetError("Email", utils.InvalidLoginDataMsg)
+			user.SetError("Password", utils.InvalidLoginDataMsg)
+		}
+		return false
+	}
+
+	passwordsMatch := utils.IsPasswordCorrect(user.Password, userFromDB.Password)
+	if !passwordsMatch {
+		user.SetError("Email", utils.InvalidLoginDataMsg)
+		user.SetError("Password", utils.InvalidLoginDataMsg)
+		return false
+	}
+
+	return true
 }
