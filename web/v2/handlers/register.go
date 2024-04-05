@@ -17,10 +17,7 @@ func RegisterPage(c *fiber.Ctx) error {
 func RegisterUser(c *fiber.Ctx) error {
 	user := models.NewUserFromForm(c)
 	if !user.IsValid() {
-		c.Set("HX-Retarget", "#register-form")
-		c.Set("HX-Reswap", "outerHTML")
-		c.Set("HX-Trigger-After-Swap", "rebuild-icons")
-		return Render(c, forms.RegisterForm(user))
+		return RetargetToForm(c, "register", forms.RegisterForm(user))
 	}
 
 	err := services.CreateUser(c.Context(), user)
