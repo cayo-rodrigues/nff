@@ -1,50 +1,53 @@
 package shared
 
-templ Button(theme string, attrs templ.Attributes) {
-	<button class={ getButtonClassesByTheme(theme) } { attrs... }>
+templ Button(theme string, size string, attrs templ.Attributes) {
+	<button class={ getButtonClassesByTheme(theme, size) } { attrs... }>
 		{ children... }
 	</button>
 }
 
-templ SubmitButton() {
-	@Button("success", templ.Attributes{"type": "submit"}) {
+templ SubmitButton(size string) {
+	@Button("success", size, templ.Attributes{"type": "submit"}) {
 		{ children... }
 	}
 }
 
-templ SuccessButton() {
-	@Button("success", templ.Attributes{"type": "button"}) {
+templ SuccessButton(size string) {
+	@Button("success", size, templ.Attributes{"type": "button"}) {
 		{ children... }
 	}
 }
 
-templ WarningButton() {
-	@Button("warning", templ.Attributes{"type": "button"}) {
+templ WarningButton(size string) {
+	@Button("warning", size, templ.Attributes{"type": "button"}) {
 		{ children... }
 	}
 }
 
-templ ErrorButton() {
-	@Button("error", templ.Attributes{"type": "button"}) {
+templ ErrorButton(size string) {
+	@Button("error", size, templ.Attributes{"type": "button"}) {
 		{ children... }
 	}
 }
 
-templ InfoButton() {
-	@Button("info", templ.Attributes{"type": "button"}) {
+templ InfoButton(size string) {
+	@Button("info", size, templ.Attributes{"type": "button"}) {
 		{ children... }
 	}
 }
 
-templ DefaultButton() {
-	@Button("default", templ.Attributes{"type": "button"}) {
+templ DefaultButton(size string) {
+	@Button("default", size, templ.Attributes{"type": "button"}) {
 		{ children... }
 	}
 }
 
-func getButtonClassesByTheme(theme string) string {
-	classes := "flex w-full flex-col items-center justify-center gap-2 rounded px-2 py-1 sm:flex-row sm:items-start sm:gap-3 sm:px-4 sm:py-3"
+func getButtonClassesByTheme(theme string, size string) string {
+	classes := "flex w-full items-center justify-center rounded gap-3"
+
 	colors := ""
+	padding := ""
+
 	switch theme {
 	case "success":
 		colors = "bg-green-400 hover:bg-green-500 active:bg-green-600"
@@ -58,5 +61,12 @@ func getButtonClassesByTheme(theme string) string {
 		colors = "bg-gray-400 hover:bg-gray-500"
 	}
 
-	return classes + " " + colors
+	switch size {
+	case "sm":
+		padding = "px-3 py-2"
+	case "md":
+		padding = "px-3 py-2 sm:py-3"
+	}
+
+	return classes + " " + colors + " " + padding
 }

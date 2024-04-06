@@ -1,6 +1,7 @@
 package components
 
 import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/components/shared"
 
 templ EntityList(entities []*models.Entity) {
 	<ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
@@ -19,4 +20,13 @@ templ EntityCard(e *models.Entity) {
 			<li><span class="font-medium">CPF/CNPJ:</span> { e.CpfCnpj }</li>
 		</ul>
 	</li>
+}
+
+templ SearchBar() {
+	<div class="group flex w-full rounded border bg-white focus-within:border-gray-400 sm:w-1/2 md:w-1/3 lg:w-1/4">
+		<div class="rounded-s bg-white p-2">
+			@shared.Icon("search")
+		</div>
+		<input class="w-full rounded-e py-2 pr-2 outline-0" type="text" name="search" value=""/>
+	</div>
 }

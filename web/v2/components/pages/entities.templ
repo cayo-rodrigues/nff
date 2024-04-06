@@ -2,9 +2,19 @@ package pages
 
 import "github.com/cayo-rodrigues/nff/web/components"
 import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/components/shared"
 
 templ EntitiesPage(entities []*models.Entity) {
-	<div>
+	<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+			<div>
+				@shared.SuccessButton("sm") {
+					@shared.Icon("user-plus")
+					<span>Nova Entidade</span>
+				}
+			</div>
+			@components.SearchBar()
+		</div>
 		@components.EntityList(entities)
 	</div>
 }

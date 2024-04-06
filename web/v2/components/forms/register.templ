@@ -28,7 +28,7 @@ templ RegisterForm(u *models.User) {
 			<sub class="min-h-3 break-words leading-3 text-red-500">{ u.Errors["Password"] }</sub>
 		</div>
 		<div class="mt-2">
-			@shared.SubmitButton() {
+			@shared.SubmitButton("md") {
 				@shared.Icon("user-plus")
 				<span>Cadastrar</span>
 			}
