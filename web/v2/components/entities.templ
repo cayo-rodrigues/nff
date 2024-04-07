@@ -2,9 +2,10 @@ package components
 
 import "github.com/cayo-rodrigues/nff/web/models"
 import "github.com/cayo-rodrigues/nff/web/components/shared"
+import "fmt"
 
 templ EntityList(entities []*models.Entity) {
-	<ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+	<ul id="entity-list" class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
 		for _, entity := range entities {
 			@EntityCard(entity)
 		}
@@ -12,8 +13,8 @@ templ EntityList(entities []*models.Entity) {
 }
 
 templ EntityCard(e *models.Entity) {
-	<li class="cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400">
-		<h3 class="rounded border border-gray-300 p-2 text-lg font-bold">{ e.Name }</h3>
+	<li id={ entityCardID(e) } class="cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400">
+		<h3 class="truncate rounded border border-gray-300 p-2 text-lg font-bold">{ e.Name }</h3>
 		<ul class="flex flex-col gap-1 p-2">
 			<li>{ e.UserType }</li>
 			<li><span class="font-medium">IE:</span> { e.Ie }</li>
@@ -29,4 +30,8 @@ templ SearchBar() {
 		</div>
 		<input class="w-full rounded-e py-2 pr-2 outline-0" type="text" name="search" value=""/>
 	</div>
+}
+
+func entityCardID(e *models.Entity) string {
+	return fmt.Sprintf("entity-card-%d", e.ID)
 }

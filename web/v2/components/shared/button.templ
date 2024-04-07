@@ -52,13 +52,13 @@ func getButtonClassesByTheme(theme string, size string) string {
 	case "success":
 		colors = "bg-green-400 hover:bg-green-500 active:bg-green-600"
 	case "warning":
-		colors = "bg-yellow-400 hover:bg-yellow-500"
+		colors = "bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600"
 	case "error":
-		colors = "bg-red-400 hover:bg-red-500"
+		colors = "bg-red-400 hover:bg-red-500 active:bg-red-600"
 	case "info":
-		colors = "bg-sky-400 hover:bg-sky-500"
+		colors = "bg-sky-400 hover:bg-sky-500 active:bg-sky-600"
 	default:
-		colors = "bg-gray-400 hover:bg-gray-500"
+		colors = "bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
 	}
 
 	switch size {

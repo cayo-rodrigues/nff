@@ -1,0 +1,204 @@
+package forms
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "strconv"
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/components/shared"
+
+templ EntityForm(e *models.Entity) {
+	<div class="sticky top-20" id="entity-form">
+		<form>
+			<input type="hidden" name="id" value={ strconv.Itoa(e.ID) }/>
+			<div class="flex flex-col py-2">
+				<sup class="text-red-600">{ e.Errors["Name"] }</sup>
+				<input
+					class="flex-1 rounded p-2 text-2xl font-semibold"
+					type="text"
+					name="name"
+					value={ e.Name }
+					placeholder="Nome"
+				/>
+			</div>
+			<hr/>
+			<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
+				<div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="user_type"><strong>Tipo</strong></label>
+						<select class="h-10 rounded bg-white p-2" id="user_type" name="user_type">
+							for _, userType := range getUserTypes() {
+								<option
+									if e.UserType == userType {
+										selected
+									}
+									value={ userType }
+								>
+									{ userType }
+								</option>
+							}
+						</select>
+						<sub class="text-red-600">{ e.Errors["UserType"] }</sub>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="cpf_cnpj"><strong>CPF/CNPJ</strong></label>
+						<input
+							class="rounded p-2"
+							type="text"
+							id="cpf_cnpj"
+							name="cpf_cnpj"
+							value={ e.CpfCnpj }
+						/>
+						<sub class="text-red-600">{ e.Errors["CpfCnpj"] }</sub>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="ie"><strong>Inscrição Estadual</strong></label>
+						<input
+							class="rounded p-2"
+							type="text"
+							id="ie"
+							name="ie"
+							value={ e.Ie }
+						/>
+						<sub class="text-red-600">{ e.Errors["Ie"] }</sub>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="email"><strong>E-mail</strong></label>
+						<input
+							class="rounded p-2"
+							type="email"
+							id="email"
+							name="email"
+							value={ e.Email }
+						/>
+						<sub class="text-red-600">{ e.Errors["Email"] }</sub>
+					</div>
+					<div class="relative flex flex-col gap-2">
+						<label class="truncate" for="password"><strong>Senha</strong></label>
+						<input
+							class="rounded p-2 pr-10"
+							type="password"
+							id="password"
+							name="password"
+							value={ e.Password }
+						/>
+						<sub></sub>
+						<button id="entity-password-toggle" type="button" class="absolute bottom-4 right-4">
+							@shared.Icon("eye-off")
+						</button>
+					</div>
+				</div>
+				<div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="postal_code"><strong>CEP</strong></label>
+						<input
+							class="rounded p-2"
+							type="text"
+							id="postal_code"
+							name="postal_code"
+							value={ e.PostalCode }
+						/>
+						<sub class="text-red-600">{ e.Errors["PostalCode"] }</sub>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="neighborhood"><strong>Bairro</strong></label>
+						<input
+							class="rounded p-2"
+							type="text"
+							id="neighborhood"
+							name="neighborhood"
+							value={ e.Neighborhood }
+						/>
+						<sub class="text-red-600">{ e.Errors["Neighborhood"] }</sub>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="street_type"><strong>Logradouro (tipo)</strong></label>
+						<select class="h-10 rounded bg-white p-2" id="street_type" name="street_type">
+							for _, streetType := range getStreetTypes() {
+								<option
+									if e.StreetType == streetType {
+										selected
+									}
+									value={ streetType }
+								>
+									{ streetType }
+								</option>
+							}
+						</select>
+						<sub class="text-red-600">{ e.Errors["StreetType"] }</sub>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="street_name"><strong>Logradouro (nome)</strong></label>
+						<input
+							class="rounded p-2"
+							type="text"
+							id="street_name"
+							name="street_name"
+							value={ e.StreetName }
+						/>
+						<sub class="text-red-600">{ e.Errors["StreetName"] }</sub>
+					</div>
+					<div class="flex flex-col gap-2">
+						<label class="truncate" for="number"><strong>Número da casa</strong></label>
+						<input
+							class="rounded p-2"
+							type="text"
+							id="number"
+							name="number"
+							value={ e.Number }
+						/>
+						<sub class="text-red-600">{ e.Errors["Number"] }</sub>
+					</div>
+				</div>
+			</div>
+
+			<div class="flex gap-6">
+				<div class="mt-4 flex-1" { getHxVerbByAction(e)... }>
+					@shared.SubmitButton("md") {
+						@shared.Icon(getIconNameByAction(e))
+						<span>{ getTextByAction(e) }</span>
+					}
+				</div>
+				if e.ID != 0 {
+					<div class="mt-4 flex-1" hx-delete={ fmt.Sprintf("/entities/%d", e.ID) }>
+						@shared.DefaultButton("md") {
+							@shared.Icon("trash-2")
+							<span>Deletar</span>
+						}
+					</div>
+				}
+			</div>
+		</form>
+	</div>
+}
+
+func getUserTypes() models.SiareUserTypes {
+	return models.EntityUserTypes
+}
+
+func getStreetTypes() models.SiareAddressStreetTypes {
+	return models.EntityAddressStreetTypes
+}
+
+func getTextByAction(e *models.Entity) string {
+	if e.ID == 0 {
+		return "Registrar"
+	}
+	return "Editar"
+}
+
+func getIconNameByAction(e *models.Entity) string {
+	if e.ID == 0 {
+		return "user-plus"
+	}
+	return "edit"
+}
+
+func getHxVerbByAction(e *models.Entity) templ.Attributes {
+	if e.ID == 0 {
+		return templ.Attributes{
+			"hx-post": "/entities/create",
+		}
+	}
+	return templ.Attributes{
+		"hx-put": fmt.Sprintf("/entities/%d", e.ID),
+	}
+}
