@@ -60,7 +60,7 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 	}
 }
 
-func (e *Entity) Validate() bool {
+func (e *Entity) IsValid() bool {
 	fields := Fields{
 		{
 			Name:  "Name",

@@ -20,7 +20,7 @@ templ EntitiesPage(entities []*models.Entity) {
 	</div>
 }
 
-templ CreateEntityPage(entity *models.Entity) {
+templ EntityFormPage(entity *models.Entity) {
 	<div class="m-auto md:w-4/5 lg:w-3/5 2xl:w-2/5">
 		@forms.EntityForm(entity)	
 	</div>	

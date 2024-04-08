@@ -7,9 +7,9 @@ import "github.com/cayo-rodrigues/nff/web/components/shared"
 
 templ EntityForm(e *models.Entity) {
 	<div class="sticky top-20" id="entity-form">
-		<form>
+		<form { getHxVerbByAction(e)... }>
 			<input type="hidden" name="id" value={ strconv.Itoa(e.ID) }/>
-			<div class="flex flex-col py-2">
+			<div class="flex flex-col gap-2 py-2">
 				<sup class="text-red-600">{ e.Errors["Name"] }</sup>
 				<input
 					class="flex-1 rounded p-2 text-2xl font-semibold"
@@ -21,7 +21,7 @@ templ EntityForm(e *models.Entity) {
 			</div>
 			<hr/>
 			<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
-				<div>
+				<div class="grid grid-cols-1 gap-4">
 					<div class="flex flex-col gap-2">
 						<label class="truncate" for="user_type"><strong>Tipo</strong></label>
 						<select class="h-10 rounded bg-white p-2" id="user_type" name="user_type">
@@ -86,7 +86,7 @@ templ EntityForm(e *models.Entity) {
 						</button>
 					</div>
 				</div>
-				<div>
+				<div class="grid grid-cols-1 gap-4">
 					<div class="flex flex-col gap-2">
 						<label class="truncate" for="postal_code"><strong>CEP</strong></label>
 						<input
@@ -151,7 +151,7 @@ templ EntityForm(e *models.Entity) {
 			</div>
 
 			<div class="flex gap-6">
-				<div class="mt-4 flex-1" { getHxVerbByAction(e)... }>
+				<div class="mt-4 flex-1">
 					@shared.SubmitButton("md") {
 						@shared.Icon(getIconNameByAction(e))
 						<span>{ getTextByAction(e) }</span>

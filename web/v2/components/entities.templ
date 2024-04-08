@@ -5,7 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/components/shared"
 import "fmt"
 
 templ EntityList(entities []*models.Entity) {
-	<ul id="entity-list" class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+	<ul id="entity-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
 		for _, entity := range entities {
 			@EntityCard(entity)
 		}
@@ -13,13 +13,29 @@ templ EntityList(entities []*models.Entity) {
 }
 
 templ EntityCard(e *models.Entity) {
-	<li id={ entityCardID(e) } class="cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400">
+	<li
+		id={ entityCardID(e) }
+		class="relative transform cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
+	>
 		<h3 class="truncate rounded border border-gray-300 p-2 text-lg font-bold">{ e.Name }</h3>
 		<ul class="flex flex-col gap-1 p-2">
 			<li>{ e.UserType }</li>
-			<li><span class="font-medium">IE:</span> { e.Ie }</li>
 			<li><span class="font-medium">CPF/CNPJ:</span> { e.CpfCnpj }</li>
+			<li><span class="font-medium">IE:</span> { e.Ie }</li>
 		</ul>
+		<div class="absolute bottom-2 right-2 grid grid-cols-3 gap-2">
+			@shared.WarningButton("xs") {
+				@shared.Icon("eye")
+			}
+			<a href={ templ.SafeURL(fmt.Sprintf("/entities/%d", e.ID)) }>
+				@shared.InfoButton("xs") {
+					@shared.Icon("edit")
+				}
+			</a>
+			@shared.DefaultButton("xs") {
+				@shared.Icon("trash-2")
+			}
+		</div>
 	</li>
 }
 

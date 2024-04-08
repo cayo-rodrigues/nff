@@ -62,8 +62,10 @@ func getButtonClassesByTheme(theme string, size string) string {
 	}
 
 	switch size {
+	case "xs":
+		padding = "p-1"
 	case "sm":
-		padding = "px-3 py-2"
+		padding = "p-2"
 	case "md":
 		padding = "px-3 py-2 sm:py-3"
 	}
