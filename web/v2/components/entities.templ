@@ -15,7 +15,7 @@ templ EntityList(entities []*models.Entity) {
 templ EntityCard(e *models.Entity) {
 	<li
 		id={ entityCardID(e) }
-		class="relative transform cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
+		class="relative cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
 	>
 		<h3 class="truncate rounded border border-gray-300 p-2 text-lg font-bold">{ e.Name }</h3>
 		<ul class="flex flex-col gap-1 p-2">
@@ -23,10 +23,12 @@ templ EntityCard(e *models.Entity) {
 			<li><span class="font-medium">CPF/CNPJ:</span> { e.CpfCnpj }</li>
 			<li><span class="font-medium">IE:</span> { e.Ie }</li>
 		</ul>
-		<div class="absolute bottom-2 right-2 grid grid-cols-3 gap-2">
-			@shared.WarningButton("xs") {
-				@shared.Icon("eye")
-			}
+		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-3 sm:p-0">
+			<div onclick={ openEntityDetails(entityDetailsID(e)) }>
+				@shared.WarningButton("xs") {
+					@shared.Icon("eye")
+				}
+			</div>
 			<a href={ templ.SafeURL(fmt.Sprintf("/entities/%d", e.ID)) }>
 				@shared.InfoButton("xs") {
 					@shared.Icon("edit")
@@ -36,7 +38,33 @@ templ EntityCard(e *models.Entity) {
 				@shared.Icon("trash-2")
 			}
 		</div>
+		@EntityDetails(e)
 	</li>
+}
+
+templ EntityDetails(e *models.Entity) {
+	<dialog id={ entityDetailsID(e) } class="w-11/12 rounded sm:w-10/12 md:w-9/12 lg:w-7/12 xl:w-6/12 2xl:w-5/12">
+		<div class="rounded border border-gray-200 p-2 shadow shadow-gray-300">
+			<div class="relative rounded border border-gray-300 p-2">
+				<h3 class="text-lg font-bold">{ e.Name }</h3>
+				<div class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1" onclick={ closeEntityDetails(entityDetailsID(e)) }>
+					@shared.Icon("x-circle")
+				</div>
+			</div>
+			<ul class="grid gap-2 p-2 sm:grid-cols-2">
+				<li><span class="font-medium">Tipo:</span> { e.UserType }</li>
+				<li><span class="font-medium">CPF/CNPJ:</span> { e.CpfCnpj }</li>
+				<li><span class="font-medium">IE:</span> { e.Ie }</li>
+				<li><span class="font-medium">Email:</span> { e.Email }</li>
+				<li><span class="font-medium">Senha:</span> { e.Password }</li>
+				<li><span class="font-medium">CEP:</span> { e.PostalCode }</li>
+				<li><span class="font-medium">Bairro:</span> { e.Neighborhood }</li>
+				<li><span class="font-medium">Tipo de logradouro:</span> { e.StreetType }</li>
+				<li><span class="font-medium">Logradouro:</span> { e.StreetName }</li>
+				<li><span class="font-medium">Número da casa:</span> { e.Number }</li>
+			</ul>
+		</div>
+	</dialog>
 }
 
 templ SearchBar() {
@@ -50,4 +78,22 @@ templ SearchBar() {
 
 func entityCardID(e *models.Entity) string {
 	return fmt.Sprintf("entity-card-%d", e.ID)
+}
+
+script openEntityDetails(entityDetailsID string) {
+	const dialog = document.querySelector(`#${entityDetailsID}`)	
+	if (dialog) {
+		dialog.showModal()
+	}
+}
+
+script closeEntityDetails(entityDetailsID string) {
+	const dialog = document.querySelector(`#${entityDetailsID}`)	
+	if (dialog) {
+		dialog.close()
+	}
+}
+
+func entityDetailsID(e *models.Entity) string {
+	return fmt.Sprintf("entity-details-%d", e.ID)
 }

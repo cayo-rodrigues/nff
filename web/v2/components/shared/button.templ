@@ -42,8 +42,14 @@ templ DefaultButton(size string) {
 	}
 }
 
+templ DefaultButtonOutline(size string) {
+	@Button("default-outline", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
 func getButtonClassesByTheme(theme string, size string) string {
-	classes := "flex w-full items-center justify-center rounded gap-3"
+	classes := "flex w-full border items-center justify-center rounded gap-3"
 
 	colors := ""
 	padding := ""
@@ -57,6 +63,10 @@ func getButtonClassesByTheme(theme string, size string) string {
 		colors = "bg-red-400 hover:bg-red-500 active:bg-red-600"
 	case "info":
 		colors = "bg-sky-400 hover:bg-sky-500 active:bg-sky-600"
+	case "default":
+		colors = "bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
+	case "default-outline":
+		colors = "bg-white border-gray-300 hover:bg-gray-200 active:bg-gray-300"
 	default:
 		colors = "bg-gray-400 hover:bg-gray-500 active:bg-gray-600"
 	}
