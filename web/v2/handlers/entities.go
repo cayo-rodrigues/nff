@@ -47,7 +47,7 @@ func CreateEntity(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/entities")
+	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
 
 func UpdateEntity(c *fiber.Ctx) error {
@@ -61,5 +61,5 @@ func UpdateEntity(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/entities")
+	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }

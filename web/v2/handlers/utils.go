@@ -27,3 +27,8 @@ func RetargetToForm(c *fiber.Ctx, resourceName string, form templ.Component, opt
 	hxTarget := fmt.Sprintf("#%s-form", resourceName)
 	return RetargetResponse(c, form, hxTarget, "outerHTML", options...)
 }
+
+func RetargetToPageHandler(c *fiber.Ctx, url string, pageHandler fiber.Handler) error {
+	c.Set("HX-Location", url)
+	return pageHandler(c)
+}
