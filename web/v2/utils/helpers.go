@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func TrimSpaceBytes(b []byte) string {
@@ -47,4 +49,9 @@ func NDaysBefore(now time.Time, days int) time.Time {
 
 func FormatedNDaysBefore(now time.Time, days int) string {
 	return FormatDate(NDaysBefore(now, days))
+}
+
+func GetCurrentUserID(c *fiber.Ctx) int {
+	userID := c.Locals("UserID").(int)
+	return userID
 }

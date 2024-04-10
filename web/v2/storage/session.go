@@ -35,3 +35,20 @@ func DeleteSessionKeys(c *fiber.Ctx, opts ...*SessionOpts) error {
 	}
 	return sess.Save()
 }
+
+func GetSessionValsByKeys(c *fiber.Ctx, opts ...*SessionOpts) (map[string]any, error) {
+	db := database.GetDB()
+
+	sess, err := db.SessionStore.Get(c)
+	if err != nil {
+		return nil, err
+	}
+
+	vals := map[string]any{}
+
+	for _, opt := range opts {
+		vals[opt.Key] = sess.Get(opt.Key)
+	}
+
+	return vals, nil
+}

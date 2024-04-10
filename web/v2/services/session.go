@@ -10,7 +10,16 @@ func SaveUserSession(c *fiber.Ctx, userID int) error {
 		{Key: "IsAuthenticated", Val: true},
 		{Key: "UserID", Val: userID},
 	}
-	return storage.SetSessionKVs(c, sessionOpts...)
+
+	err := storage.SetSessionKVs(c, sessionOpts...)
+	if err != nil {
+		return err
+	}
+
+	c.Locals("IsAuthenticated", true)
+	c.Locals("UserID", userID)
+
+	return nil
 }
 
 func DestroyUserSession(c *fiber.Ctx) error {
@@ -18,5 +27,31 @@ func DestroyUserSession(c *fiber.Ctx) error {
 		{Key: "IsAuthenticated"},
 		{Key: "UserID"},
 	}
-	return storage.DeleteSessionKeys(c, sessionOpts...)
+
+	err := storage.DeleteSessionKeys(c, sessionOpts...)
+	if err != nil {
+		return err
+	}
+
+	c.Locals("IsAuthenticated", false)
+	c.Locals("UserID", 0)
+
+	return nil
+}
+
+func GetUserSession(c *fiber.Ctx) (isAuthenticated bool, userID int, err error) {
+	sessionOpts := []*storage.SessionOpts{
+		{Key: "IsAuthenticated"},
+		{Key: "UserID"},
+	}
+
+	vals, err := storage.GetSessionValsByKeys(c, sessionOpts...)
+	if err != nil {
+		return false, 0, err
+	}
+
+	isAuthenticated = vals["IsAuthenticated"].(bool)
+	userID = vals["UserID"].(int)
+
+	return isAuthenticated, userID, nil
 }

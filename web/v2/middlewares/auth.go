@@ -1,32 +1,30 @@
 package middlewares
 
 import (
-	"github.com/cayo-rodrigues/nff/web/database"
+	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/gofiber/fiber/v2"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
-	db := database.GetDB()
-
-	sess, err := db.SessionStore.Get(c)
+	isAuthenticated, userID, err := services.GetUserSession(c)
 	if err != nil {
 		return err
 	}
 
-	isAuthenticated, authOk := sess.Get("IsAuthenticated").(bool)
-	userID, idOk := sess.Get("UserID").(int)
+	if !isAuthenticated || userID == 0 {
+		err := services.DestroyUserSession(c)
+		if err != nil {
+			return err
+		}
 
-	if !authOk || !idOk || !isAuthenticated || userID == 0 {
-		c.Locals("IsAuthenticated", false)
-		c.Locals("UserID", 0)
 		if c.Path() != "/" {
-			sess.Destroy()
+			c.Set("HX-Target", "body")
 			return c.Redirect("/login")
 		}
 	}
 
-	// maybe we could refresh the user session here
-	c.Locals("IsAuthenticated", isAuthenticated)
-	c.Locals("UserID", userID)
+	// refresh user session
+	services.SaveUserSession(c, userID)
+
 	return c.Next()
 }

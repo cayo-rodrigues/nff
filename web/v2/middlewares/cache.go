@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/database"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 )
@@ -100,7 +101,7 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 }
 
 func getKeyFactors(c *fiber.Ctx) (int, string, string) {
-	userID := c.Locals("UserID").(int)
+	userID := utils.GetCurrentUserID(c)
 	route := c.OriginalURL()
 
 	var namespace string
