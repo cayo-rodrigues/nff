@@ -66,8 +66,19 @@ func Validate(fields Fields) (ErrorMessages, bool) {
 	return messages, len(messages) == 0
 }
 
+func All(vals ...any) bool {
+	for _, val := range vals {
+		if !HasValue(val) {
+			return false
+		}
+	}
+	return true
+}
+
 func HasValue(val any) bool {
 	switch val := val.(type) {
+	case bool:
+		return val
 	case string:
 		return utf8.RuneCountInString(val) > 0
 	case int:
@@ -217,7 +228,7 @@ func Max(maxValue int) RuleFunc {
 	}
 }
 
-func OneOf(vals ...any) RuleFunc {
+func OneOf[T string | int](vals []T) RuleFunc {
 	return func() *RuleSet {
 		return &RuleSet{
 			MessageFunc: func(rs *RuleSet) string {
@@ -235,7 +246,7 @@ func OneOf(vals ...any) RuleFunc {
 	}
 }
 
-func NotOneOf(vals ...any) RuleFunc {
+func NotOneOf[T string | int](vals []T) RuleFunc {
 	return func() *RuleSet {
 		return &RuleSet{
 			MessageFunc: func(rs *RuleSet) string {
@@ -260,7 +271,7 @@ func RequiredUnless(vals ...any) RuleFunc {
 				return utils.MandatoryFieldMsg
 			},
 			ValidateFunc: func(rs *RuleSet) bool {
-				if HasValue(rs) {
+				if HasValue(rs.FieldValue) {
 					return true
 				}
 				for _, val := range vals {

@@ -71,7 +71,7 @@ func (i *InvoiceItem) IsValid() bool {
 		{
 			Name:  "Group",
 			Value: i.Group,
-			Rules: Rules(OneOf(InvoiceItemGroups)),
+			Rules: Rules(OneOf(InvoiceItemGroups[:])),
 		},
 		{
 			Name:  "NCM",
@@ -86,12 +86,12 @@ func (i *InvoiceItem) IsValid() bool {
 		{
 			Name:  "Origin",
 			Value: i.Origin,
-			Rules: Rules(OneOf(InvoiceItemOrigins)),
+			Rules: Rules(OneOf(InvoiceItemOrigins[:])),
 		},
 		{
 			Name:  "UnityOfMeasurement",
 			Value: i.UnityOfMeasurement,
-			Rules: Rules(OneOf(InvoiceItemUnitiesOfMeaasurement)),
+			Rules: Rules(OneOf(InvoiceItemUnitiesOfMeaasurement[:])),
 		},
 		{
 			Name:  "Quantity",

@@ -74,22 +74,22 @@ func (i *Invoice) Validate() bool {
 		{
 			Name:  "Operation",
 			Value: i.Operation,
-			Rules: Rules(OneOf(InvoiceOperations)),
+			Rules: Rules(OneOf(InvoiceOperations[:])),
 		},
 		{
 			Name:  "Cfop",
 			Value: i.Cfop,
-			Rules: Rules(OneOf(InvoiceCfops)),
+			Rules: Rules(OneOf(InvoiceCfops[:])),
 		},
 		{
 			Name:  "IsIcmsContributor",
 			Value: i.IsIcmsContributor,
-			Rules: Rules(OneOf(InvoiceIcmsOptions)),
+			Rules: Rules(OneOf(InvoiceIcmsOptions[:])),
 		},
 		{
 			Name:  "IsFinalCustomer",
 			Value: i.IsFinalCustomer,
-			Rules: Rules(OneOf(InvoiceBooleanField)),
+			Rules: Rules(OneOf(InvoiceBooleanField[:])),
 		},
 		{
 			Name:  "Shipping",
@@ -99,7 +99,7 @@ func (i *Invoice) Validate() bool {
 		{
 			Name:  "AddShippingToTotal",
 			Value: i.AddShippingToTotal,
-			Rules: Rules(OneOf(InvoiceBooleanField)),
+			Rules: Rules(OneOf(InvoiceBooleanField[:])),
 		},
 		{
 			Name:  "Gta",

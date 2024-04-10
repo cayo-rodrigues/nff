@@ -9,17 +9,17 @@ import (
 )
 
 type Entity struct {
-	ID         int           `json:"-"`
-	Name       string        `json:"-"`
-	UserType   string        `json:"user_type"`
-	Ie         string        `json:"ie"`
-	CpfCnpj    string        `json:"cpf_cnpj"`
-	Email      string        `json:"email"`
-	Password   string        `json:"password"`
-	CreatedBy  int           `json:"-"`
-	CreatedAt  time.Time     `json:"-"`
-	UpdatedAt  time.Time     `json:"-"`
-	Errors     ErrorMessages `json:"-"`
+	ID        int           `json:"-"`
+	Name      string        `json:"-"`
+	UserType  string        `json:"user_type"`
+	Ie        string        `json:"ie"`
+	CpfCnpj   string        `json:"cpf_cnpj"`
+	Email     string        `json:"email"`
+	Password  string        `json:"password"`
+	CreatedBy int           `json:"-"`
+	CreatedAt time.Time     `json:"-"`
+	UpdatedAt time.Time     `json:"-"`
+	Errors    ErrorMessages `json:"-"`
 	*Address
 }
 
@@ -70,7 +70,7 @@ func (e *Entity) IsValid() bool {
 		{
 			Name:  "UserType",
 			Value: e.UserType,
-			Rules: Rules(Required, OneOf(EntityUserTypes)),
+			Rules: Rules(Required, OneOf(EntityUserTypes[:])),
 		},
 		{
 			Name:  "CpfCnpj",
@@ -80,7 +80,7 @@ func (e *Entity) IsValid() bool {
 		{
 			Name:  "Ie",
 			Value: e.Ie,
-			Rules: Rules(Match(IEMGRegex)),
+			Rules: Rules(Match(IEMGRegex), RequiredUnless(All(e.PostalCode, e.Neighborhood, e.StreetType, e.StreetName, e.Number))),
 		},
 		{
 			Name:  "Email",
@@ -100,7 +100,7 @@ func (e *Entity) IsValid() bool {
 		{
 			Name:  "StreetType",
 			Value: e.StreetType,
-			Rules: Rules(OneOf(EntityAddressStreetTypes)),
+			Rules: Rules(OneOf(EntityAddressStreetTypes[:])),
 		},
 		{
 			Name:  "StreetName",
