@@ -149,7 +149,6 @@ templ EntityForm(e *models.Entity) {
 					</div>
 				</div>
 			</div>
-
 			<div class="flex gap-6">
 				<div class="mt-4 flex-1">
 					@shared.SubmitButton("md") {
@@ -158,7 +157,7 @@ templ EntityForm(e *models.Entity) {
 					}
 				</div>
 				if e.ID != 0 {
-					<div class="mt-4 flex-1" hx-delete={ fmt.Sprintf("/entities/%d", e.ID) }>
+					<div class="mt-4 flex-1" hx-delete={ fmt.Sprintf("/entities/delete/%d", e.ID) }>
 						@shared.DefaultButton("md") {
 							@shared.Icon("trash-2")
 							<span>Deletar</span>
@@ -193,15 +192,15 @@ func getIconNameByAction(e *models.Entity) string {
 }
 
 func getHxAttrsByAction(e *models.Entity) templ.Attributes {
+	attrs := templ.Attributes{
+		"hx-target":   "body",
+		"hx-boost":    "true",
+		"hx-push-url": "true",
+	}
 	if e.ID == 0 {
-		return templ.Attributes{
-			"hx-post": "/entities/create",
-			"hx-target": "body",
-			"hx-boost": "true",
-			"hx-push-url": "true",
-		}
+		attrs["hx-post"] = "/entities/create"
+		return attrs
 	}
-	return templ.Attributes{
-		"hx-put": fmt.Sprintf("/entities/%d", e.ID),
-	}
+	attrs["hx-put"] = fmt.Sprintf("/entities/update/%d", e.ID)
+	return attrs
 }

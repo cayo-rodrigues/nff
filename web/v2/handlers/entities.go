@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"strconv"
+
 	"github.com/cayo-rodrigues/nff/web/components/forms"
 	"github.com/cayo-rodrigues/nff/web/components/layouts"
 	"github.com/cayo-rodrigues/nff/web/components/pages"
@@ -23,8 +25,14 @@ func CreateEntityPage(c *fiber.Ctx) error {
 }
 
 func EditEntityPage(c *fiber.Ctx) error {
-	entity := models.NewEntity()
-	entity.ID = 1
+	entityID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+	entity, err := services.RetrieveEntity(c, entityID)
+	if err != nil {
+		return err
+	}
 	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
 }
 
@@ -35,6 +43,20 @@ func CreateEntity(c *fiber.Ctx) error {
 	}
 
 	err := services.CreateEntity(c, entity)
+	if err != nil {
+		return err
+	}
+
+	return c.Redirect("/entities")
+}
+
+func UpdateEntity(c *fiber.Ctx) error {
+	entity := models.NewEntityFromForm(c)
+	if !entity.IsValid() {
+		return RetargetToForm(c, "entity", forms.EntityForm(entity))
+	}
+
+	err := services.UpdateEntity(c, entity)
 	if err != nil {
 		return err
 	}

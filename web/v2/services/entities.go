@@ -21,3 +21,18 @@ func ListEntities(c *fiber.Ctx) ([]*models.Entity, error) {
 	}
 	return entities, nil
 }
+
+func RetrieveEntity(c *fiber.Ctx, entityID int) (*models.Entity, error) {
+	userID := utils.GetCurrentUserID(c)
+	entity, err := storage.RetrieveEntity(c.Context(), entityID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return entity, nil
+}
+
+func UpdateEntity(c *fiber.Ctx, entity *models.Entity) error {
+	userID := utils.GetCurrentUserID(c)
+	entity.CreatedBy = userID
+	return storage.UpdateEntity(c.Context(), entity)
+}
