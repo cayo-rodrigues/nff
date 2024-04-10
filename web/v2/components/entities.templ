@@ -24,7 +24,7 @@ templ EntityCard(e *models.Entity) {
 			<li><span class="font-medium">IE:</span> { e.Ie }</li>
 		</ul>
 		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-3 sm:p-0">
-			<div onclick={ openEntityDetails(entityDetailsID(e)) }>
+			<div onclick={ openDialog(entityDetailsID(e)) }>
 				@shared.WarningButton("xs") {
 					@shared.Icon("eye")
 				}
@@ -34,11 +34,14 @@ templ EntityCard(e *models.Entity) {
 					@shared.Icon("edit")
 				}
 			</a>
-			@shared.DefaultButton("xs") {
-				@shared.Icon("trash-2")
-			}
+			<div onclick={ openDialog(deleteConfirmationDialogID(e)) }>
+				@shared.DefaultButton("xs") {
+					@shared.Icon("trash-2")
+				}
+			</div>
 		</div>
 		@EntityDetails(e)
+		@DeleteConfirmationDialog(e)
 	</li>
 }
 
@@ -47,7 +50,7 @@ templ EntityDetails(e *models.Entity) {
 		<div class="rounded border border-gray-200 p-2 shadow shadow-gray-300">
 			<div class="relative rounded border border-gray-300 p-2">
 				<h3 class="text-lg font-bold">{ e.Name }</h3>
-				<div class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1" onclick={ closeEntityDetails(entityDetailsID(e)) }>
+				<div class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1" onclick={ closeDialog(entityDetailsID(e)) }>
 					@shared.Icon("x-circle")
 				</div>
 			</div>
@@ -67,6 +70,23 @@ templ EntityDetails(e *models.Entity) {
 	</dialog>
 }
 
+templ DeleteConfirmationDialog(e *models.Entity) {
+	<dialog id={ deleteConfirmationDialogID(e) }>
+		<div class="rounded border border-gray-200 p-2 shadow shadow-gray-300">
+			<h3>Quer mesmo deletar a entidade?</h3>
+			<p>Isso irá apagar todos os recursos relacionados à ela, como requerimentos, cancelamentos, histórico, etc.</p>
+			<div class="grid grid-cols-2 gap-2">
+				@shared.ErrorButton("md") {
+					Sim
+				}
+				@shared.DefaultButton("md") {
+					Cancelar
+				}
+			</div>
+		</div>
+	</dialog>
+}
+
 templ SearchBar() {
 	<div class="group flex w-full rounded border bg-white focus-within:border-gray-400 sm:w-1/2 md:w-1/3 lg:w-1/4">
 		<div class="rounded-s bg-white p-2">
@@ -80,15 +100,15 @@ func entityCardID(e *models.Entity) string {
 	return fmt.Sprintf("entity-card-%d", e.ID)
 }
 
-script openEntityDetails(entityDetailsID string) {
-	const dialog = document.querySelector(`#${entityDetailsID}`)	
+script openDialog(id string) {
+	const dialog = document.querySelector(`#${id}`)	
 	if (dialog) {
 		dialog.showModal()
 	}
 }
 
-script closeEntityDetails(entityDetailsID string) {
-	const dialog = document.querySelector(`#${entityDetailsID}`)	
+script closeDialog(id string) {
+	const dialog = document.querySelector(`#${id}`)	
 	if (dialog) {
 		dialog.close()
 	}
@@ -96,4 +116,8 @@ script closeEntityDetails(entityDetailsID string) {
 
 func entityDetailsID(e *models.Entity) string {
 	return fmt.Sprintf("entity-details-%d", e.ID)
+}
+
+func deleteConfirmationDialogID(e *models.Entity) string {
+	return fmt.Sprintf("delete-confirmation-dialog-%d", e.ID)
 }
