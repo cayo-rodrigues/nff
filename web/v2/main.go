@@ -53,7 +53,7 @@ func main() {
 	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
-	// app.Use(middlewares.CacheMiddleware)
+	app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/", handlers.HomePage)
 

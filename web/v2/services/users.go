@@ -53,5 +53,7 @@ func IsLoginDataValid(ctx context.Context, user *models.User) bool {
 		return false
 	}
 
+	user.ID = userFromDB.ID
+
 	return true
 }

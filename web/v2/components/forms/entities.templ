@@ -7,7 +7,7 @@ import "github.com/cayo-rodrigues/nff/web/components/shared"
 
 templ EntityForm(e *models.Entity) {
 	<div class="sticky top-20" id="entity-form">
-		<form { getHxVerbByAction(e)... }>
+		<form { getHxAttrsByAction(e)... }>
 			<input type="hidden" name="id" value={ strconv.Itoa(e.ID) }/>
 			<div class="flex flex-col gap-2 py-2">
 				<sup class="text-red-600">{ e.Errors["Name"] }</sup>
@@ -192,10 +192,13 @@ func getIconNameByAction(e *models.Entity) string {
 	return "edit"
 }
 
-func getHxVerbByAction(e *models.Entity) templ.Attributes {
+func getHxAttrsByAction(e *models.Entity) templ.Attributes {
 	if e.ID == 0 {
 		return templ.Attributes{
 			"hx-post": "/entities/create",
+			"hx-target": "body",
+			"hx-boost": "true",
+			"hx-push-url": "true",
 		}
 	}
 	return templ.Attributes{

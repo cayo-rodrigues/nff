@@ -18,7 +18,6 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		}
 
 		if c.Path() != "/" {
-			c.Set("HX-Target", "body")
 			return c.Redirect("/login")
 		}
 	}

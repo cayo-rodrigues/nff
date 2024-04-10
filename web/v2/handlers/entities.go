@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"github.com/a-h/templ"
 	"github.com/cayo-rodrigues/nff/web/components/forms"
 	"github.com/cayo-rodrigues/nff/web/components/layouts"
 	"github.com/cayo-rodrigues/nff/web/components/pages"
@@ -40,5 +39,5 @@ func CreateEntity(c *fiber.Ctx) error {
 		return err
 	}
 
-	return Render(c, forms.EntityForm(entity), templ.WithStatus(fiber.StatusCreated))
+	return c.Redirect("/entities")
 }

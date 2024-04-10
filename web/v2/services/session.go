@@ -50,8 +50,12 @@ func GetUserSession(c *fiber.Ctx) (isAuthenticated bool, userID int, err error) 
 		return false, 0, err
 	}
 
-	isAuthenticated = vals["IsAuthenticated"].(bool)
-	userID = vals["UserID"].(int)
+	isAuthenticated, authOk := vals["IsAuthenticated"].(bool)
+	userID, idOK := vals["UserID"].(int)
+
+	if !authOk || !idOK {
+		return false, 0, nil
+	}
 
 	return isAuthenticated, userID, nil
 }
