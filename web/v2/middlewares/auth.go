@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"github.com/cayo-rodrigues/nff/web/handlers"
 	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +19,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		}
 
 		if c.Path() != "/" {
-			return c.Redirect("/login")
+			return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
 		}
 	}
 

@@ -29,7 +29,7 @@ func LoginUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/entities")
+	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
 
 func LogoutUser(c *fiber.Ctx) error {
@@ -38,5 +38,5 @@ func LogoutUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/")
+	return RetargetToPageHandler(c, "/", HomePage)
 }
