@@ -62,7 +62,7 @@ func main() {
 	app.Post("/entities/create", handlers.CreateEntity)
 	app.Get("/entities/update/:id", handlers.EditEntityPage)
 	app.Put("/entities/update/:id", handlers.UpdateEntity)
-	// app.Delete("/entities/delete/:id", entitiesPage.DeleteEntity)
+	app.Delete("/entities/delete/:id", handlers.DeleteEntity)
 
 	// app.Get("/invoices", invoicesPage.Render)
 	// app.Post("/invoices", invoicesPage.RequireInvoice)

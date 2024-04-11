@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/cayo-rodrigues/nff/web/components/layouts"
-	"github.com/cayo-rodrigues/nff/web/components/pages"
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/gofiber/fiber/v2"
 )
 

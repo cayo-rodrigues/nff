@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"github.com/cayo-rodrigues/nff/web/components/forms"
-	"github.com/cayo-rodrigues/nff/web/components/layouts"
-	"github.com/cayo-rodrigues/nff/web/components/pages"
+	"github.com/cayo-rodrigues/nff/web/ui/forms"
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/gofiber/fiber/v2"
