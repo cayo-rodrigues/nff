@@ -58,6 +58,7 @@ func main() {
 	app.Get("/", handlers.HomePage)
 
 	app.Get("/entities", handlers.EntitiesPage)
+	app.Get("/entities/search", handlers.SearchEntities)
 	app.Get("/entities/create", handlers.CreateEntityPage)
 	app.Post("/entities/create", handlers.CreateEntity)
 	app.Get("/entities/update/:id", handlers.EditEntityPage)

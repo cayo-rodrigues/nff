@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/database"
@@ -11,16 +12,28 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func ListEntities(ctx context.Context, userID int) (entities []*models.Entity, err error) {
+func ListEntities(ctx context.Context, userID int, filters ...map[string]string) (entities []*models.Entity, err error) {
 	namespace := "entities"
 
 	db := database.GetDB()
 
-	if db.Redis.GetDecodedCache(ctx, userID, namespace, &entities); entities != nil {
-		return entities, nil
+	if len(filters) == 0 {
+		if db.Redis.GetDecodedCache(ctx, userID, namespace, &entities); entities != nil {
+			return entities, nil
+		}
 	}
 
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM entities WHERE created_by = $1 ORDER BY name", userID)
+	query := new(strings.Builder)
+	query.WriteString("SELECT * FROM entities ")
+
+	var vals []any
+	if len(filters) > 0 {
+		vals = BuildQueryFilters(query, filters[0], userID, "entities")
+	}
+
+	query.WriteString(" ORDER BY name")
+
+	rows, _ := db.PG.Query(ctx, query.String(), vals...)
 	defer rows.Close()
 
 	for rows.Next() {

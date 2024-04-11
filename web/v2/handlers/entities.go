@@ -82,3 +82,13 @@ func DeleteEntity(c *fiber.Ctx) error {
 	}
 	return Render(c, components.Nothing())
 }
+
+func SearchEntities(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
+	filters := c.Queries()
+	entities, err := services.ListEntities(c.Context(), userID, filters)
+	if err != nil {
+		return err
+	}
+	return Render(c, components.EntityList(entities))
+}

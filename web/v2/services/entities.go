@@ -12,8 +12,8 @@ func CreateEntity(ctx context.Context, entity *models.Entity, userID int) error 
 	return storage.CreateEntity(ctx, entity)
 }
 
-func ListEntities(ctx context.Context, userID int) ([]*models.Entity, error) {
-	entities, err := storage.ListEntities(ctx, userID)
+func ListEntities(ctx context.Context, userID int, filters ...map[string]string) ([]*models.Entity, error) {
+	entities, err := storage.ListEntities(ctx, userID, filters...)
 	if err != nil {
 		return nil, err
 	}

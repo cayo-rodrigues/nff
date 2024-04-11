@@ -8,16 +8,17 @@ import (
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func BuildQueryFilters(query *strings.Builder, filters map[string]string, userID int, table string) []interface{} {
-	if filters == nil {
-		filters = map[string]string{}
-	}
-
+func BuildQueryFilters(query *strings.Builder, filters map[string]string, userID int, table string) []any {
 	query.WriteString("WHERE ")
 	query.WriteString(table)
 	query.WriteString(".created_by = $1")
 
-	params := []interface{}{userID}
+	params := []any{userID}
+
+	if filters == nil {
+		return params
+	}
+
 	paramCounter := 2
 
 	now := time.Now()
@@ -79,9 +80,17 @@ func BuildQueryFilters(query *strings.Builder, filters map[string]string, userID
 		paramCounter++
 	}
 
-	query.WriteString(" ORDER BY ")
-	query.WriteString(table)
-	query.WriteString(".created_at DESC")
+	if name, ok := filters["name"]; ok && name != "" {
+		query.WriteString(" AND ")
+		query.WriteString(table)
+		query.WriteString(".name")
+		query.WriteString(" ILIKE '%' || ")
+		query.WriteString("$")
+		query.WriteString(strconv.Itoa(paramCounter))
+		query.WriteString("|| '%'")
+		params = append(params, strings.TrimSpace(name))
+		paramCounter++
+	}
 
 	return params
 }
