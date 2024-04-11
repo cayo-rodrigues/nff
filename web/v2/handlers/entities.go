@@ -3,17 +3,19 @@ package handlers
 import (
 	"strconv"
 
+	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
-	"github.com/cayo-rodrigues/nff/web/ui/shared"
-	"github.com/cayo-rodrigues/nff/web/models"
-	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
 func EntitiesPage(c *fiber.Ctx) error {
-	entities, err := services.ListEntities(c)
+	userID := utils.GetCurrentUserID(c)
+	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
 		return err
 	}
@@ -26,11 +28,12 @@ func CreateEntityPage(c *fiber.Ctx) error {
 }
 
 func EditEntityPage(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
 	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
-	entity, err := services.RetrieveEntity(c, entityID)
+	entity, err := services.RetrieveEntity(c.Context(), entityID, userID)
 	if err != nil {
 		return err
 	}
@@ -38,12 +41,13 @@ func EditEntityPage(c *fiber.Ctx) error {
 }
 
 func CreateEntity(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err := services.CreateEntity(c, entity)
+	err := services.CreateEntity(c.Context(), entity, userID)
 	if err != nil {
 		return err
 	}
@@ -52,12 +56,13 @@ func CreateEntity(c *fiber.Ctx) error {
 }
 
 func UpdateEntity(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err := services.UpdateEntity(c, entity)
+	err := services.UpdateEntity(c.Context(), entity, userID)
 	if err != nil {
 		return err
 	}
@@ -66,5 +71,14 @@ func UpdateEntity(c *fiber.Ctx) error {
 }
 
 func DeleteEntity(c *fiber.Ctx) error {
-	return Render(c, shared.Nothing())
+	userID := utils.GetCurrentUserID(c)
+	entityID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+	err = services.DeleteEntity(c.Context(), entityID, userID)
+	if err != nil {
+		return err
+	}
+	return Render(c, components.Nothing())
 }

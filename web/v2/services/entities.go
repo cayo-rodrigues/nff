@@ -1,38 +1,38 @@
 package services
 
 import (
+	"context"
+
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
-	"github.com/cayo-rodrigues/nff/web/utils"
-	"github.com/gofiber/fiber/v2"
 )
 
-func CreateEntity(c *fiber.Ctx, entity *models.Entity) error {
-	userID := utils.GetCurrentUserID(c)
+func CreateEntity(ctx context.Context, entity *models.Entity, userID int) error {
 	entity.CreatedBy = userID
-	return storage.CreateEntity(c.Context(), entity)
+	return storage.CreateEntity(ctx, entity)
 }
 
-func ListEntities(c *fiber.Ctx) ([]*models.Entity, error) {
-	userID := utils.GetCurrentUserID(c)
-	entities, err := storage.ListEntities(c.Context(), userID)
+func ListEntities(ctx context.Context, userID int) ([]*models.Entity, error) {
+	entities, err := storage.ListEntities(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 	return entities, nil
 }
 
-func RetrieveEntity(c *fiber.Ctx, entityID int) (*models.Entity, error) {
-	userID := utils.GetCurrentUserID(c)
-	entity, err := storage.RetrieveEntity(c.Context(), entityID, userID)
+func RetrieveEntity(ctx context.Context, entityID int, userID int) (*models.Entity, error) {
+	entity, err := storage.RetrieveEntity(ctx, entityID, userID)
 	if err != nil {
 		return nil, err
 	}
 	return entity, nil
 }
 
-func UpdateEntity(c *fiber.Ctx, entity *models.Entity) error {
-	userID := utils.GetCurrentUserID(c)
+func UpdateEntity(ctx context.Context, entity *models.Entity, userID int) error {
 	entity.CreatedBy = userID
-	return storage.UpdateEntity(c.Context(), entity)
+	return storage.UpdateEntity(ctx, entity)
+}
+
+func DeleteEntity(ctx context.Context, entityID int, userID int) error {
+	return storage.DeleteEntity(ctx, entityID, userID)
 }
