@@ -29,6 +29,7 @@ type EntityFormError struct {
 	UserType     string
 	CpfCnpj      string
 	Ie           string
+	OtherIes     string
 	Email        string
 	PostalCode   string
 	Neighborhood string
@@ -50,6 +51,7 @@ type Entity struct {
 	Name       string           `json:"-"`
 	UserType   string           `json:"user_type"`
 	Ie         string           `json:"ie"`
+	OtherIes   []string         `json:"other_ies"`
 	CpfCnpj    string           `json:"cpf_cnpj"`
 	Email      string           `json:"email"`
 	Password   string           `json:"password"`
@@ -63,8 +65,8 @@ type Entity struct {
 
 func NewEmptyEntity() *Entity {
 	return &Entity{
-		Address: &Address{},
-		Errors:  &EntityFormError{},
+		Address:  &Address{},
+		Errors:   &EntityFormError{},
 	}
 }
 
@@ -73,7 +75,7 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 	if err != nil {
 		id = 0
 	}
-	return &Entity{
+	entity := &Entity{
 		ID:       id,
 		Name:     strings.TrimSpace(c.FormValue("name")),
 		UserType: strings.TrimSpace(c.FormValue("user_type")),
@@ -90,13 +92,18 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 		},
 		Errors: &EntityFormError{},
 	}
+	ies := strings.Split(c.FormValue("other_ies"), ",")
+	for _, ie := range ies {
+		entity.OtherIes = append(entity.OtherIes, strings.TrimSpace(ie))
+	}
+	return entity
 }
 
 func (e *Entity) Scan(rows db.Scanner) error {
 	return rows.Scan(
 		&e.ID, &e.Name, &e.UserType, &e.CpfCnpj, &e.Ie, &e.Email, &e.Password,
 		&e.Address.PostalCode, &e.Address.Neighborhood, &e.Address.StreetType, &e.Address.StreetName, &e.Address.Number,
-		&e.CreatedBy, &e.CreatedAt, &e.UpdatedAt,
+		&e.CreatedBy, &e.CreatedAt, &e.UpdatedAt, &e.OtherIes,
 	)
 }
 

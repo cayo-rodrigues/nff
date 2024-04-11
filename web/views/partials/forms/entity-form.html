@@ -91,6 +91,23 @@
                 </div>
             </div>
         </div>
+        <div class="flex">
+            <div class="flex w-full flex-col gap-2">
+                <label class="truncate" for="other_ies"><strong>Outras IEs</strong></label>
+                {{ $OtherIesJoined := Join .Entity.OtherIes ", " }}
+                <input 
+                    class="rounded bg-gray-100 p-2"
+                    placeholder="Separe por vírgulas"
+                    type="text"
+                    id="other_ies"
+                    name="other_ies"
+                    {{ if ne $OtherIesJoined "" }}
+                        value={{ $OtherIesJoined }}
+                    {{ end }}
+                >
+                <sub class="text-red-600">{{ .Entity.Errors.OtherIes }}</sub>
+            </div>
+        </div>
         <div class="flex gap-6">
             <button hx-post="/entities" hx-target="#entity-list" hx-swap="beforeend" class="icon-btn mt-4 flex flex-1 flex-col items-center justify-center gap-2 rounded bg-green-400 px-2 py-1 hover:bg-green-500 sm:flex-row sm:items-start sm:gap-3 sm:px-4 sm:py-3" type="submit">
                 <svg class="hx-indicator relative top-1 animate-spin" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><path d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.9zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z"/></svg>
