@@ -56,6 +56,7 @@ func main() {
 	engine.AddFunc("GetReqCardData", models.NewRequestCard)
 	engine.AddFunc("FormatDate", utils.FormatDate)
 	engine.AddFunc("FormatDateAsBR", utils.FormatDateAsBR)
+	engine.AddFunc("Join", utils.Join)
 
 	userService := services.NewUserService()
 	entityService := services.NewEntityService()
@@ -98,7 +99,7 @@ func main() {
 	app.Get("/logout", handlers.Logout)
 
 	app.Use(middlewares.AuthMiddleware)
-	app.Use(middlewares.CacheMiddleware)
+	// app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/", handlers.Home)
 

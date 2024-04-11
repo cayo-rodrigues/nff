@@ -47,13 +47,13 @@ func (s *EntityService) ListEntities(ctx context.Context, userID int) (entities 
 func (s *EntityService) CreateEntity(ctx context.Context, entity *models.Entity) error {
 	row := db.PG.QueryRow(
 		ctx,
-		`INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number, created_by)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+		`INSERT INTO entities (name, user_type, cpf_cnpj, ie, email, password, postal_code, neighborhood, street_type, street_name, number, created_by, other_ies)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 		RETURNING id
 		`,
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
 		entity.Address.PostalCode, entity.Address.Neighborhood, entity.Address.StreetType, entity.Address.StreetName, entity.Address.Number,
-		entity.CreatedBy,
+		entity.CreatedBy, entity.OtherIes,
 	)
 	err := row.Scan(&entity.ID)
 	if err != nil {
@@ -91,10 +91,10 @@ func (s *EntityService) UpdateEntity(ctx context.Context, entity *models.Entity)
 		`UPDATE entities
 			SET name = $1, user_type = $2, cpf_cnpj = $3, ie = $4, email = $5,
 				password = $6, postal_code = $7, neighborhood = $8, street_type = $9,
-				street_name = $10, number = $11
-		WHERE id = $12 AND created_by = $13`,
+				street_name = $10, number = $11, other_ies = $12
+		WHERE id = $13 AND created_by = $14`,
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
-		entity.Address.PostalCode, entity.Address.Neighborhood, entity.Address.StreetType, entity.Address.StreetName, entity.Address.Number,
+		entity.Address.PostalCode, entity.Address.Neighborhood, entity.Address.StreetType, entity.Address.StreetName, entity.Address.Number, entity.OtherIes,
 		entity.ID, entity.CreatedBy,
 	)
 	if err != nil {
