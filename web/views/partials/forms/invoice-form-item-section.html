@@ -18,9 +18,9 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap border-b border-gray-400 py-4">
+    <div class="grid grid-cols-1 gap-4 border-b border-gray-400 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
 
-            <div class="w-1/7 flex flex-col gap-2 pr-4">
+            <div class="flex flex-col gap-2">
                 <label for="group"><strong>Grupo</strong></label>
                 <select class="h-10 rounded bg-gray-100 p-2" id="group" name="group">
                     {{ range $FormSelectFields.Groups }}
@@ -30,33 +30,33 @@
                 <sub class="text-red-600">{{ .Errors.Group }}</sub>
             </div>
 
-            <div class="w-1/7 flex flex-col gap-2 sm:pr-4">
+            <div class="flex flex-col gap-2">
                 <label for="ncm"><strong>NCM</strong></label>
                 <input class="rounded bg-gray-100 p-2" type="text" id="ncm" name="ncm" value="{{ .NCM }}">
                 <sub class="text-red-600">{{ .Errors.NCM }}</sub>
             </div>
 
-            <div class="w-1/7 flex flex-col gap-2 pr-4">
+            <div class="flex flex-col gap-2">
                 <label for="description"><strong>Descrição</strong></label>
                 <input class="rounded bg-gray-100 p-2" type="text" id="description" name="description" value="{{ .Description }}">
                 <sub class="text-red-600">{{ .Errors.Description }}</sub>
             </div>
 
-            <div class="w-1/7 flex flex-col gap-2 xl:pr-4">
+            <div class="flex flex-col gap-2">
                 <label for="quantity"><strong>Quantidade</strong></label>
                 <input class="rounded bg-gray-100 p-2" type="number" step="0.01" id="quantity" name="quantity"
                     value="{{ .Quantity }}">
                 <sub class="text-red-600">{{ .Errors.Quantity }}</sub>
             </div>
 
-            <div class="w-1/7 flex flex-col gap-2 pr-4">
+            <div class="flex flex-col gap-2">
                 <label class="truncate" for="value_per_unity"><strong>Valor unitário</strong></label>
                 <input class="rounded bg-gray-100 p-2" type="number" step="0.01" id="value_per_unity"
                     name="value_per_unity" value="{{ .ValuePerUnity }}">
                 <sub class="text-red-600">{{ .Errors.ValuePerUnity }}</sub>
             </div>
 
-            <div class="w-1/7 flex flex-col gap-2 sm:pr-4">
+            <div class="flex flex-col gap-2">
                 <label for="origin"><strong>Origem</strong></label>
                 <select class="h-10 rounded bg-gray-100 p-2" id="origin" name="origin">
                     {{ range $FormSelectFields.Origins }}
@@ -66,7 +66,7 @@
                 <sub class="text-red-600">{{ .Errors.Origin }}</sub>
             </div>
 
-            <div class="w-1/7 flex flex-col gap-2 pr-4 xl:pr-0">
+            <div class="flex flex-col gap-2">
                 <label class="truncate" for="unity_of_measurement"><strong>Unidade de medida</strong></label>
                 <select class="h-10 rounded bg-gray-100 p-2" id="unity_of_measurement" name="unity_of_measurement">
                     {{ range $FormSelectFields.UnitiesOfMeasurement }}
