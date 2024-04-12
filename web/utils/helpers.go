@@ -94,18 +94,6 @@ func TrimSpaceFromBytesToFloat64(f []byte) (float64, error) {
 	return TrimSpaceFloat64(TrimSpaceBytes(f))
 }
 
-func Join(s []string, sep string) string {
-	if s == nil || len(s) == 0 {
-		return ""
-	}
-
-	result := new(strings.Builder)
-
-	for i, item := range s {
-		result.WriteString(item)
-		if len(s) > 1 && i < len(s) - 1 {
-			result.WriteString(sep)
-		}
-	}
-	return result.String()
+func Join(elems []string, sep string) string {
+	return strings.Join(elems, sep)
 }
