@@ -63,6 +63,7 @@ func (p *InvoicesPage) Render(c *fiber.Ctx) error {
 
 	pageData.FormSelectFields.Entities = entities
 	pageData.Invoice = models.NewEmptyInvoice()
+	pageData.Invoice.Sender = entities[0]
 
 	invoices, err := p.service.ListInvoices(c.Context(), userID, nil)
 	if err != nil {
