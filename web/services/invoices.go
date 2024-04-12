@@ -63,13 +63,13 @@ func (s *InvoiceService) CreateInvoice(ctx context.Context, invoice *models.Invo
 		`INSERT INTO invoices (
 				number, protocol, operation, cfop, is_final_customer, is_icms_contributor,
 				shipping, add_shipping_to_total, gta, extra_notes, custom_file_name,
-				sender_id, recipient_id, created_by
+				sender_id, recipient_id, created_by, sender_ie
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 		RETURNING id, req_status, req_msg`,
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
 		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.ExtraNotes, invoice.CustomFileName, invoice.Sender.ID,
-		invoice.Recipient.ID, invoice.CreatedBy,
+		invoice.Recipient.ID, invoice.CreatedBy, invoice.SenderIe,
 	)
 	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg)
 	if err != nil {
@@ -122,10 +122,11 @@ func (s *InvoiceService) UpdateInvoice(ctx context.Context, invoice *models.Invo
 		ctx,
 		`UPDATE invoices
 			SET number = $1, protocol = $2, req_status = $3, req_msg = $4,
-				invoice_pdf = $5, custom_file_name = $6, updated_at = $7
-		WHERE id = $8 AND created_by = $9`,
+				invoice_pdf = $5, custom_file_name = $6, updated_at = $7, sender_ie = $8
+		WHERE id = $9 AND created_by = $10`,
 		invoice.Number, invoice.Protocol, invoice.ReqStatus, invoice.ReqMsg,
-		invoice.PDF, invoice.CustomFileName, time.Now(), invoice.ID, invoice.CreatedBy,
+		invoice.PDF, invoice.CustomFileName, time.Now(), invoice.SenderIe,
+		invoice.ID, invoice.CreatedBy,
 	)
 	if err != nil {
 		log.Println("Error when running update invoice query: ", err)

@@ -25,7 +25,7 @@
                     <label for="sender"><strong>Remetente</strong></label>
                     <select 
                         hx-get="/invoices/form/load-available-ies"
-                        hx-trigger="change, load"
+                        hx-trigger="change"
                         hx-target="#available-ies"
                         hx-select="#available-ies"
                         hx-swap="outerHTML"
@@ -124,19 +124,15 @@
                     <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="extra_notes" name="extra_notes" value="{{ .Invoice.ExtraNotes }}">
                     <sub class="text-red-600">{{ .Invoice.Errors.ExtraNotes }}</sub>
                 </div>
-
-
-
-
             </div>
 
             <div class="flex w-1/2 flex-col gap-4 md:w-full md:flex-1 md:flex-row">
+
                 <div id="available-ies" class="flex flex-col gap-2 md:w-1/5">
                     <label class="truncate" for="sender_ie"><strong>IE</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2 md:w-full" id="sender_ie"
-                        name="ie">
-                        {{ range .Invoice.Sender.AllIes }}
-                            <option {{ if eq $.Invoice.SenderIe . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    <select class="h-10 rounded bg-gray-100 p-2 md:w-full" id="sender_ie" name="sender_ie">
+                        {{ range .Invoice.GetAllSenderIes }}
+                            <option value="{{ . }}">{{ . }}</option>
                         {{ end }}
                     </select>
                     <sub class="text-red-600">{{ .Invoice.Errors.SenderIe }}</sub>
