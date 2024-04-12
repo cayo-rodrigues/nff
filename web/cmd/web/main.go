@@ -112,6 +112,7 @@ func main() {
 	app.Get("/invoices", invoicesPage.Render)
 	app.Post("/invoices", invoicesPage.RequireInvoice)
 	app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
+	app.Get("/invoices/form/load-available-ies", invoicesPage.LoadAvailableIesInput)
 	app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
 	app.Get("/invoices/:id/request-card-status", invoicesPage.GetRequestStatus)
 	app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)

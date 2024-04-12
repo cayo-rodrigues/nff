@@ -193,6 +193,26 @@ func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
 	return c.Render("partials/forms/invoice-form", pageData)
 }
 
+func (p *InvoicesPage) LoadAvailableIesInput(c *fiber.Ctx) error {
+	pageData := p.NewEmptyData()
+
+	entityID, err := strconv.Atoi(c.Query("sender"))
+	if err != nil {
+		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
+	}
+	userID := c.Locals("UserID").(int)
+	entity, err := p.entityService.RetrieveEntity(c.Context(), entityID, userID)
+	if err != nil {
+		return utils.GeneralErrorResponse(c, err)
+	}
+	invoice := models.NewEmptyInvoice()
+	invoice.Sender = entity
+
+	pageData.Invoice = invoice
+
+	return c.Render("partials/forms/invoice-form", pageData)
+}
+
 func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
 	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
