@@ -35,6 +35,8 @@ class XPaths:
     INVOICE_SENDER_RECIPIENT_TAB = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[5]/a"
 
     INVOICE_SENDER_EMAIL_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[5]/td[2]/input"
+    INVOICE_SENDER_IE_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[4]/input'
+    INVOICE_SENDER_SEARCH_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[5]/a'
 
     INVOICE_RECIPIENT_IE_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[2]/td[4]/input"
     INVOICE_RECIPIENT_CPF_CNPJ_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[5]/tbody/tr[2]/td[2]/input'

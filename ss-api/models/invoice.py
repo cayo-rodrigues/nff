@@ -32,6 +32,8 @@ class Invoice(Printable):
         self.sender: Entity = Entity(data.get("sender", {}), is_sender=True)
         self.recipient: Entity = Entity(data.get("recipient", {}))
 
+        self.sender_ie: str = normalize_text(data.get("sender_ie", ""), keep_case=True)
+
         self.items: list[InvoiceItem] = [
             InvoiceItem(data=item) for item in data.get("items", [])
         ]
