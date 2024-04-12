@@ -25,6 +25,7 @@ type InvoiceFormError struct {
 	Items              string
 	ExtraNotes         string
 	CustomFileName     string
+	SenderIe           string
 }
 
 type InvoiceSelectFields struct {
@@ -67,6 +68,7 @@ type Invoice struct {
 	UpdatedAt          time.Time         `json:"-"`
 	ExtraNotes         string            `json:"extra_notes"`
 	CustomFileName     string            `json:"custom_file_name"`
+	SenderIe           string            `json:"sender_ie"`
 }
 
 func NewEmptyInvoice() *Invoice {

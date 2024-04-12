@@ -158,3 +158,12 @@ func (e *Entity) IsValid() bool {
 
 	return isValid
 }
+
+func (e *Entity) AllIes() []string {
+	availableIes := []string{e.Ie}
+	for _, ie := range e.OtherIes {
+		availableIes = append(availableIes, ie)
+	}
+	return availableIes
+}
+
