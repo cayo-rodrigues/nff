@@ -129,6 +129,17 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_SENDER_EMAIL_INPUT
         self.type_into_element(xpath, invoice.sender.email)
 
+        if invoice.sender.ie != invoice.sender_ie and invoice.sender_ie != "":
+            xpath = XPaths.INVOICE_SENDER_IE_INPUT
+            input = self.get_element(xpath)
+            input.clear()
+            input.send_keys(invoice.sender_ie)
+
+            xpath = XPaths.INVOICE_SENDER_SEARCH_BUTTON
+            self.get_and_click(xpath)
+
+            self.wait_until_document_is_ready()
+
         def handle_recipient_ie_or_cpf_cnpj(input_xpath: str, value: str) -> None:
             self.type_into_element(input_xpath, value)
 
