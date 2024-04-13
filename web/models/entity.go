@@ -51,7 +51,7 @@ type Entity struct {
 	Name       string           `json:"-"`
 	UserType   string           `json:"user_type"`
 	Ie         string           `json:"ie"`
-	OtherIes   []string         `json:"other_ies"`
+	OtherIes   []string         `json:"-"`
 	CpfCnpj    string           `json:"cpf_cnpj"`
 	Email      string           `json:"email"`
 	Password   string           `json:"password"`
