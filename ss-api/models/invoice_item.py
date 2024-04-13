@@ -4,10 +4,12 @@ from constants.db import MandatoryFields, DefaultValues
 
 class InvoiceItem:
     def __init__(self, data: dict) -> None:
+        ncm = normalize_text(data.get("ncm"), keep_case=True)
+        if not ncm:
+            ncm = DefaultValues.InvoiceItem.NCM
+
         self.group: str = normalize_text(data.get("group"))
-        self.ncm: str = normalize_text(
-            data.get("ncm", DefaultValues.InvoiceItem.NCM), keep_case=True
-        )
+        self.ncm: str = ncm
         self.description: str = normalize_text(data.get("description"))
         self.origin: str = normalize_text(data.get("origin"))
         self.unity_of_measurement: str = normalize_text(
