@@ -467,7 +467,7 @@ class Siare(Browser):
         invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
         invoice_value = from_BRL_to_float(data[-2].text)
 
-        is_income = entity.ie == invoice_sender_ie
+        is_income = entity.ie == invoice_sender_ie or invoice_sender_ie in entity.other_ies
         if is_income:
             results.total_income += invoice_value
             results.positive_entries += 1
