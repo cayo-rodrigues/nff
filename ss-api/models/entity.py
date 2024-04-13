@@ -11,6 +11,8 @@ class Entity:
         self.cpf_cnpj: str = normalize_text(data.get("cpf_cnpj"), keep_case=True)
         self.password: str = data.get("password", "")
 
+        self.other_ies: list[str] = data.get("other_ies", [])
+
         if not is_sender and not self.ie:
             self.postal_code = normalize_text(data.get("postal_code"), keep_case=True)
             self.neighborhood = normalize_text(data.get("neighborhood"))

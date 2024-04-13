@@ -23,23 +23,36 @@ jobs:
       - name: Docker login
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build images
+      - name: Build project image
         working-directory: ./web
-        run: |
-          docker build -t $WEB_IMAGE_TAG .
-          docker build -t $MIGRATIONS_IMAGE_TAG -f Dockerfile.goose .
+        run: docker build -t $WEB_IMAGE_TAG .
+
+      - name: Build goose image
+        working-directory: ./web
+        run: docker build -t $MIGRATIONS_IMAGE_TAG -f Dockerfile.goose .
 
       - name: Push images to Docker Hub
         run: |
           docker push $WEB_IMAGE_TAG
           docker push $MIGRATIONS_IMAGE_TAG
 
-  deploy:
+  migrate:
     needs: build
     runs-on: ubuntu-latest
     env:
-      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
       MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
+      RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
+    steps:
+      - name: Apply migrations
+        run: docker run -e CMD=up -e DB_URL=$RDS_DB_URL $MIGRATIONS_IMAGE_TAG
+
+  deploy:
+    needs:
+      - build
+      - migrate
+    runs-on: ubuntu-latest
+    env:
+      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
       PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
@@ -56,12 +69,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
             sudo docker system prune -af --volumes &&
-            sudo docker run \
-              --rm \
-              --name nff-migrations \
-              -e CMD=up \
-              -e DB_URL=$RDS_DB_URL \
-              $MIGRATIONS_IMAGE_TAG &&
             sudo docker ps -q | xargs -r sudo docker stop &&
             sudo docker ps -q | xargs -r sudo docker rm &&
             sudo docker run \
@@ -69,6 +76,7 @@ jobs:
               --detach \
               --name nff-web \
               -p 80:8080 \
+              -p 443:8080 \
               -p 8080:8080 \
               -e PORT=8080 \
               -e START_FRESH=true \

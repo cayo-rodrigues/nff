@@ -129,6 +129,17 @@ class Siare(Browser):
         xpath = XPaths.INVOICE_SENDER_EMAIL_INPUT
         self.type_into_element(xpath, invoice.sender.email)
 
+        if invoice.sender.ie != invoice.sender_ie and invoice.sender_ie != "":
+            xpath = XPaths.INVOICE_SENDER_IE_INPUT
+            input = self.get_element(xpath)
+            input.clear()
+            input.send_keys(invoice.sender_ie)
+
+            xpath = XPaths.INVOICE_SENDER_SEARCH_BUTTON
+            self.get_and_click(xpath)
+
+            self.wait_until_document_is_ready()
+
         def handle_recipient_ie_or_cpf_cnpj(input_xpath: str, value: str) -> None:
             self.type_into_element(input_xpath, value)
 
@@ -280,8 +291,10 @@ class Siare(Browser):
         self.wait_until_document_is_ready()
 
     def fill_invoice_transport_data(self):
-        xpath = XPaths.INVOICE_TRANSPORT_THIRD_PARTY_RADIO_INPUT
+        xpath = XPaths.INVOICE_TRANSPORT_HIRED_SHIPPING_TYPE_RADIO_INPUT
         self.get_and_click(xpath)
+
+        self.wait_until_document_is_ready()
 
         xpath = XPaths.INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE
         self.get_and_click(xpath)
@@ -454,7 +467,7 @@ class Siare(Browser):
         invoice_sender_ie = normalize_text(data[3].text, remove=[".", "-"])
         invoice_value = from_BRL_to_float(data[-2].text)
 
-        is_income = entity.ie == invoice_sender_ie
+        is_income = entity.ie == invoice_sender_ie or invoice_sender_ie in entity.other_ies
         if is_income:
             results.total_income += invoice_value
             results.positive_entries += 1

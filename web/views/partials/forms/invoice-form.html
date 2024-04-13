@@ -17,119 +17,132 @@
     </div>
 
     <section>
-        <div class="flex border-b border-gray-400 py-4 md:flex-col md:gap-6">
+        <div class=" grid grid-cols-1 gap-4 border-b border-gray-400 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
 
-            <div class="flex w-1/2 flex-col gap-4 pr-4 md:w-full md:flex-1 md:flex-row md:pr-0">
-
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label for="sender"><strong>Remetente</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2" id="sender" name="sender">
-                        {{ range .FormSelectFields.Entities }}
-                            <option {{ if eq $.Invoice.Sender.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
-                        {{ end }}
-                    </select>
-                    <sub class="text-red-600">{{ .Invoice.Errors.Sender }}</sub>
-                </div>
-
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label for="recipient"><strong>Destinatário</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2" id="recipient" name="recipient">
-                        {{ range .FormSelectFields.Entities }}
-                            <option {{ if eq $.Invoice.Recipient.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
-                        {{ end }}
-                    </select>
-                    <sub class="text-red-600">{{ .Invoice.Errors.Recipient }}</sub>
-                </div>
-
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label for="operation"><strong>Operação</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2" id="operation" name="operation">
-                        {{ range .FormSelectFields.Operations }}
-                            <option {{ if eq $.Invoice.Operation . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                    <sub class="text-red-600">{{ .Invoice.Errors.Operation }}</sub>
-                </div>
-
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label for="cfop"><strong>CFOP</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2" id="cfop" name="cfop">
-                        {{ range .FormSelectFields.Cfops }}
-                            <option {{ if eq $.Invoice.Cfop . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                    <sub class="text-red-600">{{ .Invoice.Errors.Cfop }}</sub>
-                </div>
-
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label class="truncate" for="is_icms_contributor"><strong>Contribuinte ICMS</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2" id="is_icms_contributor" name="is_icms_contributor">
-                        {{ range .FormSelectFields.IcmsOptions }}
-                            <option {{ if eq $.Invoice.IsIcmsContributor . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                    <sub class="text-red-600">{{ .Invoice.Errors.IsIcmsContributor }}</sub>
-                </div>
-
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label class="truncate" for="is_final_customer"><strong>Consumidor Final</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2" id="is_final_customer" name="is_final_customer">
-                        {{ range .FormSelectFields.BooleanField }}
-                            <option {{ if eq $.Invoice.IsFinalCustomer . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                    <sub class="text-red-600">{{ .Invoice.Errors.IsFinalCustomer }}</sub>
-                </div>
-
+            <div class="flex flex-col gap-2">
+                <label for="sender"><strong>Remetente</strong></label>
+                <select 
+                    hx-get="/invoices/form/load-available-ies"
+                    hx-trigger="change"
+                    hx-target="#available-ies"
+                    hx-select="#available-ies"
+                    hx-swap="outerHTML"
+                    class="h-10 rounded bg-gray-100 p-2" id="sender" name="sender"
+                >
+                    {{ range .FormSelectFields.Entities }}
+                        <option {{ if eq $.Invoice.Sender.ID .ID }} selected {{ end }} value="{{ .ID }}">
+                            {{ .Name }}
+                        </option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.Sender }}</sub>
             </div>
 
-            <div class="flex w-1/2 flex-col gap-4 md:w-full md:flex-1 md:flex-row">
+            <div id="available-ies" class="flex flex-col gap-2">
+                <label class="truncate" for="sender_ie"><strong>IE do Remetente</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2 md:w-full" id="sender_ie" name="sender_ie">
+                    {{ range .Invoice.GetAllSenderIes }}
+                        <option value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.SenderIe }}</sub>
+            </div>
 
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label for="shipping"><strong>Frete</strong></label>
-                    <input class="rounded bg-gray-100 p-2 md:w-full" type="number" step="0.01" id="shipping" name="shipping"
-                        value="{{ .Invoice.Shipping }}">
-                    <sub class="text-red-600">{{ .Invoice.Errors.Shipping }}</sub>
-                </div>
+            <div class="flex flex-col gap-2">
+                <label for="recipient"><strong>Destinatário</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="recipient" name="recipient">
+                    {{ range .FormSelectFields.Entities }}
+                        <option {{ if eq $.Invoice.Recipient.ID .ID }} selected {{ end }} value="{{ .ID }}">{{ .Name }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.Recipient }}</sub>
+            </div>
 
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label class="truncate" for="add_shipping_to_total"><strong>Adicionar Frete ao Total</strong></label>
-                    <select class="h-10 rounded bg-gray-100 p-2 md:w-full" id="add_shipping_to_total"
-                        name="add_shipping_to_total">
-                        {{ range .FormSelectFields.BooleanField.Reverse }}
-                            <option {{ if eq $.Invoice.AddShippingToTotal . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                    <sub class="text-red-600">{{ .Invoice.Errors.AddShippingToTotal }}</sub>
-                </div>
+            <div class="flex flex-col gap-2">
+                <label for="operation"><strong>Operação</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="operation" name="operation">
+                    {{ range .FormSelectFields.Operations }}
+                        <option {{ if eq $.Invoice.Operation . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.Operation }}</sub>
+            </div>
 
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label for="gta"><strong>GTA</strong></label>
-                    <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="gta" name="gta" value="{{ .Invoice.Gta }}">
-                    <sub class="text-red-600">{{ .Invoice.Errors.Gta }}</sub>
-                </div>
+            <div class="flex flex-col gap-2">
+                <label for="cfop"><strong>CFOP</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="cfop" name="cfop">
+                    {{ range .FormSelectFields.Cfops }}
+                        <option {{ if eq $.Invoice.Cfop . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.Cfop }}</sub>
+            </div>
 
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label class="truncate" for="extra_notes"><strong>Informações complementares</strong></label>
-                    <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="extra_notes" name="extra_notes" value="{{ .Invoice.ExtraNotes }}">
-                    <sub class="text-red-600">{{ .Invoice.Errors.ExtraNotes }}</sub>
-                </div>
+            <div class="flex flex-col gap-2">
+                <label class="truncate" for="is_icms_contributor"><strong>Contribuinte ICMS</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="is_icms_contributor" name="is_icms_contributor">
+                    {{ range .FormSelectFields.IcmsOptions }}
+                        <option {{ if eq $.Invoice.IsIcmsContributor . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.IsIcmsContributor }}</sub>
+            </div>
 
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <label class="truncate" for="custom_file_name"><strong>Nome do arquivo</strong></label>
-                    <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="custom_file_name" name="custom_file_name" value="{{ .Invoice.CustomFileName }}">
-                    <sub class="text-red-600">{{ .Invoice.Errors.CustomFileName }}</sub>
-                </div>
 
-                <div class="flex flex-col gap-2 md:w-1/5">
-                    <strong>Produtos</strong>
-                    <button onclick="openItemsDialog('invoice-items-dialog')"
-                        class="group rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 md:w-full" type="button">
-                        <div class="group-active:scale-90">Gerenciar</div>
-                    </button>
-                    <sub class="text-red-600">{{ .Invoice.Errors.Items }}</sub>
-                </div>
 
+            <div class="flex flex-col gap-2">
+                <label class="truncate" for="is_final_customer"><strong>Consumidor Final</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2" id="is_final_customer" name="is_final_customer">
+                    {{ range .FormSelectFields.BooleanField }}
+                        <option {{ if eq $.Invoice.IsFinalCustomer . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.IsFinalCustomer }}</sub>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="shipping"><strong>Frete</strong></label>
+                <input class="rounded bg-gray-100 p-2 md:w-full" type="number" step="0.01" id="shipping" name="shipping"
+                    value="{{ .Invoice.Shipping }}">
+                <sub class="text-red-600">{{ .Invoice.Errors.Shipping }}</sub>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="truncate" for="add_shipping_to_total"><strong>Adicionar Frete ao Total</strong></label>
+                <select class="h-10 rounded bg-gray-100 p-2 md:w-full" id="add_shipping_to_total"
+                    name="add_shipping_to_total">
+                    {{ range .FormSelectFields.BooleanField.Reverse }}
+                        <option {{ if eq $.Invoice.AddShippingToTotal . }} selected {{ end }} value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+                <sub class="text-red-600">{{ .Invoice.Errors.AddShippingToTotal }}</sub>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label for="gta"><strong>GTA</strong></label>
+                <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="gta" name="gta" value="{{ .Invoice.Gta }}">
+                <sub class="text-red-600">{{ .Invoice.Errors.Gta }}</sub>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="truncate" for="extra_notes"><strong>Informações complementares</strong></label>
+                <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="extra_notes" name="extra_notes" value="{{ .Invoice.ExtraNotes }}">
+                <sub class="text-red-600">{{ .Invoice.Errors.ExtraNotes }}</sub>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="truncate" for="custom_file_name"><strong>Nome do arquivo</strong></label>
+                <input class="rounded bg-gray-100 p-2 md:w-full" type="text" id="custom_file_name" name="custom_file_name" value="{{ .Invoice.CustomFileName }}">
+                <sub class="text-red-600">{{ .Invoice.Errors.CustomFileName }}</sub>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <strong>Produtos</strong>
+                <button onclick="openItemsDialog('invoice-items-dialog')"
+                    class="group rounded bg-gray-600 px-4 py-2 text-white hover:bg-gray-700 md:w-full" type="button">
+                    <div class="group-active:scale-90">Gerenciar</div>
+                </button>
+                <sub class="text-red-600">{{ .Invoice.Errors.Items }}</sub>
             </div>
 
         </div>
@@ -156,7 +169,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 448 512"><path d="M32 32C14.3 32 0 46.3 0 64v96c0 17.7 14.3 32 32 32s32-14.3 32-32V96h64c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zM64 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7 14.3 32 32 32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H64V352zM320 32c-17.7 0-32 14.3-32 32s14.3 32 32 32h64v64c0 17.7 14.3 32 32 32s32-14.3 32-32V64c0-17.7-14.3-32-32-32H320zM448 352c0-17.7-14.3-32-32-32s-32 14.3-32 32v64H320c-17.7 0-32 14.3-32 32s14.3 32 32 32h96c17.7 0 32-14.3 32-32V352z"/></svg>
                     </button>
 
-                    <button onclick="this.closest('dialog').close()" class="rounded px-4 py-3 transition-colors bg-gray-200 hover:bg-gray-300 active:bg-gray-400" type="button">
+                    <button onclick="this.closest('dialog').close()" class="rounded bg-gray-200 px-4 py-3 transition-colors hover:bg-gray-300 active:bg-gray-400" type="button">
                         <svg xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512">
                             <path
                                     d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />

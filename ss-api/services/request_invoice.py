@@ -53,6 +53,9 @@ def request_invoice(invoice_data: dict):
     siare.open_aditional_data_tab()
     siare.fill_invoice_aditional_data(invoice)
 
+    if invoice_data.get("should_abort_mission"):
+        return {"msg": "Mission aborted with success"}
+
     siare.finish_invoice()
 
     error_feedback = siare.get_invoice_error_feedback()
@@ -88,12 +91,17 @@ def request_invoice(invoice_data: dict):
             invoice.erase_file()
         except exceptions.DownloadTimeoutError as e:
             traceback.print_exc()
-            print(f"Something went wrong trying to download invoice: {e}", file=sys.stderr)
+            print(
+                f"Something went wrong trying to download invoice: {e}", file=sys.stderr
+            )
             msg = e.msg
             status = e.req_status
         except Exception as e:
             traceback.print_exc()
-            print(f"Something went wrong trying to download invoice or upload pdf to s3: {e}", file=sys.stderr)
+            print(
+                f"Something went wrong trying to download invoice or upload pdf to s3: {e}",
+                file=sys.stderr,
+            )
             msg = ErrorMessages.DOWNLOAD_ERROR
             status = "warning"
 

@@ -25,6 +25,7 @@ type InvoiceFormError struct {
 	Items              string
 	ExtraNotes         string
 	CustomFileName     string
+	SenderIe           string
 }
 
 type InvoiceSelectFields struct {
@@ -67,6 +68,7 @@ type Invoice struct {
 	UpdatedAt          time.Time         `json:"-"`
 	ExtraNotes         string            `json:"extra_notes"`
 	CustomFileName     string            `json:"custom_file_name"`
+	SenderIe           string            `json:"sender_ie"`
 }
 
 func NewEmptyInvoice() *Invoice {
@@ -98,6 +100,7 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	invoice.Gta = strings.TrimSpace(c.FormValue("gta"))
 	invoice.ExtraNotes = strings.TrimSpace(c.FormValue("extra_notes"))
 	invoice.CustomFileName = strings.TrimSpace(c.FormValue("custom_file_name"))
+	invoice.SenderIe = strings.TrimSpace(c.FormValue("sender_ie"))
 
 	invoice.Items = NewInvoiceItemsFromForm(c)
 
@@ -166,7 +169,7 @@ func (i *Invoice) Scan(rows db.Scanner) error {
 		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
 		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
-		&i.ExtraNotes, &i.CustomFileName,
+		&i.ExtraNotes, &i.CustomFileName, &i.SenderIe,
 	)
 }
 
@@ -175,14 +178,34 @@ func (i *Invoice) FullScan(rows db.Scanner) error {
 		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
 		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
-		&i.ExtraNotes, &i.CustomFileName,
+		&i.ExtraNotes, &i.CustomFileName, &i.SenderIe,
 
 		&i.Sender.ID, &i.Sender.Name, &i.Sender.UserType, &i.Sender.CpfCnpj, &i.Sender.Ie, &i.Sender.Email, &i.Sender.Password,
 		&i.Sender.Address.PostalCode, &i.Sender.Address.Neighborhood, &i.Sender.Address.StreetType, &i.Sender.Address.StreetName, &i.Sender.Address.Number,
-		&i.Sender.CreatedBy, &i.Sender.CreatedAt, &i.Sender.UpdatedAt,
+		&i.Sender.CreatedBy, &i.Sender.CreatedAt, &i.Sender.UpdatedAt, &i.Sender.OtherIes,
 
 		&i.Recipient.ID, &i.Recipient.Name, &i.Recipient.UserType, &i.Recipient.CpfCnpj, &i.Recipient.Ie, &i.Recipient.Email, &i.Recipient.Password,
 		&i.Recipient.Address.PostalCode, &i.Recipient.Address.Neighborhood, &i.Recipient.Address.StreetType, &i.Recipient.Address.StreetName, &i.Recipient.Address.Number,
-		&i.Recipient.CreatedBy, &i.Recipient.CreatedAt, &i.Recipient.UpdatedAt,
+		&i.Recipient.CreatedBy, &i.Recipient.CreatedAt, &i.Recipient.UpdatedAt, &i.Sender.OtherIes,
 	)
+}
+
+func (i *Invoice) GetAllSenderIes() []string {
+	availableIes := make([]string, 0)
+
+	if i.SenderIe != "" {
+		availableIes = append(availableIes, i.SenderIe)
+	}
+
+	if i.Sender.Ie != i.SenderIe {
+		availableIes = append(availableIes, i.Sender.Ie)
+	}
+
+	for _, ie := range i.Sender.OtherIes {
+		if ie != i.SenderIe {
+			availableIes = append(availableIes, ie)
+		}
+	}
+
+	return availableIes
 }

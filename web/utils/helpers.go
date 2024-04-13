@@ -93,3 +93,7 @@ func TrimSpaceFloat64(f string) (float64, error) {
 func TrimSpaceFromBytesToFloat64(f []byte) (float64, error) {
 	return TrimSpaceFloat64(TrimSpaceBytes(f))
 }
+
+func Join(elems []string, sep string) string {
+	return strings.Join(elems, sep)
+}

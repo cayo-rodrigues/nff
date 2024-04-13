@@ -29,7 +29,8 @@ type SSAPIInvoiceErrors struct {
 
 type SSAPIInvoiceRequest struct {
 	*models.Invoice
-	ShouldDownload bool `json:"should_download"`
+	ShouldDownload     bool `json:"should_download"`
+	ShouldAbortMission bool `json:"should_abort_mission"`
 }
 
 type SSAPIInvoiceResponse struct {
@@ -136,8 +137,9 @@ func (w *SiareBGWorker) RequestInvoice(invoice *models.Invoice) {
 	defer cancel()
 
 	reqBody := SSAPIInvoiceRequest{
-		Invoice:        invoice,
-		ShouldDownload: true,
+		Invoice:            invoice,
+		ShouldDownload:     true,
+		ShouldAbortMission: false,
 	}
 
 	agent := fiber.Post(w.SS_API_BASE_URL + "/invoice/request")
