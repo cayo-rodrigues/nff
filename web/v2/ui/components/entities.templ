@@ -4,6 +4,7 @@ import "github.com/cayo-rodrigues/nff/web/models"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 import "fmt"
+import "strings"
 
 templ EntityList(entities []*models.Entity) {
 	<ul id="entity-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
@@ -69,6 +70,7 @@ templ EntityDetails(e *models.Entity) {
 				<li><span class="font-medium">Tipo de logradouro:</span> { e.StreetType }</li>
 				<li><span class="font-medium">Logradouro:</span> { e.StreetName }</li>
 				<li><span class="font-medium">Número da casa:</span> { e.Number }</li>
+				<li><span class="font-medium">Outras IEs:</span> { strings.Join(e.OtherIes, ", ") }</li>
 			</ul>
 		</div>
 	</dialog>
