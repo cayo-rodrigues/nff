@@ -59,14 +59,14 @@ func CreateEntity(ctx context.Context, entity *models.Entity) error {
 		`INSERT INTO entities (
 			name, user_type, cpf_cnpj, ie, email, password,
 			postal_code, neighborhood, street_type, street_name, number,
-			created_by
+			created_by, other_ies
 		)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 		RETURNING id, created_at, updated_at
 		`,
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
 		entity.PostalCode, entity.Neighborhood, entity.StreetType, entity.StreetName, entity.Number,
-		entity.CreatedBy,
+		entity.CreatedBy, entity.OtherIes,
 	)
 	err := row.Scan(&entity.ID, &entity.CreatedAt, &entity.UpdatedAt)
 	if err != nil {
@@ -108,10 +108,10 @@ func UpdateEntity(ctx context.Context, entity *models.Entity) error {
 		`UPDATE entities
 			SET name = $1, user_type = $2, cpf_cnpj = $3, ie = $4, email = $5,
 				password = $6, postal_code = $7, neighborhood = $8, street_type = $9,
-				street_name = $10, number = $11, updated_at = $12
-		WHERE id = $13 AND created_by = $14`,
+				street_name = $10, number = $11, updated_at = $12, other_ies = $13
+		WHERE id = $14 AND created_by = $15`,
 		entity.Name, entity.UserType, entity.CpfCnpj, entity.Ie, entity.Email, entity.Password,
-		entity.PostalCode, entity.Neighborhood, entity.StreetType, entity.StreetName, entity.Number, time.Now(),
+		entity.PostalCode, entity.Neighborhood, entity.StreetType, entity.StreetName, entity.Number, time.Now(), entity.OtherIes,
 		entity.ID, entity.CreatedBy,
 	)
 	if err != nil {

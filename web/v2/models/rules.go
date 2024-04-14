@@ -172,6 +172,37 @@ func Match(regexes ...*regexp.Regexp) RuleFunc {
 	}
 }
 
+func MatchList(regexes ...*regexp.Regexp) RuleFunc {
+	return func() *RuleSet {
+		return &RuleSet{
+			MessageFunc: func(rs *RuleSet) string {
+				return utils.InvalidFormatMsg
+			},
+			ValidateFunc: func(rs *RuleSet) bool {
+				vals, ok := rs.FieldValue.([]string)
+				if !ok {
+					return false
+				}
+
+				if len(vals) == 0 {
+					return true
+				}
+
+				for _, val := range vals {
+					for _, regex := range regexes {
+						match := regex.MatchString(val)
+						if !match {
+							return false
+						}
+					}
+				}
+
+				return true
+			},
+		}
+	}
+}
+
 func Min(minValue int) RuleFunc {
 	return func() *RuleSet {
 		return &RuleSet{

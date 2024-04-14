@@ -21,6 +21,7 @@ type Invoice struct {
 	AddShippingToTotal   string         `json:"add_shipping_to_total_value"`
 	Gta                  string         `json:"gta"`
 	Sender               *Entity        `json:"sender"`
+	SenderIe             string         `json:"sender_ie"`
 	Recipient            *Entity        `json:"recipient"`
 	ReqStatus            string         `json:"-"`
 	ReqMsg               string         `json:"-"`
@@ -63,6 +64,7 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	invoice.Gta = strings.TrimSpace(c.FormValue("gta"))
 	invoice.ExtraNotes = strings.TrimSpace(c.FormValue("extra_notes"))
 	invoice.CustomFileNamePrefix = strings.TrimSpace(c.FormValue("custom_file_name_prefix"))
+	invoice.SenderIe = strings.TrimSpace(c.FormValue("sender_ie"))
 
 	invoice.Items = NewInvoiceItemsFromForm(c)
 
@@ -136,6 +138,6 @@ func (i *Invoice) Values() []any {
 		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
 		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
-		&i.ExtraNotes, &i.CustomFileNamePrefix, &i.FileName,
+		&i.ExtraNotes, &i.CustomFileNamePrefix, &i.SenderIe, &i.FileName,
 	}
 }
