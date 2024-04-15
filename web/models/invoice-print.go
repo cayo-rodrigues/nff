@@ -119,6 +119,6 @@ func (p *InvoicePrint) FullScan(rows db.Scanner) error {
 
 		&p.Entity.ID, &p.Entity.Name, &p.Entity.UserType, &p.Entity.CpfCnpj, &p.Entity.Ie, &p.Entity.Email, &p.Entity.Password,
 		&p.Entity.Address.PostalCode, &p.Entity.Address.Neighborhood, &p.Entity.Address.StreetType, &p.Entity.Address.StreetName, &p.Entity.Address.Number,
-		&p.Entity.CreatedBy, &p.Entity.CreatedAt, &p.Entity.UpdatedAt,
+		&p.Entity.CreatedBy, &p.Entity.CreatedAt, &p.Entity.UpdatedAt, &p.Entity.OtherIes,
 	)
 }

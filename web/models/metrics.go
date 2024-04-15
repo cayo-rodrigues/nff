@@ -142,7 +142,7 @@ func (q *MetricsQuery) FullScan(rows db.Scanner) error {
 
 		&q.Entity.ID, &q.Entity.Name, &q.Entity.UserType, &q.Entity.CpfCnpj, &q.Entity.Ie, &q.Entity.Email, &q.Entity.Password,
 		&q.Entity.Address.PostalCode, &q.Entity.Address.Neighborhood, &q.Entity.Address.StreetType, &q.Entity.Address.StreetName, &q.Entity.Address.Number,
-		&q.Entity.CreatedBy, &q.Entity.CreatedAt, &q.Entity.UpdatedAt,
+		&q.Entity.CreatedBy, &q.Entity.CreatedAt, &q.Entity.UpdatedAt, &q.Entity.OtherIes,
 	)
 }
 
