@@ -4,5 +4,7 @@ import "github.com/cayo-rodrigues/nff/web/ui/forms"
 import "github.com/cayo-rodrigues/nff/web/models"
 
 templ RegisterPage(u *models.User) {
-	@forms.RegisterForm(u)
+	<div class="flex h-full items-center justify-center">
+		@forms.RegisterForm(u)
+	</div>
 }

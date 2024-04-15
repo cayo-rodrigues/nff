@@ -4,5 +4,7 @@ import "github.com/cayo-rodrigues/nff/web/models"
 import "github.com/cayo-rodrigues/nff/web/ui/forms"
 
 templ LoginPage(u *models.User) {
-	@forms.LoginForm(u)
+	<div class="flex h-full items-center justify-center">
+		@forms.LoginForm(u)
+	</div>
 }
