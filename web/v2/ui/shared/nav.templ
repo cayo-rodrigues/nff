@@ -7,6 +7,17 @@ templ Nav() {
 				Nota Fiscal Fácil
 			</a>
 		</h1>
-		@Icon("menu")
+		<div class="flex gap-4 sm:gap-6 xl:gap-8">
+			<ul class="hidden grid-cols-4 gap-2 xl:grid">
+				<li class="rounded bg-sky-800 px-4 text-center">Entidades</li>
+				<li class="rounded bg-sky-800 px-4 text-center">Notas Fiscais</li>
+				<li class="rounded bg-sky-800 px-4 text-center">Métricas</li>
+				<li class="rounded bg-sky-800 px-4 text-center">HIstórico</li>
+			</ul>
+			@Icon("bell")
+			<button class="xl:hidden">
+				@Icon("menu")
+			</button>
+		</div>
 	</nav>
 }

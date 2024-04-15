@@ -3,8 +3,8 @@ package scripts
 script ApplyIcons() {
 	document.addEventListener("DOMContentLoaded", () => {
 		feather.replace()
-		document.addEventListener("rebuild-icons", () => {
-			feather.replace()
-		})
+	})
+	document.addEventListener("rebuild-icons", () => {
+		feather.replace()
 	})
 }
