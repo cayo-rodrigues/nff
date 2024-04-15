@@ -38,7 +38,7 @@ templ Nav() {
 
 templ MenuItem(url string) {
 	<a href={ templ.SafeURL(url) }>
-		<li class="flex h-full w-full flex-1 cursor-pointer items-center justify-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800">
+		<li class="flex h-full w-full flex-1 transform cursor-pointer items-center justify-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95">
 			{ children... }
 		</li>
 	</a>
