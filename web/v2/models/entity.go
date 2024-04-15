@@ -61,9 +61,11 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 		},
 	}
 
-	ies := strings.Split(c.FormValue("other_ies"), ",")
-	for _, ie := range ies {
-		entity.OtherIes = append(entity.OtherIes, strings.TrimSpace(ie))
+	ies := c.FormValue("other_ies")
+	if ies != "" {
+		for _, ie := range strings.Split(ies, ",") {
+			entity.OtherIes = append(entity.OtherIes, strings.TrimSpace(ie))
+		}
 	}
 
 	return entity
@@ -91,10 +93,7 @@ func (e *Entity) IsValid() bool {
 			Value: e.Ie,
 			Rules: Rules(
 				Match(IEMGRegex),
-				RequiredUnless(
-					All(e.PostalCode, e.Neighborhood, e.StreetType, e.StreetName, e.Number),
-					e.UserType == EntityUserTypes[2], // [2] = apenas destinatário
-				),
+				RequiredUnless(All(e.PostalCode, e.Neighborhood, e.StreetType, e.StreetName, e.Number)),
 			),
 		},
 		{

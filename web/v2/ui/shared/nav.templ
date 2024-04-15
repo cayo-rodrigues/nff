@@ -1,23 +1,45 @@
 package shared
 
 templ Nav() {
-	<nav hx-boost="true" class="sticky top-0 flex w-full justify-between bg-sky-700 px-4 py-2 text-white md:px-8 md:py-3">
+	<nav hx-boost="true" class="sticky top-0 flex w-full justify-between bg-sky-700 px-4 py-2 text-white md:px-8">
 		<h1 class="text-xl">
 			<a href="/" hx-indicator="#global-indicator">
 				Nota Fiscal Fácil
 			</a>
 		</h1>
-		<div class="flex gap-4 sm:gap-6 xl:gap-8">
-			<ul class="hidden grid-cols-4 gap-2 xl:grid">
-				<li class="rounded bg-sky-800 px-4 text-center">Entidades</li>
-				<li class="rounded bg-sky-800 px-4 text-center">Notas Fiscais</li>
-				<li class="rounded bg-sky-800 px-4 text-center">Métricas</li>
-				<li class="rounded bg-sky-800 px-4 text-center">HIstórico</li>
+		<div class="flex items-center gap-4 sm:gap-6 xl:gap-8">
+			<ul hx-boost="true" class="hidden gap-2 xl:flex">
+				@MenuItem("/entities") {
+					@SmallIcon("user")
+					<span>Entidades</span>
+				}
+				@MenuItem("/invoices") {
+					@SmallIcon("file-text")
+					<span>Notas Fiscais</span>
+				}
+				@MenuItem("/metrics") {
+					@SmallIcon("activity")
+					<span>Métricas</span>
+				}
+				@MenuItem("/logout") {
+					@SmallIcon("log-out")
+					<span>Sair</span>
+				}
 			</ul>
-			@Icon("bell")
+			<button class="rounded-full transition hover:bg-sky-800 xl:p-2">
+				@SmallIcon("bell")
+			</button>
 			<button class="xl:hidden">
 				@Icon("menu")
 			</button>
 		</div>
 	</nav>
+}
+
+templ MenuItem(url string) {
+	<a href={ templ.SafeURL(url) }>
+		<li class="flex h-full w-full flex-1 cursor-pointer items-center justify-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800">
+			{ children... }
+		</li>
+	</a>
 }

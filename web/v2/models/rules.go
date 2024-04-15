@@ -179,6 +179,10 @@ func MatchList(regexes ...*regexp.Regexp) RuleFunc {
 				return utils.InvalidFormatMsg
 			},
 			ValidateFunc: func(rs *RuleSet) bool {
+				if rs.FieldValue == nil {
+					return true
+				}
+
 				vals, ok := rs.FieldValue.([]string)
 				if !ok {
 					return false
