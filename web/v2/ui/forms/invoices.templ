@@ -1,0 +1,190 @@
+package forms
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "strconv"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+
+templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
+	<form id="invoice-form">
+		<div class="gap-6 border-b border-gray-300 py-2">
+			<button
+				hx-post="/invoices/create"
+				hx-target="#requests-overview-wrapper"
+				hx-swap="outerHTML"
+				hx-include="[id='from_date'], [id='to_date']"
+				class="icon-btn flex w-full justify-center gap-3 rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600 lg:w-auto"
+			>
+				@shared.Icon("play-circle")
+				<span>Iniciar Requerimento</span>
+			</button>
+		</div>
+		<div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+			<div class="flex flex-col gap-2">
+				<label for="sender"><strong>Remetente</strong></label>
+				<select
+					hx-get="/invoices/form/get-sender-ie-input"
+					hx-trigger="change"
+					hx-target="#available-ies"
+					hx-select="#available-ies"
+					hx-swap="outerHTML"
+					class="h-10 rounded bg-white p-2"
+					id="sender"
+					name="sender"
+				>
+					for _, e := range entities {
+						<option value={ strconv.Itoa(e.ID) }>{ e.Name }</option>
+					}
+				</select>
+				<sub class="text-red-600">{ i.Errors["Sender"] }</sub>
+			</div>
+			@SenderIeInput(i.Sender, i.SenderIe)
+			<div class="flex flex-col gap-2">
+				<label for="recipient"><strong>Destinatário</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="recipient" name="recipient">
+					for _, e := range entities {
+						<option value={ strconv.Itoa(e.ID) }>{ e.Name }</option>
+					}
+				</select>
+				<sub class="text-red-600">{ i.Errors["Recipient"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="operation"><strong>Operação</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="operation" name="operation">
+					for _, operation := range models.InvoiceOperations {
+						<option
+							value={ operation }
+							if operation == i.Operation {
+								selected
+							}
+						>
+							{ operation }
+						</option>
+					}
+				</select>
+				<sub class="text-red-600">{ i.Errors["Operation"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="cfop"><strong>CFOP</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="cfop" name="cfop">
+					for _, cfop := range models.InvoiceCfops {
+						<option
+							value={ strconv.Itoa(cfop) }
+							if cfop == i.Cfop {
+								selected
+							}
+						>
+							{ strconv.Itoa(cfop) }
+						</option>
+					}
+				</select>
+				<sub class="text-red-600">{ i.Errors["Cfop"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="is_icms_contributor"><strong>Contribuinte ICMS</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="is_icms_contributor" name="is_icms_contributor">
+					for _, status := range models.InvoiceIcmsOptions {
+						<option
+							value={ status }
+							if status == i.IsIcmsContributor {
+								selected
+							}
+						>
+							{ status }
+						</option>
+					}
+				</select>
+				<sub class="text-red-600">{ i.Errors["IsIcmsContributor"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="is_final_customer"><strong>Consumidor Final</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="is_final_customer" name="is_final_customer">
+					for _, status := range models.InvoiceBooleanField {
+						<option
+							value={ status }
+							if status == i.IsFinalCustomer {
+								selected
+							}
+						>
+							{ status }
+						</option>
+					}
+				</select>
+				<sub class="text-red-600">{ i.Errors["IsFinalCustomer"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="shipping"><strong>Frete</strong></label>
+				<input
+					class="rounded bg-white p-2 md:w-full"
+					type="number"
+					step="0.01"
+					id="shipping"
+					name="shipping"
+					value="{{ .Invoice.Shipping }}"
+				/>
+				<sub class="text-red-600">{ i.Errors["Shipping"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="add_shipping_to_total"><strong>Adicionar Frete ao Total</strong></label>
+				<select
+					class="h-10 rounded bg-white p-2 md:w-full"
+					id="add_shipping_to_total"
+					name="add_shipping_to_total"
+				></select>
+				<sub class="text-red-600">{ i.Errors["AddShippingToTotal"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="gta"><strong>GTA</strong></label>
+				<input class="rounded bg-white p-2 md:w-full" type="text" id="gta" name="gta" value={ i.Gta }/>
+				<sub class="text-red-600">{ i.Errors["Gta"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="extra_notes"><strong>Informações complementares</strong></label>
+				<input class="rounded bg-white p-2 md:w-full" type="text" id="extra_notes" name="extra_notes" value={ i.ExtraNotes }/>
+				<sub class="text-red-600">{ i.Errors["ExtraNotes"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="custom_file_name"><strong>Nome do arquivo</strong></label>
+				<input class="rounded bg-white p-2 md:w-full" type="text" id="custom_file_name" name="custom_file_name" value={ i.CustomFileNamePrefix }/>
+				<sub class="text-red-600">{ i.Errors["CustomFileNamePrefix"] }</sub>
+			</div>
+		</div>
+		<section id="invoice-items-dialog" class="sticky top-0 z-10 border-b border-gray-300 py-2">
+			<div class="py-2">
+				<h3 class="text-xl font-bold">Produtos</h3>
+			</div>
+			<div class="flex items-center gap-6 py-2">
+				<button
+					class="rounded bg-gray-200 px-4 py-2 font-bold hover:bg-gray-300 active:bg-gray-400"
+					type="button"
+					hx-get="/invoices/items/form-section"
+					hx-target="#invoice-items-dialog"
+					hx-swap="beforeend"
+					hx-trigger="click"
+				>
+					+
+				</button>
+				<strong>Total de itens:</strong>
+				<span id="items-count"></span>
+			</div>
+		</section>
+	</form>
+}
+
+templ SenderIeInput(e *models.Entity, invoiceSenderIe string) {
+	<div id="available-ies" class="flex flex-col gap-2">
+		<label class="truncate" for="sender_ie"><strong>IE do Remetente</strong></label>
+		<select class="h-10 rounded bg-white p-2 md:w-full" id="sender_ie" name="sender_ie">
+			for _, ie := range e.AllIes() {
+				<option
+					value={ ie }
+					if ie == invoiceSenderIe {
+						selected
+					}
+				>
+					{ ie }
+				</option>
+			}
+		</select>
+		<sub class="text-red-600"></sub>
+	</div>
+}

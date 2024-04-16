@@ -1,5 +1,8 @@
 package pages
 
-templ MetricsPage() {
+import "github.com/cayo-rodrigues/nff/web/ui/forms"
+import "github.com/cayo-rodrigues/nff/web/models"
 
+templ MetricsPage(m *models.Metrics) {
+	@forms.MetricsForm(m)
 }

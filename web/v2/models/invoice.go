@@ -118,6 +118,11 @@ func (i *Invoice) Validate() bool {
 			Value: i.CustomFileNamePrefix,
 			Rules: Rules(Max(64)),
 		},
+		{
+			Name:  "SenderIe",
+			Value: i.SenderIe,
+			Rules: Rules(Required, Match(IEMGRegex)),
+		},
 	}
 	errors, ok := Validate(fields)
 	i.Errors = errors

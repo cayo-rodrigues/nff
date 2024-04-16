@@ -65,7 +65,8 @@ func main() {
 	app.Put("/entities/update/:id", handlers.UpdateEntity)
 	app.Delete("/entities/delete/:id", handlers.DeleteEntity)
 
-	// app.Get("/invoices", invoicesPage.Render)
+	app.Get("/invoices", handlers.InvoicesPage)
+	app.Get("/invoices/create", handlers.CreateInvoicePage)
 	// app.Post("/invoices", invoicesPage.RequireInvoice)
 	// app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
 	// app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
@@ -87,7 +88,7 @@ func main() {
 	// app.Get("/invoices/print/:id/request-card-status", printInvoicesPage.GetRequestStatus)
 	// app.Get("/invoices/print/request-card-filter", printInvoicesPage.FilterRequests)
 
-	// app.Get("/metrics", metricsPage.Render)
+	app.Get("/metrics", handlers.MetricsPage)
 	// app.Post("/metrics", metricsPage.GenerateMetrics)
 	// app.Get("/metrics/:id/form", metricsPage.GetMetricsForm)
 	// app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)

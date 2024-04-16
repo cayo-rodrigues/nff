@@ -1,5 +1,26 @@
 package pages
 
-templ InvoicesPage() {
+import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "github.com/cayo-rodrigues/nff/web/ui/components"
+import "github.com/cayo-rodrigues/nff/web/ui/forms"
 
+templ InvoicesPage(i *models.Invoice) {
+	<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+			<a href="/invoices/create" hx-boost="true">
+				@shared.SuccessButton("sm") {
+					@shared.Icon("file-plus")
+					<span>Nova NFA</span>
+				}
+			</a>
+		</div>
+		@components.InvoiceList()
+	</div>
+}
+
+templ InvoiceFormPage(invoice *models.Invoice, entities []*models.Entity) {
+	<div class="m-auto xl:w-10/12">
+		@forms.InvoiceForm(invoice, entities)	
+	</div>	
 }
