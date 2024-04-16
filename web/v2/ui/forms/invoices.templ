@@ -7,17 +7,19 @@ import "fmt"
 
 templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 	<form id="invoice-form">
-		<div class="gap-6 border-b border-gray-300 py-2">
-			<button
+		<div class="gap-6 border-b border-gray-300 py-2 outline-0">
+			<div
 				hx-post="/invoices/create"
 				hx-target="#requests-overview-wrapper"
 				hx-swap="outerHTML"
 				hx-include="[id='from_date'], [id='to_date']"
-				class="icon-btn flex w-full justify-center gap-3 rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600 lg:w-auto"
+				class="lg:w-fit"
 			>
-				@shared.Icon("play-circle")
-				<span>Iniciar Operação</span>
-			</button>
+				@shared.SubmitButton("sm") {
+					@shared.Icon("play-circle")
+					<span>Iniciar Operação</span>
+				}
+			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
 			<div class="flex flex-col gap-2">
@@ -28,7 +30,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 					hx-target="#available-ies"
 					hx-select="#available-ies"
 					hx-swap="outerHTML"
-					class="h-10 rounded bg-white p-2"
+					class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
 					id="sender"
 					name="sender"
 				>
@@ -41,7 +43,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			@SenderIeInput(i.Sender, i.SenderIe)
 			<div class="flex flex-col gap-2">
 				<label for="recipient"><strong>Destinatário</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="recipient" name="recipient">
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="recipient" name="recipient">
 					for _, e := range entities {
 						<option value={ strconv.Itoa(e.ID) }>{ e.Name }</option>
 					}
@@ -50,7 +52,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="operation"><strong>Operação</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="operation" name="operation">
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="operation" name="operation">
 					for _, operation := range models.InvoiceOperations {
 						<option
 							value={ operation }
@@ -66,7 +68,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="cfop"><strong>CFOP</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="cfop" name="cfop">
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="cfop" name="cfop">
 					for _, cfop := range models.InvoiceCfops {
 						<option
 							value={ strconv.Itoa(cfop) }
@@ -82,7 +84,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			</div>
 			<div class="flex flex-col gap-2">
 				<label class="truncate" for="is_icms_contributor"><strong>Contribuinte ICMS</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="is_icms_contributor" name="is_icms_contributor">
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="is_icms_contributor" name="is_icms_contributor">
 					for _, status := range models.InvoiceIcmsOptions {
 						<option
 							value={ status }
@@ -98,7 +100,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			</div>
 			<div class="flex flex-col gap-2">
 				<label class="truncate" for="is_final_customer"><strong>Consumidor Final</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="is_final_customer" name="is_final_customer">
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="is_final_customer" name="is_final_customer">
 					for _, status := range models.InvoiceBooleanField {
 						<option
 							value={ status }
@@ -115,7 +117,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			<div class="flex flex-col gap-2">
 				<label for="shipping"><strong>Frete</strong></label>
 				<input
-					class="rounded bg-white p-2 md:w-full"
+					class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full"
 					type="number"
 					step="0.01"
 					id="shipping"
@@ -127,7 +129,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			<div class="flex flex-col gap-2">
 				<label class="truncate" for="add_shipping_to_total"><strong>Adicionar Frete ao Total</strong></label>
 				<select
-					class="h-10 rounded bg-white p-2 md:w-full"
+					class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full"
 					id="add_shipping_to_total"
 					name="add_shipping_to_total"
 				></select>
@@ -135,51 +137,126 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			</div>
 			<div class="flex flex-col gap-2">
 				<label for="gta"><strong>GTA</strong></label>
-				<input class="rounded bg-white p-2 md:w-full" type="text" id="gta" name="gta" value={ i.Gta }/>
+				<input class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" type="text" id="gta" name="gta" value={ i.Gta }/>
 				<sub class="text-red-600">{ i.Errors["Gta"] }</sub>
 			</div>
 			<div class="flex flex-col gap-2">
 				<label class="truncate" for="extra_notes"><strong>Informações complementares</strong></label>
-				<input class="rounded bg-white p-2 md:w-full" type="text" id="extra_notes" name="extra_notes" value={ i.ExtraNotes }/>
+				<input class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" type="text" id="extra_notes" name="extra_notes" value={ i.ExtraNotes }/>
 				<sub class="text-red-600">{ i.Errors["ExtraNotes"] }</sub>
 			</div>
 			<div class="flex flex-col gap-2">
 				<label class="truncate" for="custom_file_name"><strong>Nome do arquivo</strong></label>
-				<input class="rounded bg-white p-2 md:w-full" type="text" id="custom_file_name" name="custom_file_name" value={ i.CustomFileNamePrefix }/>
+				<input class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" type="text" id="custom_file_name" name="custom_file_name" value={ i.CustomFileNamePrefix }/>
 				<sub class="text-red-600">{ i.Errors["CustomFileNamePrefix"] }</sub>
 			</div>
 		</div>
-		<section id="invoice-items-dialog" class="sticky top-0 z-10 mb-2 border-b border-gray-200 bg-gray-100 px-4 py-2 sm:flex sm:items-center sm:justify-between">
-			<div class="py-2">
-				<h3 class="text-xl font-bold">Produtos</h3>
-			</div>
-			<div class="flex items-center gap-6 py-2">
-				<button
-					class="rounded bg-gray-200 px-4 py-2 font-bold hover:bg-gray-300 active:bg-gray-400"
-					type="button"
-					hx-get="/invoices/items/form-section"
-					hx-target="#invoice-items-dialog"
-					hx-swap="beforeend"
-					hx-trigger="click"
-				>
-					+
-				</button>
-				<strong>Total de itens:</strong>
-				<span id="items-count">{ strconv.Itoa(len(i.Items)) }</span>
-			</div>
-		</section>
+		@InvoiceItemsHeading(i)
 		<div class="grid grid-cols-1 gap-3">
 			for idx, item := range i.Items {
-				@InvoiceItemSection(item, len(i.Items)-idx)
+				@InvoiceItemSection(item, idx+1)
 			}
 		</div>
 	</form>
 }
 
+templ InvoiceItemsHeading(i *models.Invoice) {
+	<heading id="invoice-items-heading" class="sticky top-0 z-10 mb-2 border-b border-gray-200 bg-gray-50 px-2 py-2 sm:flex sm:items-center sm:justify-between">
+		<div class="py-2">
+			<h3 class="text-lg font-bold">Produtos</h3>
+		</div>
+		<div class="flex items-center gap-6 py-2">
+			<div
+				hx-get="/invoices/items/form-section"
+				hx-target="#invoice-items-dialog"
+				hx-swap="beforeend"
+				hx-trigger="click"
+			>
+				@shared.DefaultButtonOutline("sm") {
+					@shared.IconXs("plus")
+				}
+			</div>
+			<strong>Total de itens:</strong>
+			<span id="items-count">{ strconv.Itoa(len(i.Items)) }</span>
+		</div>
+	</heading>
+}
+
+templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
+	<section id={ fmt.Sprintf("item-%d", idx) } class="rounded border border-gray-600 transition hover:border-gray-700">
+		<div class="flex items-center justify-between border-b border-gray-600 bg-gray-600 p-2">
+			<h3 class="text-base font-medium text-white">Produto { strconv.Itoa(idx) }</h3>
+			<div class="flex items-center justify-end gap-2">
+				<div onclick="duplicateItemSection(this.closest('section'))">
+					@shared.InfoButton("xs") {
+						@shared.IconXs("copy")
+					}
+				</div>
+				<div onclick="removeItemSection(this.closest('section'))">
+					@shared.DefaultButton("xs") {
+						@shared.IconXs("trash-2")
+					}
+				</div>
+			</div>
+		</div>
+		<div class="grid grid-cols-1 gap-4 rounded-b bg-white p-2 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+			<div class="flex flex-col gap-2">
+				<label for="group"><strong>Grupo</strong></label>
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" id="group" name="group"></select>
+				<sub class="text-red-600">{ item.Errors["Group"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="ncm"><strong>NCM</strong></label>
+				<input class="rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" type="text" id="ncm" name="ncm" value={ item.NCM }/>
+				<sub class="text-red-600">{ item.Errors["NCM"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="description"><strong>Descrição</strong></label>
+				<input class="rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" type="text" id="description" name="description" value={ item.Description }/>
+				<sub class="text-red-600">{ item.Errors["Description"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="quantity"><strong>Quantidade</strong></label>
+				<input
+					class="rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500"
+					type="number"
+					step="0.01"
+					id="quantity"
+					name="quantity"
+					value={ strconv.FormatFloat(item.Quantity, 'f', 2, 64) }
+				/>
+				<sub class="text-red-600">{ item.Errors["Quantity"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="value_per_unity"><strong>Valor unitário</strong></label>
+				<input
+					class="rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500"
+					type="number"
+					step="0.01"
+					id="value_per_unity"
+					name="value_per_unity"
+					value={ strconv.FormatFloat(item.ValuePerUnity, 'f', 2, 64) }
+				/>
+				<sub class="text-red-600">{ item.Errors["ValuePerUnity"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="origin"><strong>Origem</strong></label>
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" id="origin" name="origin"></select>
+				<sub class="text-red-600">{ item.Errors["Origin"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="unity_of_measurement"><strong>Unidade de medida</strong></label>
+				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" id="unity_of_measurement" name="unity_of_measurement"></select>
+				<sub class="text-red-600">{ item.Errors["UnityOfMeasurement"] }</sub>
+			</div>
+		</div>
+	</section>
+}
+
 templ SenderIeInput(e *models.Entity, invoiceSenderIe string) {
 	<div id="available-ies" class="flex flex-col gap-2">
 		<label class="truncate" for="sender_ie"><strong>IE do Remetente</strong></label>
-		<select class="h-10 rounded bg-white p-2 md:w-full" id="sender_ie" name="sender_ie">
+		<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" id="sender_ie" name="sender_ie">
 			for _, ie := range e.AllIes() {
 				<option
 					value={ ie }
@@ -193,75 +270,4 @@ templ SenderIeInput(e *models.Entity, invoiceSenderIe string) {
 		</select>
 		<sub class="text-red-600"></sub>
 	</div>
-}
-
-templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
-	<section id={ fmt.Sprintf("item-%d", idx) } class="duration-250 rounded border border-gray-300 p-4 transition-all ease-in-out hover:border-gray-400">
-		<div class="flex items-center justify-between pb-2">
-			<h3 class="text-lg font-bold">Produto { strconv.Itoa(idx) }</h3>
-			<div class="flex items-center justify-end gap-2 pb-2">
-				<div onclick="duplicateItemSection(this.closest('section'))">
-					@shared.InfoButton("xs") {
-						@shared.SmallIcon("copy")
-					}
-				</div>
-				<div onclick="removeItemSection(this.closest('section'))">
-					@shared.DefaultButton("xs") {
-						@shared.SmallIcon("trash-2")
-					}
-				</div>
-			</div>
-		</div>
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
-			<div class="flex flex-col gap-2">
-				<label for="group"><strong>Grupo</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="group" name="group"></select>
-				<sub class="text-red-600">{ item.Errors["Group"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="ncm"><strong>NCM</strong></label>
-				<input class="rounded bg-white p-2" type="text" id="ncm" name="ncm" value={ item.NCM }/>
-				<sub class="text-red-600">{ item.Errors["NCM"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="description"><strong>Descrição</strong></label>
-				<input class="rounded bg-white p-2" type="text" id="description" name="description" value={ item.Description }/>
-				<sub class="text-red-600">{ item.Errors["Description"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="quantity"><strong>Quantidade</strong></label>
-				<input
-					class="rounded bg-white p-2"
-					type="number"
-					step="0.01"
-					id="quantity"
-					name="quantity"
-					value={ strconv.FormatFloat(item.Quantity, 'f', 2, 64) }
-				/>
-				<sub class="text-red-600">{ item.Errors["Quantity"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="value_per_unity"><strong>Valor unitário</strong></label>
-				<input
-					class="rounded bg-white p-2"
-					type="number"
-					step="0.01"
-					id="value_per_unity"
-					name="value_per_unity"
-					value={ strconv.FormatFloat(item.ValuePerUnity, 'f', 2, 64) }
-				/>
-				<sub class="text-red-600">{ item.Errors["ValuePerUnity"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="origin"><strong>Origem</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="origin" name="origin"></select>
-				<sub class="text-red-600">{ item.Errors["Origin"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="unity_of_measurement"><strong>Unidade de medida</strong></label>
-				<select class="h-10 rounded bg-white p-2" id="unity_of_measurement" name="unity_of_measurement"></select>
-				<sub class="text-red-600">{ item.Errors["UnityOfMeasurement"] }</sub>
-			</div>
-		</div>
-	</section>
 }

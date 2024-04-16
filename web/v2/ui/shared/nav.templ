@@ -1,7 +1,7 @@
 package shared
 
 templ Nav() {
-	<nav hx-boost="true" class="sticky top-0 flex w-full justify-between bg-sky-700 px-4 py-2 text-white md:px-8">
+	<nav hx-boost="true" class="sticky top-0 flex w-full items-center justify-between bg-sky-700 px-4 py-2 text-white md:px-8">
 		<h1 class="text-xl">
 			<a href="/" hx-indicator="#global-indicator">
 				Nota Fiscal Fácil
@@ -10,24 +10,24 @@ templ Nav() {
 		<div class="flex items-center gap-4 sm:gap-6 xl:gap-8">
 			<ul hx-boost="true" class="hidden gap-2 xl:flex">
 				@MenuItem("/entities") {
-					@SmallIcon("user")
+					@IconSm("user")
 					<span>Entidades</span>
 				}
 				@MenuItem("/invoices") {
-					@SmallIcon("file-text")
+					@IconSm("file-text")
 					<span>Notas Fiscais</span>
 				}
 				@MenuItem("/metrics") {
-					@SmallIcon("activity")
+					@IconSm("activity")
 					<span>Métricas</span>
 				}
 				@MenuItem("/logout") {
-					@SmallIcon("log-out")
+					@IconSm("log-out")
 					<span>Sair</span>
 				}
 			</ul>
 			<button class="rounded-full transition hover:bg-sky-800 xl:p-2">
-				@SmallIcon("bell")
+				@IconSm("bell")
 			</button>
 			<button class="xl:hidden">
 				@Icon("menu")

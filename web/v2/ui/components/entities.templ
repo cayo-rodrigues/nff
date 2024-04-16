@@ -19,7 +19,7 @@ templ EntityCard(e *models.Entity) {
 		id={ entityCardID(e) }
 		class="relative cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
 	>
-		<h3 class="truncate rounded border border-gray-300 p-2 text-lg font-bold">{ e.Name }</h3>
+		<h3 class="truncate rounded border border-gray-300 p-2 text-base font-bold">{ e.Name }</h3>
 		<ul class="flex flex-col gap-1 p-2">
 			<li>{ e.UserType }</li>
 			<li><span class="font-medium">CPF/CNPJ:</span> { e.CpfCnpj }</li>

@@ -4,9 +4,14 @@ templ Icon(name string) {
 	<i data-feather={ name }></i>
 }
 
-templ SmallIcon(name string) {
+templ IconSm(name string) {
 	<i data-feather={ name } class="h-5 w-5"></i>
 }
+
+templ IconXs(name string) {
+	<i data-feather={ name } class="h-4 w-4"></i>
+}
+
 
 templ LoadingIcon() {
 	<i data-feather="loader" class="hx-indicator animate-spin text-5xl opacity-70"></i>
