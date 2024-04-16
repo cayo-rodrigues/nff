@@ -28,6 +28,14 @@ func CreateInvoicePage(c *fiber.Ctx) error {
 	if len(entities) > 0 {
 		invoice.Sender = entities[0]
 	}
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
+	invoice.Items = append(invoice.Items, models.NewInvoiceItem())
 	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities)))
 }
 

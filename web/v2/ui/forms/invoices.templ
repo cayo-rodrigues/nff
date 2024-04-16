@@ -3,6 +3,7 @@ package forms
 import "github.com/cayo-rodrigues/nff/web/models"
 import "strconv"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "fmt"
 
 templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 	<form id="invoice-form">
@@ -15,7 +16,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				class="icon-btn flex w-full justify-center gap-3 rounded bg-green-400 px-4 py-2 hover:bg-green-500 active:bg-green-600 lg:w-auto"
 			>
 				@shared.Icon("play-circle")
-				<span>Iniciar Requerimento</span>
+				<span>Iniciar Operação</span>
 			</button>
 		</div>
 		<div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
@@ -148,7 +149,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				<sub class="text-red-600">{ i.Errors["CustomFileNamePrefix"] }</sub>
 			</div>
 		</div>
-		<section id="invoice-items-dialog" class="sticky top-0 z-10 border-b border-gray-300 py-2">
+		<section id="invoice-items-dialog" class="sticky top-0 z-10 mb-2 border-b border-gray-200 bg-gray-100 px-4 py-2 sm:flex sm:items-center sm:justify-between">
 			<div class="py-2">
 				<h3 class="text-xl font-bold">Produtos</h3>
 			</div>
@@ -164,9 +165,14 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 					+
 				</button>
 				<strong>Total de itens:</strong>
-				<span id="items-count"></span>
+				<span id="items-count">{ strconv.Itoa(len(i.Items)) }</span>
 			</div>
 		</section>
+		<div class="grid grid-cols-1 gap-3">
+			for idx, item := range i.Items {
+				@InvoiceItemSection(item, len(i.Items)-idx)
+			}
+		</div>
 	</form>
 }
 
@@ -187,4 +193,75 @@ templ SenderIeInput(e *models.Entity, invoiceSenderIe string) {
 		</select>
 		<sub class="text-red-600"></sub>
 	</div>
+}
+
+templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
+	<section id={ fmt.Sprintf("item-%d", idx) } class="duration-250 rounded border border-gray-300 p-4 transition-all ease-in-out hover:border-gray-400">
+		<div class="flex items-center justify-between pb-2">
+			<h3 class="text-lg font-bold">Produto { strconv.Itoa(idx) }</h3>
+			<div class="flex items-center justify-end gap-2 pb-2">
+				<div onclick="duplicateItemSection(this.closest('section'))">
+					@shared.InfoButton("xs") {
+						@shared.SmallIcon("copy")
+					}
+				</div>
+				<div onclick="removeItemSection(this.closest('section'))">
+					@shared.DefaultButton("xs") {
+						@shared.SmallIcon("trash-2")
+					}
+				</div>
+			</div>
+		</div>
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+			<div class="flex flex-col gap-2">
+				<label for="group"><strong>Grupo</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="group" name="group"></select>
+				<sub class="text-red-600">{ item.Errors["Group"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="ncm"><strong>NCM</strong></label>
+				<input class="rounded bg-white p-2" type="text" id="ncm" name="ncm" value={ item.NCM }/>
+				<sub class="text-red-600">{ item.Errors["NCM"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="description"><strong>Descrição</strong></label>
+				<input class="rounded bg-white p-2" type="text" id="description" name="description" value={ item.Description }/>
+				<sub class="text-red-600">{ item.Errors["Description"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="quantity"><strong>Quantidade</strong></label>
+				<input
+					class="rounded bg-white p-2"
+					type="number"
+					step="0.01"
+					id="quantity"
+					name="quantity"
+					value={ strconv.FormatFloat(item.Quantity, 'f', 2, 64) }
+				/>
+				<sub class="text-red-600">{ item.Errors["Quantity"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="value_per_unity"><strong>Valor unitário</strong></label>
+				<input
+					class="rounded bg-white p-2"
+					type="number"
+					step="0.01"
+					id="value_per_unity"
+					name="value_per_unity"
+					value={ strconv.FormatFloat(item.ValuePerUnity, 'f', 2, 64) }
+				/>
+				<sub class="text-red-600">{ item.Errors["ValuePerUnity"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label for="origin"><strong>Origem</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="origin" name="origin"></select>
+				<sub class="text-red-600">{ item.Errors["Origin"] }</sub>
+			</div>
+			<div class="flex flex-col gap-2">
+				<label class="truncate" for="unity_of_measurement"><strong>Unidade de medida</strong></label>
+				<select class="h-10 rounded bg-white p-2" id="unity_of_measurement" name="unity_of_measurement"></select>
+				<sub class="text-red-600">{ item.Errors["UnityOfMeasurement"] }</sub>
+			</div>
+		</div>
+	</section>
 }
