@@ -7,57 +7,58 @@ import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "strings"
 
 templ EntityForm(e *models.Entity) {
-	<div class="sticky top-20" id="entity-form">
+	<div class="mt-4 w-full md:w-4/5 lg:w-3/5 xl:w-6/12" id="entity-form">
 		<form { getHxAttrsByAction(e)... }>
 			<input type="hidden" name="id" value={ strconv.Itoa(e.ID) }/>
-			<div class="grid grid-cols-1 gap-2 py-2">
-				<sup class="text-red-600">{ e.Errors["Name"] }</sup>
-				<input
-					class="flex-1 rounded border border-gray-300 p-2 text-2xl font-semibold outline-0 focus-within:border-gray-500"
-					type="text"
-					name="name"
-					value={ e.Name }
-					placeholder="Nome"
-				/>
-			</div>
-			<hr/>
-			<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
-				<div class="grid grid-cols-1 gap-4">
-					@shared.SelectInput(&shared.InputData{
-						ID:      "user_type",
-						Label:   "Tipo",
-						Value:   e.UserType,
-						Options: models.EntityUserTypes[:],
-						ErrMsg:  e.Errors["UserType"],
-					})
-					@shared.Input(&shared.InputData{
-						ID:     "cpf_cnpj",
-						Label:  "CPF/CNPJ",
-						Value:  e.CpfCnpj,
-						ErrMsg: e.Errors["CpfCnpj"],
-					})
-					@shared.Input(&shared.InputData{
-						ID:     "ie",
-						Label:  "Inscrição Estadual",
-						Value:  e.Ie,
-						ErrMsg: e.Errors["Ie"],
-					})
-					@shared.Input(&shared.InputData{
-						ID:        "email",
-						Label:     "E-mail",
-						Value:     e.Email,
-						ErrMsg:    e.Errors["Email"],
-						InputType: "email",
-					})
-					@shared.Input(&shared.InputData{
-						ID:        "password",
-						Label:     "Senha",
-						Value:     e.Password,
-						ErrMsg:    e.Errors["Password"],
-						InputType: "password",
-					})
-				</div>
-				<div class="grid grid-cols-1 gap-4">
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				@shared.Input(&shared.InputData{
+					ID:     "name",
+					Label:  "Nome",
+					Value:  e.Name,
+					ErrMsg: e.Errors["Name"],
+				})
+				@shared.SelectInput(&shared.InputData{
+					ID:      "user_type",
+					Label:   "Tipo",
+					Value:   e.UserType,
+					Options: &shared.InputOptions{StringOptions: models.EntityUserTypes[:]},
+					ErrMsg:  e.Errors["UserType"],
+				})
+				@shared.Input(&shared.InputData{
+					ID:     "cpf_cnpj",
+					Label:  "CPF/CNPJ",
+					Value:  e.CpfCnpj,
+					ErrMsg: e.Errors["CpfCnpj"],
+				})
+				@shared.Input(&shared.InputData{
+					ID:     "ie",
+					Label:  "Inscrição Estadual",
+					Value:  e.Ie,
+					ErrMsg: e.Errors["Ie"],
+				})
+				@shared.Input(&shared.InputData{
+					ID:        "email",
+					Label:     "E-mail",
+					Value:     e.Email,
+					ErrMsg:    e.Errors["Email"],
+					InputType: "email",
+				})
+				@shared.Input(&shared.InputData{
+					ID:        "password",
+					Label:     "Senha",
+					Value:     e.Password,
+					ErrMsg:    e.Errors["Password"],
+					InputType: "password",
+				})
+				@shared.WideInput(&shared.InputData{
+					ID:          "other_ies",
+					Label:       "Outras IEs",
+					Value:       strings.Join(e.OtherIes, ", "),
+					Placeholder: "Separe por vírgulas",
+					ErrMsg:      e.Errors["OtherIes"],
+				})
+				<fieldset class="col-span-full grid grid-cols-1 gap-4 rounded border border-gray-300 px-2 sm:grid-cols-2 lg:grid-cols-3">
+					<legend class="px-2 text-center">Endereço</legend>
 					@shared.Input(&shared.InputData{
 						ID:     "postal_code",
 						Label:  "CEP",
@@ -74,7 +75,7 @@ templ EntityForm(e *models.Entity) {
 						ID:      "street_type",
 						Label:   "Logradouro (tipo)",
 						Value:   e.StreetType,
-						Options: models.EntityAddressStreetTypes[:],
+						Options: &shared.InputOptions{StringOptions: models.EntityAddressStreetTypes[:]},
 						ErrMsg:  e.Errors["StreetType"],
 					})
 					@shared.Input(&shared.InputData{
@@ -89,14 +90,7 @@ templ EntityForm(e *models.Entity) {
 						Value:  e.Number,
 						ErrMsg: e.Errors["Number"],
 					})
-				</div>
-				@shared.WideInput(&shared.InputData{
-					ID:          "other_ies",
-					Label:       "Outras IEs",
-					Value:       strings.Join(e.OtherIes, ", "),
-					Placeholder: "Separe por vírgulas",
-					ErrMsg:      e.Errors["OtherIes"],
-				})
+				</fieldset>
 			</div>
 			<div class="flex gap-6">
 				<div class="mt-4 flex-1">
@@ -116,14 +110,6 @@ templ EntityForm(e *models.Entity) {
 			</div>
 		</form>
 	</div>
-}
-
-func getUserTypes() models.SiareUserTypes {
-	return models.EntityUserTypes
-}
-
-func getStreetTypes() models.SiareAddressStreetTypes {
-	return models.EntityAddressStreetTypes
 }
 
 func getTextByAction(e *models.Entity) string {

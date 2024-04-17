@@ -22,34 +22,33 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-			<div class="flex flex-col gap-2">
-				<label for="sender"><strong>Remetente</strong></label>
-				<select
-					hx-get="/invoices/form/get-sender-ie-input"
-					hx-trigger="change"
-					hx-target="#available-ies"
-					hx-select="#available-ies"
-					hx-swap="outerHTML"
-					class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
-					id="sender"
-					name="sender"
-				>
-					for _, e := range entities {
-						<option value={ strconv.Itoa(e.ID) }>{ e.Name }</option>
-					}
-				</select>
-				<sub class="text-red-600">{ i.Errors["Sender"] }</sub>
-			</div>
-			@SenderIeInput(i.Sender, i.SenderIe)
-			<div class="flex flex-col gap-2">
-				<label for="recipient"><strong>Destinatário</strong></label>
-				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="recipient" name="recipient">
-					for _, e := range entities {
-						<option value={ strconv.Itoa(e.ID) }>{ e.Name }</option>
-					}
-				</select>
-				<sub class="text-red-600">{ i.Errors["Recipient"] }</sub>
-			</div>
+			@shared.SelectInput(&shared.InputData{
+				ID:      "sender",
+				Label:   "Remetente",
+				Value:   strconv.Itoa(i.Sender.ID),
+				Options: &shared.InputOptions{EntityOptions: entities},
+				ErrMsg:  i.Errors["Sender"],
+				Attrs: templ.Attributes{
+					"hx-get":     "/invoices/form/get-sender-ie-input",
+					"hx-trigger": "change",
+					"hx-target":  "#available-ies",
+					"hx-select":  "#available-ies",
+					"hx-swap":    "outerHTML",
+				},
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "available-ies",
+				Label:   "IE do Remetente",
+				Value:   i.SenderIe,
+				Options: &shared.InputOptions{StringOptions: i.Sender.AllIes()},
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "recipient",
+				Label:   "Destinatário",
+				Value:   strconv.Itoa(i.Recipient.ID),
+				Options: &shared.InputOptions{EntityOptions: entities},
+				ErrMsg:  i.Errors["Recipient"],
+			})
 			<div class="flex flex-col gap-2">
 				<label for="operation"><strong>Operação</strong></label>
 				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="operation" name="operation">
@@ -205,7 +204,7 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 				Label:   "Grupo",
 				Value:   item.Group,
 				ErrMsg:  item.Errors["Group"],
-				Options: models.InvoiceItemGroups[:],
+				Options: &shared.InputOptions{StringOptions: models.InvoiceItemGroups[:]},
 			})
 			@shared.Input(&shared.InputData{
 				ID:     "ncm",
@@ -240,34 +239,15 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 				Label:   "Origem",
 				Value:   item.Origin,
 				ErrMsg:  item.Errors["Origin"],
-				Options: models.InvoiceItemOrigins[:],
+				Options: &shared.InputOptions{StringOptions: models.InvoiceItemOrigins[:]},
 			})
 			@shared.SelectInput(&shared.InputData{
 				ID:      "unity_of_measurement",
 				Label:   "Unidade de Medida",
 				Value:   item.UnityOfMeasurement,
 				ErrMsg:  item.Errors["UnityOfMeasurement"],
-				Options: models.InvoiceItemUnitiesOfMeaasurement[:],
+				Options: &shared.InputOptions{StringOptions: models.InvoiceItemUnitiesOfMeaasurement[:]},
 			})
 		</div>
 	</section>
-}
-
-templ SenderIeInput(e *models.Entity, invoiceSenderIe string) {
-	<div id="available-ies" class="flex flex-col gap-2">
-		<label class="truncate" for="sender_ie"><strong>IE do Remetente</strong></label>
-		<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" id="sender_ie" name="sender_ie">
-			for _, ie := range e.AllIes() {
-				<option
-					value={ ie }
-					if ie == invoiceSenderIe {
-						selected
-					}
-				>
-					{ ie }
-				</option>
-			}
-		</select>
-		<sub class="text-red-600"></sub>
-	</div>
 }

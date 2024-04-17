@@ -7,11 +7,23 @@ import "github.com/cayo-rodrigues/nff/web/ui/forms"
 
 templ InvoicesPage(i *models.Invoice) {
 	<div class="flex flex-col gap-4">
-		<div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+		<div class="flex flex-col gap-2 sm:flex-row">
 			<a href="/invoices/create" hx-boost="true">
 				@shared.SuccessButton("sm") {
 					@shared.Icon("file-plus")
-					<span>Emitir Nota Fiscal</span>
+					<span>Emitir NFA</span>
+				}
+			</a>
+			<a href="/invoices/cancel" hx-boost="true">
+				@shared.ErrorButton("sm") {
+					@shared.Icon("slash")
+					<span>Cancelar NFA</span>
+				}
+			</a>
+			<a href="/invoices/print" hx-boost="true">
+				@shared.InfoButton("sm") {
+					@shared.Icon("printer")
+					<span>Imprimir NFA</span>
 				}
 			</a>
 		</div>

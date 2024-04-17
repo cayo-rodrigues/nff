@@ -1,6 +1,14 @@
 package shared
 
 import "fmt"
+import "strconv"
+import "github.com/cayo-rodrigues/nff/web/models"
+
+type InputOptions struct {
+	StringOptions []string
+	IntOptions    []int
+	EntityOptions []*models.Entity
+}
 
 type InputData struct {
 	ErrMsg      string
@@ -10,7 +18,7 @@ type InputData struct {
 	Label       string
 	Placeholder string
 	Attrs       templ.Attributes
-	Options     []string
+	Options     *InputOptions
 	Step        string
 	Class       string
 }
@@ -67,14 +75,44 @@ templ SelectInput(data *InputData) {
 			name={ data.ID }
 			{ data.Attrs... }
 		>
-			for _, option := range data.Options {
+			for _, strOpt := range data.Options.StringOptions {
 				<option
-					value={ option }
-					if data.Value == option {
+					value={ strOpt }
+					if data.Value == strOpt {
 						selected
 					}
 				>
-					{ option }
+					{ strOpt }
+				</option>
+			}
+			for _, intOpt := range data.Options.IntOptions {
+				<option
+					value={ strconv.Itoa(intOpt) }
+					if data.Value == strconv.Itoa(intOpt) {
+						selected
+					}
+				>
+					{ strconv.Itoa(intOpt) }
+				</option>
+			}
+			for _, entityOpt := range data.Options.EntityOptions {
+				<option
+					value={ strconv.Itoa(entityOpt.ID) }
+					if data.Value == strconv.Itoa(entityOpt.ID) {
+						selected
+					}
+				>
+					{ entityOpt.Name }
+				</option>
+			}
+			for _, entityOpt := range data.Options.EntityOptions {
+				<option
+					value={ strconv.Itoa(entityOpt.ID) }
+					if data.Value == strconv.Itoa(entityOpt.ID) {
+						selected
+					}
+				>
+					{ entityOpt.Name }
 				</option>
 			}
 		</select>
