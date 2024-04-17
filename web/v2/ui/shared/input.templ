@@ -1,0 +1,83 @@
+package shared
+
+import "fmt"
+
+type InputData struct {
+	ErrMsg      string
+	InputType   string
+	ID          string
+	Value       string
+	Label       string
+	Placeholder string
+	Attrs       templ.Attributes
+	Options     []string
+	Step        string
+	Class       string
+}
+
+func (data *InputData) Wide() *InputData {
+	data.Class = "relative flex flex-col gap-2 col-span-full"
+	return data
+}
+
+templ WideInput(data *InputData) {
+	@Input(data.Wide())
+}
+
+templ Input(data *InputData) {
+	<div
+		if data.Class != "" {
+			class={ data.Class }
+		} else {
+			class="relative flex flex-col gap-2"
+		}
+	>
+		<label for={ data.ID }><strong>{ data.Label }</strong></label>
+		<input
+			class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
+			if data.InputType != "" {
+				type={ data.InputType }
+			} else {
+				type="text"
+			}
+			if data.InputType == "number" {
+				step={ data.Step }
+			}
+			id={ data.ID }
+			name={ data.ID }
+			value={ data.Value }
+			placeholder={ data.Placeholder }
+			{ data.Attrs... }
+		/>
+		<sub class="text-red-600">{ data.ErrMsg }</sub>
+		if data.InputType == "password" {
+			<button id={ fmt.Sprintf("password-toggle-%v", data.ID) } type="button" class="absolute bottom-4 right-4">
+				@IconSm("eye-off")
+			</button>
+		}
+	</div>
+}
+
+templ SelectInput(data *InputData) {
+	<div class="flex flex-col gap-2">
+		<label for={ data.ID }><strong>{ data.Label }</strong></label>
+		<select
+			class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
+			id={ data.ID }
+			name={ data.ID }
+			{ data.Attrs... }
+		>
+			for _, option := range data.Options {
+				<option
+					value={ option }
+					if data.Value == option {
+						selected
+					}
+				>
+					{ option }
+				</option>
+			}
+		</select>
+		<sub class="text-red-600">{ data.ErrMsg }</sub>
+	</div>
+}

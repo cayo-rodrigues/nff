@@ -20,7 +20,7 @@ templ EntityCard(e *models.Entity) {
 		class="relative cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
 	>
 		<h3 class="truncate rounded border border-gray-300 p-2 text-base font-bold">{ e.Name }</h3>
-		<ul class="flex flex-col gap-1 p-2">
+		<ul class="flex flex-col gap-1 p-2 pb-0">
 			<li>{ e.UserType }</li>
 			<li><span class="font-medium">CPF/CNPJ:</span> { e.CpfCnpj }</li>
 			<li><span class="font-medium">IE:</span> { e.Ie }</li>
@@ -28,17 +28,17 @@ templ EntityCard(e *models.Entity) {
 		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-3 sm:p-0">
 			<div onclick={ scripts.OpenDialog(entityDetailsTarget(e)) }>
 				@shared.WarningButton("xs") {
-					@shared.Icon("eye")
+					@shared.IconSm("eye")
 				}
 			</div>
 			<a href={ templ.SafeURL(fmt.Sprintf("/entities/update/%d", e.ID)) }>
 				@shared.InfoButton("xs") {
-					@shared.Icon("edit")
+					@shared.IconSm("edit")
 				}
 			</a>
 			<div onclick={ scripts.OpenDialog(deleteConfirmationDialogTarget(e)) }>
 				@shared.DefaultButton("xs") {
-					@shared.Icon("trash-2")
+					@shared.IconSm("trash-2")
 				}
 			</div>
 		</div>

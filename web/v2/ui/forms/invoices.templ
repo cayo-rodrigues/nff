@@ -182,55 +182,6 @@ templ InvoiceItemsHeading(i *models.Invoice) {
 	</heading>
 }
 
-type InputData struct {
-	ErrMsg    string
-	InputType string
-	ID        string
-	Value     string
-	Label     string
-	Attrs     templ.Attributes
-	Options   []string
-}
-
-templ Input(data *InputData) {
-	<div class="flex flex-col gap-2">
-		<label for={ data.ID }><strong>{ data.Label }</strong></label>
-		<input
-			class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
-			type={ data.InputType }
-			id={ data.ID }
-			name={ data.ID }
-			value={ data.Value }
-			{ data.Attrs... }
-		/>
-		<sub class="text-red-600">{ data.ErrMsg }</sub>
-	</div>
-}
-
-templ SelectInput(data *InputData) {
-	<div class="flex flex-col gap-2">
-		<label for={ data.ID }><strong>{ data.Label }</strong></label>
-		<select
-			class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
-			id={ data.ID }
-			name={ data.ID }
-			{ data.Attrs... }
-		>
-			for _, option := range data.Options {
-				<option
-					value={ option }
-					if data.Value == option {
-						selected
-					}
-				>
-					{ option }
-				</option>
-			}
-		</select>
-		<sub class="text-red-600">{ data.ErrMsg }</sub>
-	</div>
-}
-
 templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 	<section id={ fmt.Sprintf("item-%d", idx) } class="rounded border border-gray-600 transition hover:border-gray-700">
 		<div class="flex items-center justify-between border-b border-gray-600 bg-gray-600 p-2">
@@ -249,59 +200,55 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 			</div>
 		</div>
 		<div class="grid grid-cols-1 gap-4 rounded-b bg-white p-2 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
-			@SelectInput(&InputData{
+			@shared.SelectInput(&shared.InputData{
 				ID:      "group",
 				Label:   "Grupo",
 				Value:   item.Group,
 				ErrMsg:  item.Errors["Group"],
 				Options: models.InvoiceItemGroups[:],
 			})
-			@Input(&InputData{
-				ID:        "ncm",
-				Label:     "NCM",
-				Value:     item.NCM,
-				ErrMsg:    item.Errors["NCM"],
-				InputType: "text",
+			@shared.Input(&shared.InputData{
+				ID:     "ncm",
+				Label:  "NCM",
+				Value:  item.NCM,
+				ErrMsg: item.Errors["NCM"],
 			})
-			<div class="flex flex-col gap-2">
-				<label for="description"><strong>Descrição</strong></label>
-				<input class="rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" type="text" id="description" name="description" value={ item.Description }/>
-				<sub class="text-red-600">{ item.Errors["Description"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="quantity"><strong>Quantidade</strong></label>
-				<input
-					class="rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500"
-					type="number"
-					step="0.01"
-					id="quantity"
-					name="quantity"
-					value={ strconv.FormatFloat(item.Quantity, 'f', 2, 64) }
-				/>
-				<sub class="text-red-600">{ item.Errors["Quantity"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="value_per_unity"><strong>Valor unitário</strong></label>
-				<input
-					class="rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500"
-					type="number"
-					step="0.01"
-					id="value_per_unity"
-					name="value_per_unity"
-					value={ strconv.FormatFloat(item.ValuePerUnity, 'f', 2, 64) }
-				/>
-				<sub class="text-red-600">{ item.Errors["ValuePerUnity"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="origin"><strong>Origem</strong></label>
-				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" id="origin" name="origin"></select>
-				<sub class="text-red-600">{ item.Errors["Origin"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="unity_of_measurement"><strong>Unidade de medida</strong></label>
-				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0  focus-within:border-gray-500" id="unity_of_measurement" name="unity_of_measurement"></select>
-				<sub class="text-red-600">{ item.Errors["UnityOfMeasurement"] }</sub>
-			</div>
+			@shared.Input(&shared.InputData{
+				ID:     "description",
+				Label:  "Description",
+				Value:  item.Description,
+				ErrMsg: item.Errors["Description"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:        "quantity",
+				Label:     "Quantidade",
+				Value:     strconv.FormatFloat(item.Quantity, 'f', 2, 64),
+				ErrMsg:    item.Errors["Quantity"],
+				InputType: "number",
+				Step:      "0.01",
+			})
+			@shared.Input(&shared.InputData{
+				ID:        "value_per_unity",
+				Label:     "ValuePerUnity",
+				Value:     strconv.FormatFloat(item.ValuePerUnity, 'f', 2, 64),
+				ErrMsg:    item.Errors["ValuePerUnity"],
+				InputType: "number",
+				Step:      "0.01",
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "origin",
+				Label:   "Origem",
+				Value:   item.Origin,
+				ErrMsg:  item.Errors["Origin"],
+				Options: models.InvoiceItemOrigins[:],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "unity_of_measurement",
+				Label:   "Unidade de Medida",
+				Value:   item.UnityOfMeasurement,
+				ErrMsg:  item.Errors["UnityOfMeasurement"],
+				Options: models.InvoiceItemUnitiesOfMeaasurement[:],
+			})
 		</div>
 	</section>
 }

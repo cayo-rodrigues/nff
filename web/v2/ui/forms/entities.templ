@@ -13,7 +13,7 @@ templ EntityForm(e *models.Entity) {
 			<div class="grid grid-cols-1 gap-2 py-2">
 				<sup class="text-red-600">{ e.Errors["Name"] }</sup>
 				<input
-					class="flex-1 rounded p-2 text-2xl font-semibold"
+					class="flex-1 rounded border border-gray-300 p-2 text-2xl font-semibold outline-0 focus-within:border-gray-500"
 					type="text"
 					name="name"
 					value={ e.Name }
@@ -23,144 +23,80 @@ templ EntityForm(e *models.Entity) {
 			<hr/>
 			<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 sm:gap-6">
 				<div class="grid grid-cols-1 gap-4">
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="user_type"><strong>Tipo</strong></label>
-						<select class="h-10 rounded bg-white p-2" id="user_type" name="user_type">
-							for _, userType := range getUserTypes() {
-								<option
-									if e.UserType == userType {
-										selected
-									}
-									value={ userType }
-								>
-									{ userType }
-								</option>
-							}
-						</select>
-						<sub class="text-red-600">{ e.Errors["UserType"] }</sub>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="cpf_cnpj"><strong>CPF/CNPJ</strong></label>
-						<input
-							class="rounded p-2"
-							type="text"
-							id="cpf_cnpj"
-							name="cpf_cnpj"
-							value={ e.CpfCnpj }
-						/>
-						<sub class="text-red-600">{ e.Errors["CpfCnpj"] }</sub>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="ie"><strong>Inscrição Estadual</strong></label>
-						<input
-							class="rounded p-2"
-							type="text"
-							id="ie"
-							name="ie"
-							value={ e.Ie }
-						/>
-						<sub class="text-red-600">{ e.Errors["Ie"] }</sub>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="email"><strong>E-mail</strong></label>
-						<input
-							class="rounded p-2"
-							type="email"
-							id="email"
-							name="email"
-							value={ e.Email }
-						/>
-						<sub class="text-red-600">{ e.Errors["Email"] }</sub>
-					</div>
-					<div class="relative flex flex-col gap-2">
-						<label class="truncate" for="password"><strong>Senha</strong></label>
-						<input
-							class="rounded p-2 pr-10"
-							type="password"
-							id="password"
-							name="password"
-							value={ e.Password }
-						/>
-						<sub></sub>
-						<button id="entity-password-toggle" type="button" class="absolute bottom-4 right-4">
-							@shared.Icon("eye-off")
-						</button>
-					</div>
+					@shared.SelectInput(&shared.InputData{
+						ID:      "user_type",
+						Label:   "Tipo",
+						Value:   e.UserType,
+						Options: models.EntityUserTypes[:],
+						ErrMsg:  e.Errors["UserType"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "cpf_cnpj",
+						Label:  "CPF/CNPJ",
+						Value:  e.CpfCnpj,
+						ErrMsg: e.Errors["CpfCnpj"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "ie",
+						Label:  "Inscrição Estadual",
+						Value:  e.Ie,
+						ErrMsg: e.Errors["Ie"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:        "email",
+						Label:     "E-mail",
+						Value:     e.Email,
+						ErrMsg:    e.Errors["Email"],
+						InputType: "email",
+					})
+					@shared.Input(&shared.InputData{
+						ID:        "password",
+						Label:     "Senha",
+						Value:     e.Password,
+						ErrMsg:    e.Errors["Password"],
+						InputType: "password",
+					})
 				</div>
 				<div class="grid grid-cols-1 gap-4">
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="postal_code"><strong>CEP</strong></label>
-						<input
-							class="rounded p-2"
-							type="text"
-							id="postal_code"
-							name="postal_code"
-							value={ e.PostalCode }
-						/>
-						<sub class="text-red-600">{ e.Errors["PostalCode"] }</sub>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="neighborhood"><strong>Bairro</strong></label>
-						<input
-							class="rounded p-2"
-							type="text"
-							id="neighborhood"
-							name="neighborhood"
-							value={ e.Neighborhood }
-						/>
-						<sub class="text-red-600">{ e.Errors["Neighborhood"] }</sub>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="street_type"><strong>Logradouro (tipo)</strong></label>
-						<select class="h-10 rounded bg-white p-2" id="street_type" name="street_type">
-							for _, streetType := range getStreetTypes() {
-								<option
-									if e.StreetType == streetType {
-										selected
-									}
-									value={ streetType }
-								>
-									{ streetType }
-								</option>
-							}
-						</select>
-						<sub class="text-red-600">{ e.Errors["StreetType"] }</sub>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="street_name"><strong>Logradouro (nome)</strong></label>
-						<input
-							class="rounded p-2"
-							type="text"
-							id="street_name"
-							name="street_name"
-							value={ e.StreetName }
-						/>
-						<sub class="text-red-600">{ e.Errors["StreetName"] }</sub>
-					</div>
-					<div class="flex flex-col gap-2">
-						<label class="truncate" for="number"><strong>Número da casa</strong></label>
-						<input
-							class="rounded p-2"
-							type="text"
-							id="number"
-							name="number"
-							value={ e.Number }
-						/>
-						<sub class="text-red-600">{ e.Errors["Number"] }</sub>
-					</div>
+					@shared.Input(&shared.InputData{
+						ID:     "postal_code",
+						Label:  "CEP",
+						Value:  e.PostalCode,
+						ErrMsg: e.Errors["PostalCode"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "neighborhood",
+						Label:  "Bairro",
+						Value:  e.Neighborhood,
+						ErrMsg: e.Errors["Neighborhood"],
+					})
+					@shared.SelectInput(&shared.InputData{
+						ID:      "street_type",
+						Label:   "Logradouro (tipo)",
+						Value:   e.StreetType,
+						Options: models.EntityAddressStreetTypes[:],
+						ErrMsg:  e.Errors["StreetType"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "street_name",
+						Label:  "Logradouro (nome)",
+						Value:  e.StreetName,
+						ErrMsg: e.Errors["StreetName"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "number",
+						Label:  "Número da casa",
+						Value:  e.Number,
+						ErrMsg: e.Errors["Number"],
+					})
 				</div>
-				<div class=" flex flex-col gap-2 sm:col-span-2">
-					<label class="truncate" for="other_ies"><strong>Outras IEs</strong></label>
-					<input
-						class="rounded p-2"
-						type="text"
-						id="other_ies"
-						name="other_ies"
-						placeholder="Separe por vírgulas"
-						value={ strings.Join(e.OtherIes, ", ") }
-					/>
-					<sub class="text-red-600">{ e.Errors["OtherIes"] }</sub>
-				</div>
+				@shared.WideInput(&shared.InputData{
+					ID:          "other_ies",
+					Label:       "Outras IEs",
+					Value:       strings.Join(e.OtherIes, ", "),
+					Placeholder: "Separe por vírgulas",
+					ErrMsg:      e.Errors["OtherIes"],
+				})
 			</div>
 			<div class="flex gap-6">
 				<div class="mt-4 flex-1">
