@@ -49,106 +49,67 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				Options: &shared.InputOptions{EntityOptions: entities},
 				ErrMsg:  i.Errors["Recipient"],
 			})
-			<div class="flex flex-col gap-2">
-				<label for="operation"><strong>Operação</strong></label>
-				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="operation" name="operation">
-					for _, operation := range models.InvoiceOperations {
-						<option
-							value={ operation }
-							if operation == i.Operation {
-								selected
-							}
-						>
-							{ operation }
-						</option>
-					}
-				</select>
-				<sub class="text-red-600">{ i.Errors["Operation"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="cfop"><strong>CFOP</strong></label>
-				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="cfop" name="cfop">
-					for _, cfop := range models.InvoiceCfops {
-						<option
-							value={ strconv.Itoa(cfop) }
-							if cfop == i.Cfop {
-								selected
-							}
-						>
-							{ strconv.Itoa(cfop) }
-						</option>
-					}
-				</select>
-				<sub class="text-red-600">{ i.Errors["Cfop"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="is_icms_contributor"><strong>Contribuinte ICMS</strong></label>
-				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="is_icms_contributor" name="is_icms_contributor">
-					for _, status := range models.InvoiceIcmsOptions {
-						<option
-							value={ status }
-							if status == i.IsIcmsContributor {
-								selected
-							}
-						>
-							{ status }
-						</option>
-					}
-				</select>
-				<sub class="text-red-600">{ i.Errors["IsIcmsContributor"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="is_final_customer"><strong>Consumidor Final</strong></label>
-				<select class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500" id="is_final_customer" name="is_final_customer">
-					for _, status := range models.InvoiceBooleanField {
-						<option
-							value={ status }
-							if status == i.IsFinalCustomer {
-								selected
-							}
-						>
-							{ status }
-						</option>
-					}
-				</select>
-				<sub class="text-red-600">{ i.Errors["IsFinalCustomer"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="shipping"><strong>Frete</strong></label>
-				<input
-					class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full"
-					type="number"
-					step="0.01"
-					id="shipping"
-					name="shipping"
-					value="{{ .Invoice.Shipping }}"
-				/>
-				<sub class="text-red-600">{ i.Errors["Shipping"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="add_shipping_to_total"><strong>Adicionar Frete ao Total</strong></label>
-				<select
-					class="h-10 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full"
-					id="add_shipping_to_total"
-					name="add_shipping_to_total"
-				></select>
-				<sub class="text-red-600">{ i.Errors["AddShippingToTotal"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label for="gta"><strong>GTA</strong></label>
-				<input class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" type="text" id="gta" name="gta" value={ i.Gta }/>
-				<sub class="text-red-600">{ i.Errors["Gta"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="extra_notes"><strong>Informações complementares</strong></label>
-				<input class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" type="text" id="extra_notes" name="extra_notes" value={ i.ExtraNotes }/>
-				<sub class="text-red-600">{ i.Errors["ExtraNotes"] }</sub>
-			</div>
-			<div class="flex flex-col gap-2">
-				<label class="truncate" for="custom_file_name"><strong>Nome do arquivo</strong></label>
-				<input class="rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500 md:w-full" type="text" id="custom_file_name" name="custom_file_name" value={ i.CustomFileNamePrefix }/>
-				<sub class="text-red-600">{ i.Errors["CustomFileNamePrefix"] }</sub>
-			</div>
+			@shared.SelectInput(&shared.InputData{
+				ID:      "operation",
+				Label:   "Operação",
+				Value:   i.Operation,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceOperations[:]},
+				ErrMsg:  i.Errors["Operation"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "cfop",
+				Label:   "CFOP",
+				Value:   strconv.Itoa(i.Cfop),
+				Options: &shared.InputOptions{IntOptions: models.InvoiceCfops[:]},
+				ErrMsg:  i.Errors["Cfop"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "is_icms_contributor",
+				Label:   "Contribuinte ICMS",
+				Value:   i.IsIcmsContributor,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceIcmsOptions[:]},
+				ErrMsg:  i.Errors["IsIcmsContributor"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "is_final_customer",
+				Label:   "Consumidor Final",
+				Value:   i.IsFinalCustomer,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceBooleanField[:]},
+				ErrMsg:  i.Errors["IsFinalCustomer"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:        "shipping",
+				Label:     "Frete",
+				Value:     strconv.FormatFloat(i.Shipping, 'f', 2, 64),
+				InputType: "number",
+				Step:      "0.01",
+				ErrMsg:    i.Errors["Shipping"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "add_shipping_to_total",
+				Label:   "Adicionar Frete ao Total",
+				Value:   i.AddShippingToTotal,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceBooleanField[:]},
+				ErrMsg:  i.Errors["AddShippingToTotal"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "gta",
+				Label:  "GTA",
+				Value:  i.Gta,
+				ErrMsg: i.Errors["Gta"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "extra_notes",
+				Label:  "Informações Complementares",
+				Value:  i.ExtraNotes,
+				ErrMsg: i.Errors["ExtraNotes"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "custom_file_name_prefix",
+				Label:  "Nome do Arquivo",
+				Value:  i.CustomFileNamePrefix,
+				ErrMsg: i.Errors["CustomFileNamePrefix"],
+			})
 		</div>
 		@InvoiceItemsHeading(i)
 		<div class="grid grid-cols-1 gap-3">
