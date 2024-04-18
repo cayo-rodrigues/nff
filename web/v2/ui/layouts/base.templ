@@ -1,7 +1,6 @@
 package layouts
 
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
-import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 
 templ Base(page templ.Component) {
 	<!DOCTYPE html>
@@ -15,7 +14,7 @@ templ Base(page templ.Component) {
 			<script src="/static/js/3p/htmx.min.js"></script>
 			<script src="/static/js/3p/response-targets.js"></script>
 			<script src="/static/js/3p/feather.min.js"></script>
-			@scripts.ApplyIcons()
+			<script src="/static/js/index.js"></script>
 			<title>NFF</title>
 		</head>
 		<body class="flex h-screen flex-col bg-gray-50 text-sm">

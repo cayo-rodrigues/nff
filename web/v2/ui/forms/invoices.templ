@@ -112,7 +112,10 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			})
 		</div>
 		@InvoiceItemsHeading(i)
-		<div class="grid grid-cols-1 gap-3">
+		<div id="item-example" class="hidden">
+			@InvoiceItemSection(models.NewInvoiceItem(), 0)
+		</div>
+		<div id="items-container" class="grid grid-cols-1 gap-3">
 			for idx, item := range i.Items {
 				@InvoiceItemSection(item, idx+1)
 			}
@@ -127,10 +130,7 @@ templ InvoiceItemsHeading(i *models.Invoice) {
 		</div>
 		<div class="flex items-center gap-6 py-2">
 			<div
-				hx-get="/invoices/items/form-section"
-				hx-target="#invoice-items-dialog"
-				hx-swap="beforeend"
-				hx-trigger="click"
+				onclick="AddInvoiceItemSection()"
 			>
 				@shared.DefaultButtonOutline("sm") {
 					@shared.IconXs("plus")
