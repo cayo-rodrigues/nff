@@ -175,7 +175,7 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 			})
 			@shared.Input(&shared.InputData{
 				ID:     "description",
-				Label:  "Description",
+				Label:  "Descrição",
 				Value:  item.Description,
 				ErrMsg: item.Errors["Description"],
 			})
@@ -189,7 +189,7 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 			})
 			@shared.Input(&shared.InputData{
 				ID:        "value_per_unity",
-				Label:     "ValuePerUnity",
+				Label:     "Valor Unitário",
 				Value:     strconv.FormatFloat(item.ValuePerUnity, 'f', 2, 64),
 				ErrMsg:    item.Errors["ValuePerUnity"],
 				InputType: "number",
