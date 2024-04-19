@@ -13,8 +13,29 @@ import (
 )
 
 func InvoicesPage(c *fiber.Ctx) error {
-	invoice := models.NewInvoice()
-	return Render(c, layouts.Base(pages.InvoicesPage(invoice)))
+	i1 := models.NewInvoice()
+	i2 := models.NewInvoice()
+	i3 := models.NewInvoice()
+	i4 := models.NewInvoice()
+	i5 := models.NewInvoice()
+
+	i1.Sender.Name = "Emerson"
+	i1.Recipient.Name = "Lúcio da Silva"
+	i1.ReqStatus = "success"
+	i1.Number = "123.456.789"
+
+	i2.Sender.Name = "Cayo Rodrigues"
+	i2.Recipient.Name = "Ivy Rodrigues"
+	i2.ReqStatus = "warning"
+
+	i3.Sender.Name = "Joelson do nome desnecessauramente grande só pra enxer o saco"
+	i3.Recipient.Name = "Oto cara com nome muito grande DISTRIBOI LTDA. MONSTROS S.A."
+	i3.ReqStatus = "error"
+
+	invoices := []*models.Invoice{
+		i1, i2, i3, i4, i5,
+	}
+	return Render(c, layouts.Base(pages.InvoicesPage(invoices)))
 }
 
 func CreateInvoicePage(c *fiber.Ctx) error {

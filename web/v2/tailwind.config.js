@@ -12,7 +12,11 @@ module.exports = {
     "./ui/components/**.templ",
   ],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        'spin-slow': 'spin 2s linear infinite',
+      }
+    },
   },
   plugins: [],
 };

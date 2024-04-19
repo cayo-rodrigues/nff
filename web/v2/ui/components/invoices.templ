@@ -1,3 +1,80 @@
 package components
 
-templ InvoiceList() {}
+import "github.com/cayo-rodrigues/nff/web/models"
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+
+templ InvoiceList(invoices []*models.Invoice) {
+	<ul id="invoice-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+		for _, invoice := range invoices {
+			@InvoiceCard(invoice)
+		}
+	</ul>
+}
+
+templ InvoiceStatus(i *models.Invoice) {
+	switch i.ReqStatus {
+		case "success":
+			<div class="text-green-600">
+				@shared.Icon("check-circle")
+			</div>
+			<span>Sucesso</span>
+		case "warning":
+			<div class="text-yellow-600">
+				@shared.Icon("alert-triangle")
+			</div>
+			<span>Aviso</span>
+		case "error":
+			<div class="text-red-600">
+				@shared.Icon("x-circle")
+			</div>
+			<span>Erro </span>
+		default:
+			<div class="animate-spin-slow text-sky-600">
+				@shared.Icon("loader")
+			</div>
+			<span>Em andamento... </span>
+	}
+}
+
+templ InvoiceCard(i *models.Invoice) {
+	<li
+		id={ invoiceCardID(i) }
+		class="relative cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
+	>
+		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">
+			@InvoiceStatus(i)
+		</h3>
+		<ul class="flex flex-col gap-1 p-2 pb-0 sm:w-10/12 md:w-9/12">
+			<li class="md:truncate"><span class="font-medium">Número:</span> { i.Number } </li>
+			<li class="md:truncate"><span class="font-medium">Remetente:</span> { i.Sender.Name }</li>
+			<li class="md:truncate"><span class="font-medium">Destinatário:</span> { i.Recipient.Name }</li>
+		</ul>
+		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-2 sm:p-0">
+			<div title="Ver detalhes">
+				@shared.WarningButton("xs") {
+					@shared.IconSm("eye")
+				}
+			</div>
+			<a title="Usar como modelo">
+				@shared.InfoButton("xs") {
+					@shared.IconSm("edit")
+				}
+			</a>
+			<div title="Baixar">
+				@shared.DefaultButton("xs") {
+					@shared.IconSm("download-cloud")
+				}
+			</div>
+			<div title="Cancelar NFA">
+				@shared.ErrorButton("xs") {
+					@shared.IconSm("slash")
+				}
+			</div>
+		</div>
+	</li>
+}
+
+func invoiceCardID(i *models.Invoice) string {
+	return fmt.Sprintf("invoice-card-%d", i.ID)
+}
