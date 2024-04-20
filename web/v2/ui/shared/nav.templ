@@ -8,37 +8,77 @@ templ Nav() {
 			</a>
 		</h1>
 		<div class="flex items-center gap-4 sm:gap-6 xl:gap-8">
-			<ul hx-boost="true" class="hidden gap-2 xl:flex">
-				@MenuItem("/entities") {
-					@IconSm("user")
-					<span>Entidades</span>
-				}
-				@MenuItem("/invoices") {
-					@IconSm("file-text")
-					<span>Notas Fiscais</span>
-				}
-				@MenuItem("/metrics") {
-					@IconSm("activity")
-					<span>Métricas</span>
-				}
-				@MenuItem("/logout") {
-					@IconSm("log-out")
-					<span>Sair</span>
-				}
-			</ul>
+			<div class="hidden xl:block">
+				@ListMenu()
+			</div>
 			<button class="rounded-full transition hover:bg-sky-800 xl:p-2">
 				@IconSm("bell")
 			</button>
 			<button class="xl:hidden">
-				@Icon("menu")
+				@BurgerMenu()
 			</button>
 		</div>
 	</nav>
 }
 
+templ BurgerMenu() {
+	@Icon("menu")
+}
+
+templ ListMenu() {
+	<ul hx-boost="true" class="flex gap-2">
+		@MenuItem("/entities") {
+			@IconSm("users")
+			<span>Entidades</span>
+		}
+		@DropDownMenu("file-text", "Notas Fiscais") {
+			@DropDownMenuItem("/invoices") {
+				@IconSm("plus-circle")
+				<span>Emitir</span>
+			}
+			@DropDownMenuItem("/invoices/cancel") {
+				@IconSm("slash")
+				<span>Cancelar</span>
+			}
+			@DropDownMenuItem("/invoices/print") {
+				@IconSm("printer")
+				<span>Imprimir</span>
+			}
+		}
+		@MenuItem("/metrics") {
+			@IconSm("activity")
+			<span>Métricas</span>
+		}
+		@MenuItem("/logout") {
+			@IconSm("log-out")
+			<span>Sair</span>
+		}
+	</ul>
+}
+
 templ MenuItem(url string) {
 	<a href={ templ.SafeURL(url) }>
-		<li class="flex h-full w-full flex-1 transform cursor-pointer items-center justify-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95">
+		<li class="flex h-full w-full flex-1 cursor-pointer items-center justify-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95">
+			{ children... }
+		</li>
+	</a>
+}
+
+templ DropDownMenu(labelIcon, labelText string) {
+	<li class="group relative w-16 cursor-pointer rounded-t hover:bg-sky-800 md:w-auto">
+		<div class="flex items-center gap-2 px-2 py-1">
+			@IconSm(labelIcon)
+			<span>{ labelText }</span>
+		</div>
+		<ul class="absolute top-7 hidden w-full rounded-b bg-sky-800 group-hover:block">
+			{ children... }
+		</ul>
+	</li>
+}
+
+templ DropDownMenuItem(url string) {
+	<a href={ templ.SafeURL(url) }>
+		<li class="flex gap-2 rounded px-2 py-1 transition hover:bg-sky-900 active:scale-90">
 			{ children... }
 		</li>
 	</a>
