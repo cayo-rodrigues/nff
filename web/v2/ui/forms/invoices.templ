@@ -115,7 +115,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 		<div id="item-example" class="hidden">
 			@InvoiceItemSection(models.NewInvoiceItem(), 0)
 		</div>
-		<div id="items-container" class="grid grid-cols-1 gap-3">
+		<div id="items-container" class="grid grid-cols-1">
 			for idx, item := range i.Items {
 				@InvoiceItemSection(item, idx+1)
 			}
@@ -124,11 +124,11 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 }
 
 templ InvoiceItemsHeading(i *models.Invoice) {
-	<heading id="invoice-items-heading" class="sticky top-0 z-10 mb-2 border-b border-gray-200 bg-gray-50 px-2 py-2 sm:flex sm:items-center sm:justify-between">
+	<heading id="invoice-items-heading" class="sticky top-0 z-10 mb-2 flex items-center justify-between border-b border-gray-300 bg-gray-50 px-2 py-2">
 		<div class="py-2">
 			<h3 class="text-lg font-bold">Produtos</h3>
 		</div>
-		<div class="flex items-center gap-6 py-2">
+		<div class="flex items-center gap-3 py-2 sm:gap-6">
 			<div
 				onclick="AddInvoiceItemSection()"
 			>
@@ -143,16 +143,16 @@ templ InvoiceItemsHeading(i *models.Invoice) {
 }
 
 templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
-	<section id={ fmt.Sprintf("item-%d", idx) } class="rounded border border-gray-600 transition hover:border-gray-700">
+	<section id={ fmt.Sprintf("item-%d", idx) } class="mb-3 rounded border border-gray-600 hover:border-gray-700">
 		<div class="flex items-center justify-between border-b border-gray-600 bg-gray-600 p-2">
 			<h3 class="text-base font-medium text-white">Produto { strconv.Itoa(idx) }</h3>
 			<div class="flex items-center justify-end gap-2">
-				<div onclick="duplicateItemSection(this.closest('section'))">
+				<div onclick="CopyInvoiceItemSection(this.closest('section'))">
 					@shared.InfoButton("xs") {
 						@shared.IconXs("copy")
 					}
 				</div>
-				<div onclick="removeItemSection(this.closest('section'))">
+				<div onclick="RemoveInvoiceItemSection(this.closest('section'))">
 					@shared.DefaultButton("xs") {
 						@shared.IconXs("trash-2")
 					}
