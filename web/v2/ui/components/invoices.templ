@@ -5,7 +5,7 @@ import "fmt"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 
 templ InvoiceList(invoices []*models.Invoice) {
-	<ul id="invoice-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+	<ul id="invoice-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 		for _, invoice := range invoices {
 			@InvoiceCard(invoice)
 		}

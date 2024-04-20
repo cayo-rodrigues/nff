@@ -7,7 +7,7 @@ import "fmt"
 import "strings"
 
 templ EntityList(entities []*models.Entity) {
-	<ul id="entity-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+	<ul id="entity-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 		for _, entity := range entities {
 			@EntityCard(entity)
 		}

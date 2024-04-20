@@ -14,18 +14,6 @@ templ InvoicesPage(invoices []*models.Invoice) {
 					<span>Emitir NFA</span>
 				}
 			</a>
-			<a href="/invoices/cancel" hx-boost="true">
-				@shared.ErrorButton("sm") {
-					@shared.Icon("slash")
-					<span>Cancelar NFA</span>
-				}
-			</a>
-			<a href="/invoices/print" hx-boost="true">
-				@shared.InfoButton("sm") {
-					@shared.Icon("printer")
-					<span>Imprimir NFA</span>
-				}
-			</a>
 		</div>
 		<h2 class="text-base font-medium">Histórico de Requerimentos</h2>
 		@components.InvoiceList(invoices)
