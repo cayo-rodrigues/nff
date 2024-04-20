@@ -25,6 +25,7 @@ const (
 	InvalidItemsMsg        = "Dados dos produtos inválidos"
 	MustHaveIeOrAddressMsg = "Ie OU endereço completo obrigatórios"
 	EmailNotAvailableMsg   = "Email indisponível"
+	UniqueListMsg          = "Valores na lista devem ser únicos"
 )
 
 const (

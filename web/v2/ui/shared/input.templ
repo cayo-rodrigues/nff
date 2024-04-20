@@ -105,16 +105,6 @@ templ SelectInput(data *InputData) {
 					{ entityOpt.Name }
 				</option>
 			}
-			for _, entityOpt := range data.Options.EntityOptions {
-				<option
-					value={ strconv.Itoa(entityOpt.ID) }
-					if data.Value == strconv.Itoa(entityOpt.ID) {
-						selected
-					}
-				>
-					{ entityOpt.Name }
-				</option>
-			}
 		</select>
 		<sub class="text-red-600">{ data.ErrMsg }</sub>
 	</div>

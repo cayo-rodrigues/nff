@@ -129,7 +129,7 @@ func (e *Entity) IsValid() bool {
 		{
 			Name:  "OtherIes",
 			Value: e.OtherIes,
-			Rules: Rules(MatchList(IEMGRegex)),
+			Rules: Rules(MatchList(IEMGRegex), UniqueList[string]),
 		},
 	}
 	errors, isValid := Validate(fields)

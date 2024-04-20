@@ -48,17 +48,15 @@ func Validate(fields Fields) (ErrorMessages, bool) {
 
 	for _, field := range fields {
 		for _, rs := range field.Rules {
-			if rs.ValidateFunc != nil {
-				rs.FieldValue = field.Value
-				isValid := rs.ValidateFunc(rs)
-				if !isValid {
-					if messages == nil {
-						messages = make(ErrorMessages)
-					}
-					msg := rs.MessageFunc(rs)
-					messages[field.Name] = msg
-					break // stop runing validate funcs after first fail
+			rs.FieldValue = field.Value
+			isValid := rs.ValidateFunc(rs)
+			if !isValid {
+				if messages == nil {
+					messages = make(ErrorMessages)
 				}
+				msg := rs.MessageFunc(rs)
+				messages[field.Name] = msg
+				break // stop runing validate funcs after first fail
 			}
 		}
 	}
@@ -139,6 +137,34 @@ func Phone() *RuleSet {
 			}
 
 			return PhoneRegex.MatchString(str)
+		},
+	}
+}
+
+func UniqueList[T string | int]() *RuleSet {
+	return &RuleSet{
+		MessageFunc: func(rs *RuleSet) string {
+			return utils.UniqueListMsg
+		},
+		ValidateFunc: func(rs *RuleSet) bool {
+			vals, ok := rs.FieldValue.([]T)
+			if !ok {
+				return false
+			}
+
+			if len(vals) == 0 {
+				return true
+			}
+
+			var previousVal T
+			for _, val := range vals {
+				if val == previousVal {
+					return false
+				}
+				previousVal = val
+			}
+
+			return true
 		},
 	}
 }

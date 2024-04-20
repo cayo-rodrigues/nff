@@ -67,6 +67,7 @@ func main() {
 
 	app.Get("/invoices", handlers.InvoicesPage)
 	app.Get("/invoices/create", handlers.CreateInvoicePage)
+	app.Get("/invoices/form/get-sender-ie-input", handlers.GetSenderIeInput)
 	// app.Post("/invoices", invoicesPage.RequireInvoice)
 	// app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
 	// app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
