@@ -13,11 +13,7 @@ func CreateEntity(ctx context.Context, entity *models.Entity, userID int) error 
 }
 
 func ListEntities(ctx context.Context, userID int, filters ...map[string]string) ([]*models.Entity, error) {
-	entities, err := storage.ListEntities(ctx, userID, filters...)
-	if err != nil {
-		return nil, err
-	}
-	return entities, nil
+	return storage.ListEntities(ctx, userID, filters...)
 }
 
 func RetrieveEntity(ctx context.Context, entityID int, userID int) (*models.Entity, error) {

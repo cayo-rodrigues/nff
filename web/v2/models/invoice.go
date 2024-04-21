@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -66,12 +67,25 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	invoice.CustomFileNamePrefix = strings.TrimSpace(c.FormValue("custom_file_name_prefix"))
 	invoice.SenderIe = strings.TrimSpace(c.FormValue("sender_ie"))
 
+	senderID, err := strconv.Atoi(c.FormValue("sender"))
+	if err != nil {
+		senderID = 0
+	}
+
+	recipientID, err := strconv.Atoi(c.FormValue("recipient"))
+	if err != nil {
+		recipientID = 0
+	}
+
+	invoice.Sender.ID = senderID
+	invoice.Recipient.ID = recipientID
+
 	invoice.Items = NewInvoiceItemsFromForm(c)
 
 	return invoice
 }
 
-func (i *Invoice) Validate() bool {
+func (i *Invoice) IsValid() bool {
 	fields := Fields{
 		{
 			Name:  "Operation",
@@ -114,7 +128,7 @@ func (i *Invoice) Validate() bool {
 			Rules: Rules(Max(512)),
 		},
 		{
-			Name:  "CustomFileName",
+			Name:  "CustomFileNamePrefix",
 			Value: i.CustomFileNamePrefix,
 			Rules: Rules(Max(64)),
 		},
@@ -122,6 +136,16 @@ func (i *Invoice) Validate() bool {
 			Name:  "SenderIe",
 			Value: i.SenderIe,
 			Rules: Rules(Required, Match(IEMGRegex)),
+		},
+		{
+			Name:  "Sender",
+			Value: i.Sender.ID,
+			Rules: Rules(Required),
+		},
+		{
+			Name:  "Recipient",
+			Value: i.Recipient.ID,
+			Rules: Rules(Required),
 		},
 	}
 	errors, ok := Validate(fields)
@@ -135,10 +159,6 @@ func (i *Invoice) Validate() bool {
 }
 
 func (i *Invoice) Values() []any {
-	// TODO
-	// TROCAR CUSTOM_FILE_NAME PARA CUSTOM_FILE_NAME_PREFIX
-	// ADICIONAR COLUNA FILE_NAME
-	// AJUSTAR SS-API DE ACORDO
 	return []any{
 		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,

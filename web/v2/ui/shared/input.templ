@@ -43,7 +43,7 @@ templ Input(data *InputData) {
 	>
 		<label class="truncate" for={ data.ID }><strong>{ data.Label }</strong></label>
 		<input
-			class="h-9 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
+			class="h-8 rounded border border-gray-300 bg-white px-2 py-1 outline-0 focus-within:border-gray-500"
 			if data.InputType != "" {
 				type={ data.InputType }
 			} else {
@@ -74,11 +74,11 @@ templ SelectInput(data *InputData) {
 			if data.HxIndicatorID != "" {
 				<span id={ data.HxIndicatorID }>
 					@LoadingIconXs()
-					</span>
+				</span>
 			}
 		</label>
 		<select
-			class="h-9 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
+			class="h-8 rounded border border-gray-300 bg-white px-2 py-1 outline-0 focus-within:border-gray-500"
 			id={ data.ID }
 			name={ data.ID }
 			{ data.Attrs... }

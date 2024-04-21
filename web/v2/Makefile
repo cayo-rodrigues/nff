@@ -6,7 +6,7 @@ DB_NAME := nff
 RDS_URL := postgres://$(USER)@$(ENDPOINT):$(PORT)/$(DB_NAME)
 RDS_URL_WITH_PWD := postgres://$(USER):$(PWD)@$(ENDPOINT):$(PORT)/$(DB_NAME)
 
-DIR_PATH := db/migrations
+DIR_PATH := database/migrations
 NAME :=
 
 TAILWIND_INPUT := ./static/css/custom.css

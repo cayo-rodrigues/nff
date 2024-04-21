@@ -25,6 +25,8 @@ func ListInvoices(ctx context.Context, userID int, filters map[string]string) ([
 
 	params := BuildQueryFilters(&query, filters, userID, "invoices")
 
+	query.WriteString(" ORDER BY invoices.created_at DESC")
+
 	db := database.GetDB()
 
 	rows, _ := db.PG.Query(ctx, query.String(), params...)
@@ -53,14 +55,14 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 		ctx,
 		`INSERT INTO invoices (
 				number, protocol, operation, cfop, is_final_customer, is_icms_contributor,
-				shipping, add_shipping_to_total, gta, extra_notes, custom_file_name_prefix,
+				shipping, add_shipping_to_total, gta, extra_notes, custom_file_name_prefix, file_name,
 				sender_id, recipient_id, created_by, sender_ie
 			)
-			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
 		RETURNING id, req_status, req_msg`,
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
-		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.ExtraNotes, invoice.CustomFileNamePrefix, invoice.Sender.ID,
-		invoice.Recipient.ID, invoice.CreatedBy, invoice.SenderIe,
+		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.ExtraNotes, invoice.CustomFileNamePrefix, invoice.FileName,
+		invoice.Sender.ID, invoice.Recipient.ID, invoice.CreatedBy, invoice.SenderIe,
 	)
 	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg)
 	if err != nil {

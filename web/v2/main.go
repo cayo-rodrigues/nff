@@ -53,7 +53,7 @@ func main() {
 	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
-	app.Use(middlewares.CacheMiddleware)
+	// app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/", handlers.HomePage)
 
@@ -66,9 +66,9 @@ func main() {
 	app.Delete("/entities/delete/:id", handlers.DeleteEntity)
 
 	app.Get("/invoices", handlers.InvoicesPage)
-	app.Get("/invoices/create", handlers.CreateInvoicePage)
 	app.Get("/invoices/form/get-sender-ie-input", handlers.GetSenderIeInput)
-	// app.Post("/invoices", invoicesPage.RequireInvoice)
+	app.Get("/invoices/create", handlers.CreateInvoicePage)
+	app.Post("/invoices/create", handlers.CreateInvoice)
 	// app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
 	// app.Get("/invoices/:id/request-card-details", invoicesPage.GetRequestCardDetails)
 	// app.Get("/invoices/:id/request-card-status", invoicesPage.GetRequestStatus)

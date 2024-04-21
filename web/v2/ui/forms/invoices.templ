@@ -6,13 +6,15 @@ import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "fmt"
 
 templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
-	<form id="invoice-form">
+	<form
+		id="invoice-form"
+		hx-post="/invoices/create"
+		hx-target="body"
+		hx-swap="outerHTML"
+		hx-boost="true"
+	>
 		<div class="gap-6 border-b border-gray-300 py-2 outline-0">
 			<div
-				hx-post="/invoices/create"
-				hx-target="#requests-overview-wrapper"
-				hx-swap="outerHTML"
-				hx-include="[id='from_date'], [id='to_date']"
 				class="lg:w-fit"
 			>
 				@shared.SubmitButton("sm") {
@@ -29,20 +31,21 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				Options: &shared.InputOptions{EntityOptions: entities},
 				ErrMsg:  i.Errors["Sender"],
 				Attrs: templ.Attributes{
-					"hx-get":     "/invoices/form/get-sender-ie-input",
-					"hx-trigger": "change",
-					"hx-target":  "#available-ies",
-					"hx-select":  "#available-ies",
-					"hx-swap":    "outerHTML",
+					"hx-get":       "/invoices/form/get-sender-ie-input",
+					"hx-trigger":   "change",
+					"hx-target":    "#sender_ie",
+					"hx-select":    "#sender_ie",
+					"hx-swap":      "outerHTML",
 					"hx-indicator": "#available-ies-indicator",
 				},
 			})
 			@shared.SelectInput(&shared.InputData{
-				ID:      "available-ies",
-				Label:   "IE do Remetente",
-				Value:   i.SenderIe,
-				Options: &shared.InputOptions{StringOptions: i.Sender.AllIes()},
+				ID:            "sender_ie",
+				Label:         "IE do Remetente",
+				Value:         i.SenderIe,
+				Options:       &shared.InputOptions{StringOptions: i.Sender.AllIes()},
 				HxIndicatorID: "available-ies-indicator",
+				ErrMsg:        i.Errors["SenderIe"],
 			})
 			@shared.SelectInput(&shared.InputData{
 				ID:      "recipient",
@@ -114,15 +117,15 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			})
 		</div>
 		@InvoiceItemsHeading(i)
-		<div id="item-example" class="hidden">
-			@InvoiceItemSection(models.NewInvoiceItem(), 0)
-		</div>
 		<div id="items-container" class="grid grid-cols-1">
 			for idx, item := range i.Items {
 				@InvoiceItemSection(item, idx+1)
 			}
 		</div>
 	</form>
+	<div id="item-example" class="hidden">
+		@InvoiceItemSection(models.NewInvoiceItem(), 0)
+	</div>
 }
 
 templ InvoiceItemsHeading(i *models.Invoice) {
@@ -146,7 +149,7 @@ templ InvoiceItemsHeading(i *models.Invoice) {
 
 templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 	<section id={ fmt.Sprintf("item-%d", idx) } class="mb-3 rounded border border-gray-600 hover:border-gray-700">
-		<div class="flex items-center justify-between border-b border-gray-600 bg-gray-600 p-2">
+		<div class="flex items-center justify-between border-b border-gray-600 bg-gray-600 px-2 py-1">
 			<h3 class="text-base font-medium text-white">Produto { strconv.Itoa(idx) }</h3>
 			<div class="flex items-center justify-end gap-2">
 				<div onclick="CopyInvoiceItemSection(this.closest('section'))">
@@ -161,7 +164,7 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 				</div>
 			</div>
 		</div>
-		<div class="grid grid-cols-1 gap-4 rounded-b bg-white p-2 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+		<div class="grid grid-cols-1 gap-4 rounded-b bg-white px-2 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
 			@shared.SelectInput(&shared.InputData{
 				ID:      "group",
 				Label:   "Grupo",

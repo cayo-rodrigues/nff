@@ -53,12 +53,13 @@ function CopyInvoiceItemSection(section) {
 }
 
 function RemoveInvoiceItemSection(section) {
-    section.classList.add('duration-300')
-    if (section.parentNode.childElementCount !== 1) {
-        const mb3Size = 12
-        const bordersSize = 2
-        section.style.marginTop = `-${section.clientHeight + mb3Size + bordersSize}px`
+    if (section.parentNode.childElementCount === 1) {
+        return
     }
+    section.classList.add('duration-300')
+    const mb3Size = 12
+    const bordersSize = 2
+    section.style.marginTop = `-${section.clientHeight + mb3Size + bordersSize}px`
     section.style.opacity = 0
     setTimeout(() => {
         section.remove()
