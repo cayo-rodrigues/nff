@@ -3,6 +3,9 @@ package components
 import "github.com/cayo-rodrigues/nff/web/models"
 import "fmt"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "github.com/cayo-rodrigues/nff/web/ui/scripts"
+import "strconv"
+import "github.com/cayo-rodrigues/nff/web/utils"
 
 templ InvoiceList(invoices []*models.Invoice) {
 	<ul id="invoice-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
@@ -51,7 +54,7 @@ templ InvoiceCard(i *models.Invoice) {
 			<li class="md:truncate"><span class="font-medium">Destinatário:</span> { i.Recipient.Name }</li>
 		</ul>
 		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-2 sm:p-0">
-			<div title="Ver detalhes">
+			<div onclick={ scripts.OpenDialog(invoiceDetailsTarget(i)) } title="Ver detalhes">
 				@shared.WarningButton("xs") {
 					@shared.IconSm("eye")
 				}
@@ -72,9 +75,52 @@ templ InvoiceCard(i *models.Invoice) {
 				}
 			</div>
 		</div>
+		@InvoiceDetails(i)
 	</li>
+}
+
+templ InvoiceDetails(i *models.Invoice) {
+	<dialog id={ invoiceDetailsID(i) } class="rounded sm:w-10/12 md:w-9/12 lg:w-7/12 xl:w-6/12 2xl:w-5/12">
+		<div class="rounded border border-gray-200 p-2 shadow shadow-gray-300">
+			<div class="relative rounded border border-gray-300 p-2">
+				<h3 class="flex items-center gap-2 break-words rounded text-base font-bold">
+					@InvoiceStatus(i)
+				</h3>
+				<div
+					class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1"
+					onclick={ scripts.CloseDialog(invoiceDetailsTarget(i)) }
+				>
+					@shared.Icon("x-circle")
+				</div>
+			</div>
+			<ul class="grid gap-2 p-2 sm:grid-cols-2">
+				<li><span class="font-medium">Número:</span> { i.Number }</li>
+				<li><span class="font-medium">Protocolo:</span> { i.Protocol }</li>
+				<li><span class="font-medium">Remetente:</span> { i.Sender.Name }</li>
+				<li><span class="font-medium">IE do Remetente:</span> { i.SenderIe }</li>
+				<li><span class="font-medium">Destinatário:</span> { i.Recipient.Name }</li>
+				<li><span class="font-medium">Operação:</span> { i.Operation }</li>
+				<li><span class="font-medium">CFOP:</span> { strconv.Itoa(i.Cfop) }</li>
+				<li><span class="font-medium">Contribuinte ICMS:</span> { i.IsIcmsContributor }</li>
+				<li><span class="font-medium">Consumidor Final:</span> { i.IsFinalCustomer }</li>
+				<li><span class="font-medium">Frete:</span> { utils.Float64ToString(i.Shipping) } </li>
+				<li><span class="font-medium">Adicionar Frete ao Total:</span> { i.AddShippingToTotal } </li>
+				<li><span class="font-medium">GTA:</span> { i.Gta } </li>
+				<li><span class="font-medium">Nome do Arquivo:</span> { i.FileName } </li>
+				<li><span class="font-medium">Quantidade de Itens:</span> { strconv.Itoa(len(i.Items)) } </li>
+			</ul>
+		</div>
+	</dialog>
 }
 
 func invoiceCardID(i *models.Invoice) string {
 	return fmt.Sprintf("invoice-card-%d", i.ID)
+}
+
+func invoiceDetailsID(i *models.Invoice) string {
+	return fmt.Sprintf("invoice-details-%d", i.ID)
+}
+
+func invoiceDetailsTarget(i *models.Invoice) string {
+	return fmt.Sprintf("#invoice-details-%d", i.ID)
 }

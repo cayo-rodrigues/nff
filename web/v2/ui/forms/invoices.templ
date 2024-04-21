@@ -4,6 +4,7 @@ import "github.com/cayo-rodrigues/nff/web/models"
 import "strconv"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "fmt"
+import "github.com/cayo-rodrigues/nff/web/utils"
 
 templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 	<form
@@ -85,7 +86,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			@shared.Input(&shared.InputData{
 				ID:        "shipping",
 				Label:     "Frete",
-				Value:     strconv.FormatFloat(i.Shipping, 'f', 2, 64),
+				Value:     utils.Float64ToString(i.Shipping),
 				InputType: "number",
 				Step:      "0.01",
 				ErrMsg:    i.Errors["Shipping"],
@@ -187,7 +188,7 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 			@shared.Input(&shared.InputData{
 				ID:        "quantity",
 				Label:     "Quantidade",
-				Value:     strconv.FormatFloat(item.Quantity, 'f', 2, 64),
+				Value:     utils.Float64ToString(item.Quantity),
 				ErrMsg:    item.Errors["Quantity"],
 				InputType: "number",
 				Step:      "0.01",
@@ -195,7 +196,7 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 			@shared.Input(&shared.InputData{
 				ID:        "value_per_unity",
 				Label:     "Valor Unitário",
-				Value:     strconv.FormatFloat(item.ValuePerUnity, 'f', 2, 64),
+				Value:     utils.Float64ToString(item.ValuePerUnity),
 				ErrMsg:    item.Errors["ValuePerUnity"],
 				InputType: "number",
 				Step:      "0.01",

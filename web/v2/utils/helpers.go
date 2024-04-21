@@ -55,3 +55,7 @@ func GetCurrentUserID(c *fiber.Ctx) int {
 	userID := c.Locals("UserID").(int)
 	return userID
 }
+
+func Float64ToString(f float64) string  {
+	return strconv.FormatFloat(f, 'f', 2, 64)
+}
