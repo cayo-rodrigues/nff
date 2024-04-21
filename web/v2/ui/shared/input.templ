@@ -11,16 +11,17 @@ type InputOptions struct {
 }
 
 type InputData struct {
-	ErrMsg      string
-	InputType   string
-	ID          string
-	Value       string
-	Label       string
-	Placeholder string
-	Attrs       templ.Attributes
-	Options     *InputOptions
-	Step        string
-	Class       string
+	ErrMsg        string
+	InputType     string
+	ID            string
+	Value         string
+	Label         string
+	Placeholder   string
+	Attrs         templ.Attributes
+	Options       *InputOptions
+	Step          string
+	Class         string
+	HxIndicatorID string
 }
 
 func (data *InputData) Wide() *InputData {
@@ -68,7 +69,14 @@ templ Input(data *InputData) {
 
 templ SelectInput(data *InputData) {
 	<div class="flex flex-col gap-2">
-		<label class="truncate" for={ data.ID }><strong>{ data.Label }</strong></label>
+		<label class="flex items-center gap-2 truncate" for={ data.ID }>
+			<strong>{ data.Label }</strong>
+			if data.HxIndicatorID != "" {
+				<span id={ data.HxIndicatorID }>
+					@LoadingIconXs()
+					</span>
+			}
+		</label>
 		<select
 			class="h-9 rounded border border-gray-300 bg-white p-2 outline-0 focus-within:border-gray-500"
 			id={ data.ID }

@@ -34,6 +34,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 					"hx-target":  "#available-ies",
 					"hx-select":  "#available-ies",
 					"hx-swap":    "outerHTML",
+					"hx-indicator": "#available-ies-indicator",
 				},
 			})
 			@shared.SelectInput(&shared.InputData{
@@ -41,6 +42,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				Label:   "IE do Remetente",
 				Value:   i.SenderIe,
 				Options: &shared.InputOptions{StringOptions: i.Sender.AllIes()},
+				HxIndicatorID: "available-ies-indicator",
 			})
 			@shared.SelectInput(&shared.InputData{
 				ID:      "recipient",
