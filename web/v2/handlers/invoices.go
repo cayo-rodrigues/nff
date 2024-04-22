@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
@@ -89,4 +90,19 @@ func CreateInvoice(c *fiber.Ctx) error {
 	}
 
 	return RetargetToPageHandler(c, "/invoices", InvoicesPage)
+}
+
+func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
+	invoiceID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID, userID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoiceItemsDetails(invoice))
 }
