@@ -70,7 +70,7 @@ templ EntityDetails(e *models.Entity) {
 				<li><span class="font-medium">Tipo de logradouro:</span> { e.StreetType }</li>
 				<li><span class="font-medium">Logradouro:</span> { e.StreetName }</li>
 				<li><span class="font-medium">Número da casa:</span> { e.Number }</li>
-				<li><span class="font-medium">Outras IEs:</span> { strings.Join(e.OtherIes, ", ") }</li>
+				<li class="sm:col-span-2"><span class="font-medium">Outras IEs:</span> { strings.Join(e.OtherIes, ", ") }</li>
 			</ul>
 		</div>
 	</dialog>
