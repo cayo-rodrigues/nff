@@ -99,6 +99,7 @@ func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
 		return err
 	}
 
+
 	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID, userID)
 	if err != nil {
 		return err
