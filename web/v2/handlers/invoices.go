@@ -32,13 +32,20 @@ func CreateInvoicePage(c *fiber.Ctx) error {
 		return err
 	}
 
-	invoice := models.NewInvoice()
-	if len(entities) > 0 {
-		invoice.Sender = entities[0]
+	if baseInvoiceIDStr := c.Query("base-invoice-id"); baseInvoiceIDStr != "" {
+		baseInvoiceID, err := strconv.Atoi(baseInvoiceIDStr)
+		if err != nil {
+			return err
+		}
+		baseInvoice, err := services.RetrieveInvoice(c.Context(), baseInvoiceID, userID)
+		if err != nil {
+			return err
+		}
+		return Render(c, layouts.Base(pages.InvoiceFormPage(baseInvoice, entities)))
 	}
-	if len(invoice.Items) == 0 {
-		invoice.Items = append(invoice.Items, models.NewInvoiceItem())
-	}
+
+	invoice := models.NewInvoiceWithSamples(entities)
+
 	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities)))
 }
 
@@ -98,7 +105,6 @@ func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-
 
 	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID, userID)
 	if err != nil {

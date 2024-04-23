@@ -45,6 +45,18 @@ func NewInvoice() *Invoice {
 	}
 }
 
+func NewInvoiceWithSamples(entities []*Entity) *Invoice {
+	invoice := NewInvoice()
+	if len(entities) > 0 {
+		invoice.Sender = entities[0]
+	}
+	if len(invoice.Items) == 0 {
+		invoice.Items = append(invoice.Items, NewInvoiceItem())
+	}
+
+	return invoice
+}
+
 func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	var err error
 

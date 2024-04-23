@@ -59,16 +59,25 @@ templ InvoiceCard(i *models.Invoice) {
 					@shared.IconSm("eye")
 				}
 			</div>
-			<a title="Usar como modelo">
+			<a
+				href={ templ.URL(fmt.Sprintf("/invoices/create?base-invoice-id=%d", i.ID)) }
+				hx-boost="true"
+				title="Usar como modelo"
+			>
 				@shared.InfoButton("xs") {
 					@shared.IconSm("edit")
 				}
 			</a>
-			<div title="Baixar">
+			<a
+				if i.PDF != "" {
+					href={ templ.URL(i.PDF) }
+				}
+				title="Baixar"
+			>
 				@shared.DefaultButton("xs") {
 					@shared.IconSm("download-cloud")
 				}
-			</div>
+			</a>
 			<div title="Cancelar NFA">
 				@shared.ErrorButton("xs") {
 					@shared.IconSm("slash")
