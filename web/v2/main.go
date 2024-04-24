@@ -74,7 +74,7 @@ func main() {
 	// app.Get("/invoices/request-card-filter", invoicesPage.FilterRequests)
 
 	app.Get("/invoices/cancel", handlers.InvoicesCancelingsPage)
-	// app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)
+	app.Post("/invoices/cancel", handlers.CancelInvoice)
 	// app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	// app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 	// app.Get("/invoices/cancel/:id/request-card-status", cancelInvoicesPage.GetRequestStatus)

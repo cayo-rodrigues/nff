@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -50,6 +51,12 @@ func NewInvoiceCancelFromForm(c *fiber.Ctx) *InvoiceCancel {
 		log.Println("Error converting invoice canceling year from string to int: ", err)
 	}
 	invoiceCancel.Justification = strings.TrimSpace(c.FormValue("justification"))
+
+	entityID, err := strconv.Atoi(c.FormValue("entity"))
+	if err != nil {
+		entityID = 0
+	}
+	invoiceCancel.Entity.ID = entityID
 
 	return invoiceCancel
 }
