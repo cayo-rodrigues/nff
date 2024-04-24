@@ -81,6 +81,35 @@ function EnumerateInvoiceItems(itemsContainer = null) {
     document.querySelector('#items-count').innerText = itemSectionTitles.length
 }
 
+function ToggleForm(target, srcElement) {
+    const form = document.querySelector(target)
+    const icon = srcElement.querySelector('svg')
+
+    form.classList.add('duration-300')
+    icon.classList.add('transition', 'duration-300')
+
+    if (form.classList.contains('hidden')) {
+        form.classList.remove('hidden')
+
+        setTimeout(() => {
+            form.style.marginTop = '-0px'
+            form.style.opacity = 100
+            icon.classList.remove('transform', 'rotate-180')
+        }, 0)
+        return
+    }
+
+    const inputGap2 = 8
+    form.style.marginTop = `-${form.offsetHeight + inputGap2}px`
+    form.style.opacity = 0
+    icon.classList.add('transform', 'rotate-180')
+
+    setTimeout(() => {
+        form.classList.add('hidden')
+    }, 300)
+
+}
+
 function ApplyIcons() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()

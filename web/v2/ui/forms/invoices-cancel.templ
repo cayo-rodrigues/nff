@@ -5,7 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "strconv"
 
 templ CancelInvoiceForm(c *models.InvoiceCancel, entities []*models.Entity) {
-	<form class="flex flex-col gap-4">
+	<form id="cancel-invoice-form" class="flex flex-col gap-4 transition-all">
 		<div class="md:w-fit">
 			@shared.SubmitButton("sm") {
 				@shared.Icon("play-circle")
@@ -40,12 +40,11 @@ templ CancelInvoiceForm(c *models.InvoiceCancel, entities []*models.Entity) {
 			})
 		</div>
 	</form>
-	<div class="-mb-2 mt-4 flex justify-center border-t sm:-mb-6 xl:justify-end">
-		<div class="w-fit -translate-y-3 transform bg-gray-50 px-2">
+	<div class="-mb-2 mt-4 flex justify-center border-t sm:-mb-6">
+		<div onclick="ToggleForm('#cancel-invoice-form', this)" class="w-fit -translate-y-3 transform bg-gray-50 px-2">
 			@shared.DefaultButtonOutline("xs") {
 				@shared.IconXs("chevron-up")
 			}
 		</div>
-		<div class="hidden w-1/4 xl:block"></div>
 	</div>
 }
