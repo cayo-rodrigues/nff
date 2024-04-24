@@ -70,12 +70,10 @@ func main() {
 	app.Get("/invoices/create", handlers.CreateInvoicePage)
 	app.Post("/invoices/create", handlers.CreateInvoice)
 	app.Get("/invoices/:id/items-details", handlers.RetrieveInvoiceItemsDetails)
-	// app.Get("/invoices/:id/form", invoicesPage.GetInvoiceForm)
 	// app.Get("/invoices/:id/request-card-status", invoicesPage.GetRequestStatus)
-	// app.Get("/invoices/items/form-section", invoicesPage.GetItemFormSection)
 	// app.Get("/invoices/request-card-filter", invoicesPage.FilterRequests)
 
-	// app.Get("/invoices/cancel", cancelInvoicesPage.Render)
+	app.Get("/invoices/cancel", handlers.InvoicesCancelingsPage)
 	// app.Post("/invoices/cancel", cancelInvoicesPage.CancelInvoice)
 	// app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
 	// app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)

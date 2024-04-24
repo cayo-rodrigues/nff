@@ -1,0 +1,51 @@
+package forms
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "strconv"
+
+templ CancelInvoiceForm(c *models.InvoiceCancel, entities []*models.Entity) {
+	<form class="flex flex-col gap-4">
+		<div class="md:w-fit">
+			@shared.SubmitButton("sm") {
+				@shared.Icon("play-circle")
+				<span>Iniciar Operação de Cancelamento</span>
+			}
+		</div>
+		<div class="grid grid-cols-2 gap-4 md:grid-cols-4 xl:w-1/2">
+			@shared.SelectInput(&shared.InputData{
+				ID:      "entity",
+				Label:   "Entidade",
+				Value:   strconv.Itoa(c.Entity.ID),
+				Options: &shared.InputOptions{EntityOptions: entities},
+				ErrMsg:  c.Errors["Entity"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "invoice_number",
+				Label:  "Número da nota",
+				Value:  c.InvoiceNumber,
+				ErrMsg: c.Errors["InvoiceNumber"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "year",
+				Label:  "Ano",
+				Value:  strconv.Itoa(c.Year),
+				ErrMsg: c.Errors["Year"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "justification",
+				Label:  "Justificativa",
+				Value:  c.Justification,
+				ErrMsg: c.Errors["Justification"],
+			})
+		</div>
+	</form>
+	<div class="-mb-2 mt-4 flex justify-center border-t sm:-mb-6 xl:justify-end">
+		<div class="w-fit -translate-y-3 transform bg-gray-50 px-2">
+			@shared.DefaultButtonOutline("xs") {
+				@shared.IconXs("chevron-up")
+			}
+		</div>
+		<div class="hidden w-1/4 xl:block"></div>
+	</div>
+}

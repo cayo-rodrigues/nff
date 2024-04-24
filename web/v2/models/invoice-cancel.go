@@ -30,12 +30,21 @@ func NewInvoiceCancel() *InvoiceCancel {
 	}
 }
 
+func NewInvoiceCancelWithSamples(entities []*Entity) *InvoiceCancel {
+	canceling := NewInvoiceCancel()
+	if len(entities) > 0 {
+		canceling.Entity = entities[0]
+	}
+
+	return canceling
+}
+
 func NewInvoiceCancelFromForm(c *fiber.Ctx) *InvoiceCancel {
 	var err error
 
 	invoiceCancel := NewInvoiceCancel()
 
-	invoiceCancel.InvoiceNumber = strings.TrimSpace(c.FormValue("invoice_id"))
+	invoiceCancel.InvoiceNumber = strings.TrimSpace(c.FormValue("invoice_number"))
 	invoiceCancel.Year, err = utils.TrimSpaceInt(c.FormValue("year"))
 	if err != nil {
 		log.Println("Error converting invoice canceling year from string to int: ", err)
