@@ -15,35 +15,6 @@ templ InvoiceList(invoices []*models.Invoice) {
 	</ul>
 }
 
-templ InvoiceStatus(i *models.Invoice) {
-	switch i.ReqStatus {
-		case "success":
-			<div class="text-green-600">
-				@shared.Icon("check-circle")
-			</div>
-			<span class="text-green-700">Sucesso</span>
-		case "warning":
-			<div class="text-yellow-600">
-				@shared.Icon("alert-triangle")
-			</div>
-			<span class="text-yellow-700">Aviso</span>
-		case "error":
-			<div class="text-red-600">
-				@shared.Icon("x-circle")
-			</div>
-			<span class="text-red-700">Erro</span>
-		case "canceled":
-			<div class="text-gray-500">
-				@shared.Icon("slash")
-			</div>
-			<span class="text-gray-600">Cancelada</span>
-		default:
-			<div class="animate-spin-slow text-sky-600">
-				@shared.Icon("loader")
-			</div>
-			<span>Em andamento...</span>
-	}
-}
 
 templ InvoiceCard(i *models.Invoice) {
 	<li
@@ -51,7 +22,7 @@ templ InvoiceCard(i *models.Invoice) {
 		class="relative cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
 	>
 		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">
-			@InvoiceStatus(i)
+			@shared.OperationStatus(i)
 		</h3>
 		<ul class="flex flex-col gap-1 p-2 pb-0 sm:w-10/12 md:w-9/12">
 			<li class="md:truncate"><span class="font-medium">Número:</span> { i.Number } </li>
@@ -99,7 +70,7 @@ templ InvoiceDetailsDialog(i *models.Invoice) {
 		<div class="rounded border border-gray-200 p-2 shadow shadow-gray-300">
 			<div class="relative rounded border border-gray-300 p-2">
 				<h3 class="flex items-center gap-2 break-words rounded text-base font-bold">
-					@InvoiceStatus(i)
+					@shared.OperationStatus(i)
 				</h3>
 				<div
 					class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1"
@@ -108,7 +79,7 @@ templ InvoiceDetailsDialog(i *models.Invoice) {
 					@shared.Icon("x-circle")
 				</div>
 			</div>
-			if i.ReqStatus != "pending" {
+			if i.ReqStatus != "pending" && i.ReqMsg != "" {
 				<div class="border-b p-2 text-base">
 					<pre>{ i.ReqMsg }</pre>
 				</div>

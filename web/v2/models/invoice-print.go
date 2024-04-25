@@ -24,6 +24,10 @@ type InvoicePrint struct {
 	Errors               *ErrorMessages `json:"-"`
 }
 
+func (i *InvoicePrint) GetStatus() string {
+	return i.ReqStatus
+}
+
 func NewInvoicePrint() *InvoicePrint {
 	return &InvoicePrint{
 		Entity: NewEntity(),

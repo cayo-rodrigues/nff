@@ -1,0 +1,35 @@
+package shared
+
+type Operation interface {
+	GetStatus() string
+}
+
+templ OperationStatus(o Operation) {
+	switch o.GetStatus() {
+		case "success":
+			<div class="text-green-600">
+				@Icon("check-circle")
+			</div>
+			<span class="text-green-700">Sucesso</span>
+		case "warning":
+			<div class="text-yellow-600">
+				@Icon("alert-triangle")
+			</div>
+			<span class="text-yellow-700">Aviso</span>
+		case "error":
+			<div class="text-red-600">
+				@Icon("x-circle")
+			</div>
+			<span class="text-red-700">Erro</span>
+		case "canceled":
+			<div class="text-gray-500">
+				@Icon("slash")
+			</div>
+			<span class="text-gray-600">Cancelada</span>
+		default:
+			<div class="animate-spin-slow text-sky-600">
+				@Icon("loader")
+			</div>
+			<span>Em andamento...</span>
+	}
+}

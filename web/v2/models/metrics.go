@@ -21,6 +21,10 @@ type Metrics struct {
 	*MetricsResult
 }
 
+func (i *Metrics) GetStatus() string {
+	return i.ReqStatus
+}
+
 type MetricsResult struct {
 	ID              int              `json:"-"`
 	Type            string           `json:"type"`

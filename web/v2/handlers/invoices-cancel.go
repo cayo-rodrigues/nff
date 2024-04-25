@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
@@ -43,8 +44,22 @@ func CancelInvoice(c *fiber.Ctx) error {
 	canceling.Entity = entity
 
 	if canceling.IsValid() {
-		c.Set("HX-Trigger-After-Swap", "reload-cancelings-list")
+		err := services.CreateCanceling(c.Context(), canceling, userID)
+		if err != nil {
+			return err
+		}
+		c.Set("HX-Trigger-After-Settle", "reload-canceling-list")
 	}
 
 	return Render(c, forms.CancelInvoiceForm(canceling, entities))
+}
+
+func ListInvoiceCancelings(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
+	cancelings, err := services.ListCancelings(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoicesCancelingsList(cancelings))
 }

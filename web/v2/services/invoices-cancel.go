@@ -10,3 +10,8 @@ import (
 func ListCancelings(ctx context.Context, userID int) ([]*models.InvoiceCancel, error) {
 	return storage.ListInvoiceCancelings(ctx, userID, map[string]string{})
 }
+
+func CreateCanceling(ctx context.Context, c *models.InvoiceCancel, userID int) error {
+	c.CreatedBy = userID
+	return storage.CreateInvoiceCanceling(ctx, c)
+}

@@ -34,7 +34,7 @@ func ListInvoiceCancelings(ctx context.Context, userID int, filters map[string]s
 
 	for rows.Next() {
 		canceling := models.NewInvoiceCancel()
-		err := Scan(rows, canceling)
+		err := Scan(rows, canceling, canceling.Entity)
 		if err != nil {
 			log.Println("Error scaning invoice canceling rows: ", err)
 			return nil, utils.InternalServerErr

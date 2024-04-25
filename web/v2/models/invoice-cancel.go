@@ -24,6 +24,10 @@ type InvoiceCancel struct {
 	Errors        ErrorMessages `json:"-"`
 }
 
+func (i *InvoiceCancel) GetStatus() string {
+	return i.ReqStatus
+}
+
 func NewInvoiceCancel() *InvoiceCancel {
 	return &InvoiceCancel{
 		Entity: NewEntity(),
