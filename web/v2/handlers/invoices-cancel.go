@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"strconv"
+
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/cayo-rodrigues/nff/web/ui/components"
@@ -62,4 +64,25 @@ func ListInvoiceCancelings(c *fiber.Ctx) error {
 	}
 
 	return Render(c, components.InvoicesCancelingsList(cancelings))
+}
+
+func GetCancelInvoiceForm(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
+
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
+	baseCancelingID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	baseCanceling, err := services.RetrieveCanceling(c.Context(), baseCancelingID, userID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, forms.CancelInvoiceForm(baseCanceling, entities))
 }

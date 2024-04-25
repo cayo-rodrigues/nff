@@ -13,7 +13,7 @@ func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.Comp
 	for _, opt := range options {
 		opt(componentHandler)
 	}
-	c.Set("HX-Trigger-After-Settle", "rebuild-icons")
+	c.Set("HX-Trigger-After-Swap", "rebuild-icons")
 	return adaptor.HTTPHandler(componentHandler)(c)
 }
 

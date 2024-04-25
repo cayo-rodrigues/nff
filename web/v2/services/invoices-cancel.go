@@ -15,3 +15,7 @@ func CreateCanceling(ctx context.Context, c *models.InvoiceCancel, userID int) e
 	c.CreatedBy = userID
 	return storage.CreateInvoiceCanceling(ctx, c)
 }
+
+func RetrieveCanceling(ctx context.Context, cancelingID int, userID int) (*models.InvoiceCancel, error) {
+	return storage.RetrieveInvoiceCanceling(ctx, cancelingID, userID)
+}

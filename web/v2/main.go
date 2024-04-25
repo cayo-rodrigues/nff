@@ -53,7 +53,7 @@ func main() {
 	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
-	// app.Use(middlewares.CacheMiddleware)
+	app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/", handlers.HomePage)
 
@@ -76,7 +76,7 @@ func main() {
 	app.Get("/invoices/cancel", handlers.InvoicesCancelingsPage)
 	app.Post("/invoices/cancel", handlers.CancelInvoice)
 	app.Get("/invoices/cancel/list", handlers.ListInvoiceCancelings)
-	// app.Get("/invoices/cancel/:id/form", cancelInvoicesPage.GetInvoiceCancelForm)
+	app.Get("/invoices/cancel/:id/form", handlers.GetCancelInvoiceForm)
 	// app.Get("/invoices/cancel/:id/request-card-details", cancelInvoicesPage.GetRequestCardDetails)
 	// app.Get("/invoices/cancel/:id/request-card-status", cancelInvoicesPage.GetRequestStatus)
 	// app.Get("/invoices/cancel/request-card-filter", cancelInvoicesPage.FilterRequests)

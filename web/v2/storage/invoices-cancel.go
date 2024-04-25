@@ -80,7 +80,7 @@ func RetrieveInvoiceCanceling(ctx context.Context, cancelingID int, userID int) 
 	)
 
 	canceling := models.NewInvoiceCancel()
-	err := Scan(row, canceling)
+	err := Scan(row, canceling, canceling.Entity)
 	if errors.Is(err, pgx.ErrNoRows) {
 		log.Printf("Invoice canceling with id %v not found: %v", cancelingID, err)
 		return nil, utils.CancelingNotFoundErr
