@@ -25,6 +25,8 @@ func ListInvoiceCancelings(ctx context.Context, userID int, filters map[string]s
 
 	params := BuildQueryFilters(&query, filters, userID, "invoices_cancelings")
 
+	query.WriteString(" ORDER BY invoices_cancelings.created_at DESC")
+
 	db := database.GetDB()
 
 	rows, _ := db.PG.Query(ctx, query.String(), params...)

@@ -50,7 +50,7 @@ func CancelInvoice(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		c.Set("HX-Trigger-After-Settle", "reload-canceling-list")
+		c.Set("HX-Trigger-After-Swap", "reload-canceling-list")
 	}
 
 	return Render(c, forms.CancelInvoiceForm(canceling, entities))
@@ -84,5 +84,6 @@ func GetCancelInvoiceForm(c *fiber.Ctx) error {
 		return err
 	}
 
+	c.Set("HX-Trigger-After-Swap", "scroll-to-top")
 	return Render(c, forms.CancelInvoiceForm(baseCanceling, entities))
 }

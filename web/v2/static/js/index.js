@@ -81,12 +81,15 @@ function EnumerateInvoiceItems(itemsContainer = null) {
     document.querySelector('#items-count').innerText = itemSectionTitles.length
 }
 
-function ApplyIcons() {
+function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()
     })
     document.addEventListener("rebuild-icons", () => {
         feather.replace()
     })
+    document.addEventListener("scroll-to-top", () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
 }
-ApplyIcons()
+Init()
