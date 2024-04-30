@@ -1,0 +1,43 @@
+package forms
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "strconv"
+
+templ PrintInvoiceForm(p *models.InvoicePrint, entities []*models.Entity) {
+	<form
+		id="print-invoice-form"
+		class="flex flex-col gap-4"
+		hx-post="/invoices/print"
+		hx-target="this"
+		hx-swap="outerHTML"
+	>
+		<div class="md:w-fit">
+			@shared.SubmitButton("sm") {
+				@shared.Icon("play-circle")
+				<span>Iniciar Operação de Impressão</span>
+			}
+		</div>
+		<div class="grid grid-cols-2 gap-4 md:grid-cols-4 xl:w-1/2">
+			@shared.SelectInput(&shared.InputData{
+				ID:      "entity",
+				Label:   "Entidade",
+				Value:   strconv.Itoa(p.Entity.ID),
+				Options: &shared.InputOptions{EntityOptions: entities},
+				ErrMsg:  p.Errors["Entity"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "invoice_id",
+				Label:  "Número / Protocolo",
+				Value:  p.InvoiceID,
+				ErrMsg: p.Errors["InvoiceID"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "custom_file_name_prefix",
+				Label:  "Nome do Arquivo",
+				Value:  p.CustomFileNamePrefix,
+				ErrMsg: p.Errors["CustomFileNamePrefix"],
+			})
+		</div>
+	</form>
+}

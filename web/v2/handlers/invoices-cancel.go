@@ -13,7 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func InvoicesCancelingsPage(c *fiber.Ctx) error {
+func CancelInvoicePage(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
 	cancelingsList, err := services.ListCancelings(c.Context(), userID)
 	if err != nil {

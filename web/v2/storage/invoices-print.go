@@ -24,6 +24,8 @@ func ListInvoicePrintings(ctx context.Context, userID int, filters map[string]st
 
 	params := BuildQueryFilters(&query, filters, userID, "invoices_printings")
 
+	query.WriteString(" ORDER BY invoices_printings.created_at DESC")
+
 	db := database.GetDB()
 
 	rows, _ := db.PG.Query(ctx, query.String(), params...)
@@ -51,10 +53,10 @@ func CreateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) e
 	row := db.PG.QueryRow(
 		ctx,
 		`INSERT INTO invoices_printings
-			(invoice_number, invoice_id_type, custom_file_name_prefix, entity_id, created_by)
+			(invoice_id, invoice_id_type, custom_file_name_prefix, entity_id, created_by)
 			VALUES ($1, $2, $3, $4, $5)
 		RETURNING id, req_status, req_msg`,
-		printing.InvoiceNumber, printing.InvoiceIDType, printing.CustomFileNamePrefix, printing.Entity.ID, printing.CreatedBy,
+		printing.InvoiceID, printing.InvoiceIDType, printing.CustomFileNamePrefix, printing.Entity.ID, printing.CreatedBy,
 	)
 	err := row.Scan(&printing.ID, &printing.ReqStatus, &printing.ReqMsg)
 	if err != nil {
