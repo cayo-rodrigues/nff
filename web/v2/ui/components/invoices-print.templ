@@ -14,27 +14,27 @@ templ InvoicesPrintingsList(printings []*models.InvoicePrint) {
 		hx-trigger="reload-printing-list from:body"
 		hx-swap="outerHTML"
 	>
-		for _, c := range printings {
-			@InvoicePrintCard(c)
+		for _, p := range printings {
+			@InvoicePrintCard(p)
 		}
 	</ul>
 }
 
-templ InvoicePrintCard(c *models.InvoicePrint) {
+templ InvoicePrintCard(p *models.InvoicePrint) {
 	<li
-		id={ printingCardID(c) }
+		id={ printingCardID(p) }
 		class="relative cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
 	>
 		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">
-			@shared.OperationStatus(c)
+			@shared.OperationStatus(p)
 		</h3>
 		<ul class="flex flex-col gap-1 p-2 pb-0 sm:w-10/12 md:w-9/12">
-			<li class="md:truncate"><span class="font-medium">Entidade:</span> { c.Entity.Name }</li>
-			<li class="md:truncate"><span class="font-medium">Número / Protocolo:</span> { c.InvoiceID } </li>
+			<li class="md:truncate"><span class="font-medium">Entidade:</span> { p.Entity.Name }</li>
+			<li class="md:truncate"><span class="font-medium">Número / Protocolo:</span> { p.InvoiceID } </li>
 		</ul>
 		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-2 sm:p-0">
 			<div
-				onclick={ scripts.OpenDialog(printingDetailsDialogTarget(c)) }
+				onclick={ scripts.OpenDialog(printingDetailsDialogTarget(p)) }
 				title="Ver detalhes"
 			>
 				@shared.WarningButton("xs") {
@@ -42,7 +42,7 @@ templ InvoicePrintCard(c *models.InvoicePrint) {
 				}
 			</div>
 			<div
-				hx-get={ fmt.Sprintf("/invoices/print/%d/form", c.ID) }
+				hx-get={ fmt.Sprintf("/invoices/print/%d/form", p.ID) }
 				hx-target="#print-invoice-form"
 				hx-swap="outerHTML"
 				hx-trigger="click"
@@ -53,7 +53,7 @@ templ InvoicePrintCard(c *models.InvoicePrint) {
 				}
 			</div>
 		</div>
-		@PrintingDetailsDialog(c)
+		@PrintingDetailsDialog(p)
 	</li>
 }
 

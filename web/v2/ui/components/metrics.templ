@@ -1,0 +1,23 @@
+package components
+
+import "github.com/cayo-rodrigues/nff/web/models"
+
+
+templ MetricsList(metrics []*models.Metrics) {
+	<ul
+		id="printing-list"
+		class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
+		hx-get="/invoices/print/list"
+		hx-target="this"
+		hx-trigger="reload-printing-list from:body"
+		hx-swap="outerHTML"
+	>
+		for _, m := range metrics {
+			@MetricsCard(m)
+		}
+	</ul>
+}
+
+templ MetricsCard(m *models.Metrics) {
+
+}

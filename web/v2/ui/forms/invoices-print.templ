@@ -18,14 +18,16 @@ templ PrintInvoiceForm(p *models.InvoicePrint, entities []*models.Entity) {
 				<span>Iniciar Operação de Impressão</span>
 			}
 		</div>
-		<div class="grid grid-cols-2 gap-4 md:grid-cols-4 xl:w-1/2">
-			@shared.SelectInput(&shared.InputData{
-				ID:      "entity",
-				Label:   "Entidade",
-				Value:   strconv.Itoa(p.Entity.ID),
-				Options: &shared.InputOptions{EntityOptions: entities},
-				ErrMsg:  p.Errors["Entity"],
-			})
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:w-1/2 2xl:w-2/5">
+			<div class="col-span-full md:col-span-1">
+				@shared.SelectInput(&shared.InputData{
+					ID:      "entity",
+					Label:   "Entidade",
+					Value:   strconv.Itoa(p.Entity.ID),
+					Options: &shared.InputOptions{EntityOptions: entities},
+					ErrMsg:  p.Errors["Entity"],
+				})
+			</div>
 			@shared.Input(&shared.InputData{
 				ID:     "invoice_id",
 				Label:  "Número / Protocolo",

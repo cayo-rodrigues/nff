@@ -2,7 +2,16 @@ package pages
 
 import "github.com/cayo-rodrigues/nff/web/ui/forms"
 import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "github.com/cayo-rodrigues/nff/web/ui/components"
 
-templ MetricsPage(m *models.Metrics) {
-	@forms.MetricsForm(m)
+templ MetricsPage(metricsList []*models.Metrics, m *models.Metrics, entities []*models.Entity) {
+	<div class="flex flex-col gap-4">
+		<div class="flex flex-col gap-2">
+			@forms.MetricsForm(m, entities)
+			@shared.ToggleElementVisibilityButton("#metrics-form")
+		</div>
+		<h2 class="text-base font-medium">Histórico de Operações</h2>
+		@components.MetricsList(metricsList)
+	</div>
 }

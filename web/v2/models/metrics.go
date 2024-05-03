@@ -55,6 +55,7 @@ func NewMetrics() *Metrics {
 	return &Metrics{
 		Entity:        NewEntity(),
 		MetricsResult: &MetricsResult{},
+		EndDate:       time.Now(),
 	}
 
 }
