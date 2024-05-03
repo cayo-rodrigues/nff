@@ -101,9 +101,11 @@ func UpdateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) e
 	result, err := db.PG.Exec(
 		ctx,
 		`UPDATE invoices_printings
-			SET req_status = $1, req_msg = $2, invoice_pdf = $3, custom_file_name_prefix = $4, updated_at = $5
-		WHERE id = $6 AND created_by = $7`,
-		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.CustomFileNamePrefix, printing.UpdatedAt,
+			SET req_status = $1, req_msg = $2, invoice_pdf = $3, custom_file_name_prefix = $4,
+				file_name = $5, updated_at = $6
+		WHERE id = $7 AND created_by = $8`,
+		printing.ReqStatus, printing.ReqMsg, printing.InvoicePDF, printing.CustomFileNamePrefix,
+		printing.FileName, printing.UpdatedAt,
 		printing.ID, printing.CreatedBy,
 	)
 	if err != nil {

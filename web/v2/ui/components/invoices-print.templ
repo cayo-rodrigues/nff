@@ -79,8 +79,9 @@ templ PrintingDetailsDialog(p *models.InvoicePrint) {
 			<ul class="grid gap-2 p-2 sm:grid-cols-2">
 				<li><span class="font-medium">Entidade:</span> { p.Entity.Name }</li>
 				<li><span class="font-medium">Número / Protocolo:</span> { p.InvoiceID }</li>
+				<li><span class="font-medium">Tipo de identificação:</span> { p.InvoiceIDType }</li>
 				<li><span class="font-medium">Prefixo do nome do arquivo:</span> { p.CustomFileNamePrefix }</li>
-				<li><span class="font-medium">Nome completo do arquivo:</span> { p.FileName }</li>
+				<li class="sm:col-span-2"><span class="font-medium">Nome completo do arquivo:</span> { p.FileName }</li>
 			</ul>
 		</div>
 	</dialog>

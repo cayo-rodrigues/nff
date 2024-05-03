@@ -97,7 +97,8 @@ templ InvoiceDetailsDialog(i *models.Invoice) {
 				<li><span class="font-medium">Frete:</span> { utils.Float64ToString(i.Shipping) } </li>
 				<li><span class="font-medium">Adicionar Frete ao Total:</span> { i.AddShippingToTotal } </li>
 				<li><span class="font-medium">GTA:</span> { i.Gta } </li>
-				<li><span class="font-medium">Nome do Arquivo:</span> { i.FileName } </li>
+				<li><span class="font-medium">Prefixo do nome do arquivo:</span> { i.CustomFileNamePrefix } </li>
+				<li><span class="font-medium">Nome completo do arquivo:</span> { i.FileName } </li>
 			</ul>
 			@InvoiceItemsDetails(i)
 		</div>

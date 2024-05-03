@@ -34,7 +34,7 @@ templ PrintInvoiceForm(p *models.InvoicePrint, entities []*models.Entity) {
 			})
 			@shared.Input(&shared.InputData{
 				ID:     "custom_file_name_prefix",
-				Label:  "Nome do Arquivo",
+				Label:  "Prefixo do Nome do Arquivo",
 				Value:  p.CustomFileNamePrefix,
 				ErrMsg: p.Errors["CustomFileNamePrefix"],
 			})
