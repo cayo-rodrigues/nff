@@ -1,11 +1,11 @@
 package models
 
 import (
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -48,7 +48,6 @@ func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
 	invoicePrint := NewInvoicePrint()
 
 	invoicePrint.InvoiceID = strings.TrimSpace(c.FormValue("invoice_id"))
-	invoicePrint.InvoiceIDType = strings.TrimSpace(c.FormValue("invoice_id_type"))
 	invoicePrint.CustomFileNamePrefix = strings.TrimSpace(c.FormValue("custom_file_name_prefix"))
 
 	entityID, err := strconv.Atoi(c.FormValue("entity"))
@@ -61,23 +60,11 @@ func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
 }
 
 func (p *InvoicePrint) IsValid() bool {
-	var invoiceIDRegex *regexp.Regexp
-	if p.InvoiceIDType == "number" {
-		invoiceIDRegex = SiareNFANumberRegex
-	} else {
-		invoiceIDRegex = SiareNFAProtocolRegex
-	}
-
 	fields := Fields{
 		{
 			Name:  "InvoiceID",
 			Value: p.InvoiceID,
-			Rules: Rules(Required, Match(invoiceIDRegex)),
-		},
-		{
-			Name:  "InvoiceIDType",
-			Value: p.InvoiceIDType,
-			Rules: Rules(Required, OneOf(InvoiceIDTypes[:])),
+			Rules: Rules(Required),
 		},
 		{
 			Name:  "CustomFileNamePrefix",
@@ -87,7 +74,37 @@ func (p *InvoicePrint) IsValid() bool {
 	}
 	errors, ok := Validate(fields)
 	p.Errors = errors
+
+	if !p.InvoiceIDFormatIsValid() {
+		return false
+	}
+
 	return ok
+}
+
+func (p *InvoicePrint) InvoiceIDFormatIsValid() bool {
+	if p.Errors == nil {
+		p.Errors = make(ErrorMessages)
+	}
+	_, hasVal := p.Errors["InvoiceID"]
+	if hasVal {
+		return true
+	}
+
+	isNumber := SiareNFANumberRegex.MatchString(p.InvoiceID)
+	if isNumber {
+		p.InvoiceIDType = InvoiceIDTypes.NFANumber()
+		return true
+	}
+
+	isProtocol := SiareNFAProtocolRegex.MatchString(p.InvoiceID)
+	if isProtocol {
+		p.InvoiceIDType = InvoiceIDTypes.NFAProtocol()
+		return true
+	}
+
+	p.Errors["InvoiceID"] = utils.InvalidFormatMsg
+	return false
 }
 
 func (p *InvoicePrint) Values() []any {

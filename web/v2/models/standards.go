@@ -83,6 +83,14 @@ var InvoiceBooleanField = BooleanField{
 
 type SiareInvoiceIDTypes [2]string
 
+func (t *SiareInvoiceIDTypes) NFANumber() string {
+	return t[0]
+}
+
+func (t *SiareInvoiceIDTypes) NFAProtocol() string {
+	return t[1]
+}
+
 var InvoiceIDTypes = SiareInvoiceIDTypes{
 	"Número da NFA",
 	"Protocolo",
