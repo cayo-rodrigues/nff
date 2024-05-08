@@ -8,7 +8,7 @@ templ Nav() {
 			</a>
 		</h1>
 		<div class="flex items-center gap-4 sm:gap-6 xl:gap-8">
-			@ListMenu()
+			@ListMenu(true)
 			@NotificationBell()
 			@BurgerMenu()
 		</div>
@@ -27,33 +27,44 @@ templ BurgerMenu() {
 	</button>
 }
 
-templ ListMenu() {
+templ ListMenu(isAuthenticated bool) {
 	<ul hx-boost="true" class="hidden gap-2 xl:flex">
-		@MenuItem("/entities") {
-			@IconSm("users")
-			<span>Entidades</span>
-		}
-		@SubMenu("file-text", "Notas Fiscais") {
-			@SubMenuItem("/invoices") {
-				@IconSm("plus-circle")
-				<span>Emitir</span>
+		if isAuthenticated {
+			@MenuItem("/entities") {
+				@IconSm("users")
+				<span>Entidades</span>
 			}
-			@SubMenuItem("/invoices/cancel") {
-				@IconSm("slash")
-				<span>Cancelar</span>
+			@SubMenu("file-text", "Notas Fiscais") {
+				@SubMenuItem("/invoices") {
+					@IconSm("plus-circle")
+					<span>Emitir</span>
+				}
+				@SubMenuItem("/invoices/cancel") {
+					@IconSm("slash")
+					<span>Cancelar</span>
+				}
+				@SubMenuItem("/invoices/print") {
+					@IconSm("printer")
+					<span>Imprimir</span>
+				}
 			}
-			@SubMenuItem("/invoices/print") {
-				@IconSm("printer")
-				<span>Imprimir</span>
+			@MenuItem("/metrics") {
+				@IconSm("activity")
+				<span>Métricas</span>
 			}
-		}
-		@MenuItem("/metrics") {
-			@IconSm("activity")
-			<span>Métricas</span>
-		}
-		@MenuItem("/logout") {
-			@IconSm("log-out")
-			<span>Sair</span>
+			@MenuItem("/logout") {
+				@IconSm("log-out")
+				<span>Sair</span>
+			}
+		} else {
+			@MenuItem("/register") {
+				@IconSm("user-plus")
+				<span>Cadastro</span>
+			}
+			@MenuItem("/login") {
+				@IconSm("log-in")
+				<span>Login</span>
+			}
 		}
 	</ul>
 }

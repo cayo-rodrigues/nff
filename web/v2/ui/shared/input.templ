@@ -3,6 +3,7 @@ package shared
 import "fmt"
 import "strconv"
 import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 
 type InputOptions struct {
 	StringOptions []string
@@ -64,7 +65,12 @@ templ Input(data *InputData) {
 		/>
 		<sub class="text-red-600">{ data.ErrMsg }</sub>
 		if data.InputType == "password" {
-			<button id={ fmt.Sprintf("password-toggle-%v", data.ID) } type="button" class="absolute bottom-4 right-4">
+			<button
+				id={ passwordToggleID(data) }
+				type="button"
+				class="absolute bottom-4 right-4"
+				onclick={ scripts.TogglePasswordVisibility(inputTarget(data), passwordToggleTarget(data)) }
+			>
 				@IconSm("eye-off")
 			</button>
 		}
@@ -126,4 +132,16 @@ templ SelectInput(data *InputData) {
 		</select>
 		<sub class="text-red-600">{ data.ErrMsg }</sub>
 	</div>
+}
+
+func passwordToggleID(data *InputData) string {
+	return fmt.Sprintf("password-toggle-%v", data.ID)
+}
+
+func passwordToggleTarget(data *InputData) string {
+	return fmt.Sprintf("#password-toggle-%v", data.ID)
+}
+
+func inputTarget(data *InputData) string {
+	return fmt.Sprintf("#%s", data.ID)
 }
