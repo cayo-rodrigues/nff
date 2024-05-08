@@ -24,6 +24,8 @@ func ListMetrics(ctx context.Context, userID int, filters map[string]string) ([]
 
 	params := BuildQueryFilters(&query, filters, userID, "metrics_history")
 
+	query.WriteString(" ORDER BY metrics_history.created_at")
+
 	db := database.GetDB()
 
 	rows, _ := db.PG.Query(ctx, query.String(), params...)
@@ -33,7 +35,7 @@ func ListMetrics(ctx context.Context, userID int, filters map[string]string) ([]
 
 	for rows.Next() {
 		metrics := models.NewMetrics()
-		err := Scan(rows, metrics)
+		err := Scan(rows, metrics, metrics.Entity)
 		if err != nil {
 			log.Println("Error scaning metrics query rows: ", err)
 			return nil, utils.InternalServerErr
@@ -95,6 +97,8 @@ func RetrieveMetrics(ctx context.Context, queryId int, userID int) (*models.Metr
 	}
 	for _, result := range results {
 		switch result.Type {
+		case "total":
+			metrics.Total = result
 		case "month":
 			metrics.Months = append(metrics.Months, result)
 		case "record":

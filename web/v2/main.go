@@ -89,8 +89,10 @@ func main() {
 	// app.Get("/invoices/print/request-card-filter", printInvoicesPage.FilterRequests)
 
 	app.Get("/metrics", handlers.MetricsPage)
-	// app.Post("/metrics", metricsPage.GenerateMetrics)
-	// app.Get("/metrics/:id/form", metricsPage.GetMetricsForm)
+	app.Post("/metrics", handlers.GenerateMetrics)
+	app.Get("/metrics/list", handlers.ListMetrics)
+	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
+	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
 	// app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)
 	// app.Get("/metrics/:id/request-card-status", metricsPage.GetRequestStatus)
 	// app.Get("/metrics/request-card-filter", metricsPage.FilterRequests)

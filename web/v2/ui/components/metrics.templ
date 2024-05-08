@@ -1,15 +1,19 @@
 package components
 
 import "github.com/cayo-rodrigues/nff/web/models"
-
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "github.com/cayo-rodrigues/nff/web/ui/scripts"
+import "github.com/cayo-rodrigues/nff/web/utils"
+import "strconv"
 
 templ MetricsList(metrics []*models.Metrics) {
 	<ul
-		id="printing-list"
+		id="metrics-list"
 		class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
-		hx-get="/invoices/print/list"
+		hx-get="/metrics/list"
 		hx-target="this"
-		hx-trigger="reload-printing-list from:body"
+		hx-trigger="reload-metrics-list from:body"
 		hx-swap="outerHTML"
 	>
 		for _, m := range metrics {
@@ -19,5 +23,257 @@ templ MetricsList(metrics []*models.Metrics) {
 }
 
 templ MetricsCard(m *models.Metrics) {
+	<li
+		id={ metricsCardID(m) }
+		class="relative rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
+	>
+		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">
+			@shared.OperationStatus(m)
+		</h3>
+		<ul class="flex flex-col gap-1 p-2 pb-0 sm:w-10/12 md:w-9/12">
+			<li class="md:truncate"><span class="font-medium">Entidade:</span> { m.Entity.Name }</li>
+			<li class="md:truncate"><span class="font-medium">Desde:</span> { utils.FormatDateAsBR(m.StartDate) } </li>
+			<li class="md:truncate"><span class="font-medium">Até:</span> { utils.FormatDateAsBR(m.EndDate) } </li>
+		</ul>
+		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-2 sm:p-0">
+			<div
+				onclick={ scripts.OpenDialogWithEvent(metricsDetailsDialogTarget(m), metricsResultsEventName(m)) }
+				title="Ver detalhes"
+			>
+				@shared.WarningButton("xs") {
+					@shared.IconSm("eye")
+				}
+			</div>
+			<div
+				hx-get={ fmt.Sprintf("/metrics/%d/form", m.ID) }
+				hx-target="#metrics-form"
+				hx-swap="outerHTML"
+				hx-trigger="click"
+				title="Usar como modelo"
+			>
+				@shared.InfoButton("xs") {
+					@shared.IconSm("edit")
+				}
+			</div>
+		</div>
+		@MetricsDetailsDialog(m)
+	</li>
+}
 
+templ MetricsDetailsDialog(m *models.Metrics) {
+	<dialog id={ metricsDetailsDialogID(m) } class="w-full rounded sm:w-10/12 md:w-9/12 lg:w-7/12">
+		<div class="rounded border border-gray-200 p-2 shadow shadow-gray-300">
+			<div class="relative rounded border border-gray-300 p-2">
+				<h3 class="flex items-center gap-2 break-words rounded text-base font-bold">
+					@shared.OperationStatus(m)
+				</h3>
+				<div
+					class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1"
+					onclick={ scripts.CloseDialog(metricsDetailsDialogTarget(m)) }
+				>
+					@shared.Icon("x-circle")
+				</div>
+			</div>
+			if m.ReqStatus != "pending" && m.ReqStatus != "success" && m.ReqMsg != "" {
+				<div class="border-b p-2 text-base">
+					<pre>{ m.ReqMsg }</pre>
+				</div>
+			}
+			<ul class="grid gap-2 p-2 sm:grid-cols-2 md:grid-cols-3">
+				<li><span class="font-medium">Entidade:</span> { m.Entity.Name }</li>
+				<li><span class="font-medium">Data inicial:</span> { utils.FormatDateAsBR(m.StartDate) }</li>
+				<li><span class="font-medium">Data final:</span> { utils.FormatDateAsBR(m.EndDate) }</li>
+			</ul>
+			if m.ReqStatus != "pending" {
+				@MetricsResultsDetails(m)
+			}
+		</div>
+	</dialog>
+}
+
+templ MetricsResultsDetails(m *models.Metrics) {
+	<div id={ metricsResultsDetailsID(m) }>
+		<div class="border-t p-2">
+			if m.Total.TotalRecords == 0 && len(m.Months) == 0 && len(m.Records) == 0 {
+				<div
+					class="mt-2"
+					hx-trigger={ fmt.Sprintf("click, %s from:document", metricsResultsEventName(m)) }
+					hx-get={ fmt.Sprintf("/metrics/%d/results-details", m.ID) }
+					hx-target={ metricsResultsDetailsTarget(m) }
+					hx-swap="outerHTML"
+					hx-indicator={ loadMetricsResultsIndicatorTarget(m) }
+				>
+					@shared.DefaultButtonOutline("xs") {
+						<span id={ loadMetricsResultsIndicatorID(m) }>
+							@shared.LoadingIconSm()
+						</span>
+						<span>Carregar resultados</span>
+					}
+				</div>
+			}
+		</div>
+		<div class="grid grid-cols-1 gap-2">
+			if m.Total.TotalRecords != 0 {
+				<section class="rounded border border-gray-400">
+					<header
+						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m), metricsResultChevronIconTarget(m)) }
+						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+					>
+						<h3 class="text-lg">Geral</h3>
+						<div id={ metricsResultChevronIconID(m) }>
+							@shared.IconSm("chevron-up")
+						</div>
+					</header>
+					<div id={ metricsResultDataID(m) }>
+						@MetricsResultData(m.Total)
+					</div>
+				</section>
+			}
+			if len(m.Months) != 0 {
+				<section class="rounded border border-gray-400">
+					<header
+						onclick={ scripts.ToggleAccordion(metricsResultsDetailsTarget(m), metricsResultChevronIconTarget(m)) }
+						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+					>
+						<h3 class="text-lg">Mensal</h3>
+						<div id={ metricsResultChevronIconID(m) }>
+							@shared.IconSm("chevron-down")
+						</div>
+					</header>
+					<div id={ metricsResultDataID(m) } class="hidden">
+						for _, month := range m.Months {
+							<h4 class="px-4 pt-2 text-lg">{ month.MonthName }</h4>
+							@MetricsResultData(month)
+							<hr/>
+						}
+					</div>
+				</section>
+			}
+			if len(m.Records) != 0 {
+				<section class="rounded border border-gray-400">
+					<header
+						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m), metricsResultChevronIconTarget(m)) }
+						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+					>
+						<h3 class="text-lg">Individual</h3>
+						<div id={ metricsResultChevronIconID(m) }>
+							@shared.IconSm("chevron-down")
+						</div>
+					</header>
+					<div id={ metricsResultDataID(m) } class="hidden">
+						for _, r := range m.Records {
+							<div class="relative">
+								<h4 class="px-4 pt-2 text-lg">NFA-{ r.InvoiceNumber }</h4>
+								@MetricsResultData(r)
+								<hr/>
+							</div>
+						}
+					</div>
+				</section>
+			}
+		</div>
+	</div>
+}
+
+templ MetricsResultData(r *models.MetricsResult) {
+	<ul class="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
+		if r.Type == "record" {
+			<li>
+				<strong>Lucro</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>
+			</li>
+			<li>
+				<strong>Despesa</strong>: <span class="text-red-600">R$ { r.TotalExpenses }</span>
+			</li>
+			<li>
+				<strong>Data de emissão</strong>: <span>{ utils.FormatDateAsBR(r.IssueDate) } </span>
+			</li>
+			<div class="absolute right-4 top-3 sm:col-span-2 lg:col-span-3">
+				@shared.DefaultButton("xs") {
+					@shared.IconSm("download-cloud")
+				}
+			</div>
+		} else {
+			<li>
+				<strong>Lucro total</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>
+			</li>
+			<li>
+				<strong>Despesa total</strong>: <span class="text-red-600">R$ { r.TotalExpenses }</span>
+			</li>
+			<li>
+				<strong>Diferença</strong>: 
+				<span
+					if r.IsPositive {
+						class="text-green-600"
+					} else {
+						class="text-red-600"
+					}
+				>
+					R$ { r.Diff }
+				</span>
+			</li>
+			<li>
+				<strong>Lucro médio</strong>: <span class="text-green-600">R$ { r.AvgIncome }</span>
+			</li>
+			<li>
+				<strong>Despesa média</strong>: <span class="text-red-600">R$ { r.AvgExpenses }</span>
+			</li>
+			<li>
+				<strong>Total de transações</strong>: <span>{ strconv.Itoa(r.TotalRecords) }</span>
+			</li>
+			<li>
+				<strong>Vendas</strong>: <span>{ strconv.Itoa(r.PositiveRecords) }</span>
+			</li>
+			<li>
+				<strong>Compras</strong>: <span>{ strconv.Itoa(r.NegativeRecords) }</span>
+			</li>
+		}
+	</ul>
+}
+
+func metricsCardID(m *models.Metrics) string {
+	return fmt.Sprintf("metrics-card-%d", m.ID)
+}
+
+func metricsDetailsDialogID(m *models.Metrics) string {
+	return fmt.Sprintf("metrics-details-%d", m.ID)
+}
+
+func metricsDetailsDialogTarget(m *models.Metrics) string {
+	return fmt.Sprintf("#metrics-details-%d", m.ID)
+}
+
+func metricsResultsDetailsID(m *models.Metrics) string {
+	return fmt.Sprintf("metrics-results-details-%d", m.ID)
+}
+
+func metricsResultsDetailsTarget(m *models.Metrics) string {
+	return fmt.Sprintf("#metrics-results-details-%d", m.ID)
+}
+
+func metricsResultsEventName(m *models.Metrics) string {
+	return fmt.Sprintf("load-metrics-results-%d", m.ID)
+}
+
+func loadMetricsResultsIndicatorID(m *models.Metrics) string {
+	return fmt.Sprintf("metrics-results-indicator-%d", m.ID)
+}
+
+func loadMetricsResultsIndicatorTarget(m *models.Metrics) string {
+	return fmt.Sprintf("#metrics-results-indicator-%d", m.ID)
+}
+
+func metricsResultDataID(m *models.Metrics) string {
+	return fmt.Sprintf("metrics-results-%s-%d", m.Type, m.ID)
+}
+
+func metricsResultDataTarget(m *models.Metrics) string {
+	return fmt.Sprintf("#metrics-results-%s-%d", m.Type, m.ID)
+}
+
+func metricsResultChevronIconID(m *models.Metrics) string {
+	return fmt.Sprintf("chevron-%s-%d", m.Type, m.ID)
+}
+
+func metricsResultChevronIconTarget(m *models.Metrics) string {
+	return fmt.Sprintf("#chevron-%s-%d", m.Type, m.ID)
 }

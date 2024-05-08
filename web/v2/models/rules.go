@@ -364,7 +364,7 @@ func NotAfter(dt time.Time) RuleFunc {
 	}
 }
 
-func MaxTimeRange(dt time.Time, days int) RuleFunc {
+func MaxTimeRange(dt time.Time, maxDays int) RuleFunc {
 	return func() *RuleSet {
 		return &RuleSet{
 			MessageFunc: func(rs *RuleSet) string {
@@ -373,7 +373,8 @@ func MaxTimeRange(dt time.Time, days int) RuleFunc {
 			ValidateFunc: func(rs *RuleSet) bool {
 				switch val := rs.FieldValue.(type) {
 				case time.Time:
-					return int(dt.Sub(val).Hours()/24) > days
+					diffInDays := int(dt.Sub(val).Hours()/24)
+					return diffInDays <= maxDays
 				}
 
 				return false

@@ -1,6 +1,6 @@
 package scripts
 
-script OpenDialog(target string, events ...string) {
+script OpenDialog(target string) {
 	const dialog = document.querySelector(target)	
 	if (dialog) {
 		dialog.showModal()

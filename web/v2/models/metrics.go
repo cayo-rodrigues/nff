@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -45,6 +46,7 @@ type MetricsResult struct {
 	IssueDate       time.Time        `json:"issue_date"`
 	Months          []*MetricsResult `json:"months"`
 	Records         []*MetricsResult `json:"records"`
+	Total           *MetricsResult   `json:"total"`
 	MetricsID       int              `json:"-"`
 	EntityID        int              `json:"-"`
 	CreatedBy       int              `json:"-"`
@@ -53,14 +55,20 @@ type MetricsResult struct {
 
 func NewMetrics() *Metrics {
 	return &Metrics{
-		Entity:        NewEntity(),
-		MetricsResult: &MetricsResult{},
-		EndDate:       time.Now(),
+		Entity: NewEntity(),
+		MetricsResult: &MetricsResult{
+			Months:  []*MetricsResult{},
+			Records: []*MetricsResult{},
+			Total:   &MetricsResult{},
+		},
+		EndDate: time.Now(),
 	}
 
 }
 
 func NewMetricsFromForm(c *fiber.Ctx) *Metrics {
+	m := NewMetrics()
+
 	startDate, err := utils.ParseDate(strings.TrimSpace(c.FormValue("start_date")))
 	if err != nil {
 		log.Println("Error converting input start date string to time.Time:", err)
@@ -69,12 +77,16 @@ func NewMetricsFromForm(c *fiber.Ctx) *Metrics {
 	if err != nil {
 		log.Println("Error converting input end date string to time.Time:", err)
 	}
-
-	return &Metrics{
-		StartDate:     startDate,
-		EndDate:       endDate,
-		MetricsResult: &MetricsResult{},
+	entityID, err := strconv.Atoi(c.FormValue("entity"))
+	if err != nil {
+		entityID = 0
 	}
+
+	m.Entity.ID = entityID
+	m.StartDate = startDate
+	m.EndDate = endDate
+
+	return m
 }
 
 func (m *Metrics) IsValid() bool {
@@ -96,11 +108,9 @@ func (m *Metrics) IsValid() bool {
 }
 
 func (m *Metrics) Values() []any {
-	// TODO
-	// ELIMINAR COLUNAS REDUNDANTES EM METRICS E PASSAR DADOS PARA TABELA DE METRICS RESULT COM UM TYPE "total"
 	return []any{
-		&m.ID, &m.StartDate, &m.EndDate, &m.Entity.ID,
-		&m.CreatedBy, &m.CreatedAt, &m.UpdatedAt,
+		&m.ID, &m.StartDate, &m.EndDate, &m.ReqStatus, &m.ReqMsg,
+		&m.Entity.ID, &m.CreatedBy, &m.CreatedAt, &m.UpdatedAt,
 	}
 }
 
