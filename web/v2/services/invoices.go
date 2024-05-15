@@ -18,7 +18,9 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice, userID int) err
 }
 
 func ListInvoices(ctx context.Context, userID int) ([]*models.Invoice, error) {
-	return storage.ListInvoices(ctx, userID, map[string]string{})
+	f := models.NewFilters().Where("invoices.created_by = ").Placeholder(userID)
+	f.OrderBy("invoices.created_at").Desc()
+	return storage.ListInvoices(ctx, userID, f)
 }
 
 func RetrieveInvoice(ctx context.Context, invoiceID int, userID int) (*models.Invoice, error) {

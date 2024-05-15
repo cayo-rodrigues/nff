@@ -8,7 +8,9 @@ import (
 )
 
 func ListCancelings(ctx context.Context, userID int) ([]*models.InvoiceCancel, error) {
-	return storage.ListInvoiceCancelings(ctx, userID, map[string]string{})
+	f := models.NewFilters().Where("invoices_cancelings.created_by = ").Placeholder(userID)
+	f.OrderBy("invoices_cancelings.created_at").Desc()
+	return storage.ListInvoiceCancelings(ctx, userID, f)
 }
 
 func CreateCanceling(ctx context.Context, c *models.InvoiceCancel, userID int) error {

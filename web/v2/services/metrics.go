@@ -8,7 +8,9 @@ import (
 )
 
 func ListMetrics(ctx context.Context, userID int) ([]*models.Metrics, error) {
-	return storage.ListMetrics(ctx, userID, map[string]string{})
+	f := models.NewFilters().Where("metrics_history.created_by = ").Placeholder(userID)
+	f.OrderBy("metrics_history.created_at")
+	return storage.ListMetrics(ctx, userID, f)
 }
 
 func CreateMetrics(ctx context.Context, c *models.Metrics, userID int) error {

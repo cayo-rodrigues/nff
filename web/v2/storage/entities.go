@@ -12,28 +12,22 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func ListEntities(ctx context.Context, userID int, filters ...map[string]string) (entities []*models.Entity, err error) {
-	namespace := "entities"
+func ListEntities(ctx context.Context, userID int, filters *models.Filters) (entities []*models.Entity, err error) {
+	// namespace := "entities"
 
 	db := database.GetDB()
 
-	if len(filters) == 0 {
-		if db.Redis.GetDecodedCache(ctx, userID, namespace, &entities); entities != nil {
-			return entities, nil
-		}
-	}
+	// if len(filters) == 0 {
+	// 	if db.Redis.GetDecodedCache(ctx, userID, namespace, &entities); entities != nil {
+	// 		return entities, nil
+	// 	}
+	// }
 
 	query := new(strings.Builder)
-	query.WriteString("SELECT * FROM entities ")
+	query.WriteString("SELECT * FROM entities")
+	query.WriteString(filters.String())
 
-	var vals []any
-	if len(filters) > 0 {
-		vals = BuildQueryFilters(query, filters[0], userID, "entities")
-	}
-
-	query.WriteString(" ORDER BY name")
-
-	rows, _ := db.PG.Query(ctx, query.String(), vals...)
+	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
 
 	for rows.Next() {
@@ -46,7 +40,7 @@ func ListEntities(ctx context.Context, userID int, filters ...map[string]string)
 		entities = append(entities, entity)
 	}
 
-	db.Redis.SetEncodedCache(ctx, userID, namespace, entities, time.Hour)
+	// db.Redis.SetEncodedCache(ctx, userID, namespace, entities, time.Hour)
 
 	return entities, nil
 }

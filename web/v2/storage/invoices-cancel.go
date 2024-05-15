@@ -14,7 +14,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func ListInvoiceCancelings(ctx context.Context, userID int, filters map[string]string) ([]*models.InvoiceCancel, error) {
+func ListInvoiceCancelings(ctx context.Context, userID int, filters *models.Filters) ([]*models.InvoiceCancel, error) {
 	var query strings.Builder
 
 	query.WriteString(`
@@ -23,13 +23,11 @@ func ListInvoiceCancelings(ctx context.Context, userID int, filters map[string]s
 				JOIN entities ON entities.id = invoices_cancelings.entity_id
 	`)
 
-	params := BuildQueryFilters(&query, filters, userID, "invoices_cancelings")
-
-	query.WriteString(" ORDER BY invoices_cancelings.created_at DESC")
+	query.WriteString(filters.String())
 
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, query.String(), params...)
+	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
 
 	cancelings := []*models.InvoiceCancel{}

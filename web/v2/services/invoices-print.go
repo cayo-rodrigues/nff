@@ -8,7 +8,9 @@ import (
 )
 
 func ListPrintings(ctx context.Context, userID int) ([]*models.InvoicePrint, error) {
-	return storage.ListInvoicePrintings(ctx, userID, map[string]string{})
+	f := models.NewFilters().Where("invoices_printings.created_by = ").Placeholder(userID)
+	f.OrderBy("invoices_printings.created_at").Desc()
+	return storage.ListInvoicePrintings(ctx, userID, f)
 }
 
 func CreatePrinting(ctx context.Context, c *models.InvoicePrint, userID int) error {

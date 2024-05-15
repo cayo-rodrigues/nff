@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func ListInvoicePrintings(ctx context.Context, userID int, filters map[string]string) ([]*models.InvoicePrint, error) {
+func ListInvoicePrintings(ctx context.Context, userID int, filters *models.Filters) ([]*models.InvoicePrint, error) {
 	var query strings.Builder
 
 	query.WriteString(`
@@ -22,13 +22,11 @@ func ListInvoicePrintings(ctx context.Context, userID int, filters map[string]st
 				JOIN entities ON entities.id = invoices_printings.entity_id
 	`)
 
-	params := BuildQueryFilters(&query, filters, userID, "invoices_printings")
-
-	query.WriteString(" ORDER BY invoices_printings.created_at DESC")
+	query.WriteString(filters.String())
 
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, query.String(), params...)
+	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
 
 	printings := []*models.InvoicePrint{}

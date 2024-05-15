@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func ListMetrics(ctx context.Context, userID int, filters map[string]string) ([]*models.Metrics, error) {
+func ListMetrics(ctx context.Context, userID int, filters *models.Filters) ([]*models.Metrics, error) {
 	var query strings.Builder
 
 	query.WriteString(`
@@ -22,13 +22,11 @@ func ListMetrics(ctx context.Context, userID int, filters map[string]string) ([]
 			JOIN entities ON entities.id = metrics_history.entity_id
 	`)
 
-	params := BuildQueryFilters(&query, filters, userID, "metrics_history")
-
-	query.WriteString(" ORDER BY metrics_history.created_at")
+	query.WriteString(filters.String())
 
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, query.String(), params...)
+	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
 
 	metricsList := []*models.Metrics{}

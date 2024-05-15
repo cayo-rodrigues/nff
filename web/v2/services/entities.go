@@ -13,7 +13,17 @@ func CreateEntity(ctx context.Context, entity *models.Entity, userID int) error 
 }
 
 func ListEntities(ctx context.Context, userID int, filters ...map[string]string) ([]*models.Entity, error) {
-	return storage.ListEntities(ctx, userID, filters...)
+	f := models.NewFilters().Where("created_by = ").Placeholder(userID)
+
+	for _, filter := range filters {
+		if name, ok := filter["name"]; ok {
+			f.And("name").ILike().WildPlaceholder(name)
+		}
+	}
+
+	f.OrderBy("name")
+
+	return storage.ListEntities(ctx, userID, f)
 }
 
 func RetrieveEntity(ctx context.Context, entityID int, userID int) (*models.Entity, error) {

@@ -13,7 +13,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func ListInvoices(ctx context.Context, userID int, filters map[string]string) ([]*models.Invoice, error) {
+func ListInvoices(ctx context.Context, userID int, filters *models.Filters) ([]*models.Invoice, error) {
 	var query strings.Builder
 
 	query.WriteString(`
@@ -23,13 +23,11 @@ func ListInvoices(ctx context.Context, userID int, filters map[string]string) ([
 				JOIN entities AS recipients ON invoices.recipient_id = recipients.id
 	`)
 
-	params := BuildQueryFilters(&query, filters, userID, "invoices")
-
-	query.WriteString(" ORDER BY invoices.created_at DESC")
+	query.WriteString(filters.String())
 
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, query.String(), params...)
+	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
 
 	invoices := []*models.Invoice{}
