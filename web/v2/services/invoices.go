@@ -2,9 +2,11 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
+	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
 func CreateInvoice(ctx context.Context, invoice *models.Invoice, userID int) error {
@@ -17,8 +19,21 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice, userID int) err
 	return storage.BulkCreateInvoiceItems(ctx, invoice.Items, invoice.ID, userID)
 }
 
-func ListInvoices(ctx context.Context, userID int) ([]*models.Invoice, error) {
+func ListInvoices(ctx context.Context, userID int, filters ...map[string]string) ([]*models.Invoice, error) {
 	f := models.NewFilters().Where("invoices.created_by = ").Placeholder(userID)
+
+	for _, filter := range filters {
+		_, fromDateOk := filter["from_date"]
+		_, toDateOk := filter["to_date"]
+
+		if fromDateOk && toDateOk {
+			now := time.Now()
+			fromDate := utils.FormatedNDaysBefore(now, utils.DefaultFiltersDaysRange)
+			toDate := utils.FormatDate(now)
+			f.And().AsDate("invoices.created_at").Between(fromDate, toDate)
+		}
+	}
+
 	f.OrderBy("invoices.created_at").Desc()
 	return storage.ListInvoices(ctx, userID, f)
 }

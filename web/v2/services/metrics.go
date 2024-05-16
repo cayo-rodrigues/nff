@@ -25,6 +25,7 @@ func ListMetrics(ctx context.Context, userID int, filters ...map[string]string) 
 	}
 
 	f.OrderBy("metrics_history.created_at")
+
 	return storage.ListMetrics(ctx, userID, f)
 }
 
