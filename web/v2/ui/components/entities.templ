@@ -105,7 +105,8 @@ templ SearchBar() {
 		<input 
 			class="w-full rounded-e py-2 pr-2 outline-0"
 			type="text"
-			name="name"
+			name="q"
+			placeholder="Nome, IE, CPF/CNPJ, E-mail ou Tipo"
 			hx-get="/entities/search"
 			hx-trigger="keyup delay:0.2s"
 			hx-target="#entity-list"

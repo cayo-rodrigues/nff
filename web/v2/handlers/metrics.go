@@ -33,11 +33,6 @@ func MetricsPage(c *fiber.Ctx) error {
 func GenerateMetrics(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
 
-	entities, err := services.ListEntities(c.Context(), userID)
-	if err != nil {
-		return err
-	}
-
 	metrics := models.NewMetricsFromForm(c)
 
 	entity, err := services.RetrieveEntity(c.Context(), metrics.Entity.ID, userID)
@@ -52,6 +47,11 @@ func GenerateMetrics(c *fiber.Ctx) error {
 			return err
 		}
 		c.Set("HX-Trigger-After-Swap", "reload-metrics-list")
+	}
+
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
 	}
 
 	return Render(c, forms.MetricsForm(metrics, entities))
@@ -70,17 +70,17 @@ func ListMetrics(c *fiber.Ctx) error {
 func GetMetricsForm(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
 
-	entities, err := services.ListEntities(c.Context(), userID)
-	if err != nil {
-		return err
-	}
-
 	baseMetricsID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
 	baseMetrics, err := services.RetrieveMetrics(c.Context(), baseMetricsID, userID)
+	if err != nil {
+		return err
+	}
+
+	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
 		return err
 	}

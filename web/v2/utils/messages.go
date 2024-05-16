@@ -33,5 +33,5 @@ const (
 )
 
 const (
-	DefaultFiltersDaysRange = 30
+	DefaultFiltersDaysRange = 7
 )

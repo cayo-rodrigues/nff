@@ -15,13 +15,43 @@ func (f *Filters) Where(condition string) *Filters {
 	return f
 }
 
-func (f *Filters) And(condition string) *Filters {
-	f.query.WriteString(" AND " + condition)
+func (f *Filters) And(condition ...string) *Filters {
+	conditionsCount := len(condition)
+	if conditionsCount == 0 {
+		f.query.WriteString(" AND ")
+		return f
+	}
+
+	if conditionsCount == 1 {
+		f.query.WriteString(" AND " + condition[0])
+		return f
+	}
+
+	cond := new(strings.Builder)
+	for _, c := range condition {
+		cond.WriteString(c)
+	}
+	f.query.WriteString(" AND " + cond.String())
 	return f
 }
 
-func (f *Filters) Or() *Filters {
-	f.query.WriteString(" OR ")
+func (f *Filters) Or(condition ...string) *Filters {
+	conditionsCount := len(condition)
+	if conditionsCount == 0 {
+		f.query.WriteString(" OR ")
+		return f
+	}
+
+	if conditionsCount == 1 {
+		f.query.WriteString(" OR " + condition[0])
+		return f
+	}
+
+	cond := new(strings.Builder)
+	for _, c := range condition {
+		cond.WriteString(c)
+	}
+	f.query.WriteString(" OR " + cond.String())
 	return f
 }
 
@@ -57,6 +87,22 @@ func (f *Filters) Asc() *Filters {
 
 func (f *Filters) Desc() *Filters {
 	f.query.WriteString(" DESC ")
+	return f
+}
+
+func (f *Filters) Between(x, y any) *Filters  {
+	f.query.WriteString(" BETWEEN ")
+	f.Placeholder(x).And("").Placeholder(y)
+	return f
+}
+
+func (f *Filters) Cast(col, colType string) *Filters {
+	f.query.WriteString(fmt.Sprintf("CAST(%s AS %s)", col, colType))
+	return f
+}
+
+func (f *Filters) AsDate(col string) *Filters {
+	f.Cast(col, "DATE")
 	return f
 }
 

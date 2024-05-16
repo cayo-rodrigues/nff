@@ -16,8 +16,12 @@ func ListEntities(ctx context.Context, userID int, filters ...map[string]string)
 	f := models.NewFilters().Where("created_by = ").Placeholder(userID)
 
 	for _, filter := range filters {
-		if name, ok := filter["name"]; ok {
-			f.And("name").ILike().WildPlaceholder(name)
+		if q, ok := filter["q"]; ok {
+			f.And("name").ILike().WildPlaceholder(q)
+			f.Or("cpf_cnpj").ILike().WildPlaceholder(q)
+			f.Or("ie").ILike().WildPlaceholder(q)
+			f.Or("user_type").ILike().WildPlaceholder(q)
+			f.Or("email").ILike().WildPlaceholder(q)
 		}
 	}
 
