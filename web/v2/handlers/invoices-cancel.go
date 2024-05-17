@@ -58,7 +58,8 @@ func CancelInvoice(c *fiber.Ctx) error {
 
 func ListInvoiceCancelings(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
-	cancelings, err := services.ListCancelings(c.Context(), userID)
+	filters := c.Queries()
+	cancelings, err := services.ListCancelings(c.Context(), userID, filters)
 	if err != nil {
 		return err
 	}

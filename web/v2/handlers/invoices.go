@@ -113,3 +113,14 @@ func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
 
 	return Render(c, components.InvoiceItemsDetails(invoice))
 }
+
+func ListInvoices(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
+	filters := c.Queries()
+	invoices, err := services.ListInvoices(c.Context(), userID, filters)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoiceList(invoices))
+}

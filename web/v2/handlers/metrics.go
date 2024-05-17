@@ -59,7 +59,8 @@ func GenerateMetrics(c *fiber.Ctx) error {
 
 func ListMetrics(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
-	metrics, err := services.ListMetrics(c.Context(), userID)
+	filters := c.Queries()
+	metrics, err := services.ListMetrics(c.Context(), userID, filters)
 	if err != nil {
 		return err
 	}

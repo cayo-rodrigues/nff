@@ -58,7 +58,8 @@ func PrintInvoice(c *fiber.Ctx) error {
 
 func ListInvoicePrintings(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
-	printings, err := services.ListPrintings(c.Context(), userID)
+	filters := c.Queries()
+	printings, err := services.ListPrintings(c.Context(), userID, filters)
 	if err != nil {
 		return err
 	}
