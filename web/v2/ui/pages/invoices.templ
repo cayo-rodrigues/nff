@@ -7,7 +7,7 @@ import "github.com/cayo-rodrigues/nff/web/ui/forms"
 
 templ InvoicesPage(invoices []*models.Invoice) {
 	<div class="flex flex-col gap-3">
-		<div class="flex flex-col gap-2 sm:flex-row">
+		<div class="flex flex-col gap-2 border-b pb-3 sm:flex-row">
 			<a href="/invoices/create" hx-boost="true">
 				@shared.SuccessButton("sm") {
 					@shared.Icon("file-plus")
@@ -25,6 +25,6 @@ templ InvoicesPage(invoices []*models.Invoice) {
 
 templ InvoiceFormPage(invoice *models.Invoice, entities []*models.Entity) {
 	<div class="m-auto xl:w-10/12">
-		@forms.InvoiceForm(invoice, entities)	
-	</div>	
+		@forms.InvoiceForm(invoice, entities)
+	</div>
 }
