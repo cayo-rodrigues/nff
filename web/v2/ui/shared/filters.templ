@@ -3,6 +3,7 @@ package shared
 import "fmt"
 import "github.com/cayo-rodrigues/nff/web/utils"
 import "time"
+import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 
 templ FiltersByDate(listTarget string, endpoint string) {
 	<div class="mt-2 w-full md:w-fit 2xl:col-span-2 2xl:mt-0 2xl:w-full">
@@ -37,6 +38,8 @@ templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
 		hx-target={ listTarget }
 		hx-swap="outerHTML"
 		hx-trigger="click"
+		id={ fmt.Sprintf("filter-button-%d", daysRange) }
+		onclick={ scripts.HighlightButton(filterButtonTarget(daysRange), "default-outline") }
 	>
 		@DefaultButtonOutline("xs") {
 			<span>
@@ -48,4 +51,8 @@ templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
 
 func listUrl(endpoint string, daysRange int) string {
 	return fmt.Sprintf("%s?from_date=%s&to_date=%s", endpoint, utils.FormatedNDaysBefore(time.Now(), daysRange), utils.FormatDate(time.Now()))
+}
+
+func filterButtonTarget(daysRange int) string {
+	return fmt.Sprintf("#filter-button-%d > button", daysRange)
 }
