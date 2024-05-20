@@ -2,7 +2,7 @@ package scripts
 
 script HighlightButton(target string, theme string) {
     const classesByTheme = {
-        'default-outline': ['font-medium', 'bg-gray-200', 'highlighted']
+        'default-outline': ['font-medium', 'bg-gray-200', 'border-gray-400', 'highlighted']
     }
     const classes = classesByTheme[theme] || classesByTheme['default-outline']
 
