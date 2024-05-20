@@ -1,7 +1,9 @@
 package shared
 
+import "fmt"
+
 templ Button(theme string, size string, attrs templ.Attributes) {
-	<button class={ getButtonClassesByTheme(theme, size) } { attrs... }>
+	<button class={ GetButtonClassesByTheme(theme, size) } { attrs... }>
 		{ children... }
 	</button>
 }
@@ -42,13 +44,20 @@ templ DefaultButton(size string) {
 	}
 }
 
-templ DefaultButtonOutline(size string) {
-	@Button("default-outline", size, templ.Attributes{"type": "button"}) {
+templ DefaultButtonOutline(size string, active ...bool) {
+	@Button(getThemeByActiveStatus("default-outline", active...), size, templ.Attributes{"type": "button"}) {
 		{ children... }
 	}
 }
 
-func getButtonClassesByTheme(theme string, size string) string {
+func getThemeByActiveStatus(theme string, active ...bool) string {
+	if len(active) > 0 && active[0] == true {
+		return fmt.Sprintf("%s-active", theme)
+	}
+	return theme
+}
+
+func GetButtonClassesByTheme(theme string, size string) string {
 	classes := "flex w-full transition border items-center justify-center rounded gap-3"
 
 	colors := ""
@@ -67,6 +76,8 @@ func getButtonClassesByTheme(theme string, size string) string {
 		colors = "bg-gray-300 border-gray-400 hover:bg-gray-400 active:bg-gray-500"
 	case "default-outline":
 		colors = "border-gray-300 hover:bg-gray-200 active:bg-gray-300"
+	case "default-outline-active":
+		colors = "bg-gray-200 border-gray-300 hover:bg-gray-200 active:bg-gray-300 font-medium highlighted"
 	}
 
 	switch size {

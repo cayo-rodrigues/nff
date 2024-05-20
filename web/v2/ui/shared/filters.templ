@@ -41,16 +41,27 @@ templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
 		id={ fmt.Sprintf("filter-button-%d", daysRange) }
 		onclick={ scripts.HighlightButton(filterButtonTarget(daysRange), "default-outline") }
 	>
-		@DefaultButtonOutline("xs") {
-			<span>
-				{ children... }
-			</span>
+		if daysRange == 7 {
+			@DefaultButtonOutline("xs", true) {
+				<span>
+					{ children... }
+				</span>
+			}
+		} else {
+			@DefaultButtonOutline("xs") {
+				<span>
+					{ children... }
+				</span>
+			}
 		}
 	</div>
 }
 
 func listUrl(endpoint string, daysRange int) string {
-	return fmt.Sprintf("%s?from_date=%s&to_date=%s", endpoint, utils.FormatedNDaysBefore(time.Now(), daysRange), utils.FormatDate(time.Now()))
+	now := time.Now()
+	from := utils.FormatedNDaysBefore(now, daysRange)
+	to := utils.FormatDate(now)
+	return fmt.Sprintf("%s?from_date=%s&to_date=%s", endpoint, from, to)
 }
 
 func filterButtonTarget(daysRange int) string {
