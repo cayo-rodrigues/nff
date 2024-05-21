@@ -43,6 +43,26 @@ func FormatDateAsBR(date time.Time) string {
 	return date.Format("02/01/2006")
 }
 
+func IsToday(date string) bool {
+	today := FormatDate(time.Now())
+	return today == date
+}
+
+func IsTodayBR(date string) bool {
+	today := FormatDateAsBR(time.Now())
+	return today == date
+}
+
+func IsYesterday(date string) bool {
+	yesterday := time.Now().AddDate(0, 0, -1)
+	return date == FormatDate(yesterday)
+}
+
+func IsYesterdayBR(date string) bool {
+	yesterday := time.Now().AddDate(0, 0, -1)
+	return date == FormatDateAsBR(yesterday)
+}
+
 func NDaysBefore(now time.Time, days int) time.Time {
 	return now.Add(-time.Duration(days) * 24 * time.Hour)
 }

@@ -25,9 +25,11 @@ func MetricsPage(c *fiber.Ctx) error {
 		return err
 	}
 
+	a := services.GroupListByDate(metricsList)
+
 	m := models.NewMetrics()
 
-	return Render(c, layouts.Base(pages.MetricsPage(metricsList, m, entities)))
+	return Render(c, layouts.Base(pages.MetricsPage(a, m, entities)))
 }
 
 func GenerateMetrics(c *fiber.Ctx) error {
@@ -65,7 +67,9 @@ func ListMetrics(c *fiber.Ctx) error {
 		return err
 	}
 
-	return Render(c, components.MetricsList(metrics))
+	a := services.GroupListByDate(metrics)
+
+	return Render(c, components.MetricsList(a))
 }
 
 func GetMetricsForm(c *fiber.Ctx) error {
