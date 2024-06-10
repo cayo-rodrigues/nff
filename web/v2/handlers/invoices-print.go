@@ -15,7 +15,10 @@ import (
 
 func PrintInvoicePage(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
-	printingsList, err := services.ListPrintings(c.Context(), userID)
+
+	filters := c.Queries()
+
+	printingsList, err := services.ListPrintings(c.Context(), userID, filters)
 	if err != nil {
 		return err
 	}
@@ -26,6 +29,7 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 	}
 	printingForForm := models.NewInvoicePrintWithSamples(entities)
 
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
 	return Render(c, layouts.Base(pages.InvoicesPrintPage(printingsList, printingForForm, entities)))
 }
 
@@ -50,7 +54,7 @@ func PrintInvoice(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		c.Set("HX-Trigger-After-Swap", "reload-printing-list")
+		c.Append("HX-Trigger-After-Swap", "reload-printing-list")
 	}
 
 	return Render(c, forms.PrintInvoiceForm(printing, entities))
@@ -85,6 +89,6 @@ func GetPrintInvoiceForm(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Set("HX-Trigger-After-Swap", "scroll-to-top")
+	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
 	return Render(c, forms.PrintInvoiceForm(basePrinting, entities))
 }

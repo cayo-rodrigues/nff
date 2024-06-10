@@ -16,7 +16,7 @@ templ InvoicesPage(invoices []*models.Invoice) {
 			</a>
 		</div>
 		<div class="grid grid-cols-1 items-center 2xl:grid-cols-5">
-			<h2 class="col-span-3 text-base font-medium">Histórico de Operações</h2>
+			<h2 class="col-span-3 text-base font-medium">Histórico de Operações (Notas Fiscais)</h2>
 			@shared.FiltersByDate("#invoice-list", "/invoices/list")
 		</div>
 		@components.InvoiceList(invoices)

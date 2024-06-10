@@ -18,8 +18,8 @@ func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.Comp
 }
 
 func RetargetResponse(c *fiber.Ctx, component templ.Component, hxTarget string, hxSwap string, options ...func(*templ.ComponentHandler)) error {
-	c.Set("HX-Retarget", hxTarget)
-	c.Set("HX-Reswap", hxSwap)
+	c.Append("HX-Retarget", hxTarget)
+	c.Append("HX-Reswap", hxSwap)
 	return Render(c, component, options...)
 }
 
@@ -29,6 +29,6 @@ func RetargetToForm(c *fiber.Ctx, resourceName string, form templ.Component, opt
 }
 
 func RetargetToPageHandler(c *fiber.Ctx, url string, pageHandler fiber.Handler) error {
-	c.Set("HX-Location", url)
+	c.Append("HX-Location", url)
 	return pageHandler(c)
 }

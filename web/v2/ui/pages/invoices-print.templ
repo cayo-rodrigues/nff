@@ -12,7 +12,7 @@ templ InvoicesPrintPage(printingsList []*models.InvoicePrint, printingForForm *m
 			@shared.ToggleElementVisibilityButton("#print-invoice-form")
 		</div>
 		<div class="grid grid-cols-1 items-center 2xl:grid-cols-5">
-			<h2 class="col-span-3 text-base font-medium">Histórico de Operações</h2>
+			<h2 class="col-span-3 text-base font-medium">Histórico de Operações (Impressões)</h2>
 			@shared.FiltersByDate("#printing-list", "/invoices/print/list")
 		</div>
 		@components.InvoicesPrintingsList(printingsList)

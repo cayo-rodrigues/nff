@@ -3,10 +3,9 @@ package shared
 import "fmt"
 import "github.com/cayo-rodrigues/nff/web/utils"
 import "time"
-import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 
 templ FiltersByDate(listTarget string, endpoint string) {
-	<div class="mt-2 w-full md:w-fit 2xl:col-span-2 2xl:mt-0 2xl:w-full">
+	<div id="filters-container" class="mt-2 w-full md:w-fit 2xl:col-span-2 2xl:mt-0 2xl:w-full">
 		<fieldset class="relative rounded border border-gray-300 text-center sm:text-start">
 			<legend class="-left-4 top-2 rounded border border-gray-300 bg-gray-200 p-1 text-center md:absolute">
 				@IconSm("filter")
@@ -22,7 +21,7 @@ templ FiltersByDate(listTarget string, endpoint string) {
 					Últimos 7 dias 
 				}
 				@DateFilterOption(listTarget, endpoint, 1) {
-					Ontem
+					Desde Ontem
 				}
 				@DateFilterOption(listTarget, endpoint, 0) {
 					Hoje
@@ -32,6 +31,11 @@ templ FiltersByDate(listTarget string, endpoint string) {
 	</div>
 }
 
+script OnClickDateFilterOption(target string, theme string, queryParams string) {
+	HighlightButton(target, theme)
+	AppendQueryParams(queryParams)
+}
+
 templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
 	<div
 		hx-get={ listUrl(endpoint, daysRange) }
@@ -39,29 +43,26 @@ templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
 		hx-swap="outerHTML"
 		hx-trigger="click"
 		id={ fmt.Sprintf("filter-button-%d", daysRange) }
-		onclick={ scripts.HighlightButton(filterButtonTarget(daysRange), "default-outline") }
+		onclick={ OnClickDateFilterOption(filterButtonTarget(daysRange), "default-outline", listQueryParams(daysRange)) }
 	>
-		if daysRange == 7 {
-			@DefaultButtonOutline("xs", true) {
-				<span>
-					{ children... }
-				</span>
-			}
-		} else {
-			@DefaultButtonOutline("xs") {
-				<span>
-					{ children... }
-				</span>
-			}
+		@DefaultButtonOutline("xs") {
+			<span>
+				{ children... }
+			</span>
 		}
 	</div>
 }
 
 func listUrl(endpoint string, daysRange int) string {
+	queryParams := listQueryParams(daysRange)
+	return fmt.Sprintf("%s?%s", endpoint, queryParams)
+}
+
+func listQueryParams(daysRange int) string {
 	now := time.Now()
 	from := utils.FormatedNDaysBefore(now, daysRange)
 	to := utils.FormatDate(now)
-	return fmt.Sprintf("%s?from_date=%s&to_date=%s", endpoint, from, to)
+	return fmt.Sprintf("from_date=%s&to_date=%s", from, to)
 }
 
 func filterButtonTarget(daysRange int) string {

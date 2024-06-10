@@ -20,7 +20,9 @@ func MetricsPage(c *fiber.Ctx) error {
 		return err
 	}
 
-	metricsList, err := services.ListMetrics(c.Context(), userID)
+	filters := c.Queries()
+
+	metricsList, err := services.ListMetrics(c.Context(), userID, filters)
 	if err != nil {
 		return err
 	}
@@ -29,6 +31,7 @@ func MetricsPage(c *fiber.Ctx) error {
 
 	m := models.NewMetrics()
 
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
 	return Render(c, layouts.Base(pages.MetricsPage(a, m, entities)))
 }
 
@@ -48,7 +51,7 @@ func GenerateMetrics(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		c.Set("HX-Trigger-After-Swap", "reload-metrics-list")
+		c.Append("HX-Trigger-After-Swap", "reload-metrics-list")
 	}
 
 	entities, err := services.ListEntities(c.Context(), userID)
@@ -90,7 +93,7 @@ func GetMetricsForm(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Set("HX-Trigger-After-Swap", "scroll-to-top")
+	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
 	return Render(c, forms.MetricsForm(baseMetrics, entities))
 }
 

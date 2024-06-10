@@ -15,7 +15,10 @@ import (
 
 func CancelInvoicePage(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
-	cancelingsList, err := services.ListCancelings(c.Context(), userID)
+
+	filters := c.Queries()
+
+	cancelingsList, err := services.ListCancelings(c.Context(), userID, filters)
 	if err != nil {
 		return err
 	}
@@ -26,6 +29,7 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 	}
 	cancelingForForm := models.NewInvoiceCancelWithSamples(entities)
 
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
 	return Render(c, layouts.Base(pages.InvoicesCancelingsPage(cancelingsList, cancelingForForm, entities)))
 }
 
@@ -50,7 +54,7 @@ func CancelInvoice(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		c.Set("HX-Trigger-After-Swap", "reload-canceling-list")
+		c.Append("HX-Trigger-After-Swap", "reload-canceling-list")
 	}
 
 	return Render(c, forms.CancelInvoiceForm(canceling, entities))
@@ -85,6 +89,6 @@ func GetCancelInvoiceForm(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Set("HX-Trigger-After-Swap", "scroll-to-top")
+	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
 	return Render(c, forms.CancelInvoiceForm(baseCanceling, entities))
 }

@@ -17,5 +17,7 @@ func handleDateFilters(colName string, query map[string]string, f *models.Filter
 		toDate = utils.FormatDate(now)
 	}
 
+	// verificar se o período selecionado é válido
+
 	f.And().AsDate(colName).Between(fromDate, toDate)
 }

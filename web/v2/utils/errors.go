@@ -18,12 +18,12 @@ var InternalServerErr = errors.New(InternalServerErrMsg)
 
 func ErrorResponse(c *fiber.Ctx, tmplName string, tmplData interface{}, event string) error {
 	// w.WriteHeader(statusCode)
-	c.Set("HX-Trigger-After-Settle", event)
+	c.Append("HX-Trigger-After-Settle", event)
 	return c.Render(tmplName, tmplData)
 }
 
 func GeneralErrorResponse(c *fiber.Ctx, err error) error {
-	c.Set("HX-Retarget", "#general-error-msg")
-	c.Set("HX-Reswap", "outerHTML")
+	c.Append("HX-Retarget", "#general-error-msg")
+	c.Append("HX-Reswap", "outerHTML")
 	return ErrorResponse(c, "partials/general-error", err.Error(), "general-error")
 }

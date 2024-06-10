@@ -81,6 +81,83 @@ function EnumerateInvoiceItems(itemsContainer = null) {
     document.querySelector('#items-count').innerText = itemSectionTitles.length
 }
 
+function HighlightButton(target, theme) {
+    const classesByTheme = {
+        'default-outline': ['font-medium', 'bg-gray-200', 'border-gray-400', 'highlighted']
+    }
+    const classes = classesByTheme[theme] || classesByTheme['default-outline']
+
+    document.querySelectorAll('.highlighted').forEach(btn => {
+        btn.classList.remove(...classes)
+    })
+
+    const btn = document.querySelector(target)
+    if (btn) {
+        btn.classList.add(...classes)
+    }
+}
+
+function AppendQueryParams(queryString) {
+    const url = new URL(window.location);
+    const params = new URLSearchParams(url.search);
+
+    queryString.split('&').forEach(param => {
+        const [key, val] = param.split('=')
+        params.set(key, val);
+    })
+
+    history.pushState(null, '', `${url.pathname}?${params.toString()}`);
+}
+
+function HighlightCurrentFilterButton() {
+    const url = new URL(window.location);
+    const params = new URLSearchParams(url.search)
+
+    const fromDate = params.get("from_date")
+    const toDate = params.get("to_date")
+
+    function calculateDaysRange(start, end) {
+        if (!start || !end) {
+            return 7
+        }
+
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        const oneDayInMs = 24 * 60 * 60 * 1000
+
+        if (isNaN(startDate) || isNaN(endDate)) {
+            return 7
+        }
+
+        return Math.round((endDate - startDate) / oneDayInMs)
+    }
+
+    const daysRange = calculateDaysRange(fromDate, toDate)
+
+    const filterButtonTarget = `#filters-container #filter-button-${daysRange}`
+    HighlightButton(filterButtonTarget, "default-outline")
+}
+
+function GetCurrentQueryString() {
+    const url = new URL(window.location);
+    const params = new URLSearchParams(url.search)
+
+    return params.toString()
+}
+
+function PreserveListFilters(event) {
+    const pagePaths = ['/metrics', '/invoices', '/invoices/cancel', '/invoices/print']
+    const reqPath = event.detail.path
+
+
+    const isListRequest = new RegExp('.*\/list$').test(reqPath)
+    const isPageRequest = pagePaths.includes(reqPath) && event.detail.verb === 'get'
+
+    if (isListRequest || isPageRequest) {
+        reqPath += `?${GetCurrentQueryString()}`
+    }
+}
+
 function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()
@@ -88,8 +165,18 @@ function Init() {
     document.addEventListener("rebuild-icons", () => {
         feather.replace()
     })
+
+    document.addEventListener("DOMContentLoaded", () => {
+        HighlightCurrentFilterButton()
+    })
+    document.addEventListener("highlight-current-filter", () => {
+        HighlightCurrentFilterButton()
+    })
+
     document.addEventListener("scroll-to-top", () => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     })
+
+    document.addEventListener('htmx:beforeRequest', PreserveListFilters)
 }
 Init()

@@ -1,17 +1,5 @@
 package scripts
 
 script HighlightButton(target string, theme string) {
-    const classesByTheme = {
-        'default-outline': ['font-medium', 'bg-gray-200', 'border-gray-400', 'highlighted']
-    }
-    const classes = classesByTheme[theme] || classesByTheme['default-outline']
-
-    document.querySelectorAll('.highlighted').forEach(btn => {
-        btn.classList.remove(...classes)       
-    })
-
-    const btn = document.querySelector(target)
-    if (btn) {
-        btn.classList.add(...classes)
-    }
+    HighlightButton(target, theme)
 }

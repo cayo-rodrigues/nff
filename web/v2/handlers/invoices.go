@@ -17,11 +17,14 @@ import (
 func InvoicesPage(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
 
-	invoices, err := services.ListInvoices(c.Context(), userID)
+	filters := c.Queries()
+
+	invoices, err := services.ListInvoices(c.Context(), userID, filters)
 	if err != nil {
 		return err
 	}
 
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
 	return Render(c, layouts.Base(pages.InvoicesPage(invoices)))
 }
 
@@ -96,6 +99,7 @@ func CreateInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
+	c.Append("HX-Trigger-After-Swap", "reload-invoice-list")
 	return RetargetToPageHandler(c, "/invoices", InvoicesPage)
 }
 
