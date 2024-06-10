@@ -29,8 +29,10 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 	}
 	printingForForm := models.NewInvoicePrintWithSamples(entities)
 
+	printingsByDate := services.GroupListByDate(printingsList)
+
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
-	return Render(c, layouts.Base(pages.InvoicesPrintPage(printingsList, printingForForm, entities)))
+	return Render(c, layouts.Base(pages.InvoicesPrintPage(printingsByDate, printingForForm, entities)))
 }
 
 func PrintInvoice(c *fiber.Ctx) error {
@@ -68,7 +70,9 @@ func ListInvoicePrintings(c *fiber.Ctx) error {
 		return err
 	}
 
-	return Render(c, components.InvoicesPrintingsList(printings))
+	printingsByDate := services.GroupListByDate(printings)
+
+	return Render(c, components.InvoicesPrintingsList(printingsByDate))
 }
 
 func GetPrintInvoiceForm(c *fiber.Ctx) error {

@@ -70,9 +70,9 @@ func ListMetrics(c *fiber.Ctx) error {
 		return err
 	}
 
-	a := services.GroupListByDate(metrics)
+	metricsByDate := services.GroupListByDate(metrics)
 
-	return Render(c, components.MetricsList(a))
+	return Render(c, components.MetricsList(metricsByDate))
 }
 
 func GetMetricsForm(c *fiber.Ctx) error {

@@ -24,8 +24,10 @@ func InvoicesPage(c *fiber.Ctx) error {
 		return err
 	}
 
+	invoicesByDate := services.GroupListByDate(invoices)
+
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
-	return Render(c, layouts.Base(pages.InvoicesPage(invoices)))
+	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate)))
 }
 
 func CreateInvoicePage(c *fiber.Ctx) error {
@@ -126,5 +128,7 @@ func ListInvoices(c *fiber.Ctx) error {
 		return err
 	}
 
-	return Render(c, components.InvoiceList(invoices))
+	invoicesByDate := services.GroupListByDate(invoices)
+
+	return Render(c, components.InvoiceList(invoicesByDate))
 }

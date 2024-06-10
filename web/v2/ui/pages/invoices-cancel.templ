@@ -5,7 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/models"
 import "github.com/cayo-rodrigues/nff/web/ui/forms"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 
-templ InvoicesCancelingsPage(cancelingsList []*models.InvoiceCancel, cancelingForForm *models.InvoiceCancel, entities []*models.Entity) {
+templ InvoicesCancelingsPage(cancelingsByDate []map[string][]*models.InvoiceCancel, cancelingForForm *models.InvoiceCancel, entities []*models.Entity) {
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-col gap-2">
 			@forms.CancelInvoiceForm(cancelingForForm, entities)
@@ -15,6 +15,6 @@ templ InvoicesCancelingsPage(cancelingsList []*models.InvoiceCancel, cancelingFo
 			<h2 class="col-span-3 text-base font-medium">Histórico de Operações (Cancelamentos)</h2>
 			@shared.FiltersByDate("#canceling-list", "/invoices/cancel/list")
 		</div>
-		@components.InvoicesCancelingsList(cancelingsList)
+		@components.InvoicesCancelingsList(cancelingsByDate)
 	</div>
 }

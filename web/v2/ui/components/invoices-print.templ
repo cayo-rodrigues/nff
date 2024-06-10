@@ -5,16 +5,26 @@ import "fmt"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 
-templ InvoicesPrintingsList(printings []*models.InvoicePrint) {
-	<ul
+templ InvoicesPrintingsList(printingsByDate []map[string][]*models.InvoicePrint) {
+	<section
 		id="printing-list"
-		class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
 		hx-get="/invoices/print/list"
 		hx-target="this"
 		hx-trigger="reload-printing-list from:body"
 		hx-swap="outerHTML"
 	>
-		for _, p := range printings {
+		for _, dailyGroup := range printingsByDate {
+			for date, printingsOfTheDay := range dailyGroup {
+				@InvoicePrintListRow(date, printingsOfTheDay)
+			}
+		}
+	</section>
+}
+
+templ InvoicePrintListRow(date string, printingsOfTheDay []*models.InvoicePrint) {
+	@shared.DateGroupSeparator(date)
+	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+		for _, p := range printingsOfTheDay {
 			@InvoicePrintCard(p)
 		}
 	</ul>

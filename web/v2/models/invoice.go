@@ -37,6 +37,10 @@ type Invoice struct {
 	Errors               ErrorMessages  `json:"-"`
 }
 
+func (i *Invoice) GetCreatedAt() time.Time {
+	return i.CreatedAt
+}
+
 func (i *Invoice) GetStatus() string {
 	return i.ReqStatus
 }

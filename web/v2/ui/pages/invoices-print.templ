@@ -5,7 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/models"
 import "github.com/cayo-rodrigues/nff/web/ui/forms"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 
-templ InvoicesPrintPage(printingsList []*models.InvoicePrint, printingForForm *models.InvoicePrint, entities []*models.Entity) {
+templ InvoicesPrintPage(pritingsByDate []map[string][]*models.InvoicePrint, printingForForm *models.InvoicePrint, entities []*models.Entity) {
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-col gap-2">
 			@forms.PrintInvoiceForm(printingForForm, entities)
@@ -15,6 +15,6 @@ templ InvoicesPrintPage(printingsList []*models.InvoicePrint, printingForForm *m
 			<h2 class="col-span-3 text-base font-medium">Histórico de Operações (Impressões)</h2>
 			@shared.FiltersByDate("#printing-list", "/invoices/print/list")
 		</div>
-		@components.InvoicesPrintingsList(printingsList)
+		@components.InvoicesPrintingsList(pritingsByDate)
 	</div>
 }

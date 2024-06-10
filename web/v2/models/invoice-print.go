@@ -25,8 +25,12 @@ type InvoicePrint struct {
 	Errors               ErrorMessages `json:"-"`
 }
 
-func (i *InvoicePrint) GetStatus() string {
-	return i.ReqStatus
+func (p *InvoicePrint) GetCreatedAt() time.Time {
+	return p.CreatedAt
+}
+
+func (p *InvoicePrint) GetStatus() string {
+	return p.ReqStatus
 }
 
 func NewInvoicePrint() *InvoicePrint {

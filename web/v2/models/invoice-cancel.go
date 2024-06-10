@@ -24,8 +24,12 @@ type InvoiceCancel struct {
 	Errors        ErrorMessages `json:"-"`
 }
 
-func (i *InvoiceCancel) GetStatus() string {
-	return i.ReqStatus
+func (c *InvoiceCancel) GetCreatedAt() time.Time {
+	return c.CreatedAt
+}
+
+func (c *InvoiceCancel) GetStatus() string {
+	return c.ReqStatus
 }
 
 func NewInvoiceCancel() *InvoiceCancel {

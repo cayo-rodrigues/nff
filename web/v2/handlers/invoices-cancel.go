@@ -29,8 +29,10 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 	}
 	cancelingForForm := models.NewInvoiceCancelWithSamples(entities)
 
+	canclingsByDate := services.GroupListByDate(cancelingsList)
+
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
-	return Render(c, layouts.Base(pages.InvoicesCancelingsPage(cancelingsList, cancelingForForm, entities)))
+	return Render(c, layouts.Base(pages.InvoicesCancelingsPage(canclingsByDate, cancelingForForm, entities)))
 }
 
 func CancelInvoice(c *fiber.Ctx) error {
@@ -68,7 +70,9 @@ func ListInvoiceCancelings(c *fiber.Ctx) error {
 		return err
 	}
 
-	return Render(c, components.InvoicesCancelingsList(cancelings))
+	cancelingsByDate := services.GroupListByDate(cancelings)
+
+	return Render(c, components.InvoicesCancelingsList(cancelingsByDate))
 }
 
 func GetCancelInvoiceForm(c *fiber.Ctx) error {

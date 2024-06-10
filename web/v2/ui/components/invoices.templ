@@ -7,14 +7,24 @@ import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 import "strconv"
 import "github.com/cayo-rodrigues/nff/web/utils"
 
-templ InvoiceList(invoices []*models.Invoice) {
-	<ul id="invoice-list" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-		for _, invoice := range invoices {
-			@InvoiceCard(invoice)
+templ InvoiceList(invoicesByDate []map[string][]*models.Invoice) {
+	<section id="invoice-list">
+		for _, dailyGroup := range invoicesByDate {
+			for date, invoicesOfTheDay := range dailyGroup {
+				@InvoiceListRow(date, invoicesOfTheDay)
+			}
+		}
+	</section>
+}
+
+templ InvoiceListRow(date string, invoicesOfTheDay []*models.Invoice) {
+	@shared.DateGroupSeparator(date)
+	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+		for _, i := range invoicesOfTheDay {
+			@InvoiceCard(i)
 		}
 	</ul>
 }
-
 
 templ InvoiceCard(i *models.Invoice) {
 	<li

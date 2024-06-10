@@ -5,7 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "github.com/cayo-rodrigues/nff/web/ui/components"
 import "github.com/cayo-rodrigues/nff/web/ui/forms"
 
-templ InvoicesPage(invoices []*models.Invoice) {
+templ InvoicesPage(invoicesByDate []map[string][]*models.Invoice) {
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-col gap-2 border-b pb-3 sm:flex-row">
 			<a href="/invoices/create" hx-boost="true">
@@ -19,7 +19,7 @@ templ InvoicesPage(invoices []*models.Invoice) {
 			<h2 class="col-span-3 text-base font-medium">Histórico de Operações (Notas Fiscais)</h2>
 			@shared.FiltersByDate("#invoice-list", "/invoices/list")
 		</div>
-		@components.InvoiceList(invoices)
+		@components.InvoiceList(invoicesByDate)
 	</div>
 }
 

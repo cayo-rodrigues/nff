@@ -21,3 +21,32 @@ func handleDateFilters(colName string, query map[string]string, f *models.Filter
 
 	f.And().AsDate(colName).Between(fromDate, toDate)
 }
+
+type CreatedAtGetter interface {
+	GetCreatedAt() time.Time
+}
+
+func GroupListByDate[T CreatedAtGetter](list []T) []map[string][]T {
+	groupedList := []map[string][]T{}
+
+	if len(list) == 0 {
+		return groupedList
+	}
+
+	lastSeenDate := utils.FormatDateAsBR(list[0].GetCreatedAt())
+	dailyList := map[string][]T{}
+
+	for _, item := range list {
+		key := utils.FormatDateAsBR(item.GetCreatedAt())
+		if key != lastSeenDate {
+			lastSeenDate = key
+			groupedList = append(groupedList, dailyList)
+			dailyList = map[string][]T{}
+		}
+		dailyList[key] = append(dailyList[key], item)
+	}
+
+	groupedList = append(groupedList, dailyList)
+
+	return groupedList
+}

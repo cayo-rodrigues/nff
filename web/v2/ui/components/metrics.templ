@@ -24,18 +24,7 @@ templ MetricsList(metricsByDate []map[string][]*models.Metrics) {
 }
 
 templ MetricsListRow(date string, metricsOfTheDay []*models.Metrics) {
-	<div class="flex items-center gap-2 rounded border border-gray-300 bg-gray-200 p-2">
-		@shared.IconSm("calendar")
-		<h3 class="text-base font-bold tracking-wide">
-			if utils.IsTodayBR(date) {
-				Hoje <span class="text-sm font-medium">({ date })</span>
-			} else if utils.IsYesterdayBR(date) {
-				Ontem <span class="text-sm font-medium">({ date })</span>
-			} else {
-				{ date }
-			}
-		</h3>
-	</div>
+	@shared.DateGroupSeparator(date)
 	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 		for _, m := range metricsOfTheDay {
 			@MetricsCard(m)

@@ -6,16 +6,26 @@ import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 import "strconv"
 
-templ InvoicesCancelingsList(cancelings []*models.InvoiceCancel) {
-	<ul 
+templ InvoicesCancelingsList(cancelingsByDate []map[string][]*models.InvoiceCancel) {
+	<section
 		id="canceling-list"
-		class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5"
 		hx-get="/invoices/cancel/list"
 		hx-target="this"
 		hx-trigger="reload-canceling-list from:body"
 		hx-swap="outerHTML"
 	>
-		for _, c := range cancelings {
+		for _, dailyGroup := range cancelingsByDate {
+			for date, cancelingsOfTheDay := range dailyGroup {
+				@InvoiceCancelListRow(date, cancelingsOfTheDay)
+			}
+		}
+	</section>
+}
+
+templ InvoiceCancelListRow(date string, cancelingsOfTheDay []*models.InvoiceCancel) {
+	@shared.DateGroupSeparator(date)
+	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+		for _, c := range cancelingsOfTheDay {
 			@InvoiceCancelCard(c)
 		}
 	</ul>
