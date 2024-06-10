@@ -7,7 +7,7 @@ import "github.com/cayo-rodrigues/nff/web/ui/scripts"
 import "github.com/cayo-rodrigues/nff/web/utils"
 import "strconv"
 
-templ MetricsList(metrics []map[string][]*models.Metrics) {
+templ MetricsList(metricsByDate []map[string][]*models.Metrics) {
 	<section
 		id="metrics-list"
 		hx-get="/metrics/list"
@@ -15,29 +15,29 @@ templ MetricsList(metrics []map[string][]*models.Metrics) {
 		hx-trigger="reload-metrics-list from:body"
 		hx-swap="outerHTML"
 	>
-		for _, l := range metrics {
-			for date, m := range l {
-				@MetricsListRow(date, m)
+		for _, dailyGroup := range metricsByDate {
+			for date, metricsOfTheDay := range dailyGroup {
+				@MetricsListRow(date, metricsOfTheDay)
 			}
 		}
 	</section>
 }
 
-templ MetricsListRow(date string, metrics []*models.Metrics) {
+templ MetricsListRow(date string, metricsOfTheDay []*models.Metrics) {
 	<div class="flex items-center gap-2 rounded border border-gray-300 bg-gray-200 p-2">
 		@shared.IconSm("calendar")
 		<h3 class="text-base font-bold tracking-wide">
 			if utils.IsTodayBR(date) {
-				Hoje <span class="text-sm font-medium">({date})</span>
+				Hoje <span class="text-sm font-medium">({ date })</span>
 			} else if utils.IsYesterdayBR(date) {
-				Ontem <span class="text-sm font-medium">({date})</span>
+				Ontem <span class="text-sm font-medium">({ date })</span>
 			} else {
 				{ date }
 			}
 		</h3>
 	</div>
 	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-		for _, m := range metrics {
+		for _, m := range metricsOfTheDay {
 			@MetricsCard(m)
 		}
 	</ul>

@@ -5,7 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/models"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "github.com/cayo-rodrigues/nff/web/ui/components"
 
-templ MetricsPage(metricsList []map[string][]*models.Metrics, m *models.Metrics, entities []*models.Entity) {
+templ MetricsPage(metricsByDate []map[string][]*models.Metrics, m *models.Metrics, entities []*models.Entity) {
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-col gap-2">
 			@forms.MetricsForm(m, entities)
@@ -15,6 +15,6 @@ templ MetricsPage(metricsList []map[string][]*models.Metrics, m *models.Metrics,
 			<h2 class="col-span-3 py-2 text-center text-base font-medium sm:py-3 md:py-0 md:text-left">Histórico de Operações (Métricas)</h2>
 			@shared.FiltersByDate("#metrics-list", "/metrics/list")
 		</div>
-		@components.MetricsList(metricsList)
+		@components.MetricsList(metricsByDate)
 	</div>
 }

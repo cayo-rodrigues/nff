@@ -22,8 +22,12 @@ type Metrics struct {
 	*MetricsResult
 }
 
-func (i *Metrics) GetStatus() string {
-	return i.ReqStatus
+func (m *Metrics) GetCreatedAt() time.Time {
+	return m.CreatedAt
+}
+
+func (m *Metrics) GetStatus() string {
+	return m.ReqStatus
 }
 
 type MetricsResult struct {

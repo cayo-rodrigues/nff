@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"time"
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
@@ -35,22 +36,26 @@ func RetrieveMetrics(ctx context.Context, printingID int, userID int) (*models.M
 	return storage.RetrieveMetrics(ctx, printingID, userID)
 }
 
-func GroupListByDate(list []*models.Metrics) []map[string][]*models.Metrics {
-	groupedList := []map[string][]*models.Metrics{}
+type CreatedAtGetter interface {
+	GetCreatedAt() time.Time
+}
+
+func GroupListByDate[T CreatedAtGetter](list []T) []map[string][]T {
+	groupedList := []map[string][]T{}
 
 	if len(list) == 0 {
 		return groupedList
 	}
 
-	lastSeenDate := utils.FormatDateAsBR(list[0].CreatedAt)
-	dailyList := map[string][]*models.Metrics{}
+	lastSeenDate := utils.FormatDateAsBR(list[0].GetCreatedAt())
+	dailyList := map[string][]T{}
 
 	for _, item := range list {
-		key := utils.FormatDateAsBR(item.CreatedAt)
+		key := utils.FormatDateAsBR(item.GetCreatedAt())
 		if key != lastSeenDate {
 			lastSeenDate = key
 			groupedList = append(groupedList, dailyList)
-			dailyList = map[string][]*models.Metrics{}
+			dailyList = map[string][]T{}
 		}
 		dailyList[key] = append(dailyList[key], item)
 	}

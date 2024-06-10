@@ -27,12 +27,12 @@ func MetricsPage(c *fiber.Ctx) error {
 		return err
 	}
 
-	a := services.GroupListByDate(metricsList)
+	metricsByDate := services.GroupListByDate(metricsList)
 
 	m := models.NewMetrics()
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
-	return Render(c, layouts.Base(pages.MetricsPage(a, m, entities)))
+	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entities)))
 }
 
 func GenerateMetrics(c *fiber.Ctx) error {
