@@ -158,13 +158,41 @@ function PreserveListFilters(event) {
     }
 }
 
-function OpenBurgerMenu(menuTarget) {
-    const menu = document.querySelector(menuTarget)
+function OpenBurgerMenu() {
+    const menu = document.querySelector('#burger-menu')
     if (!menu) {
         return
     }
 
+    const menuBtn = document.querySelector('#burger-menu-btn')
+    if (!menuBtn) {
+        return
+    }
+
+    menuBtn.classList.toggle('shadow')
+    menuBtn.classList.toggle('shadow-black')
+    menuBtn.classList.toggle('rounded')
+
     menu.classList.toggle('hidden')
+}
+
+function CloseBurgerMenu() {
+    const menu = document.querySelector('#burger-menu')
+    if (!menu) {
+        return
+    }
+
+    const menuBtn = document.querySelector('#burger-menu-btn')
+    if (!menuBtn) {
+        return
+    }
+
+    if (menu.classList.contains('hidden')) {
+        return
+    }
+
+    menuBtn.classList.remove('shadow', 'shadow-black', 'rounded')
+    menu.classList.add('hidden')
 }
 
 function Init() {
@@ -187,5 +215,16 @@ function Init() {
     })
 
     document.addEventListener('htmx:beforeRequest', PreserveListFilters)
+
+    document.addEventListener('keyup', (event) => {
+        if (event.code === 'Escape') {
+            CloseBurgerMenu()
+        }
+    })
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('#burger-menu-container')) {
+            CloseBurgerMenu()
+        }
+    })
 }
 Init()

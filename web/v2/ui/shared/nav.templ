@@ -1,7 +1,7 @@
 package shared
 
 templ Nav() {
-	<nav hx-boost="true" class="sticky top-0 flex w-full items-center justify-between bg-sky-700 px-4 py-1 text-white md:px-8">
+	<nav hx-boost="true" class="sticky top-0 flex w-full items-center justify-between bg-sky-700 px-4 py-1 text-white xl:pl-8">
 		<h1 class="text-lg">
 			<a href="/" hx-indicator="#global-indicator">
 				Nota Fiscal Fácil
@@ -22,8 +22,8 @@ templ NotificationBell() {
 }
 
 templ BurgerMenu(isAuthenticated bool) {
-	<div class="relative">
-		<button class="xl:hidden" onclick="OpenBurgerMenu('#burger-menu')">
+	<div id="burger-menu-container" class="relative">
+		<button id="burger-menu-btn" class="translate-y-0.5 transform xl:hidden" onclick="OpenBurgerMenu()">
 			@Icon("menu")
 		</button>
 		<ul id="burger-menu" hx-boost="true" class="absolute -right-4 top-8 z-30 hidden w-36 gap-2 rounded-s bg-sky-800 p-1 shadow shadow-black">
