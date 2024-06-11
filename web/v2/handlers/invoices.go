@@ -54,6 +54,10 @@ func CreateInvoicePage(c *fiber.Ctx) error {
 	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities)))
 }
 
+func ChooseInvoiceOperationPage(c *fiber.Ctx) error {
+	return Render(c, layouts.Base(pages.ChooseInvoiceOperationPage()))
+}
+
 func GetSenderIeInput(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
 	entityID, err := strconv.Atoi(c.Query("sender"))

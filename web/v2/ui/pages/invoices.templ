@@ -28,3 +28,27 @@ templ InvoiceFormPage(invoice *models.Invoice, entities []*models.Entity) {
 		@forms.InvoiceForm(invoice, entities)
 	</div>
 }
+
+templ ChooseInvoiceOperationPage() {
+	<fieldset hx-boost="true" class="grid grid-cols-1 gap-4 rounded border border-gray-300 p-4">
+		<legend class="px-2">Operações</legend>
+		<a href="/invoices">
+			@shared.SuccessButton("md") {
+				@shared.Icon("plus-circle")
+				<span>Emissão</span>
+			}
+		</a>
+		<a href="/invoices/cancel">
+			@shared.ErrorButton("md") {
+				@shared.Icon("slash")
+				<span>Cancelamento</span>
+			}
+		</a>
+		<a href="/invoices/print">
+			@shared.DefaultButton("md") {
+				@shared.Icon("printer")
+				<span>Impressão</span>
+			}
+		</a>
+	</fieldset>
+}

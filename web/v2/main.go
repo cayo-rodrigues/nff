@@ -66,6 +66,7 @@ func main() {
 	app.Delete("/entities/delete/:id", handlers.DeleteEntity)
 
 	app.Get("/invoices", handlers.InvoicesPage)
+	app.Get("/invoices/choose-operation", handlers.ChooseInvoiceOperationPage)
 	app.Get("/invoices/list", handlers.ListInvoices)
 	app.Get("/invoices/form/get-sender-ie-input", handlers.GetSenderIeInput)
 	app.Get("/invoices/create", handlers.CreateInvoicePage)

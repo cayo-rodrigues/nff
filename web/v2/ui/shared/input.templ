@@ -26,8 +26,25 @@ type InputData struct {
 }
 
 func (data *InputData) Wide() *InputData {
-	data.Class = "relative flex flex-col gap-2 col-span-full"
+	data.Class = "flex flex-col gap-2 col-span-full"
+	if data.InputType == "password" {
+		data.Class += " relative"
+	}
 	return data
+}
+
+func (data *InputData) GetClassName() string {
+	if data.Class != "" {
+		return data.Class
+	}
+
+	className := "flex flex-col gap-2"
+
+	if data.InputType == "password" {
+		className += " relative"
+	}
+
+	return className
 }
 
 templ WideInput(data *InputData) {
@@ -39,13 +56,7 @@ templ WideSelectInput(data *InputData) {
 }
 
 templ Input(data *InputData) {
-	<div
-		if data.Class != "" {
-			class={ data.Class }
-		} else {
-			class="relative flex flex-col gap-2"
-		}
-	>
+	<div class={ data.GetClassName() }>
 		<label class="truncate" for={ data.ID }><strong>{ data.Label }</strong></label>
 		<input
 			class="h-8 rounded border border-gray-300 bg-white px-2 py-1 outline-0 focus-within:border-gray-500"
@@ -78,13 +89,7 @@ templ Input(data *InputData) {
 }
 
 templ SelectInput(data *InputData) {
-	<div
-		if data.Class != "" {
-			class={ data.Class }
-		} else {
-			class="flex flex-col gap-2"
-		}
-	>
+	<div class={ data.GetClassName() }>
 		<label class="flex items-center gap-2 truncate" for={ data.ID }>
 			<strong>{ data.Label }</strong>
 			if data.HxIndicatorID != "" {

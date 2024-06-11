@@ -158,6 +158,15 @@ function PreserveListFilters(event) {
     }
 }
 
+function OpenBurgerMenu(menuTarget) {
+    const menu = document.querySelector(menuTarget)
+    if (!menu) {
+        return
+    }
+
+    menu.classList.toggle('hidden')
+}
+
 function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()

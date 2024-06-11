@@ -10,7 +10,7 @@ templ Nav() {
 		<div class="flex items-center gap-4 sm:gap-6 xl:gap-8">
 			@ListMenu(true)
 			@NotificationBell()
-			@BurgerMenu()
+			@BurgerMenu(true)
 		</div>
 	</nav>
 }
@@ -21,10 +21,41 @@ templ NotificationBell() {
 	</button>
 }
 
-templ BurgerMenu() {
-	<button class="xl:hidden">
-		@Icon("menu")
-	</button>
+templ BurgerMenu(isAuthenticated bool) {
+	<div class="relative">
+		<button class="xl:hidden" onclick="OpenBurgerMenu('#burger-menu')">
+			@Icon("menu")
+		</button>
+		<ul id="burger-menu" hx-boost="true" class="absolute -right-4 top-8 z-30 hidden w-36 gap-2 rounded-s bg-sky-800 p-1 shadow shadow-black">
+			if isAuthenticated {
+				@MenuItem("/entities") {
+					@IconSm("users")
+					<span>Entidades</span>
+				}
+				@MenuItem("/invoices/choose-operation") {
+					@IconSm("file-text")
+					<span>Notas Fiscais</span>
+				}
+				@MenuItem("/metrics") {
+					@IconSm("activity")
+					<span>Métricas</span>
+				}
+				@MenuItem("/logout") {
+					@IconSm("log-out")
+					<span>Sair</span>
+				}
+			} else {
+				@MenuItem("/register") {
+					@IconSm("user-plus")
+					<span>Cadastro</span>
+				}
+				@MenuItem("/login") {
+					@IconSm("log-in")
+					<span>Login</span>
+				}
+			}
+		</ul>
+	</div>
 }
 
 templ ListMenu(isAuthenticated bool) {
@@ -71,7 +102,7 @@ templ ListMenu(isAuthenticated bool) {
 
 templ MenuItem(url string) {
 	<a href={ templ.URL(url) }>
-		<li class="flex h-full w-full flex-1 cursor-pointer items-center justify-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95">
+		<li class="flex h-full w-full flex-1 cursor-pointer items-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95 xl:justify-center">
 			{ children... }
 		</li>
 	</a>
