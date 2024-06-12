@@ -19,12 +19,14 @@ func EntitiesPage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return Render(c, layouts.Base(pages.EntitiesPage(entities)))
+	isAuthenticated := utils.IsAuthenticated(c)
+	return Render(c, layouts.Base(pages.EntitiesPage(entities), isAuthenticated))
 }
 
 func CreateEntityPage(c *fiber.Ctx) error {
 	entity := models.NewEntity()
-	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
+	isAuthenticated := utils.IsAuthenticated(c)
+	return Render(c, layouts.Base(pages.EntityFormPage(entity), isAuthenticated))
 }
 
 func EditEntityPage(c *fiber.Ctx) error {
@@ -37,7 +39,8 @@ func EditEntityPage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
+	isAuthenticated := utils.IsAuthenticated(c)
+	return Render(c, layouts.Base(pages.EntityFormPage(entity), isAuthenticated))
 }
 
 func CreateEntity(c *fiber.Ctx) error {

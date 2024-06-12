@@ -27,12 +27,15 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	printingForForm := models.NewInvoicePrintWithSamples(entities)
 
+	printingForForm := models.NewInvoicePrintWithSamples(entities)
 	printingsByDate := services.GroupListByDate(printingsList)
+	page := pages.InvoicesPrintPage(printingsByDate, printingForForm, entities)
+
+	isAuthenticated := utils.IsAuthenticated(c)
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
-	return Render(c, layouts.Base(pages.InvoicesPrintPage(printingsByDate, printingForForm, entities)))
+	return Render(c, layouts.Base(page, isAuthenticated))
 }
 
 func PrintInvoice(c *fiber.Ctx) error {

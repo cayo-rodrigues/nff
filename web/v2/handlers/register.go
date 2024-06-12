@@ -11,7 +11,8 @@ import (
 
 func RegisterPage(c *fiber.Ctx) error {
 	user := models.NewUser()
-	return Render(c, layouts.Base(pages.RegisterPage(user)))
+	isAuthenticated := false
+	return Render(c, layouts.Base(pages.RegisterPage(user), isAuthenticated))
 }
 
 func RegisterUser(c *fiber.Ctx) error {

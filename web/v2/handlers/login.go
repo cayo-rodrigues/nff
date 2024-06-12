@@ -11,7 +11,8 @@ import (
 
 func LoginPage(c *fiber.Ctx) error {
 	user := models.NewUser()
-	return Render(c, layouts.Base(pages.LoginPage(user)))
+	isAuthenticated := false
+	return Render(c, layouts.Base(pages.LoginPage(user), isAuthenticated))
 }
 
 func LoginUser(c *fiber.Ctx) error {
@@ -38,5 +39,5 @@ func LogoutUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	return RetargetToPageHandler(c, "/", HomePage)
+	return RetargetToPageHandler(c, "/login", LoginPage)
 }

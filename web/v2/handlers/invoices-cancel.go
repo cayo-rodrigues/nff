@@ -27,12 +27,15 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	cancelingForForm := models.NewInvoiceCancelWithSamples(entities)
 
+	cancelingForForm := models.NewInvoiceCancelWithSamples(entities)
 	canclingsByDate := services.GroupListByDate(cancelingsList)
+	page := pages.InvoicesCancelingsPage(canclingsByDate, cancelingForForm, entities)
+
+	isAuthenticated := utils.IsAuthenticated(c)
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
-	return Render(c, layouts.Base(pages.InvoicesCancelingsPage(canclingsByDate, cancelingForForm, entities)))
+	return Render(c, layouts.Base(page, isAuthenticated))
 }
 
 func CancelInvoice(c *fiber.Ctx) error {

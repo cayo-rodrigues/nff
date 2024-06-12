@@ -26,8 +26,10 @@ func InvoicesPage(c *fiber.Ctx) error {
 
 	invoicesByDate := services.GroupListByDate(invoices)
 
+	isAuthenticated := utils.IsAuthenticated(c)
+
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
-	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate)))
+	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate), isAuthenticated))
 }
 
 func CreateInvoicePage(c *fiber.Ctx) error {
@@ -46,16 +48,20 @@ func CreateInvoicePage(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		return Render(c, layouts.Base(pages.InvoiceFormPage(baseInvoice, entities)))
+	isAuthenticated := utils.IsAuthenticated(c)
+		return Render(c, layouts.Base(pages.InvoiceFormPage(baseInvoice, entities), isAuthenticated))
 	}
 
 	invoice := models.NewInvoiceWithSamples(entities)
 
-	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities)))
+	isAuthenticated := utils.IsAuthenticated(c)
+
+	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities), isAuthenticated))
 }
 
 func ChooseInvoiceOperationPage(c *fiber.Ctx) error {
-	return Render(c, layouts.Base(pages.ChooseInvoiceOperationPage()))
+	isAuthenticated := utils.IsAuthenticated(c)
+	return Render(c, layouts.Base(pages.ChooseInvoiceOperationPage(), isAuthenticated))
 }
 
 func GetSenderIeInput(c *fiber.Ctx) error {

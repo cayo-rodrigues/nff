@@ -18,8 +18,12 @@ func AuthMiddleware(c *fiber.Ctx) error {
 			return err
 		}
 
-		if c.Path() != "/" {
+		switch c.Path() {
+		case "/":
+			return handlers.RetargetToPageHandler(c, "/", handlers.HomePage)
+		default:
 			return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
+
 		}
 	}
 

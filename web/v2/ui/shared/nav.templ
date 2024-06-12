@@ -1,6 +1,6 @@
 package shared
 
-templ Nav() {
+templ Nav(isAuthenticated bool) {
 	<nav hx-boost="true" class="sticky top-0 flex w-full items-center justify-between bg-sky-700 px-4 py-1 text-white xl:pl-8">
 		<h1 class="text-lg">
 			<a href="/" hx-indicator="#global-indicator">
@@ -8,9 +8,9 @@ templ Nav() {
 			</a>
 		</h1>
 		<div class="flex items-center gap-4 sm:gap-6 xl:gap-8">
-			@ListMenu(true)
+			@ListMenu(isAuthenticated)
 			@NotificationBell()
-			@BurgerMenu(true)
+			@BurgerMenu(isAuthenticated)
 		</div>
 	</nav>
 }

@@ -76,6 +76,14 @@ func GetCurrentUserID(c *fiber.Ctx) int {
 	return userID
 }
 
-func Float64ToString(f float64) string  {
+func IsAuthenticated(c *fiber.Ctx) bool {
+	isAuthenticated, ok := c.Locals("IsAuthenticated").(bool)
+	if !ok {
+		return false
+	}
+	return isAuthenticated
+}
+
+func Float64ToString(f float64) string {
 	return strconv.FormatFloat(f, 'f', 2, 64)
 }
