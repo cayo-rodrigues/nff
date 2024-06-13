@@ -28,7 +28,7 @@ func InvoicesPage(c *fiber.Ctx) error {
 
 	isAuthenticated := utils.IsAuthenticated(c)
 
-	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
 	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate), isAuthenticated))
 }
 
@@ -56,6 +56,7 @@ func CreateInvoicePage(c *fiber.Ctx) error {
 
 	isAuthenticated := utils.IsAuthenticated(c)
 
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
 	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities), isAuthenticated))
 }
 

@@ -109,6 +109,31 @@ function AppendQueryParams(queryString) {
     history.pushState(null, '', `${url.pathname}?${params.toString()}`);
 }
 
+function HighlightCurrentPageButton() {
+    const url = new URL(window.location)
+
+    if (url.pathname.includes("/invoices")) {
+        const submenuBtn = document.getElementById("invoices-submenu")
+        if (!submenuBtn) {
+            return
+        }
+        submenuBtn.classList.toggle("bg-sky-800")
+    }
+    
+    const pageBtn = document.getElementById(url.pathname)
+    if (!pageBtn) {
+        return
+    }
+
+    let classToToggle = "bg-sky-800"
+
+    if (pageBtn.dataset.submenuItem) {
+        classToToggle = "bg-sky-900"
+    }
+
+    pageBtn.classList.toggle(classToToggle)
+}
+
 function HighlightCurrentFilterButton() {
     const url = new URL(window.location);
     const params = new URLSearchParams(url.search)
@@ -205,9 +230,14 @@ function Init() {
 
     document.addEventListener("DOMContentLoaded", () => {
         HighlightCurrentFilterButton()
+        HighlightCurrentPageButton()
     })
     document.addEventListener("highlight-current-filter", () => {
         HighlightCurrentFilterButton()
+    })
+
+    document.addEventListener("highlight-current-page", () => {
+        HighlightCurrentPageButton()
     })
 
     document.addEventListener("scroll-to-top", () => {

@@ -65,7 +65,7 @@ templ ListMenu(isAuthenticated bool) {
 				@IconSm("users")
 				<span>Entidades</span>
 			}
-			@SubMenu("file-text", "Notas Fiscais") {
+			@SubMenu("invoices-submenu", "file-text", "Notas Fiscais") {
 				@SubMenuItem("/invoices") {
 					@IconSm("plus-circle")
 					<span>Emitir</span>
@@ -102,14 +102,14 @@ templ ListMenu(isAuthenticated bool) {
 
 templ MenuItem(url string) {
 	<a href={ templ.URL(url) }>
-		<li class="flex h-full w-full flex-1 cursor-pointer items-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95 xl:justify-center">
+		<li id={ url } class="flex h-full w-full flex-1 cursor-pointer items-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95 xl:justify-center">
 			{ children... }
 		</li>
 	</a>
 }
 
-templ SubMenu(labelIcon, labelText string) {
-	<li class="group relative w-16 cursor-pointer rounded-t hover:bg-sky-800 md:w-auto">
+templ SubMenu(id, labelIcon, labelText string) {
+	<li id={id} class="group relative w-16 cursor-pointer rounded-t hover:bg-sky-800 md:w-auto">
 		<div class="flex items-center gap-2 px-2 py-1">
 			@IconSm(labelIcon)
 			<span>{ labelText }</span>
@@ -122,7 +122,7 @@ templ SubMenu(labelIcon, labelText string) {
 
 templ SubMenuItem(url string) {
 	<a href={ templ.URL(url) }>
-		<li class="flex gap-2 rounded px-2 py-1 transition hover:bg-sky-900 active:scale-90">
+		<li id={ url } data-submenu-item="true" class="flex gap-2 rounded px-2 py-1 transition hover:bg-sky-900 active:scale-90">
 			{ children... }
 		</li>
 	</a>

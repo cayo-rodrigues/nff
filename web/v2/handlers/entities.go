@@ -20,6 +20,7 @@ func EntitiesPage(c *fiber.Ctx) error {
 		return err
 	}
 	isAuthenticated := utils.IsAuthenticated(c)
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
 	return Render(c, layouts.Base(pages.EntitiesPage(entities), isAuthenticated))
 }
 

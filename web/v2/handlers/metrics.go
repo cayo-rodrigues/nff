@@ -33,7 +33,7 @@ func MetricsPage(c *fiber.Ctx) error {
 
 	isAuthenticated := utils.IsAuthenticated(c)
 
-	c.Append("HX-Trigger-After-Settle", "highlight-current-filter")
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
 	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entities), isAuthenticated))
 }
 

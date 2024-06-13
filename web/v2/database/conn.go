@@ -133,7 +133,7 @@ func initSessionStore() error {
 			URL: getRedisURL(),
 		}),
 		CookieHTTPOnly: true,
-		Expiration:     7 * 24 * time.Hour,
+		Expiration:     7 * (24 * time.Hour),
 	})
 
 	fmt.Println("New instance.SessionStore connection OK")
