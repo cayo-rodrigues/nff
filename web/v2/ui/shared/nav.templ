@@ -15,12 +15,6 @@ templ Nav(isAuthenticated bool) {
 	</nav>
 }
 
-templ NotificationBell() {
-	<button class="rounded-full transition hover:bg-sky-800 xl:p-2">
-		@IconSm("bell")
-	</button>
-}
-
 templ BurgerMenu(isAuthenticated bool) {
 	<div id="burger-menu-container" class="relative">
 		<button id="burger-menu-btn" class="translate-y-0.5 transform xl:hidden" onclick="OpenBurgerMenu()">
@@ -109,7 +103,7 @@ templ MenuItem(url string) {
 }
 
 templ SubMenu(id, labelIcon, labelText string) {
-	<li id={id} class="group relative w-16 cursor-pointer rounded-t hover:bg-sky-800 md:w-auto">
+	<li id={ id } class="group relative w-16 cursor-pointer rounded-t hover:bg-sky-800 md:w-auto">
 		<div class="flex items-center gap-2 px-2 py-1">
 			@IconSm(labelIcon)
 			<span>{ labelText }</span>

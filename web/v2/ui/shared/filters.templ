@@ -11,6 +11,9 @@ templ FiltersByDate(listTarget string, endpoint string) {
 				@IconSm("filter")
 			</legend>
 			<section class="grid w-full grid-cols-2 gap-2 px-2 py-2 pl-5 sm:grid-cols-5 md:w-fit 2xl:w-full">
+				@DateFilterOption(listTarget, endpoint, 60) {
+					Últimos 60 dias 
+				}
 				@DateFilterOption(listTarget, endpoint, 30) {
 					Últimos 30 dias 
 				}
@@ -19,9 +22,6 @@ templ FiltersByDate(listTarget string, endpoint string) {
 				}
 				@DateFilterOption(listTarget, endpoint, 7) {
 					Últimos 7 dias 
-				}
-				@DateFilterOption(listTarget, endpoint, 1) {
-					Desde Ontem
 				}
 				@DateFilterOption(listTarget, endpoint, 0) {
 					Hoje
