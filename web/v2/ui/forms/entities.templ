@@ -94,7 +94,7 @@ templ EntityForm(e *models.Entity) {
 			</div>
 			<div class="flex gap-6">
 				<div class="mt-4 flex-1">
-					@shared.SubmitButton("md") {
+					@shared.Button(getThemeByAction(e), "md", templ.Attributes{"type": "submit"}) {
 						@shared.Icon(getIconNameByAction(e))
 						<span>{ getTextByAction(e) }</span>
 					}
@@ -112,11 +112,18 @@ templ EntityForm(e *models.Entity) {
 	</div>
 }
 
+func getThemeByAction(e *models.Entity) string {
+	if e.ID == 0 {
+		return "success"
+	}
+	return "info"
+}
+
 func getTextByAction(e *models.Entity) string {
 	if e.ID == 0 {
 		return "Registrar"
 	}
-	return "Editar"
+	return "Atualizar"
 }
 
 func getIconNameByAction(e *models.Entity) string {

@@ -14,6 +14,12 @@ templ SubmitButton(size string) {
 	}
 }
 
+templ SubmitInfoButton(size string) {
+	@Button("info", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
 templ SuccessButton(size string) {
 	@Button("success", size, templ.Attributes{"type": "button"}) {
 		{ children... }

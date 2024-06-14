@@ -220,6 +220,29 @@ function CloseBurgerMenu() {
     menu.classList.add('hidden')
 }
 
+function ShowNotificationDialog() {
+    const notificationDialog = document.querySelector('#notification-dialog')
+    if (!notificationDialog) {
+        return
+    }
+
+    const notificationList = notificationDialog.querySelector('#notification-list')
+    if (!notificationList || notificationList.childElementCount === 0) {
+        return
+    }
+
+    notificationDialog.showModal()
+}
+
+function CloseNotificationDialog() {
+    const notificationDialog = document.querySelector('#notification-dialog')
+    if (!notificationDialog) {
+        return
+    }
+
+    notificationDialog.close()
+}
+
 function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()
