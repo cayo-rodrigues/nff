@@ -43,6 +43,13 @@ func FormatDateAsBR(date time.Time) string {
 	return date.Format("02/01/2006")
 }
 
+func FormatDatetimeAsBR(dt time.Time) string {
+	if dt.IsZero() {
+		return ""
+	}
+	return dt.Format("02/01/2006 às 15:04")
+}
+
 func IsToday(date string) bool {
 	today := FormatDate(time.Now())
 	return today == date

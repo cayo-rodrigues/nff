@@ -10,6 +10,7 @@ services:
       - REDIS_URL=redis://rdb:6379/0
       - START_FRESH=true
       - SS_API_BASE_URL=https://bmabg5gxpykclea3u3roxajlxm0kywgy.lambda-url.sa-east-1.on.aws
+      - TZ=America/Sao_Paulo
     ports:
       - 8080:8080
     volumes:
