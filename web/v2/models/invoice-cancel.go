@@ -32,6 +32,18 @@ func (c *InvoiceCancel) GetStatus() string {
 	return c.ReqStatus
 }
 
+func (c *InvoiceCancel) GetOperationType() string {
+	return "Cancelamento de NFA"
+}
+
+func (c *InvoiceCancel) GetID() int {
+	return c.ID
+}
+
+func (c *InvoiceCancel) GetPageEndpoint() string {
+	return "/invoices/cancel"
+}
+
 func NewInvoiceCancel() *InvoiceCancel {
 	return &InvoiceCancel{
 		Entity: NewEntity(),

@@ -33,6 +33,18 @@ func (p *InvoicePrint) GetStatus() string {
 	return p.ReqStatus
 }
 
+func (p *InvoicePrint) GetOperationType() string {
+	return "Impressão/Download de NFA"
+}
+
+func (p *InvoicePrint) GetID() int {
+	return p.ID
+}
+
+func (p *InvoicePrint) GetPageEndpoint() string {
+	return "/invoices/print"
+}
+
 func NewInvoicePrint() *InvoicePrint {
 	return &InvoicePrint{
 		Entity: NewEntity(),

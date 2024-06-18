@@ -1,6 +1,9 @@
 package shared
 
 import "strconv"
+import "time"
+import "github.com/cayo-rodrigues/nff/web/utils"
+import "github.com/cayo-rodrigues/nff/web/models"
 
 templ NotificationBell() {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
@@ -11,14 +14,14 @@ templ NotificationBell() {
 }
 
 templ NotificationCounter() {
-	<div class="min-w-5 max-w-6 absolute -right-3.5 -top-2 rounded-full bg-red-600 py-0.5 text-center text-xs text-white xl:-right-1.5 xl:-top-0.5">
-		7
+	<div class="min-w-5 max-w-6 absolute -right-3.5 -top-2 rounded-full bg-red-600 py-0.5 text-center text-xs xl:-right-1.5 xl:-top-0.5">
+		!
 	</div>
 }
 
 templ NotificationDialog() {
 	<dialog id="notification-dialog" class="rounded shadow shadow-gray-700">
-		<div class="flex items-center justify-between bg-gray-100 px-4 py-2 ">
+		<div class="sticky top-0 z-40 flex items-center justify-between border-b bg-gray-100 px-4 py-2">
 			<h2 class="text-lg font-bold">Notificações</h2>
 			<div onclick="CloseNotificationDialog()">
 				@DefaultButtonOutline("xs") {
@@ -26,53 +29,39 @@ templ NotificationDialog() {
 				}
 			</div>
 		</div>
-		<hr/>
 		@NotificationList(getNotificationListItems())
 	</dialog>
 }
 
-type A struct {
-	Status string
-	Type   string
-}
-
-func (a *A) GetStatus() string {
-	return a.Status
-}
-
-func (a *A) GetType() string {
-	return a.Type
-}
-func (a *A) GetCreatedAt() string {
-	return a.Status
-}
-func (a *A) GetID() int {
-	return 1
-}
-
 type Notification interface {
 	GetStatus() string
-	GetType() string
-	GetCreatedAt() string
+	GetOperationType() string
+	GetCreatedAt() time.Time
 	GetID() int
+	GetPageEndpoint() string
 }
 
-func getNotificationListItems() []*A {
-	return []*A{
-		{Status: "success", Type: "Emissão de NFA"},
-		{Status: "success", Type: "Cálculo de Métricas"},
-		{Status: "warning", Type: "Cancelamento de NFA"},
-		{Status: "error", Type: "Emissão de NFA"},
-		{Status: "warning", Type: "Cancelamento de NFA"},
-		{Status: "error", Type: "Cálculo de Métricas"},
-		{Status: "canceled", Type: "Impressão/Download de NFA"},
-	}
+func getNotificationListItems() []Notification {
+	// items will be stored in redis
+	m := models.NewMetrics()
+	m.ReqStatus = "success"
+	m.CreatedAt = time.Now()
+	i := models.NewInvoice()
+	i.ReqStatus = "success"
+	i.CreatedAt = time.Now()
+	c := models.NewInvoiceCancel()
+	c.ReqStatus = "success"
+	c.CreatedAt = time.Now()
+	p := models.NewInvoicePrint()
+	p.ReqStatus = "success"
+	p.CreatedAt = time.Now()
+	return []Notification{m, i, c, p}
 }
 
-templ NotificationList(items []*A) {
+templ NotificationList[T Notification](items []T) {
 	<ul id="notification-list" class="grid grid-cols-1 gap-2 rounded p-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
 		for i, item := range items {
-			@NotificationListItem(item, i + 1)
+			@NotificationListItem(item, len(items)-i)
 		}
 	</ul>
 }
@@ -84,10 +73,10 @@ templ NotificationListItem(n Notification, position int) {
 			@OperationStatus(n)
 		</h3>
 		<ul class="grid grid-cols-1 gap-2">
-			<li><strong>Tipo:</strong> <span>{ n.GetType() }</span></li>
-			<li><strong>Iniciado Em:</strong> <span>14/06/2024 às 14:46:15</span></li>
+			<li><strong>Tipo:</strong> <span>{ n.GetOperationType() }</span></li>
+			<li><strong>Iniciado às:</strong> <span>{ utils.FormatTime(n.GetCreatedAt()) }</span></li>
 			<li>
-				<a href="" target="_blank">
+				<a href={ templ.URL(n.GetPageEndpoint()) } target="_blank">
 					@DefaultButton("xs") {
 						<span>Ver Resultado</span>
 						@IconSm("external-link")

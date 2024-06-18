@@ -45,6 +45,18 @@ func (i *Invoice) GetStatus() string {
 	return i.ReqStatus
 }
 
+func (i *Invoice) GetOperationType() string {
+	return "Emissão de NFA"
+}
+
+func (i *Invoice) GetID() int {
+	return i.ID
+}
+
+func (i *Invoice) GetPageEndpoint() string {
+	return "/invoices"
+}
+
 func NewInvoice() *Invoice {
 	return &Invoice{
 		Sender:    NewEntity(),

@@ -36,6 +36,13 @@ func FormatDate(date time.Time) string {
 	return date.Format("2006-01-02")
 }
 
+func FormatTime(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format("15:04:05")
+}
+
 func FormatDateAsBR(date time.Time) string {
 	if date.IsZero() {
 		return ""

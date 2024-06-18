@@ -30,6 +30,18 @@ func (m *Metrics) GetStatus() string {
 	return m.ReqStatus
 }
 
+func (m *Metrics) GetOperationType() string {
+	return "Cálculo de Métricas"
+}
+
+func (m *Metrics) GetID() int {
+	return m.ID
+}
+
+func (m *Metrics) GetPageEndpoint() string {
+	return "/metrics"
+}
+
 type MetricsResult struct {
 	ID              int              `json:"-"`
 	Type            string           `json:"type"`
