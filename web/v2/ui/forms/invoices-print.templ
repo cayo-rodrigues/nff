@@ -13,7 +13,7 @@ templ PrintInvoiceForm(p *models.InvoicePrint, entities []*models.Entity) {
 		hx-swap="outerHTML"
 	>
 		<div class="md:w-fit">
-			@shared.SubmitButton("sm") {
+			@shared.SubmitDarkButton("sm") {
 				@shared.Icon("play-circle")
 				<span>Iniciar Operação de Impressão</span>
 			}

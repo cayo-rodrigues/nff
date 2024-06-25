@@ -20,6 +20,18 @@ templ SubmitInfoButton(size string) {
 	}
 }
 
+templ SubmitErrorButton(size string) {
+	@Button("error", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
+templ SubmitDarkButton(size string) {
+	@Button("dark", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
 templ SuccessButton(size string) {
 	@Button("success", size, templ.Attributes{"type": "button"}) {
 		{ children... }
@@ -40,6 +52,12 @@ templ ErrorButton(size string) {
 
 templ InfoButton(size string) {
 	@Button("info", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ DarkButton(size string) {
+	@Button("dark", size, templ.Attributes{"type": "button"}) {
 		{ children... }
 	}
 }
@@ -75,9 +93,11 @@ func GetButtonClassesByTheme(theme string, size string) string {
 	case "warning":
 		colors = "bg-yellow-400 border-yellow-500 hover:bg-yellow-500 active:bg-yellow-600"
 	case "error":
-		colors = "bg-red-500 border-red-600 hover:bg-red-600 active:bg-red-700"
+		colors = "bg-red-600 border-red-700 hover:bg-red-700 active:bg-red-800 text-gray-100"
 	case "info":
 		colors = "bg-sky-400 border-sky-500 hover:bg-sky-500 active:bg-sky-600"
+	case "dark":
+		colors = "bg-gray-600 border-gray-700 hover:bg-gray-700 active:bg-gray-800 text-gray-100"
 	case "default":
 		colors = "bg-gray-300 border-gray-400 hover:bg-gray-400 active:bg-gray-500"
 	case "default-outline":

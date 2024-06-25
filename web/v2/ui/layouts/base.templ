@@ -18,7 +18,7 @@ templ Base(page templ.Component, isAuthenticated bool) {
 			<script src="/static/js/index.js"></script>
 			<title>NFF</title>
 		</head>
-		<body class="flex h-screen flex-col overflow-y-scroll bg-gray-50 text-sm">
+		<body hx-ext="sse" class="flex h-screen flex-col overflow-y-scroll bg-gray-50 text-sm">
 			<header>
 				@shared.Nav(isAuthenticated)
 			</header>

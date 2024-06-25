@@ -8,13 +8,16 @@ import "github.com/cayo-rodrigues/nff/web/models"
 templ NotificationBell() {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
 		@IconSm("bell")
-		@NotificationCounter()
+		@NotificationBang()
 	</button>
 	@NotificationDialog()
 }
 
-templ NotificationCounter() {
-	<div class="min-w-5 max-w-6 absolute -right-3.5 -top-2 rounded-full bg-red-600 py-0.5 text-center text-xs xl:-right-1.5 xl:-top-0.5">
+templ NotificationBang() {
+	<div
+		id="notification-bang"
+		class="min-w-5 max-w-6 absolute -right-3.5 -top-2 hidden rounded-full bg-red-600 py-0.5 text-center text-xs xl:-right-1.5 xl:-top-0.5"
+	>
 		!
 	</div>
 }
@@ -59,7 +62,14 @@ func getNotificationListItems() []Notification {
 }
 
 templ NotificationList[T Notification](items []T) {
-	<ul id="notification-list" class="grid grid-cols-1 gap-2 rounded p-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4">
+	<ul
+		hx-get="/get-notifications"
+		hx-trigger="sse:operation-finished"
+		hx-target="this"
+		hx-swap="outerHTML"
+		id="notification-list"
+		class="grid grid-cols-1 gap-2 rounded p-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4"
+	>
 		for i, item := range items {
 			@NotificationListItem(item, len(items)-i)
 		}

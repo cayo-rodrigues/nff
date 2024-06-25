@@ -7,6 +7,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/handlers"
+	// "github.com/cayo-rodrigues/nff/web/handlers/sse"
 	"github.com/cayo-rodrigues/nff/web/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -55,7 +56,10 @@ func main() {
 	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
+
+
 	app.Use(middlewares.CacheMiddleware)
+	// app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)
 
 	app.Get("/", handlers.HomePage)
 
@@ -90,10 +94,6 @@ func main() {
 	app.Get("/metrics/list", handlers.ListMetrics)
 	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
-	// app.Get("/metrics/:id/request-card-details", metricsPage.GetRequestCardDetails)
-	// app.Get("/metrics/:id/request-card-status", metricsPage.GetRequestStatus)
-	// app.Get("/metrics/request-card-filter", metricsPage.FilterRequests)
-	// app.Get("/metrics/results/records/print", metricsPage.PrintInvoice)
 
 	app.Use(handlers.NotFoundPage)
 

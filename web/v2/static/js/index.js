@@ -243,6 +243,24 @@ function CloseNotificationDialog() {
     notificationDialog.close()
 }
 
+function ShowNotificationBang() {
+    const notificationBang = document.querySelector('#notification-bang')
+    if (!notificationBang) {
+        return
+    }
+
+    notificationBang.classList.remove('hidden')
+}
+
+function HideNotificationBang() {
+    const notificationBang = document.querySelector('#notification-bang')
+    if (!notificationBang) {
+        return
+    }
+
+    notificationBang.classList.add('hidden')
+}
+
 function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()
@@ -278,6 +296,13 @@ function Init() {
         if (!event.target.closest('#burger-menu-container')) {
             CloseBurgerMenu()
         }
+    })
+
+    document.addEventListener('notification-list-loaded', () => {
+        ShowNotificationBang()
+    })
+    document.addEventListener('notification-list-closed', () => {
+        HideNotificationBang()
     })
 }
 Init()

@@ -15,6 +15,10 @@ import (
 )
 
 func CacheMiddleware(c *fiber.Ctx) error {
+	if (strings.HasPrefix(c.Path(), "/sse")) {
+		return c.Next()
+	}
+
 	if fiber.IsMethodSafe(c.Method()) {
 		return useOrSetCache(c)
 	}

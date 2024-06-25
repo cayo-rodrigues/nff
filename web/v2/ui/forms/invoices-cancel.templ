@@ -13,7 +13,7 @@ templ CancelInvoiceForm(c *models.InvoiceCancel, entities []*models.Entity) {
 		hx-swap="outerHTML"
 	>
 		<div class="md:w-fit">
-			@shared.SubmitButton("sm") {
+			@shared.SubmitErrorButton("sm") {
 				@shared.Icon("play-circle")
 				<span>Iniciar Operação de Cancelamento</span>
 			}
