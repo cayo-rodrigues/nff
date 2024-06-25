@@ -23,7 +23,7 @@ templ InvoicesPrintingsList(printingsByDate []map[string][]*models.InvoicePrint)
 
 templ InvoicePrintListRow(date string, printingsOfTheDay []*models.InvoicePrint) {
 	@shared.DateGroupSeparator(date)
-	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
 		for _, p := range printingsOfTheDay {
 			@InvoicePrintCard(p)
 		}

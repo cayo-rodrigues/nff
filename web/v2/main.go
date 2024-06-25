@@ -2,16 +2,23 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/handlers"
+
 	// "github.com/cayo-rodrigues/nff/web/handlers/sse"
 	"github.com/cayo-rodrigues/nff/web/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
+
+//go:embed static/*
+var staticFiles embed.FS
 
 func main() {
 	PORT := os.Getenv("PORT")
@@ -46,7 +53,11 @@ func main() {
 		TimeZone: "America/Sao_Paulo",
 	}))
 
-	app.Static("/static", "./static")
+	app.Use("/static", filesystem.New(filesystem.Config{
+		Root: http.FS(staticFiles),
+		PathPrefix: "static",
+		Browse: true,
+	}))
 
 	app.Get("/register", handlers.RegisterPage)
 	app.Post("/register", handlers.RegisterUser)
