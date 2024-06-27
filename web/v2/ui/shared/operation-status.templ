@@ -33,3 +33,18 @@ templ OperationStatus(o Operation) {
 			<span>Em andamento...</span>
 	}
 }
+
+func GetTextColorByOperationStatus(o Operation) string {
+	switch o.GetStatus() {
+	case "success":
+		return "text-green-700"
+	case "warning":
+		return "text-yellow-700"
+	case "error":
+		return "text-red-700"
+	case "canceled":
+		return "text-gray-600"
+	default:
+		return ""
+	}
+}

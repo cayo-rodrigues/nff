@@ -78,7 +78,7 @@ templ MetricsDetailsDialog(m *models.Metrics) {
 					@shared.OperationStatus(m)
 				</h3>
 				<div
-					class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1"
+					class="absolute -right-2 -top-2 cursor-pointer rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1"
 					onclick={ scripts.CloseDialog(metricsDetailsDialogTarget(m)) }
 				>
 					@shared.Icon("x-circle")
@@ -86,7 +86,7 @@ templ MetricsDetailsDialog(m *models.Metrics) {
 			</div>
 			if m.ReqStatus != "pending" && m.ReqStatus != "success" && m.ReqMsg != "" {
 				<div class="border-b p-2 text-base">
-					<pre>{ m.ReqMsg }</pre>
+					<pre class={ shared.GetTextColorByOperationStatus(m) }>{ m.ReqMsg }</pre>
 				</div>
 			}
 			<ul class="grid gap-2 p-2 sm:grid-cols-2 md:grid-cols-3">

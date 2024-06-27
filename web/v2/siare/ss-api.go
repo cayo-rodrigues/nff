@@ -35,15 +35,15 @@ func NewSSApiClient() *SSApiClient {
 		BaseUrl: os.Getenv("SS_API_BASE_URL"),
 		DB:      database.GetDB(),
 		Endpoints: &SSApiEndpoints{
-			IssueInvoice:  "/invoices/issue", // AJUSTAR NOME DO ENDPOINT NA SS-API
-			CancelInvoice: "/invoices/cancel",
-			PrintInvoice:  "/invoices/print",
+			IssueInvoice:  "/invoice/issue", // AJUSTAR NOME DO ENDPOINT NA SS-API
+			CancelInvoice: "/invoice/cancel",
+			PrintInvoice:  "/invoice/print",
 			Metrics:       "/metrics",
 		},
 	}
 }
 
-func (c *SSApiClient) RequestInvoice(invoice *models.Invoice) {
+func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
 	defer cancel()
 
@@ -90,7 +90,7 @@ func (c *SSApiClient) RequestInvoice(invoice *models.Invoice) {
 	c.DB.Redis.Set(ctx, key, true, time.Minute)
 }
 
-func (c *SSApiClient) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCancel) {
+func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
 	defer cancel()
 
@@ -132,7 +132,7 @@ func (c *SSApiClient) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCance
 	c.DB.Redis.Set(ctx, key, true, time.Minute)
 }
 
-func (c *SSApiClient) RequestInvoicePrinting(invoicePrint *models.InvoicePrint) {
+func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) {
 	ctx, print := context.WithTimeout(context.Background(), time.Minute*10)
 	defer print()
 

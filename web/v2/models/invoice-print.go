@@ -11,7 +11,7 @@ import (
 
 type InvoicePrint struct {
 	ID                   int
-	InvoiceID            string        `json:"invoice_number_or_protocol"`
+	InvoiceID            string        `json:"invoice_id"` // ATUALIZAR SS-API PARA USAR invoice_number_or_protocol
 	InvoiceIDType        string        `json:"invoice_id_type"`
 	InvoicePDF           string        `json:"invoice_pdf"`
 	Entity               *Entity       `json:"entity"`
@@ -20,7 +20,7 @@ type InvoicePrint struct {
 	CreatedBy            int           `json:"-"`
 	CreatedAt            time.Time     `json:"-"`
 	UpdatedAt            time.Time     `json:"-"`
-	CustomFileNamePrefix string        `json:"custom_file_name_prefix"`
+	CustomFileNamePrefix string        `json:"custom_file_name"` // ATUALIZAR SS-API PARA USAR custom_file_name_prefix 
 	FileName             string        `json:"file_name"`
 	Errors               ErrorMessages `json:"-"`
 }

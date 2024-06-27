@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/siare"
 	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
@@ -54,14 +55,19 @@ func PrintInvoice(c *fiber.Ctx) error {
 	}
 	printing.Entity = entity
 
-	if printing.IsValid() {
-		err := services.CreatePrinting(c.Context(), printing, userID)
-		if err != nil {
-			return err
-		}
-		c.Append("HX-Trigger-After-Swap", "reload-printing-list")
+	if !printing.IsValid() {
+		return Render(c, forms.PrintInvoiceForm(printing, entities))
 	}
 
+	err = services.CreatePrinting(c.Context(), printing, userID)
+	if err != nil {
+		return err
+	}
+
+	ssapi := siare.NewSSApiClient()
+	go ssapi.PrintInvoice(printing)
+
+	c.Append("HX-Trigger-After-Swap", "reload-printing-list")
 	return Render(c, forms.PrintInvoiceForm(printing, entities))
 }
 

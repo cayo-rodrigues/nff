@@ -40,7 +40,7 @@ type SSApiPrintingRequest struct {
 
 type SSApiPrintingResponse struct {
 	Msg           string              `json:"msg"`
-	InvoiceNumber string              `json:"invoice_number"`
+	InvoiceNumber string              `json:"invoice_id"` // MUDAR NA SS-API PARA invoice_number
 	InvoicePDF    string              `json:"invoice_pdf"`
 	FileName      string              `json:"file_name"`
 	Status        string              `json:"status"`
