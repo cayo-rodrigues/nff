@@ -12,7 +12,7 @@ import (
 
 type InvoiceCancel struct {
 	ID            int           `json:"-"`
-	InvoiceNumber string        `json:"invoice_number"`
+	InvoiceNumber string        `json:"invoice_id"` // MUDAR NA SS-API PARA invoice_number
 	Year          int           `json:"year"`
 	Justification string        `json:"justification"`
 	Entity        *Entity       `json:"entity"`

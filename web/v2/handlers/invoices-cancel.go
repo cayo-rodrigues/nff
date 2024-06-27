@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/siare"
 	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
@@ -54,14 +55,19 @@ func CancelInvoice(c *fiber.Ctx) error {
 	}
 	canceling.Entity = entity
 
-	if canceling.IsValid() {
-		err := services.CreateCanceling(c.Context(), canceling, userID)
-		if err != nil {
-			return err
-		}
-		c.Append("HX-Trigger-After-Swap", "reload-canceling-list")
+	if !canceling.IsValid() {
+		return Render(c, forms.CancelInvoiceForm(canceling, entities))
 	}
 
+	err = services.CreateCanceling(c.Context(), canceling, userID)
+	if err != nil {
+		return err
+	}
+
+	ssapi := siare.NewSSApiClient()
+	go ssapi.CancelInvoice(canceling)
+
+	c.Append("HX-Trigger-After-Swap", "reload-canceling-list")
 	return Render(c, forms.CancelInvoiceForm(canceling, entities))
 }
 
