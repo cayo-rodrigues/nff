@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/siare"
 	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
@@ -48,19 +49,24 @@ func GenerateMetrics(c *fiber.Ctx) error {
 	}
 	metrics.Entity = entity
 
-	if metrics.IsValid() {
-		err := services.CreateMetrics(c.Context(), metrics, userID)
-		if err != nil {
-			return err
-		}
-		c.Append("HX-Trigger-After-Swap", "reload-metrics-list")
-	}
-
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
 		return err
 	}
 
+	if !metrics.IsValid() {
+		return Render(c, forms.MetricsForm(metrics, entities))
+	}
+
+	err = services.CreateMetrics(c.Context(), metrics, userID)
+	if err != nil {
+		return err
+	}
+
+	ssapi := siare.NewSSApiClient()
+	go ssapi.GetMetrics(metrics)
+
+	c.Append("HX-Trigger-After-Swap", "reload-metrics-list")
 	return Render(c, forms.MetricsForm(metrics, entities))
 }
 

@@ -32,12 +32,52 @@ func ListMetricsResults(ctx context.Context, metricsID int, userID int) ([]*mode
 	return results, nil
 }
 
+func CreateMetricsResult(ctx context.Context, result *models.MetricsResult, resultType string, metricsID, userID, entityID int) error {
+	result.Type = resultType
+	result.MetricsID = metricsID
+	result.CreatedBy = userID
+	result.EntityID = entityID
+
+	db := database.GetDB()
+
+	row := db.PG.QueryRow(
+		ctx,
+		`INSERT INTO metrics_results (
+				type, month_name, total_income, total_expenses,
+				avg_income, avg_expenses, diff, is_positive,
+				total_records, positive_records, negative_records,
+				metrics_id, created_by,
+				issue_date, invoice_id, entity_id
+			)
+			VALUES (
+				$1, $2, $3, $4,
+				$5, $6, $7, $8,
+				$9, $10, $11,
+				$12, $13,
+				$14, $15, $16
+			)
+		RETURNING *`,
+		result.Type, result.MonthName, result.TotalIncome, result.TotalExpenses,
+		result.AvgIncome, result.AvgExpenses, result.Diff, result.IsPositive,
+		result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
+		result.MetricsID, result.CreatedBy,
+		result.IssueDate, result.InvoiceNumber, result.EntityID,
+	)
+	err := Scan(row, result)
+	if err != nil {
+		log.Println("Error when running insert metrics query: ", err)
+		return utils.InternalServerErr
+	}
+
+	return nil
+}
+
 func BulkCreateMetricsResults(ctx context.Context, results []*models.MetricsResult, resultType string, metricsID, userID, entityID int) error {
 	rows := [][]interface{}{}
 	for _, result := range results {
+		result.Type = resultType
 		result.MetricsID = metricsID
 		result.CreatedBy = userID
-		result.Type = resultType
 		result.EntityID = entityID
 
 		rows = append(rows, []interface{}{

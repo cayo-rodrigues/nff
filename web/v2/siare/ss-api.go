@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -17,14 +18,28 @@ import (
 )
 
 type SSApiClient struct {
-	BaseUrl string
-	DB      *database.Database
+	BaseUrl   string
+	DB        *database.Database
+	Endpoints *SSApiEndpoints
 }
 
-func NewSSApiClient(baseUrl string) *SSApiClient {
+type SSApiEndpoints struct {
+	IssueInvoice  string
+	CancelInvoice string
+	PrintInvoice  string
+	Metrics       string
+}
+
+func NewSSApiClient() *SSApiClient {
 	return &SSApiClient{
-		BaseUrl: baseUrl,
+		BaseUrl: os.Getenv("SS_API_BASE_URL"),
 		DB:      database.GetDB(),
+		Endpoints: &SSApiEndpoints{
+			IssueInvoice:  "/invoices/issue", // AJUSTAR NOME DO ENDPOINT NA SS-API
+			CancelInvoice: "/invoices/cancel",
+			PrintInvoice:  "/invoices/print",
+			Metrics:       "/metrics",
+		},
 	}
 }
 
@@ -37,21 +52,21 @@ func (c *SSApiClient) RequestInvoice(invoice *models.Invoice) {
 		ShouldDownload: true,
 	}
 
-	agent := fiber.Post(c.BaseUrl + "/invoice/issue")
+	agent := fiber.Post(c.BaseUrl + c.Endpoints.IssueInvoice)
 	// TEMP!
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/issue for invoice with id %v: %v\n", invoice.ID, err)
+			requestErrLog(c.Endpoints.IssueInvoice, "invoice", invoice.ID, err)
 		}
 	}
 
 	var response SSApiInvoiceResponse
 	err := json.Unmarshal(body, &response)
 	if err != nil {
-		log.Printf("Something went wrong trying to unmarshal ss-api /invoice/request json response. Invoice with id %v will be on 'pending' state for ever: %v\n", invoice.ID, err)
+		jsonUnmarchalErrLog(c.Endpoints.IssueInvoice, "invoice", invoice.ID, err)
 	}
 
 	if response.Errors != nil {
@@ -83,21 +98,21 @@ func (c *SSApiClient) RequestInvoiceCanceling(invoiceCancel *models.InvoiceCance
 		InvoiceCancel: invoiceCancel,
 	}
 
-	agent := fiber.Post(c.BaseUrl + "/invoice/cancel")
+	agent := fiber.Post(c.BaseUrl + c.Endpoints.CancelInvoice)
 	// TEMP!
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/cancel for canceling with id %v: %v\n", invoiceCancel.ID, err)
+			requestErrLog(c.Endpoints.CancelInvoice, "canceling", invoiceCancel.ID, err)
 		}
 	}
 
 	var response SSApiCancelingResponse
 	err := json.Unmarshal(body, &response)
 	if err != nil {
-		log.Printf("Something went wrong trying to unmarshal ss-api /invoice/cancel json response. Canceling with id %v will be on 'pending' state for ever: %v\n", invoiceCancel.ID, err)
+		jsonUnmarchalErrLog(c.Endpoints.CancelInvoice, "canceling", invoiceCancel.ID, err)
 	}
 
 	if response.Errors != nil {
@@ -125,21 +140,21 @@ func (c *SSApiClient) RequestInvoicePrinting(invoicePrint *models.InvoicePrint) 
 		InvoicePrint: invoicePrint,
 	}
 
-	agent := fiber.Post(c.BaseUrl + "/invoice/print")
+	agent := fiber.Post(c.BaseUrl + c.Endpoints.PrintInvoice)
 	// TEMP!
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /invoice/print for printing with id %v: %v\n", invoicePrint.ID, err)
+			requestErrLog(c.Endpoints.PrintInvoice, "printing", invoicePrint.ID, err)
 		}
 	}
 
 	var response SSApiPrintingResponse
 	err := json.Unmarshal(body, &response)
 	if err != nil {
-		log.Printf("Something went wrong trying to unmarshal ss-api /invoice/print json response. Printing with id %v will be on 'pending' state for ever: %v\n", invoicePrint.ID, err)
+		jsonUnmarchalErrLog(c.Endpoints.PrintInvoice, "printing", invoicePrint.ID, err)
 	}
 
 	if response.Errors != nil {
@@ -185,21 +200,23 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 		queryString += fmt.Sprintf("&include_records=%v", reqData.Query.IncludeRecords)
 	}
 
-	agent := fiber.Get(c.BaseUrl + "/metrics")
+	agent := fiber.Get(c.BaseUrl + c.Endpoints.Metrics)
 	agent.QueryString(queryString)
 	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
 
+	fmt.Println("response!", string(body))
+
 	for _, err := range errs {
 		if err != nil {
-			log.Printf("Something went wrong with the request at /metrics for metrics query with id %v: %v\n", metrics.ID, err)
+			requestErrLog(c.Endpoints.Metrics, "metrics", metrics.ID, err)
 		}
 	}
 
 	var response SSApiMetricsResponse
 	err := json.Unmarshal(body, &response)
 	if err != nil {
-		log.Printf("Something went wrong trying to unmarshal ss-api /metrics json response. Metrics query with id %v will be on 'pending' state for ever: %v\n", metrics.ID, err)
+		jsonUnmarchalErrLog(c.Endpoints.Metrics, "metrics", metrics.ID, err)
 	}
 
 	if response.Errors != nil {
@@ -209,9 +226,8 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	metrics.MetricsResult = response.MetricsResult
 
 	if err == nil {
-		var wg *sync.WaitGroup
-
-		wg.Add(3)
+		var wg sync.WaitGroup
+		wg.Add(4)
 
 		go func() {
 			defer wg.Done()
@@ -219,11 +235,15 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 		}()
 		go func() {
 			defer wg.Done()
-			storage.BulkCreateMetricsResults(ctx, metrics.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+			storage.CreateMetricsResult(ctx, metrics.MetricsResult.Total, "total", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
 		}()
 		go func() {
 			defer wg.Done()
-			storage.BulkCreateMetricsResults(ctx, metrics.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+			storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+		}()
+		go func() {
+			defer wg.Done()
+			storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
 		}()
 
 		wg.Wait()
@@ -269,4 +289,12 @@ func formatErrResponse(response *SSApiErrorResponse) string {
 	}
 
 	return clientErrs.String()
+}
+
+func requestErrLog(endpoint, resourceName string, resourceID int, err error) {
+	log.Printf("Something went wrong with the request at %s for %s with id %v: %v\n", endpoint, resourceName, resourceID, err)
+}
+
+func jsonUnmarchalErrLog(endpoint, resourceName string, resourceID int, err error) {
+	log.Printf("Something went wrong trying to unmarshal ss-api %s json response. %s with id %v will be on 'pending' state for ever: %v\n", endpoint, resourceName, resourceID, err)
 }

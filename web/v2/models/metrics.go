@@ -57,7 +57,7 @@ type MetricsResult struct {
 	ReqStatus       string           `json:"status"`
 	ReqMsg          string           `json:"msg"`
 	MonthName       string           `json:"month_name"`
-	InvoiceNumber   string           `json:"invoice_number"` // AJUSTAR NOME NA SS-API
+	InvoiceNumber   string           `json:"invoice_id"` // AJUSTAR NOME NA SS-API para invoice_number
 	InvoicePDF      string           `json:"invoice_pdf"`
 	IssueDate       time.Time        `json:"issue_date"`
 	Months          []*MetricsResult `json:"months"`

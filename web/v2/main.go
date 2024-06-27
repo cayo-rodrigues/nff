@@ -13,8 +13,8 @@ import (
 	// "github.com/cayo-rodrigues/nff/web/handlers/sse"
 	"github.com/cayo-rodrigues/nff/web/middlewares"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 //go:embed static/*
@@ -54,9 +54,9 @@ func main() {
 	}))
 
 	app.Use("/static", filesystem.New(filesystem.Config{
-		Root: http.FS(staticFiles),
+		Root:       http.FS(staticFiles),
 		PathPrefix: "static",
-		Browse: true,
+		Browse:     true,
 	}))
 
 	app.Get("/register", handlers.RegisterPage)
@@ -67,7 +67,6 @@ func main() {
 	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
-
 
 	app.Use(middlewares.CacheMiddleware)
 	// app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)

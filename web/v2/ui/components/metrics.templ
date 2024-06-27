@@ -126,15 +126,15 @@ templ MetricsResultsDetails(m *models.Metrics) {
 			if m.Total.TotalRecords != 0 {
 				<section class="rounded border border-gray-400">
 					<header
-						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m), metricsResultChevronIconTarget(m)) }
+						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "total"), metricsResultChevronIconTarget(m, "total")) }
 						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Geral</h3>
-						<div id={ metricsResultChevronIconID(m) }>
+						<div id={ metricsResultChevronIconID(m, "total") }>
 							@shared.IconSm("chevron-up")
 						</div>
 					</header>
-					<div id={ metricsResultDataID(m) }>
+					<div id={ metricsResultDataID(m, "total") }>
 						@MetricsResultData(m.Total)
 					</div>
 				</section>
@@ -142,15 +142,15 @@ templ MetricsResultsDetails(m *models.Metrics) {
 			if len(m.Months) != 0 {
 				<section class="rounded border border-gray-400">
 					<header
-						onclick={ scripts.ToggleAccordion(metricsResultsDetailsTarget(m), metricsResultChevronIconTarget(m)) }
+						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "month"), metricsResultChevronIconTarget(m, "month")) }
 						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Mensal</h3>
-						<div id={ metricsResultChevronIconID(m) }>
+						<div id={ metricsResultChevronIconID(m, "month") }>
 							@shared.IconSm("chevron-down")
 						</div>
 					</header>
-					<div id={ metricsResultDataID(m) } class="hidden">
+					<div id={ metricsResultDataID(m, "month") } class="hidden">
 						for _, month := range m.Months {
 							<h4 class="px-4 pt-2 text-lg">{ month.MonthName }</h4>
 							@MetricsResultData(month)
@@ -162,18 +162,18 @@ templ MetricsResultsDetails(m *models.Metrics) {
 			if len(m.Records) != 0 {
 				<section class="rounded border border-gray-400">
 					<header
-						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m), metricsResultChevronIconTarget(m)) }
+						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "record"), metricsResultChevronIconTarget(m, "record")) }
 						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Individual</h3>
-						<div id={ metricsResultChevronIconID(m) }>
+						<div id={ metricsResultChevronIconID(m, "record") }>
 							@shared.IconSm("chevron-down")
 						</div>
 					</header>
-					<div id={ metricsResultDataID(m) } class="hidden">
+					<div id={ metricsResultDataID(m, "record") } class="hidden">
 						for _, r := range m.Records {
 							<div class="relative">
-								<h4 class="px-4 pt-2 text-lg">NFA-{ r.InvoiceNumber }</h4>
+								<h4 class="bg-gradient-to-r from-sky-100 px-4 py-2 text-lg italic">NFA-{ r.InvoiceNumber }</h4>
 								@MetricsResultData(r)
 								<hr/>
 							</div>
@@ -186,7 +186,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 }
 
 templ MetricsResultData(r *models.MetricsResult) {
-	<ul class="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 lg:grid-cols-3">
+	<ul class="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 xl:grid-cols-3">
 		if r.Type == "record" {
 			<li>
 				<strong>Lucro</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>
@@ -197,7 +197,7 @@ templ MetricsResultData(r *models.MetricsResult) {
 			<li>
 				<strong>Data de emissão</strong>: <span>{ utils.FormatDateAsBR(r.IssueDate) } </span>
 			</li>
-			<div class="absolute right-4 top-3 sm:col-span-2 lg:col-span-3">
+			<div class="absolute right-4 top-2 sm:col-span-2 lg:col-span-3">
 				@shared.DefaultButton("xs") {
 					@shared.IconSm("download-cloud")
 				}
@@ -272,18 +272,18 @@ func loadMetricsResultsIndicatorTarget(m *models.Metrics) string {
 	return fmt.Sprintf("#metrics-results-indicator-%d", m.ID)
 }
 
-func metricsResultDataID(m *models.Metrics) string {
-	return fmt.Sprintf("metrics-results-%s-%d", m.Type, m.ID)
+func metricsResultDataID(m *models.Metrics, resultType string) string {
+	return fmt.Sprintf("metrics-results-%s-%d", resultType, m.ID)
 }
 
-func metricsResultDataTarget(m *models.Metrics) string {
-	return fmt.Sprintf("#metrics-results-%s-%d", m.Type, m.ID)
+func metricsResultDataTarget(m *models.Metrics, resultType string) string {
+	return fmt.Sprintf("#metrics-results-%s-%d", resultType, m.ID)
 }
 
-func metricsResultChevronIconID(m *models.Metrics) string {
-	return fmt.Sprintf("chevron-%s-%d", m.Type, m.ID)
+func metricsResultChevronIconID(m *models.Metrics, resultType string) string {
+	return fmt.Sprintf("chevron-%s-%d", resultType, m.ID)
 }
 
-func metricsResultChevronIconTarget(m *models.Metrics) string {
-	return fmt.Sprintf("#chevron-%s-%d", m.Type, m.ID)
+func metricsResultChevronIconTarget(m *models.Metrics, resultType string) string {
+	return fmt.Sprintf("#chevron-%s-%d", resultType, m.ID)
 }

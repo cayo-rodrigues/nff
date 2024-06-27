@@ -107,27 +107,23 @@ func RetrieveMetrics(ctx context.Context, queryId int, userID int) (*models.Metr
 	return metrics, nil
 }
 
-func UpdateMetrics(ctx context.Context, query *models.Metrics) error {
+func UpdateMetrics(ctx context.Context, metrics *models.Metrics) error {
 	db := database.GetDB()
 
 	result, err := db.PG.Exec(
 		ctx,
 		`UPDATE metrics_history SET
-			req_status = $1, req_msg = $2, total_income = $3, total_expenses = $4,
-			avg_income = $5, avg_expenses = $6, diff = $7, is_positive = $8,
-			total_records = $9, positive_records = $10, negative_records = $11, updated_at = $12
-		WHERE id = $13 AND created_by = $14`,
-		query.ReqStatus, query.ReqMsg, query.TotalIncome, query.TotalExpenses,
-		query.AvgIncome, query.AvgExpenses, query.Diff, query.IsPositive,
-		query.TotalRecords, query.PositiveRecords, query.NegativeRecords, time.Now(),
-		query.ID, query.CreatedBy,
+			req_status = $1, req_msg = $2, updated_at = $3
+		WHERE id = $4 AND created_by = $5`,
+		metrics.ReqStatus, metrics.ReqMsg, time.Now(),
+		metrics.ID, metrics.CreatedBy,
 	)
 	if err != nil {
-		log.Printf("Error when running update metrics query. Metrics id: %d. Err: %v\n", query.ID, err)
+		log.Printf("Error when running update metrics query. Metrics id: %d. Err: %v\n", metrics.ID, err)
 		return utils.InternalServerErr
 	}
 	if result.RowsAffected() == 0 {
-		log.Printf("Metrics with id %v not found when running update query", query.ID)
+		log.Printf("Metrics with id %v not found when running update query", metrics.ID)
 		return utils.MetricsNotFoundErr
 	}
 

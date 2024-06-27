@@ -50,10 +50,10 @@ func getNotificationListItems() []Notification {
 	m.ReqStatus = "success"
 	m.CreatedAt = time.Now()
 	i := models.NewInvoice()
-	i.ReqStatus = "success"
+	i.ReqStatus = "error"
 	i.CreatedAt = time.Now()
 	c := models.NewInvoiceCancel()
-	c.ReqStatus = "success"
+	c.ReqStatus = "warning"
 	c.CreatedAt = time.Now()
 	p := models.NewInvoicePrint()
 	p.ReqStatus = "success"
