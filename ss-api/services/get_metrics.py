@@ -108,6 +108,7 @@ def get_metrics(data: dict):
         "total_records": query.results.total_records,
         "positive_records": query.results.positive_entries,
         "negative_records": query.results.negative_entries,
+        "total": query.results.json_serializable_format(),
         "months": query.results.json_serializable_months,
         "records": query.results.json_serializable_records,
     }
