@@ -12,7 +12,7 @@ type SSApiInvoiceRequest struct {
 type SSApiInvoiceResponse struct {
 	Msg                string              `json:"msg"`
 	IsAwaitingAnalisys bool                `json:"is_awaiting_analisys"`
-	InvoiceNumber      string              `json:"invoice_number"`
+	InvoiceNumber      string              `json:"invoice_id"` // TROCAR PARA invoice_number NA SS-API
 	InvoiceProtocol    string              `json:"invoice_protocol"`
 	InvoicePDF         string              `json:"invoice_pdf"`
 	FileName           string              `json:"file_name"`

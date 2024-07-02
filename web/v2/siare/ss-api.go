@@ -30,17 +30,29 @@ type SSApiEndpoints struct {
 	Metrics       string
 }
 
+var instance *SSApiClient
+
 func NewSSApiClient() *SSApiClient {
-	return &SSApiClient{
+	instance = &SSApiClient{
 		BaseUrl: os.Getenv("SS_API_BASE_URL"),
 		DB:      database.GetDB(),
 		Endpoints: &SSApiEndpoints{
-			IssueInvoice:  "/invoice/issue", // AJUSTAR NOME DO ENDPOINT NA SS-API
+			IssueInvoice:  "/invoice/request", // AJUSTAR NOME DO ENDPOINT NA SS-API para /invoice/issue
 			CancelInvoice: "/invoice/cancel",
 			PrintInvoice:  "/invoice/print",
 			Metrics:       "/metrics",
 		},
 	}
+
+	return instance
+}
+
+func GetSSApiClient() *SSApiClient {
+	if instance == nil {
+		return NewSSApiClient()
+	}
+
+	return instance
 }
 
 func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
@@ -124,6 +136,15 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) {
 
 	if err == nil {
 		storage.UpdateInvoiceCanceling(ctx, invoiceCancel)
+
+		// go func(invoiceID, userID int) {
+		// 	if invoiceCancel.ReqStatus == "error" {
+		// 		invoice, _ := storage.RetrieveInvoice(context.Background(), invoiceID, userID)
+		// 		invoice.ReqStatus = "canceled"
+		// 		invoice.ReqMsg = fmt.Sprintf("Nota Fiscal cancelada no Siare em %s.", utils.FormatDateAsBR(time.Now()))
+		// 		storage.UpdateInvoice(ctx, invoice)
+		// 	}
+		// }(invoiceID, invoiceCancel.CreatedBy)
 	}
 
 	c.DB.Redis.ClearCache(ctx, invoiceCancel.CreatedBy, "invoices-cancel")
@@ -204,8 +225,6 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	agent.QueryString(queryString)
 	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
-
-	fmt.Println("response!", string(body))
 
 	for _, err := range errs {
 		if err != nil {

@@ -63,7 +63,7 @@ func GenerateMetrics(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.NewSSApiClient()
+	ssapi := siare.GetSSApiClient()
 	go ssapi.GetMetrics(metrics)
 
 	c.Append("HX-Trigger-After-Swap", "reload-metrics-list")

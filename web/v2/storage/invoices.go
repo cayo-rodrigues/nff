@@ -68,12 +68,6 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 		return utils.InternalServerErr
 	}
 
-	err = BulkCreateInvoiceItems(ctx, invoice.Items, invoice.ID, invoice.CreatedBy)
-	if err != nil {
-		log.Println("Error running create invoice items query: ", err)
-		return utils.InternalServerErr
-	}
-
 	return nil
 }
 

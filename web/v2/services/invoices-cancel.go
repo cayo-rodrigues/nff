@@ -31,3 +31,25 @@ func CreateCanceling(ctx context.Context, c *models.InvoiceCancel, userID int) e
 func RetrieveCanceling(ctx context.Context, cancelingID int, userID int) (*models.InvoiceCancel, error) {
 	return storage.RetrieveInvoiceCanceling(ctx, cancelingID, userID)
 }
+
+func CreateCancelingFromInvoiceID(ctx context.Context, invoiceID, userID int) (*models.InvoiceCancel, error) {
+	invoice, err := RetrieveInvoice(ctx, invoiceID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	c := models.NewInvoiceCancel()
+
+	c.CreatedBy = userID
+	c.Entity = invoice.Sender
+	c.InvoiceNumber = invoice.Number
+	c.Year = invoice.CreatedAt.Year()
+	c.Justification = "A nota possui dados incorretos"
+
+	err = storage.CreateInvoiceCanceling(ctx, c)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}

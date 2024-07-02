@@ -12,7 +12,7 @@ import (
 
 type Invoice struct {
 	ID                   int            `json:"-"`
-	Number               string         `json:"invoice_id"`
+	Number               string         `json:"invoice_id"` // TROCAR PARA invoice_number NA SS-API
 	Protocol             string         `json:"-"`
 	Operation            string         `json:"operation"`
 	Cfop                 int            `json:"cfop,string"`
@@ -31,7 +31,7 @@ type Invoice struct {
 	CreatedAt            time.Time      `json:"-"`
 	UpdatedAt            time.Time      `json:"-"`
 	ExtraNotes           string         `json:"extra_notes"`
-	CustomFileNamePrefix string         `json:"custom_file_name_prefix"`
+	CustomFileNamePrefix string         `json:"custom_file_name"` // TROCAR PARA custom_file_name_prefix NA SS-API
 	FileName             string         `json:"file_name"`
 	Items                []*InvoiceItem `json:"items"`
 	Errors               ErrorMessages  `json:"-"`

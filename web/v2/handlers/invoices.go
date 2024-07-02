@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/siare"
 	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
@@ -111,6 +112,9 @@ func CreateInvoice(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+	ssapi := siare.GetSSApiClient()
+	go ssapi.IssueInvoice(invoice)
 
 	c.Append("HX-Trigger-After-Swap", "reload-invoice-list")
 	return RetargetToPageHandler(c, "/invoices", InvoicesPage)

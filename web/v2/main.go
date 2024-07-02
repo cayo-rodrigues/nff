@@ -91,6 +91,7 @@ func main() {
 
 	app.Get("/invoices/cancel", handlers.CancelInvoicePage)
 	app.Post("/invoices/cancel", handlers.CancelInvoice)
+	app.Post("/invoices/cancel/:invoice_id", handlers.CancelInvoiceByID)
 	app.Get("/invoices/cancel/list", handlers.ListInvoiceCancelings)
 	app.Get("/invoices/cancel/:id/form", handlers.GetCancelInvoiceForm)
 

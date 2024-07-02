@@ -64,11 +64,29 @@ func CancelInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.NewSSApiClient()
+	ssapi := siare.GetSSApiClient()
 	go ssapi.CancelInvoice(canceling)
 
 	c.Append("HX-Trigger-After-Swap", "reload-canceling-list")
 	return Render(c, forms.CancelInvoiceForm(canceling, entities))
+}
+
+func CancelInvoiceByID(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
+	invoiceID, err := c.ParamsInt("invoice_id")
+	if err != nil {
+		return err
+	}
+
+	canceling, err := services.CreateCancelingFromInvoiceID(c.Context(), invoiceID, userID)
+	if err != nil {
+		return err
+	}
+
+	ssapi := siare.GetSSApiClient()
+	go ssapi.CancelInvoice(canceling)
+
+	return nil
 }
 
 func ListInvoiceCancelings(c *fiber.Ctx) error {
