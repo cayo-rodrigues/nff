@@ -71,6 +71,27 @@ func PrintInvoice(c *fiber.Ctx) error {
 	return Render(c, forms.PrintInvoiceForm(printing, entities))
 }
 
+func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
+	userID := utils.GetCurrentUserID(c)
+
+	recordID, err := c.ParamsInt("record_id")
+	if err != nil {
+		return err
+	}
+	invoiceNumber := c.Params("invoice_number")
+	entityID, err := c.ParamsInt("entity_id")
+	if err != nil {
+		return err
+	}
+
+	printing, err := services.CreatePrintingFromMetricsRecord(c.Context(), invoiceNumber, entityID, userID)
+
+	ssapi := siare.GetSSApiClient()
+	go ssapi.PrintInvoiceFromMetricsRecord(printing, recordID, userID)
+
+	return nil
+}
+
 func ListInvoicePrintings(c *fiber.Ctx) error {
 	userID := utils.GetCurrentUserID(c)
 	filters := c.Queries()

@@ -57,6 +57,10 @@ func (i *Invoice) GetPageEndpoint() string {
 	return "/invoices"
 }
 
+func (i *Invoice) IsCancelable() bool {
+	return i.Number != "" && i.ReqStatus != "canceled"
+}
+
 func NewInvoice() *Invoice {
 	return &Invoice{
 		Sender:    NewEntity(),

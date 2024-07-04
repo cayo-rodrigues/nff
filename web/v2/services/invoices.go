@@ -33,7 +33,9 @@ func ListInvoices(ctx context.Context, userID int, filters ...map[string]string)
 }
 
 func RetrieveInvoice(ctx context.Context, invoiceID int, userID int) (*models.Invoice, error) {
-	invoice, err := storage.RetrieveInvoice(ctx, invoiceID, userID)
+	// TODO
+	// DEIXAR BONITO
+	invoice, err := storage.RetrieveInvoice(ctx, invoiceID, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -44,5 +46,16 @@ func RetrieveInvoice(ctx context.Context, invoiceID int, userID int) (*models.In
 	}
 
 	invoice.Items = items
+	return invoice, nil
+}
+
+func RetrieveInvoiceByNumber(ctx context.Context, invoiceNumber string, userID int) (*models.Invoice, error) {
+	// TODO
+	// DEIXAR BONITO
+	invoice, err := storage.RetrieveInvoice(ctx, 0, userID, invoiceNumber)
+	if err != nil {
+		return nil, err
+	}
+
 	return invoice, nil
 }

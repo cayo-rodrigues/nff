@@ -30,7 +30,7 @@ func CreateMetrics(ctx context.Context, m *models.Metrics, userID int) error {
 	return storage.CreateMetrics(ctx, m)
 }
 
-func RetrieveMetrics(ctx context.Context, printingID int, userID int) (*models.Metrics, error) {
-	return storage.RetrieveMetrics(ctx, printingID, userID)
+func RetrieveMetrics(ctx context.Context, metricsID int, userID int) (*models.Metrics, error) {
+	return storage.RetrieveMetrics(ctx, metricsID, userID)
 }
 

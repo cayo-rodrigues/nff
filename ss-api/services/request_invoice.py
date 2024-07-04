@@ -83,7 +83,7 @@ def request_invoice(invoice_data: dict):
             invoice_id = invoice.get_id_from_filename()
             invoice_file_path = invoice.get_file_path()
             invoice_file_name = invoice.get_file_name()
-            if invoice.custom_file_name:
+            if invoice.custom_file_name_prefix:
                 invoice_file_name = invoice.use_custom_file_name()
             pdf_url = upload_to_s3(
                 file_path=invoice_file_path, s3_file_name=invoice_file_name
@@ -102,7 +102,7 @@ def request_invoice(invoice_data: dict):
                 f"Something went wrong trying to download invoice or upload pdf to s3: {e}",
                 file=sys.stderr,
             )
-            msg = ErrorMessages.DOWNLOAD_ERROR
+            msg = WarningMessages.DOWNLOAD_ERROR
             status = "warning"
 
     siare.close()

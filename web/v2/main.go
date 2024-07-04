@@ -68,7 +68,7 @@ func main() {
 
 	app.Use(middlewares.AuthMiddleware)
 
-	app.Use(middlewares.CacheMiddleware)
+	// app.Use(middlewares.CacheMiddleware)
 	// app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)
 
 	app.Get("/", handlers.HomePage)
@@ -97,6 +97,7 @@ func main() {
 
 	app.Get("/invoices/print", handlers.PrintInvoicePage)
 	app.Post("/invoices/print", handlers.PrintInvoice)
+	app.Post("/invoices/print/:record_id/:invoice_number/:entity_id", handlers.PrintInvoiceFromMetricsRecord)
 	app.Get("/invoices/print/list", handlers.ListInvoicePrintings)
 	app.Get("/invoices/print/:id/form", handlers.GetPrintInvoiceForm)
 

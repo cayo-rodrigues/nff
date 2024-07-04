@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -71,17 +72,32 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 	return nil
 }
 
-func RetrieveInvoice(ctx context.Context, invoiceID int, userID int) (*models.Invoice, error) {
+// TODO
+// DEIXAR BONITO
+func RetrieveInvoice(ctx context.Context, invoiceID int, userID int, invoiceNumber string) (*models.Invoice, error) {
 	db := database.GetDB()
+
+	searchColumn := "id"
+	queryValues := []any{}
+	if invoiceID != 0 && invoiceNumber == "" {
+		queryValues = append(queryValues, invoiceID)
+	}
+	if invoiceID == 0 && invoiceNumber != "" {
+		searchColumn = "number"
+		queryValues = append(queryValues, invoiceNumber)
+	}
+	queryValues = append(queryValues, userID)
 
 	row := db.PG.QueryRow(
 		ctx,
-		`SELECT *
+		fmt.Sprintf(
+			`SELECT *
 			FROM invoices
 				JOIN entities AS senders ON invoices.sender_id = senders.id
 				JOIN entities AS recipients ON invoices.recipient_id = recipients.id
-		WHERE invoices.id = $1 AND invoices.created_by = $2`,
-		invoiceID, userID,
+		WHERE invoices.%s = $1 AND invoices.created_by = $2`, searchColumn,
+		),
+		queryValues...,
 	)
 	invoice := models.NewInvoice()
 	err := Scan(row, invoice, invoice.Sender, invoice.Recipient)

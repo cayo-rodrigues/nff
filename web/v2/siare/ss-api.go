@@ -102,7 +102,7 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	c.DB.Redis.Set(ctx, key, true, time.Minute)
 }
 
-func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) {
+func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
 	defer cancel()
 
@@ -137,23 +137,47 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) {
 	if err == nil {
 		storage.UpdateInvoiceCanceling(ctx, invoiceCancel)
 
-		// go func(invoiceID, userID int) {
-		// 	if invoiceCancel.ReqStatus == "error" {
-		// 		invoice, _ := storage.RetrieveInvoice(context.Background(), invoiceID, userID)
-		// 		invoice.ReqStatus = "canceled"
-		// 		invoice.ReqMsg = fmt.Sprintf("Nota Fiscal cancelada no Siare em %s.", utils.FormatDateAsBR(time.Now()))
-		// 		storage.UpdateInvoice(ctx, invoice)
-		// 	}
-		// }(invoiceID, invoiceCancel.CreatedBy)
+		// TODO
+		// DEIXAR BONITO?
+		go func(invoiceNumber string, userID int) {
+			if invoiceCancel.ReqStatus == "success" {
+				invoice, err := storage.RetrieveInvoice(context.Background(), 0, userID, invoiceCancel.InvoiceNumber)
+				if err == nil {
+					invoice.ReqStatus = "canceled"
+					invoice.ReqMsg = fmt.Sprintf(
+						"Nota Fiscal havia sido emitida com sucesso, porém foi cancelada em %s.\nJustificativa: %s",
+						utils.FormatDatetimeAsBR(time.Now()),
+						invoiceCancel.Justification,
+					)
+					storage.UpdateInvoice(context.Background(), invoice)
+				}
+			}
+		}(invoiceCancel.InvoiceNumber, invoiceCancel.CreatedBy)
 	}
 
 	c.DB.Redis.ClearCache(ctx, invoiceCancel.CreatedBy, "invoices-cancel")
 
 	key := fmt.Sprintf("reqstatus:canceling:%v", invoiceCancel.ID)
 	c.DB.Redis.Set(ctx, key, true, time.Minute)
+
+	return err
 }
 
-func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) {
+func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, recordID, userID int) error {
+	err := c.PrintInvoice(p)
+	if err != nil {
+		return err
+	}
+
+	record := models.NewMetricsResult()
+	record.InvoicePDF = p.InvoicePDF
+	record.ID = recordID
+	record.CreatedBy = userID
+
+	return storage.UpdateMetricsResultRecord(context.Background(), record)
+}
+
+func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 	ctx, print := context.WithTimeout(context.Background(), time.Minute*10)
 	defer print()
 
@@ -195,6 +219,8 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) {
 
 	key := fmt.Sprintf("reqstatus:printing:%v", invoicePrint.ID)
 	c.DB.Redis.Set(ctx, key, true, time.Minute)
+
+	return err
 }
 
 func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {

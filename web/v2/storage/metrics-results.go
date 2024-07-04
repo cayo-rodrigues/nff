@@ -13,7 +13,7 @@ import (
 func ListMetricsResults(ctx context.Context, metricsID int, userID int) ([]*models.MetricsResult, error) {
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM metrics_results WHERE metrics_id = $1 AND created_by = $2 ORDER BY issue_date", metricsID, userID)
+	rows, _ := db.PG.Query(ctx, "SELECT * FROM metrics_results WHERE metrics_id = $1 AND created_by = $2 ORDER BY issue_date, id", metricsID, userID)
 	defer rows.Close()
 
 	results := []*models.MetricsResult{}
@@ -106,6 +106,29 @@ func BulkCreateMetricsResults(ctx context.Context, results []*models.MetricsResu
 	if err != nil {
 		log.Printf("Error when running bulk insert metrics results query. Metrics id: %d. Result type: %s. Err: %v\n", metricsID, resultType, err)
 		return utils.InternalServerErr
+	}
+
+	return nil
+}
+
+func UpdateMetricsResultRecord(ctx context.Context, result *models.MetricsResult) error  {
+	db := database.GetDB()
+
+	cmd, err := db.PG.Exec(
+		ctx,
+		`UPDATE metrics_results
+			SET invoice_pdf = $1
+		WHERE id = $2 AND created_by = $3 AND type = 'record'`,
+		result.InvoicePDF,
+		result.ID, result.CreatedBy,
+	)
+	if err != nil {
+		log.Println("Error when running update metrics query: ", err)
+		return utils.InternalServerErr
+	}
+	if cmd.RowsAffected() == 0 {
+		log.Printf("Metrics result with id %v not found when running update query", result.ID)
+		return utils.MetricsNotFoundErr
 	}
 
 	return nil

@@ -82,6 +82,10 @@ func NewMetrics() *Metrics {
 
 }
 
+func NewMetricsResult() *MetricsResult {
+	return &MetricsResult{}
+}
+
 func NewMetricsFromForm(c *fiber.Ctx) *Metrics {
 	m := NewMetrics()
 
@@ -138,5 +142,6 @@ func (r *MetricsResult) Values() []any {
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
 		&r.IssueDate, &r.InvoiceNumber, &r.EntityID,
+		&r.InvoicePDF,
 	}
 }

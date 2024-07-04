@@ -5,7 +5,7 @@ from apis import FileManager
 
 
 class Printable:
-    custom_file_name: str
+    custom_file_name_prefix: str
 
     def get_file_path(self):
         return FileManager.get_latest_file_name(INVOICES_DIR_PATH)
@@ -31,7 +31,7 @@ class Printable:
     def use_custom_file_name(self):
         invoice_file_name = self.get_file_name()
         invoice_id = invoice_file_name.removesuffix(".pdf")
-        new_file_name = self.custom_file_name + f" ({invoice_id})" + ".pdf"
+        new_file_name = self.custom_file_name_prefix + f" ({invoice_id})" + ".pdf"
         return new_file_name
 
     def erase_file(self):

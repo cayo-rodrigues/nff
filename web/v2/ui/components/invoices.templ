@@ -64,14 +64,21 @@ templ InvoiceCard(i *models.Invoice) {
 					@shared.IconSm("download-cloud")
 				}
 			</a>
-			<div onclick={ scripts.OpenDialog(cancelingConfirmationDialogTarget(i)) } title="Cancelar NFA">
+			<div
+				if i.IsCancelable() {
+					onclick={ scripts.OpenDialog(cancelingConfirmationDialogTarget(i)) }
+				}
+				title="Cancelar NFA"
+			>
 				@shared.ErrorButton("xs") {
 					@shared.IconSm("slash")
 				}
 			</div>
 		</div>
 		@InvoiceDetailsDialog(i)
-		@CancelingConfirmationDialog(i)
+		if i.IsCancelable() {
+			@CancelingConfirmationDialog(i)
+		}
 	</li>
 }
 
