@@ -64,7 +64,7 @@ func getNotificationListItems() []Notification {
 templ NotificationList[T Notification](items []T) {
 	<ul
 		hx-get="/get-notifications"
-		hx-trigger="sse:operation-finished"
+		hx-trigger="sse:metrics-finished, sse:invoice-issue-finished, sse:invoice-cancel-finished, sse:invoice-print-finished"
 		hx-target="this"
 		hx-swap="outerHTML"
 		id="notification-list"

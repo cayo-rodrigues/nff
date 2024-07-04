@@ -10,7 +10,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/handlers"
 
-	// "github.com/cayo-rodrigues/nff/web/handlers/sse"
+	"github.com/cayo-rodrigues/nff/web/handlers/sse"
 	"github.com/cayo-rodrigues/nff/web/middlewares"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
@@ -69,7 +69,7 @@ func main() {
 	app.Use(middlewares.AuthMiddleware)
 
 	// app.Use(middlewares.CacheMiddleware)
-	// app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)
+	app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)
 
 	app.Get("/", handlers.HomePage)
 

@@ -79,6 +79,7 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	err := json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.IssueInvoice, "invoice", invoice.ID, err)
+		return
 	}
 
 	if response.Errors != nil {
@@ -92,9 +93,7 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	invoice.PDF = response.InvoicePDF
 	invoice.FileName = response.FileName
 
-	if err == nil {
-		storage.UpdateInvoice(ctx, invoice)
-	}
+	storage.UpdateInvoice(ctx, invoice)
 
 	c.DB.Redis.ClearCache(ctx, invoice.CreatedBy, "invoices")
 
@@ -125,6 +124,7 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	err := json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.CancelInvoice, "canceling", invoiceCancel.ID, err)
+		return err
 	}
 
 	if response.Errors != nil {
@@ -134,26 +134,24 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	invoiceCancel.ReqStatus = response.Status
 	invoiceCancel.ReqMsg = response.Msg
 
-	if err == nil {
-		storage.UpdateInvoiceCanceling(ctx, invoiceCancel)
+	storage.UpdateInvoiceCanceling(ctx, invoiceCancel)
 
-		// TODO
-		// DEIXAR BONITO?
-		go func(invoiceNumber string, userID int) {
-			if invoiceCancel.ReqStatus == "success" {
-				invoice, err := storage.RetrieveInvoice(context.Background(), 0, userID, invoiceCancel.InvoiceNumber)
-				if err == nil {
-					invoice.ReqStatus = "canceled"
-					invoice.ReqMsg = fmt.Sprintf(
-						"Nota Fiscal havia sido emitida com sucesso, porém foi cancelada em %s.\nJustificativa: %s",
-						utils.FormatDatetimeAsBR(time.Now()),
-						invoiceCancel.Justification,
-					)
-					storage.UpdateInvoice(context.Background(), invoice)
-				}
+	// TODO
+	// DEIXAR BONITO?
+	go func(invoiceNumber string, userID int) {
+		if invoiceCancel.ReqStatus == "success" {
+			invoice, err := storage.RetrieveInvoice(context.Background(), 0, userID, invoiceCancel.InvoiceNumber)
+			if err == nil {
+				invoice.ReqStatus = "canceled"
+				invoice.ReqMsg = fmt.Sprintf(
+					"Nota Fiscal havia sido emitida com sucesso, porém foi cancelada em %s.\nJustificativa: %s",
+					utils.FormatDatetimeAsBR(time.Now()),
+					invoiceCancel.Justification,
+				)
+				storage.UpdateInvoice(context.Background(), invoice)
 			}
-		}(invoiceCancel.InvoiceNumber, invoiceCancel.CreatedBy)
-	}
+		}
+	}(invoiceCancel.InvoiceNumber, invoiceCancel.CreatedBy)
 
 	c.DB.Redis.ClearCache(ctx, invoiceCancel.CreatedBy, "invoices-cancel")
 
@@ -200,6 +198,7 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 	err := json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.PrintInvoice, "printing", invoicePrint.ID, err)
+		return err
 	}
 
 	if response.Errors != nil {
@@ -211,9 +210,7 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 	invoicePrint.InvoicePDF = response.InvoicePDF
 	invoicePrint.FileName = response.FileName
 
-	if err == nil {
-		storage.UpdateInvoicePrinting(ctx, invoicePrint)
-	}
+	storage.UpdateInvoicePrinting(ctx, invoicePrint)
 
 	c.DB.Redis.ClearCache(ctx, invoicePrint.CreatedBy, "invoices-print")
 
@@ -226,6 +223,8 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
 	defer cancel()
+
+	resourceName := "metrics"
 
 	reqData := SSApiMetricsRequest{
 		Body: &SSApiMetricsRequestBody{
@@ -254,14 +253,16 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 
 	for _, err := range errs {
 		if err != nil {
-			requestErrLog(c.Endpoints.Metrics, "metrics", metrics.ID, err)
+			requestErrLog(c.Endpoints.Metrics, resourceName, metrics.ID, err)
 		}
 	}
 
 	var response SSApiMetricsResponse
 	err := json.Unmarshal(body, &response)
 	if err != nil {
-		jsonUnmarchalErrLog(c.Endpoints.Metrics, "metrics", metrics.ID, err)
+		jsonUnmarchalErrLog(c.Endpoints.Metrics, resourceName, metrics.ID, err)
+		finishOperation(ctx, c.DB.Redis, resourceName, metrics.CreatedBy)
+		return
 	}
 
 	if response.Errors != nil {
@@ -269,35 +270,41 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	}
 
 	metrics.MetricsResult = response.MetricsResult
+	metrics.ReqStatus = response.ReqStatus
+	metrics.ReqMsg = response.ReqMsg
 
-	if err == nil {
-		var wg sync.WaitGroup
-		wg.Add(4)
+	var wg sync.WaitGroup
+	wg.Add(4)
 
-		go func() {
-			defer wg.Done()
-			storage.UpdateMetrics(ctx, metrics)
-		}()
-		go func() {
-			defer wg.Done()
-			storage.CreateMetricsResult(ctx, metrics.MetricsResult.Total, "total", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
-		}()
-		go func() {
-			defer wg.Done()
-			storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
-		}()
-		go func() {
-			defer wg.Done()
-			storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
-		}()
+	go func() {
+		defer wg.Done()
+		storage.UpdateMetrics(ctx, metrics)
+	}()
+	go func() {
+		defer wg.Done()
+		if metrics.MetricsResult.Total == nil {
+			return
+		}
+		storage.CreateMetricsResult(ctx, metrics.MetricsResult.Total, "total", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+	}()
+	go func() {
+		defer wg.Done()
+		if metrics.MetricsResult.Months == nil {
+			return
+		}
+		storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+	}()
+	go func() {
+		defer wg.Done()
+		if metrics.MetricsResult.Records == nil {
+			return
+		}
+		storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+	}()
 
-		wg.Wait()
-	}
+	wg.Wait()
 
-	c.DB.Redis.ClearCache(ctx, metrics.CreatedBy, "metrics")
-
-	key := fmt.Sprintf("reqstatus:metrics:%v", metrics.ID)
-	c.DB.Redis.Set(ctx, key, true, time.Minute)
+	finishOperation(ctx, c.DB.Redis, resourceName, metrics.CreatedBy)
 }
 
 func formatErrResponseField(fieldErrs []string, prefix string) string {
@@ -342,4 +349,13 @@ func requestErrLog(endpoint, resourceName string, resourceID int, err error) {
 
 func jsonUnmarchalErrLog(endpoint, resourceName string, resourceID int, err error) {
 	log.Printf("Something went wrong trying to unmarshal ss-api %s json response. %s with id %v will be on 'pending' state for ever: %v\n", endpoint, resourceName, resourceID, err)
+}
+
+func finishOperation(ctx context.Context, redisClient *database.Redis, channel string, userID int) {
+	// primeiro, adicionar Operation em uma fila no redis para que seja consumida por outro endpoint (que será chamado quando o sininho receber notificação)
+
+	redisClient.ClearCache(ctx, userID, channel)
+
+	message := fmt.Sprintf("%s-finished", channel)
+	redisClient.Publish(ctx, channel, message)
 }
