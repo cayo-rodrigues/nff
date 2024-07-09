@@ -172,15 +172,18 @@ function GetCurrentQueryString() {
 
 function PreserveListFilters(event) {
     const pagePaths = ['/metrics', '/invoices', '/invoices/cancel', '/invoices/print']
-    const reqPath = event.detail.path
+    const reqPath = event.detail.pathInfo.requestPath
+
+    console.log(event)
 
 
     const isListRequest = new RegExp('.*\/list$').test(reqPath)
-    const isPageRequest = pagePaths.includes(reqPath) && event.detail.verb === 'get'
+    const isPageRequest = pagePaths.includes(reqPath) && event.detail.boosted && event.detail.requestConfig.verb === 'get'
 
     if (isListRequest || isPageRequest) {
-        reqPath += `?${GetCurrentQueryString()}`
+        event.detail.pathInfo.requestPath += `?${GetCurrentQueryString()}` // NOT WORKING!!
     }
+    console.log('no fim', reqPath)
 }
 
 function OpenBurgerMenu() {

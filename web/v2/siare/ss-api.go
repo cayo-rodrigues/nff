@@ -56,8 +56,11 @@ func GetSSApiClient() *SSApiClient {
 }
 
 func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
+
+	resourceName := "invoice-issue"
+	defer finishOperation(ctx, c.DB.Redis, resourceName, invoice.CreatedBy, invoice)
 
 	reqBody := SSApiInvoiceRequest{
 		Invoice:        invoice,
@@ -94,16 +97,14 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	invoice.FileName = response.FileName
 
 	storage.UpdateInvoice(ctx, invoice)
-
-	c.DB.Redis.ClearCache(ctx, invoice.CreatedBy, "invoices")
-
-	key := fmt.Sprintf("reqstatus:invoice:%v", invoice.ID)
-	c.DB.Redis.Set(ctx, key, true, time.Minute)
 }
 
 func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
+
+	resourceName := "invoice-cancel"
+	defer finishOperation(ctx, c.DB.Redis, resourceName, invoiceCancel.CreatedBy, invoiceCancel)
 
 	reqBody := SSApiCancelingRequest{
 		InvoiceCancel: invoiceCancel,
@@ -134,34 +135,39 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	invoiceCancel.ReqStatus = response.Status
 	invoiceCancel.ReqMsg = response.Msg
 
-	storage.UpdateInvoiceCanceling(ctx, invoiceCancel)
+	err = storage.UpdateInvoiceCanceling(ctx, invoiceCancel)
 
 	// TODO
 	// DEIXAR BONITO?
-	go func(invoiceNumber string, userID int) {
+	go func(invoiceCancel *models.InvoiceCancel) {
 		if invoiceCancel.ReqStatus == "success" {
-			invoice, err := storage.RetrieveInvoice(context.Background(), 0, userID, invoiceCancel.InvoiceNumber)
-			if err == nil {
-				invoice.ReqStatus = "canceled"
-				invoice.ReqMsg = fmt.Sprintf(
-					"Nota Fiscal havia sido emitida com sucesso, porém foi cancelada em %s.\nJustificativa: %s",
-					utils.FormatDatetimeAsBR(time.Now()),
-					invoiceCancel.Justification,
-				)
-				storage.UpdateInvoice(context.Background(), invoice)
+			invoice, err := storage.RetrieveInvoice(context.Background(), 0, invoiceCancel.CreatedBy, invoiceCancel.InvoiceNumber)
+			if err != nil {
+				return
 			}
+
+			invoice.ReqStatus = "canceled"
+			invoice.ReqMsg = fmt.Sprintf(
+				"Nota Fiscal havia sido emitida com sucesso, porém foi cancelada em %s.\nJustificativa: %s",
+				utils.FormatDatetimeAsBR(time.Now()),
+				invoiceCancel.Justification,
+			)
+			err = storage.UpdateInvoice(context.Background(), invoice)
+			if err != nil {
+				return
+			}
+			innerResourceName := "invoice-cancel-from-invoice-card"
+			notifyOperationResult(ctx, c.DB.Redis, innerResourceName, invoiceCancel.CreatedBy)
 		}
-	}(invoiceCancel.InvoiceNumber, invoiceCancel.CreatedBy)
-
-	c.DB.Redis.ClearCache(ctx, invoiceCancel.CreatedBy, "invoices-cancel")
-
-	key := fmt.Sprintf("reqstatus:canceling:%v", invoiceCancel.ID)
-	c.DB.Redis.Set(ctx, key, true, time.Minute)
+	}(invoiceCancel)
 
 	return err
 }
 
 func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, recordID, userID int) error {
+	resourceName := "invoice-print-from-record"
+	defer notifyOperationResult(context.Background(), c.DB.Redis, resourceName, userID)
+
 	err := c.PrintInvoice(p)
 	if err != nil {
 		return err
@@ -176,8 +182,11 @@ func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, reco
 }
 
 func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
-	ctx, print := context.WithTimeout(context.Background(), time.Minute*10)
+	ctx, print := context.WithTimeout(context.Background(), time.Minute*5)
 	defer print()
+
+	resourceName := "invoice-print"
+	defer finishOperation(ctx, c.DB.Redis, resourceName, invoicePrint.CreatedBy, invoicePrint)
 
 	reqBody := SSApiPrintingRequest{
 		InvoicePrint: invoicePrint,
@@ -190,14 +199,14 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 
 	for _, err := range errs {
 		if err != nil {
-			requestErrLog(c.Endpoints.PrintInvoice, "printing", invoicePrint.ID, err)
+			requestErrLog(c.Endpoints.PrintInvoice, resourceName, invoicePrint.ID, err)
 		}
 	}
 
 	var response SSApiPrintingResponse
 	err := json.Unmarshal(body, &response)
 	if err != nil {
-		jsonUnmarchalErrLog(c.Endpoints.PrintInvoice, "printing", invoicePrint.ID, err)
+		jsonUnmarchalErrLog(c.Endpoints.PrintInvoice, resourceName, invoicePrint.ID, err)
 		return err
 	}
 
@@ -210,21 +219,15 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 	invoicePrint.InvoicePDF = response.InvoicePDF
 	invoicePrint.FileName = response.FileName
 
-	storage.UpdateInvoicePrinting(ctx, invoicePrint)
-
-	c.DB.Redis.ClearCache(ctx, invoicePrint.CreatedBy, "invoices-print")
-
-	key := fmt.Sprintf("reqstatus:printing:%v", invoicePrint.ID)
-	c.DB.Redis.Set(ctx, key, true, time.Minute)
-
-	return err
+	return storage.UpdateInvoicePrinting(ctx, invoicePrint)
 }
 
 func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
 	resourceName := "metrics"
+	defer finishOperation(ctx, c.DB.Redis, resourceName, metrics.CreatedBy, metrics)
 
 	reqData := SSApiMetricsRequest{
 		Body: &SSApiMetricsRequestBody{
@@ -261,7 +264,6 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	err := json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.Metrics, resourceName, metrics.ID, err)
-		finishOperation(ctx, c.DB.Redis, resourceName, metrics.CreatedBy)
 		return
 	}
 
@@ -303,8 +305,7 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	}()
 
 	wg.Wait()
-
-	finishOperation(ctx, c.DB.Redis, resourceName, metrics.CreatedBy)
+	return
 }
 
 func formatErrResponseField(fieldErrs []string, prefix string) string {
@@ -351,11 +352,30 @@ func jsonUnmarchalErrLog(endpoint, resourceName string, resourceID int, err erro
 	log.Printf("Something went wrong trying to unmarshal ss-api %s json response. %s with id %v will be on 'pending' state for ever: %v\n", endpoint, resourceName, resourceID, err)
 }
 
-func finishOperation(ctx context.Context, redisClient *database.Redis, channel string, userID int) {
-	// primeiro, adicionar Operation em uma fila no redis para que seja consumida por outro endpoint (que será chamado quando o sininho receber notificação)
+func finishOperation(ctx context.Context, redisClient *database.Redis, resourceName string, userID int, n models.Notification) {
+	// primeiro, adicionar Notification em uma fila no redis para que seja consumida por outro endpoint (que será chamado quando o sininho receber notificação)
+	pushOperationToNotificationQueue(ctx, redisClient, userID, n)
+	go redisClient.ClearCache(ctx, userID, resourceName)
+	go notifyOperationResult(ctx, redisClient, resourceName, userID)
+}
 
-	redisClient.ClearCache(ctx, userID, channel)
+func notifyOperationResult(ctx context.Context, redisClient *database.Redis, resourceName string, userID int) {
+	channel := fmt.Sprintf("%d:%s-finished", userID, resourceName)
+	redisClient.Publish(ctx, channel, nil)
+}
 
-	message := fmt.Sprintf("%s-finished", channel)
-	redisClient.Publish(ctx, channel, message)
+func pushOperationToNotificationQueue(ctx context.Context, redisClient *database.Redis, userID int, n models.Notification) {
+	queueName := fmt.Sprintf("notification-queue:%d", userID)
+	notification := models.JsonSerializableNotification(n, userID)
+
+	notificationData, err := json.Marshal(notification)
+	if err != nil {
+		log.Println("Failed to marshal notification:", err)
+		return
+	}
+
+	err = redisClient.RPush(ctx, queueName, notificationData).Err()
+	if err != nil {
+		log.Println("Failed to enqueue notification:", err)
+	}
 }

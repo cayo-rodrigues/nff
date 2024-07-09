@@ -1,9 +1,11 @@
 package shared
 
 import "strconv"
-import "time"
 import "github.com/cayo-rodrigues/nff/web/utils"
 import "github.com/cayo-rodrigues/nff/web/models"
+import "strings"
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/services"
 
 templ NotificationBell() {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
@@ -32,39 +34,39 @@ templ NotificationDialog() {
 				}
 			</div>
 		</div>
-		@NotificationList(getNotificationListItems())
+		@NotificationList(services.GetNotificationListItems())
+		<div>
+			@DefaultButtonOutline("xs") {
+				<span>Limpar Notificações</span>
+			}
+		</div>
 	</dialog>
 }
 
-type Notification interface {
-	GetStatus() string
-	GetOperationType() string
-	GetCreatedAt() time.Time
-	GetID() int
-	GetPageEndpoint() string
+func getNotificationEventNames(ctx context.Context) string {
+	baseNames := []string{"invoice-issue", "invoice-cancel", "invoice-print", "metrics"}
+	userData := utils.GetCurrentUserData(ctx)
+
+	builder := strings.Builder{}
+
+	for i, baseName := range baseNames {
+		userEvent := fmt.Sprintf("sse:%s:%s-finished", userData.ID, baseName)
+		builder.WriteString(userEvent)
+		if i < len(baseNames) - 1 {
+			builder.WriteString(", ")
+		}
+	}
+
+	return builder.String()
 }
 
-func getNotificationListItems() []Notification {
-	// items will be stored in redis
-	m := models.NewMetrics()
-	m.ReqStatus = "success"
-	m.CreatedAt = time.Now()
-	i := models.NewInvoice()
-	i.ReqStatus = "error"
-	i.CreatedAt = time.Now()
-	c := models.NewInvoiceCancel()
-	c.ReqStatus = "warning"
-	c.CreatedAt = time.Now()
-	p := models.NewInvoicePrint()
-	p.ReqStatus = "success"
-	p.CreatedAt = time.Now()
-	return []Notification{m, i, c, p}
-}
-
-templ NotificationList[T Notification](items []T) {
+// need userID to expect the correct sse events
+// getting access to the current context would be more straightforward and have better performance than querying redis
+// maybe will need to get rid of fiber ?
+templ NotificationList[T models.Notification](items []T) {
 	<ul
 		hx-get="/get-notifications"
-		hx-trigger="sse:metrics-finished, sse:invoice-issue-finished, sse:invoice-cancel-finished, sse:invoice-print-finished"
+		hx-trigger={ getNotificationEventNames(ctx) }
 		hx-target="this"
 		hx-swap="outerHTML"
 		id="notification-list"
@@ -76,7 +78,7 @@ templ NotificationList[T Notification](items []T) {
 	</ul>
 }
 
-templ NotificationListItem(n Notification, position int) {
+templ NotificationListItem(n models.Notification, position int) {
 	<li class="relative grid grid-cols-1 gap-2 rounded p-2 shadow shadow-gray-600">
 		<span class="absolute -right-1 -top-1 rounded border border-gray-300 bg-gray-100 px-2 py-1">{ strconv.Itoa(position) }</span>
 		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">

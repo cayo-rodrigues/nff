@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"strconv"
 	"strings"
 	"time"
@@ -88,6 +89,18 @@ func FormatedNDaysBefore(now time.Time, days int) string {
 func GetCurrentUserID(c *fiber.Ctx) int {
 	userID := c.Locals("UserID").(int)
 	return userID
+}
+
+type UserData struct {
+	ID              string
+	IsAuthenticated bool
+}
+
+func GetCurrentUserData(ctx context.Context) *UserData {
+	if userData, ok := ctx.Value("UserData").(*UserData); ok {
+		return userData
+	}
+	return new(UserData)
 }
 
 func IsAuthenticated(c *fiber.Ctx) bool {
