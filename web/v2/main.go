@@ -47,6 +47,7 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Prefork: PREFORK,
 		AppName: "NFF",
+		// ErrorHandler: SERIA UTIL?
 	})
 
 	app.Use(logger.New(logger.Config{
@@ -67,8 +68,8 @@ func main() {
 	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
-
 	// app.Use(middlewares.CacheMiddleware)
+
 	app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)
 
 	app.Get("/", handlers.HomePage)
@@ -106,6 +107,9 @@ func main() {
 	app.Get("/metrics/list", handlers.ListMetrics)
 	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
+
+	app.Get("/notifications", handlers.ListNotifications)
+	app.Delete("/notifications", handlers.ClearNotifications)
 
 	app.Use(handlers.NotFoundPage)
 

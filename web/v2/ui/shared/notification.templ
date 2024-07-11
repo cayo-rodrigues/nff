@@ -34,25 +34,27 @@ templ NotificationDialog() {
 				}
 			</div>
 		</div>
-		@NotificationList(services.GetNotificationListItems())
-		<div>
-			@DefaultButtonOutline("xs") {
-				<span>Limpar Notificações</span>
-			}
+		@NotificationList(services.GetNotifications(ctx))
+		<div class="border-t p-2">
+			<div hx-delete="notifications" hx-trigger="click" onclick="CloseNotificationDialog(); HideNotificationBang()">
+				@DefaultButtonOutline("xs") {
+					<span>Limpar Notificações</span>
+				}
+			</div>
 		</div>
 	</dialog>
 }
 
 func getNotificationEventNames(ctx context.Context) string {
 	baseNames := []string{"invoice-issue", "invoice-cancel", "invoice-print", "metrics"}
-	userData := utils.GetCurrentUserData(ctx)
+	userData := utils.GetUserData(ctx)
 
 	builder := strings.Builder{}
 
 	for i, baseName := range baseNames {
-		userEvent := fmt.Sprintf("sse:%s:%s-finished", userData.ID, baseName)
+		userEvent := fmt.Sprintf("sse:%d:%s-finished", userData.ID, baseName)
 		builder.WriteString(userEvent)
-		if i < len(baseNames) - 1 {
+		if i < len(baseNames)-1 {
 			builder.WriteString(", ")
 		}
 	}
@@ -60,12 +62,9 @@ func getNotificationEventNames(ctx context.Context) string {
 	return builder.String()
 }
 
-// need userID to expect the correct sse events
-// getting access to the current context would be more straightforward and have better performance than querying redis
-// maybe will need to get rid of fiber ?
-templ NotificationList[T models.Notification](items []T) {
+templ NotificationList[T *models.Notification](items []T) {
 	<ul
-		hx-get="/get-notifications"
+		hx-get="/notifications"
 		hx-trigger={ getNotificationEventNames(ctx) }
 		hx-target="this"
 		hx-swap="outerHTML"
@@ -78,17 +77,17 @@ templ NotificationList[T models.Notification](items []T) {
 	</ul>
 }
 
-templ NotificationListItem(n models.Notification, position int) {
+templ NotificationListItem(n *models.Notification, position int) {
 	<li class="relative grid grid-cols-1 gap-2 rounded p-2 shadow shadow-gray-600">
 		<span class="absolute -right-1 -top-1 rounded border border-gray-300 bg-gray-100 px-2 py-1">{ strconv.Itoa(position) }</span>
 		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">
 			@OperationStatus(n)
 		</h3>
 		<ul class="grid grid-cols-1 gap-2">
-			<li><strong>Tipo:</strong> <span>{ n.GetOperationType() }</span></li>
-			<li><strong>Iniciado às:</strong> <span>{ utils.FormatTime(n.GetCreatedAt()) }</span></li>
+			<li><strong>Tipo:</strong> <span>{ n.OperationType }</span></li>
+			<li><strong>Iniciado às:</strong> <span>{ utils.FormatTime(n.CreatedAt) }</span></li>
 			<li>
-				<a href={ templ.URL(n.GetPageEndpoint()) } target="_blank">
+				<a href={ templ.URL(n.PageEndpoint) } target="_blank">
 					@DefaultButton("xs") {
 						<span>Ver Resultado</span>
 						@IconSm("external-link")

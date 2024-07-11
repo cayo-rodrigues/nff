@@ -14,24 +14,22 @@ import (
 )
 
 func EntitiesPage(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
 		return err
 	}
-	isAuthenticated := utils.IsAuthenticated(c)
 	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
-	return Render(c, layouts.Base(pages.EntitiesPage(entities), isAuthenticated))
+	return Render(c, layouts.Base(pages.EntitiesPage(entities)))
 }
 
 func CreateEntityPage(c *fiber.Ctx) error {
 	entity := models.NewEntity()
-	isAuthenticated := utils.IsAuthenticated(c)
-	return Render(c, layouts.Base(pages.EntityFormPage(entity), isAuthenticated))
+	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
 }
 
 func EditEntityPage(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
@@ -40,12 +38,11 @@ func EditEntityPage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	isAuthenticated := utils.IsAuthenticated(c)
-	return Render(c, layouts.Base(pages.EntityFormPage(entity), isAuthenticated))
+	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
 }
 
 func CreateEntity(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
@@ -60,7 +57,7 @@ func CreateEntity(c *fiber.Ctx) error {
 }
 
 func UpdateEntity(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
@@ -75,7 +72,7 @@ func UpdateEntity(c *fiber.Ctx) error {
 }
 
 func DeleteEntity(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
@@ -88,7 +85,7 @@ func DeleteEntity(c *fiber.Ctx) error {
 }
 
 func SearchEntities(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
 	entities, err := services.ListEntities(c.Context(), userID, filters)
 	if err != nil {

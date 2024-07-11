@@ -2,22 +2,19 @@ package models
 
 import "time"
 
-type Notification interface {
-	GetStatus() string
-	GetOperationType() string
-	GetCreatedAt() time.Time
-	GetID() int
-	GetPageEndpoint() string
+type Notifiable interface {
+	AsNotification() *Notification
 }
 
-func JsonSerializableNotification(n Notification, userID int) map[string]any {
-	operation := map[string]interface{}{
-		"id":             n.GetID(),
-		"status":         n.GetStatus(),
-		"operation_type": n.GetOperationType(),
-		"page_endpoint":  n.GetPageEndpoint(),
-		"created_at":     n.GetCreatedAt(),
-		"user_id":        userID,
-	}
-	return operation
+type Notification struct {
+	ID            int       `json:"id"`
+	Status        string    `json:"status"`
+	OperationType string    `json:"operation_type"`
+	PageEndpoint  string    `json:"page_endpoint"`
+	CreatedAt     time.Time `json:"created_at"`
+	UserID        int       `json:"user_id"`
+}
+
+func (n *Notification) GetStatus() string  {
+	return n.Status
 }

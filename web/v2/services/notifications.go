@@ -1,27 +1,38 @@
 package services
 
 import (
-	"time"
+	"context"
+	"encoding/json"
+	"fmt"
+	"log"
 
-	// "github.com/cayo-rodrigues/nff/web/database"
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func GetNotificationListItems() []models.Notification {
-	// items will be stored in redis
-	// redis := database.GetDB().Redis
+func GetNotifications(ctx context.Context) []*models.Notification {
+	redis := database.GetDB().Redis
+	userID := utils.GetUserData(ctx).ID
 
-	m := models.NewMetrics()
-	m.ReqStatus = "success"
-	m.CreatedAt = time.Now()
-	i := models.NewInvoice()
-	i.ReqStatus = "error"
-	i.CreatedAt = time.Now()
-	c := models.NewInvoiceCancel()
-	c.ReqStatus = "warning"
-	c.CreatedAt = time.Now()
-	p := models.NewInvoicePrint()
-	p.ReqStatus = "success"
-	p.CreatedAt = time.Now()
-	return []models.Notification{m, i, c, p}
+	key := fmt.Sprintf("%d:notification-queue", userID)
+	rawItems, err := redis.LRange(ctx, key, 0, -1).Result()
+	if err != nil {
+		log.Printf("Error reading notification queue for user with id %d. Err: %v\n", userID, err)
+		return nil
+	}
+
+	notifications := []*models.Notification{}
+
+	for _, rawItem := range rawItems {
+		n := new(models.Notification)
+		err := json.Unmarshal([]byte(rawItem), &n)
+		if err != nil {
+			log.Printf("Error unmarshaling notification json data from queue for user with id %d.\nRaw notification data: %s.\nErr: %v\n", userID, rawItem, err)
+			continue
+		}
+		notifications = append(notifications, n)
+	}
+
+	return notifications
 }

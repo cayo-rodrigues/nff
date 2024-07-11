@@ -15,7 +15,7 @@ import (
 )
 
 func CancelInvoicePage(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	filters := c.Queries()
 
@@ -33,14 +33,12 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 	canclingsByDate := services.GroupListByDate(cancelingsList)
 	page := pages.InvoicesCancelingsPage(canclingsByDate, cancelingForForm, entities)
 
-	isAuthenticated := utils.IsAuthenticated(c)
-
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
-	return Render(c, layouts.Base(page, isAuthenticated))
+	return Render(c, layouts.Base(page))
 }
 
 func CancelInvoice(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
@@ -72,7 +70,7 @@ func CancelInvoice(c *fiber.Ctx) error {
 }
 
 func CancelInvoiceByID(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	invoiceID, err := c.ParamsInt("invoice_id")
 	if err != nil {
 		return err
@@ -90,7 +88,7 @@ func CancelInvoiceByID(c *fiber.Ctx) error {
 }
 
 func ListInvoiceCancelings(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
 	cancelings, err := services.ListCancelings(c.Context(), userID, filters)
 	if err != nil {
@@ -103,7 +101,7 @@ func ListInvoiceCancelings(c *fiber.Ctx) error {
 }
 
 func GetCancelInvoiceForm(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {

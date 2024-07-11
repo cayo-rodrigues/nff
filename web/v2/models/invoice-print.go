@@ -20,9 +20,20 @@ type InvoicePrint struct {
 	CreatedBy            int           `json:"-"`
 	CreatedAt            time.Time     `json:"-"`
 	UpdatedAt            time.Time     `json:"-"`
-	CustomFileNamePrefix string        `json:"custom_file_name"` // ATUALIZAR SS-API PARA USAR custom_file_name_prefix 
+	CustomFileNamePrefix string        `json:"custom_file_name"` // ATUALIZAR SS-API PARA USAR custom_file_name_prefix
 	FileName             string        `json:"file_name"`
 	Errors               ErrorMessages `json:"-"`
+}
+
+func (p *InvoicePrint) AsNotification() *Notification {
+	return &Notification{
+		ID:            p.ID,
+		Status:        p.ReqStatus,
+		OperationType: "Impressão/Download de NFA",
+		PageEndpoint:  "/invoices/print",
+		CreatedAt:     p.CreatedAt,
+		UserID:        p.CreatedBy,
+	}
 }
 
 func (p *InvoicePrint) GetCreatedAt() time.Time {
@@ -31,18 +42,6 @@ func (p *InvoicePrint) GetCreatedAt() time.Time {
 
 func (p *InvoicePrint) GetStatus() string {
 	return p.ReqStatus
-}
-
-func (p *InvoicePrint) GetOperationType() string {
-	return "Impressão/Download de NFA"
-}
-
-func (p *InvoicePrint) GetID() int {
-	return p.ID
-}
-
-func (p *InvoicePrint) GetPageEndpoint() string {
-	return "/invoices/print"
 }
 
 func NewInvoicePrint() *InvoicePrint {

@@ -16,7 +16,7 @@ import (
 )
 
 func InvoicesPage(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	filters := c.Queries()
 
@@ -27,14 +27,12 @@ func InvoicesPage(c *fiber.Ctx) error {
 
 	invoicesByDate := services.GroupListByDate(invoices)
 
-	isAuthenticated := utils.IsAuthenticated(c)
-
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
-	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate), isAuthenticated))
+	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate)))
 }
 
 func CreateInvoicePage(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
 		return err
@@ -49,25 +47,21 @@ func CreateInvoicePage(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-	isAuthenticated := utils.IsAuthenticated(c)
-		return Render(c, layouts.Base(pages.InvoiceFormPage(baseInvoice, entities), isAuthenticated))
+		return Render(c, layouts.Base(pages.InvoiceFormPage(baseInvoice, entities)))
 	}
 
 	invoice := models.NewInvoiceWithSamples(entities)
 
-	isAuthenticated := utils.IsAuthenticated(c)
-
 	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
-	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities), isAuthenticated))
+	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities)))
 }
 
 func ChooseInvoiceOperationPage(c *fiber.Ctx) error {
-	isAuthenticated := utils.IsAuthenticated(c)
-	return Render(c, layouts.Base(pages.ChooseInvoiceOperationPage(), isAuthenticated))
+	return Render(c, layouts.Base(pages.ChooseInvoiceOperationPage()))
 }
 
 func GetSenderIeInput(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entityID, err := strconv.Atoi(c.Query("sender"))
 	if err != nil {
 		return err
@@ -83,7 +77,7 @@ func GetSenderIeInput(c *fiber.Ctx) error {
 }
 
 func CreateInvoice(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	invoice := models.NewInvoiceFromForm(c)
 
@@ -121,7 +115,7 @@ func CreateInvoice(c *fiber.Ctx) error {
 }
 
 func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
@@ -136,7 +130,7 @@ func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
 }
 
 func ListInvoices(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
 	invoices, err := services.ListInvoices(c.Context(), userID, filters)
 	if err != nil {

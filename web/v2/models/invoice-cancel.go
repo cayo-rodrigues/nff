@@ -24,24 +24,23 @@ type InvoiceCancel struct {
 	Errors        ErrorMessages `json:"-"`
 }
 
+func (c *InvoiceCancel) AsNotification() *Notification {
+	return &Notification{
+		ID:            c.ID,
+		Status:        c.ReqStatus,
+		OperationType: "Cancelamento de NFA",
+		PageEndpoint:  "/invoices/cancel",
+		CreatedAt:     c.CreatedAt,
+		UserID:        c.CreatedBy,
+	}
+}
+
 func (c *InvoiceCancel) GetCreatedAt() time.Time {
 	return c.CreatedAt
 }
 
 func (c *InvoiceCancel) GetStatus() string {
 	return c.ReqStatus
-}
-
-func (c *InvoiceCancel) GetOperationType() string {
-	return "Cancelamento de NFA"
-}
-
-func (c *InvoiceCancel) GetID() int {
-	return c.ID
-}
-
-func (c *InvoiceCancel) GetPageEndpoint() string {
-	return "/invoices/cancel"
 }
 
 func NewInvoiceCancel() *InvoiceCancel {

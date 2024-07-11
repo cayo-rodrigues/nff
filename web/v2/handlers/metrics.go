@@ -15,7 +15,7 @@ import (
 )
 
 func MetricsPage(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
 		return err
@@ -32,14 +32,12 @@ func MetricsPage(c *fiber.Ctx) error {
 
 	m := models.NewMetrics()
 
-	isAuthenticated := utils.IsAuthenticated(c)
-
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
-	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entities), isAuthenticated))
+	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entities)))
 }
 
 func GenerateMetrics(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	metrics := models.NewMetricsFromForm(c)
 
@@ -71,7 +69,7 @@ func GenerateMetrics(c *fiber.Ctx) error {
 }
 
 func ListMetrics(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
 	metrics, err := services.ListMetrics(c.Context(), userID, filters)
 	if err != nil {
@@ -84,7 +82,7 @@ func ListMetrics(c *fiber.Ctx) error {
 }
 
 func GetMetricsForm(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	baseMetricsID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -106,7 +104,7 @@ func GetMetricsForm(c *fiber.Ctx) error {
 }
 
 func RetrieveMetricsResultsDetails(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	metricsID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err

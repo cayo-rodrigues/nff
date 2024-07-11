@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 func TrimSpaceBytes(b []byte) string {
@@ -86,31 +84,18 @@ func FormatedNDaysBefore(now time.Time, days int) string {
 	return FormatDate(NDaysBefore(now, days))
 }
 
-func GetCurrentUserID(c *fiber.Ctx) int {
-	userID := c.Locals("UserID").(int)
-	return userID
+func Float64ToString(f float64) string {
+	return strconv.FormatFloat(f, 'f', 2, 64)
 }
 
 type UserData struct {
-	ID              string
+	ID              int
 	IsAuthenticated bool
 }
 
-func GetCurrentUserData(ctx context.Context) *UserData {
+func GetUserData(ctx context.Context) *UserData {
 	if userData, ok := ctx.Value("UserData").(*UserData); ok {
 		return userData
 	}
 	return new(UserData)
-}
-
-func IsAuthenticated(c *fiber.Ctx) bool {
-	isAuthenticated, ok := c.Locals("IsAuthenticated").(bool)
-	if !ok {
-		return false
-	}
-	return isAuthenticated
-}
-
-func Float64ToString(f float64) string {
-	return strconv.FormatFloat(f, 'f', 2, 64)
 }

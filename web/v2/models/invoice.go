@@ -37,24 +37,23 @@ type Invoice struct {
 	Errors               ErrorMessages  `json:"-"`
 }
 
+func (i *Invoice) AsNotification() *Notification {
+	return &Notification{
+		ID:            i.ID,
+		Status:        i.ReqStatus,
+		OperationType: "Emissão de NFA",
+		PageEndpoint:  "/invoices",
+		CreatedAt:     i.CreatedAt,
+		UserID:        i.CreatedBy,
+	}
+}
+
 func (i *Invoice) GetCreatedAt() time.Time {
 	return i.CreatedAt
 }
 
 func (i *Invoice) GetStatus() string {
 	return i.ReqStatus
-}
-
-func (i *Invoice) GetOperationType() string {
-	return "Emissão de NFA"
-}
-
-func (i *Invoice) GetID() int {
-	return i.ID
-}
-
-func (i *Invoice) GetPageEndpoint() string {
-	return "/invoices"
 }
 
 func (i *Invoice) IsCancelable() bool {

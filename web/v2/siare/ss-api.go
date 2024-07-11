@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -306,76 +304,4 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 
 	wg.Wait()
 	return
-}
-
-func formatErrResponseField(fieldErrs []string, prefix string) string {
-	var builder strings.Builder
-
-	if fieldErrs != nil {
-		builder.WriteString(prefix)
-		for _, fieldName := range fieldErrs {
-			builder.WriteString(" - ")
-			builder.WriteString(fieldName)
-			builder.WriteString("\n")
-		}
-	}
-
-	return builder.String()
-}
-
-func formatErrResponse(response *SSApiErrorResponse) string {
-	var clientErrs strings.Builder
-
-	clientErrs.WriteString(formatErrResponseField(response.InvalidFields, InvalidFieldsPrefix))
-	clientErrs.WriteString(formatErrResponseField(response.MissingFields, MissingFieldsPrefix))
-	if response.Entity != nil {
-		clientErrs.WriteString(formatErrResponseField(response.Entity.InvalidFields, EntityInvalidFieldsPrefix))
-		clientErrs.WriteString(formatErrResponseField(response.Entity.MissingFields, EntityMissingFieldsPrefix))
-	}
-	if response.Sender != nil {
-		clientErrs.WriteString(formatErrResponseField(response.Sender.InvalidFields, SenderInvalidFieldsPrefix))
-		clientErrs.WriteString(formatErrResponseField(response.Sender.MissingFields, SenderMissingFieldsPrefix))
-	}
-	if response.Recipient != nil {
-		clientErrs.WriteString(formatErrResponseField(response.Recipient.InvalidFields, RecipientInvalidFieldsPrefix))
-		clientErrs.WriteString(formatErrResponseField(response.Recipient.MissingFields, RecipientMissingFieldsPrefix))
-	}
-
-	return clientErrs.String()
-}
-
-func requestErrLog(endpoint, resourceName string, resourceID int, err error) {
-	log.Printf("Something went wrong with the request at %s for %s with id %v: %v\n", endpoint, resourceName, resourceID, err)
-}
-
-func jsonUnmarchalErrLog(endpoint, resourceName string, resourceID int, err error) {
-	log.Printf("Something went wrong trying to unmarshal ss-api %s json response. %s with id %v will be on 'pending' state for ever: %v\n", endpoint, resourceName, resourceID, err)
-}
-
-func finishOperation(ctx context.Context, redisClient *database.Redis, resourceName string, userID int, n models.Notification) {
-	// primeiro, adicionar Notification em uma fila no redis para que seja consumida por outro endpoint (que será chamado quando o sininho receber notificação)
-	pushOperationToNotificationQueue(ctx, redisClient, userID, n)
-	go redisClient.ClearCache(ctx, userID, resourceName)
-	go notifyOperationResult(ctx, redisClient, resourceName, userID)
-}
-
-func notifyOperationResult(ctx context.Context, redisClient *database.Redis, resourceName string, userID int) {
-	channel := fmt.Sprintf("%d:%s-finished", userID, resourceName)
-	redisClient.Publish(ctx, channel, nil)
-}
-
-func pushOperationToNotificationQueue(ctx context.Context, redisClient *database.Redis, userID int, n models.Notification) {
-	queueName := fmt.Sprintf("notification-queue:%d", userID)
-	notification := models.JsonSerializableNotification(n, userID)
-
-	notificationData, err := json.Marshal(notification)
-	if err != nil {
-		log.Println("Failed to marshal notification:", err)
-		return
-	}
-
-	err = redisClient.RPush(ctx, queueName, notificationData).Err()
-	if err != nil {
-		log.Println("Failed to enqueue notification:", err)
-	}
 }

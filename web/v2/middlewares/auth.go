@@ -1,9 +1,13 @@
 package middlewares
 
 import (
+	"context"
+
 	"github.com/cayo-rodrigues/nff/web/handlers"
 	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
@@ -29,6 +33,14 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 	// refresh user session
 	services.SaveUserSession(c, userID)
+
+	// save user data to request context
+	userData := &utils.UserData{
+		ID:              userID,
+		IsAuthenticated: isAuthenticated,
+	}
+	ctx := context.WithValue(c.Context(), "UserData", userData)
+	adaptor.CopyContextToFiberContext(ctx, c.Context())
 
 	return c.Next()
 }

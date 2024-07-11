@@ -22,24 +22,23 @@ type Metrics struct {
 	*MetricsResult
 }
 
+func (m *Metrics) AsNotification() *Notification {
+	return &Notification{
+		ID:            m.ID,
+		Status:        m.ReqStatus,
+		OperationType: "Cálculo de Métricas",
+		PageEndpoint:  "/metrics",
+		CreatedAt:     m.CreatedAt,
+		UserID:        m.CreatedBy,
+	}
+}
+
 func (m *Metrics) GetCreatedAt() time.Time {
 	return m.CreatedAt
 }
 
 func (m *Metrics) GetStatus() string {
 	return m.ReqStatus
-}
-
-func (m *Metrics) GetOperationType() string {
-	return "Cálculo de Métricas"
-}
-
-func (m *Metrics) GetID() int {
-	return m.ID
-}
-
-func (m *Metrics) GetPageEndpoint() string {
-	return "/metrics"
 }
 
 type MetricsResult struct {

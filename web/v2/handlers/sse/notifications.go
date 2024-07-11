@@ -15,16 +15,16 @@ func NotifyOperationsResults(c *fiber.Ctx) error {
 	c.Set("Connection", "keep-alive")
 	c.Set("Transfer-Encoding", "chunked")
 
-	db := database.GetDB()
+	redis := database.GetDB().Redis
 
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	channelPatterns := []string{"invoice-issue", "invoice-cancel", "invoice-print", "metrics"}
 	userChannels := []string{}
 	for _, pattern := range channelPatterns {
 		userChannels = append(userChannels, fmt.Sprintf("%d:%s-finished", userID, pattern))
 	}
-	sub := db.Redis.Subscribe(c.Context(), userChannels...)
+	sub := redis.Subscribe(c.Context(), userChannels...)
 
 	defer sub.Unsubscribe(c.Context())
 	defer sub.Close()

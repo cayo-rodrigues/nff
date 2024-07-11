@@ -15,7 +15,7 @@ import (
 )
 
 func PrintInvoicePage(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	filters := c.Queries()
 
@@ -33,14 +33,12 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 	printingsByDate := services.GroupListByDate(printingsList)
 	page := pages.InvoicesPrintPage(printingsByDate, printingForForm, entities)
 
-	isAuthenticated := utils.IsAuthenticated(c)
-
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
-	return Render(c, layouts.Base(page, isAuthenticated))
+	return Render(c, layouts.Base(page))
 }
 
 func PrintInvoice(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
@@ -72,7 +70,7 @@ func PrintInvoice(c *fiber.Ctx) error {
 }
 
 func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	recordID, err := c.ParamsInt("record_id")
 	if err != nil {
@@ -93,7 +91,7 @@ func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
 }
 
 func ListInvoicePrintings(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
 	printings, err := services.ListPrintings(c.Context(), userID, filters)
 	if err != nil {
@@ -106,7 +104,7 @@ func ListInvoicePrintings(c *fiber.Ctx) error {
 }
 
 func GetPrintInvoiceForm(c *fiber.Ctx) error {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {

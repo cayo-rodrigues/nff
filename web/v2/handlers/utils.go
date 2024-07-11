@@ -1,12 +1,9 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/a-h/templ"
-	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
@@ -18,13 +15,6 @@ func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.Comp
 	}
 
 	c.Append("HX-Trigger-After-Swap", "rebuild-icons")
-
-	userData := &utils.UserData{
-		ID:              strconv.Itoa(utils.GetCurrentUserID(c)),
-		IsAuthenticated: utils.IsAuthenticated(c),
-	}
-	ctx := context.WithValue(c.Context(), "UserData", userData)
-	adaptor.CopyContextToFiberContext(ctx, c.Context())
 
 	return adaptor.HTTPHandler(componentHandler)(c)
 }

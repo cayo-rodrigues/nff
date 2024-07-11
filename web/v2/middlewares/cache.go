@@ -105,7 +105,7 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 }
 
 func getKeyFactors(c *fiber.Ctx) (int, string, string) {
-	userID := utils.GetCurrentUserID(c)
+	userID := utils.GetUserData(c.Context()).ID
 	route := c.OriginalURL()
 
 	var namespace string

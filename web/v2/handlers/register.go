@@ -11,9 +11,8 @@ import (
 
 func RegisterPage(c *fiber.Ctx) error {
 	user := models.NewUser()
-	isAuthenticated := false
 	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
-	return Render(c, layouts.Base(pages.RegisterPage(user), isAuthenticated))
+	return Render(c, layouts.Base(pages.RegisterPage(user)))
 }
 
 func RegisterUser(c *fiber.Ctx) error {
