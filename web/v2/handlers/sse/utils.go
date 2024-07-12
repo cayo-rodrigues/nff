@@ -12,6 +12,11 @@ type Message struct {
 }
 
 func sendEvent(c *fiber.Ctx, message Message) error {
-	_, err := fmt.Fprintf(c, "event: %s\ndata: %s\n\n", message.Event, message.Data)
-	return err
+	if _, err := fmt.Fprintf(c, "event: %s\n", message.Event); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(c, "data: %s\n\n", message.Data); err != nil {
+		return err
+	}
+	return nil
 }

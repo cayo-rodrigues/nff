@@ -119,7 +119,7 @@ function HighlightCurrentPageButton() {
         }
         submenuBtn.classList.toggle("bg-sky-800")
     }
-    
+
     const pageBtn = document.getElementById(url.pathname)
     if (!pageBtn) {
         return
@@ -246,22 +246,55 @@ function CloseNotificationDialog() {
     notificationDialog.close()
 }
 
-function ShowNotificationBang() {
-    const notificationBang = document.querySelector('#notification-bang')
-    if (!notificationBang) {
+function ShowNotificationCounter() {
+    const notificationCounter = document.querySelector('#notification-bang')
+    if (!notificationCounter) {
         return
     }
 
-    notificationBang.classList.remove('hidden')
+    notificationCounter.classList.remove('hidden')
 }
 
-function HideNotificationBang() {
-    const notificationBang = document.querySelector('#notification-bang')
-    if (!notificationBang) {
+function HideNotificationCounter() {
+    const notificationCounter = document.querySelector('#notification-bang')
+    if (!notificationCounter) {
         return
     }
 
-    notificationBang.classList.add('hidden')
+    notificationCounter.classList.add('hidden')
+}
+
+
+function CountNotificationItems() {
+    const notificationDialog = document.querySelector('#notification-dialog')
+    if (!notificationDialog) {
+        return
+    }
+
+    const notificationList = notificationDialog.querySelector('#notification-list')
+    if (!notificationList) {
+        return
+    }
+
+    const notificationCounter = document.querySelector('#notification-counter')
+    if (!notificationCounter) {
+        return
+    }
+
+    if (notificationList.childElementCount === 0) {
+        notificationCounter.classList.add('hidden')
+        return
+    }
+
+    notificationCounter.innerHTML = `<span>${notificationList.childElementCount}</span>`
+    notificationCounter.classList.remove('hidden')
+    if (notificationList.childElementCount < 10) {
+        notificationCounter.classList.remove('p-1')
+        notificationCounter.classList.add('py-1', 'px-2')
+    } else {
+        notificationCounter.classList.remove('py-1', 'px-2')
+        notificationCounter.classList.add('p-1')
+    }
 }
 
 function Init() {
@@ -275,6 +308,7 @@ function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         HighlightCurrentFilterButton()
         HighlightCurrentPageButton()
+        CountNotificationItems()
     })
     document.addEventListener("highlight-current-filter", () => {
         HighlightCurrentFilterButton()
@@ -302,10 +336,10 @@ function Init() {
     })
 
     document.addEventListener('notification-list-loaded', () => {
-        ShowNotificationBang()
+        CountNotificationItems()
     })
-    document.addEventListener('notification-list-closed', () => {
-        HideNotificationBang()
+    document.addEventListener('notification-list-cleared', () => {
+        CountNotificationItems()
     })
 }
 Init()

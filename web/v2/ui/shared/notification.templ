@@ -3,24 +3,23 @@ package shared
 import "strconv"
 import "github.com/cayo-rodrigues/nff/web/utils"
 import "github.com/cayo-rodrigues/nff/web/models"
-import "strings"
 import "fmt"
 import "github.com/cayo-rodrigues/nff/web/services"
 
 templ NotificationBell() {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
 		@IconSm("bell")
-		@NotificationBang()
+		@NotificationCounter()
 	</button>
 	@NotificationDialog()
 }
 
-templ NotificationBang() {
+templ NotificationCounter() {
 	<div
-		id="notification-bang"
-		class="min-w-5 max-w-6 absolute -right-3.5 -top-2 hidden rounded-full bg-red-600 py-0.5 text-center text-xs xl:-right-1.5 xl:-top-0.5"
+		id="notification-counter"
+		class="absolute -right-3.5 -top-2 hidden rounded-full border border-red-800 bg-red-600 p-1 text-center text-xs xl:-right-1.5 xl:-top-0.5"
 	>
-		!
+		0
 	</div>
 }
 
@@ -36,7 +35,13 @@ templ NotificationDialog() {
 		</div>
 		@NotificationList(services.GetNotifications(ctx))
 		<div class="border-t p-2">
-			<div hx-delete="notifications" hx-trigger="click" onclick="CloseNotificationDialog(); HideNotificationBang()">
+			<div
+				hx-delete="notifications"
+				hx-trigger="click"
+				hx-target="#notification-list"
+				hx-swap="innerHTML"
+				onclick="CloseNotificationDialog()"
+			>
 				@DefaultButtonOutline("xs") {
 					<span>Limpar Notificações</span>
 				}
@@ -45,27 +50,15 @@ templ NotificationDialog() {
 	</dialog>
 }
 
-func getNotificationEventNames(ctx context.Context) string {
-	baseNames := []string{"invoice-issue", "invoice-cancel", "invoice-print", "metrics"}
+func notificationEventName(ctx context.Context) string {
 	userData := utils.GetUserData(ctx)
-
-	builder := strings.Builder{}
-
-	for i, baseName := range baseNames {
-		userEvent := fmt.Sprintf("sse:%d:%s-finished", userData.ID, baseName)
-		builder.WriteString(userEvent)
-		if i < len(baseNames)-1 {
-			builder.WriteString(", ")
-		}
-	}
-
-	return builder.String()
+	return fmt.Sprintf("sse:%d:operation-finished", userData.ID)
 }
 
-templ NotificationList[T *models.Notification](items []T) {
+templ NotificationList(items []*models.Notification) {
 	<ul
 		hx-get="/notifications"
-		hx-trigger={ getNotificationEventNames(ctx) }
+		hx-trigger={ notificationEventName(ctx) }
 		hx-target="this"
 		hx-swap="outerHTML"
 		id="notification-list"

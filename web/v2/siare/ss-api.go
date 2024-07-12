@@ -154,8 +154,7 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 			if err != nil {
 				return
 			}
-			innerResourceName := "invoice-cancel-from-invoice-card"
-			notifyOperationResult(ctx, c.DB.Redis, innerResourceName, invoiceCancel.CreatedBy)
+			notifyOperationResult(ctx, c.DB.Redis, invoiceCancel.CreatedBy)
 		}
 	}(invoiceCancel)
 
@@ -163,8 +162,7 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 }
 
 func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, recordID, userID int) error {
-	resourceName := "invoice-print-from-record"
-	defer notifyOperationResult(context.Background(), c.DB.Redis, resourceName, userID)
+	defer notifyOperationResult(context.Background(), c.DB.Redis, userID)
 
 	err := c.PrintInvoice(p)
 	if err != nil {

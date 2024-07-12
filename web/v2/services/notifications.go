@@ -36,3 +36,18 @@ func GetNotifications(ctx context.Context) []*models.Notification {
 
 	return notifications
 }
+
+func ClearNotifications(ctx context.Context) error {
+	redis := database.GetDB().Redis
+	userID := utils.GetUserData(ctx).ID
+
+	key := fmt.Sprintf("%d:notification-queue", userID)
+
+	err := redis.Del(ctx, key).Err()
+	if err != nil {
+		log.Printf("Error clearing notification queue for user with id %d. Err: %v\n", userID, err)
+	}
+
+	return err
+}
+

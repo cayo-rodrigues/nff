@@ -55,8 +55,8 @@ func jsonUnmarchalErrLog(endpoint, resourceName string, resourceID int, err erro
 	log.Printf("Something went wrong trying to unmarshal ss-api %s json response. %s with id %v will be on 'pending' state for ever: %v\n", endpoint, resourceName, resourceID, err)
 }
 
-func notifyOperationResult(ctx context.Context, redisClient *database.Redis, resourceName string, userID int) {
-	channel := fmt.Sprintf("%d:%s-finished", userID, resourceName)
+func notifyOperationResult(ctx context.Context, redisClient *database.Redis, userID int) {
+	channel := fmt.Sprintf("%d:operation-finished", userID)
 	redisClient.Publish(ctx, channel, nil)
 	fmt.Println("Notify opeartion result OK!")
 }
@@ -83,5 +83,5 @@ func finishOperation(ctx context.Context, redisClient *database.Redis, resourceN
 
 	enqueueNotification(ctx, redisClient, userID, notification)
 	redisClient.ClearCache(ctx, userID, resourceName)
-	notifyOperationResult(ctx, redisClient, resourceName, userID)
+	notifyOperationResult(ctx, redisClient, userID)
 }
