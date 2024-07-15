@@ -8,24 +8,27 @@ import "github.com/cayo-rodrigues/nff/web/ui/forms"
 templ InvoicesPage(invoicesByDate []map[string][]*models.Invoice) {
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-col gap-2 border-b pb-3 sm:flex-row">
-			<a href="/invoices/create" hx-boost="true">
+			<dialog id="invoice-form-dialog" class="m-auto h-full w-full rounded bg-gray-50">
+				<div id="invoice-form-dialog-content" class="p-4"></div>
+			</dialog>
+			<div
+				hx-get="/invoices/0/form"
+				hx-trigger="load once"
+				hx-target="#invoice-form-dialog-content"
+				hx-swap="innerHTML"
+				onclick="OpenInvoiceFormDialog()"
+			>
 				@shared.SuccessButton("sm") {
 					@shared.Icon("file-plus")
 					<span>Emitir Nota Fiscal</span>
 				}
-			</a>
+			</div>
 		</div>
 		<div class="grid grid-cols-1 items-center 2xl:grid-cols-5">
 			<h2 class="col-span-3 text-base font-medium">Histórico de Operações (Notas Fiscais)</h2>
 			@shared.FiltersByDate("#invoice-list", "/invoices/list")
 		</div>
 		@components.InvoiceList(invoicesByDate)
-	</div>
-}
-
-templ InvoiceFormPage(invoice *models.Invoice, entities []*models.Entity) {
-	<div class="m-auto xl:w-10/12">
-		@forms.InvoiceForm(invoice, entities)
 	</div>
 }
 

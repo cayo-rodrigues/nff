@@ -9,10 +9,9 @@ import "github.com/cayo-rodrigues/nff/web/utils"
 templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 	<form
 		id="invoice-form"
-		hx-post="/invoices/create"
-		hx-target="body"
+		hx-post="/invoices"
+		hx-target="this"
 		hx-swap="outerHTML"
-		hx-boost="true"
 	>
 		<div class="gap-6 border-b border-gray-300 py-2 outline-0">
 			<div
@@ -142,7 +141,7 @@ templ InvoiceItemsHeading(i *models.Invoice) {
 					@shared.IconXs("plus")
 				}
 			</div>
-			<strong>Total de itens:</strong>
+			<strong>Total:</strong>
 			<span id="items-count">{ strconv.Itoa(len(i.Items)) }</span>
 		</div>
 	</heading>

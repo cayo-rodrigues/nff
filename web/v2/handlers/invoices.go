@@ -31,29 +31,30 @@ func InvoicesPage(c *fiber.Ctx) error {
 	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate)))
 }
 
-func CreateInvoicePage(c *fiber.Ctx) error {
+func GetInvoiceForm(c *fiber.Ctx) error {
 	userID := utils.GetUserData(c.Context()).ID
 	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
 		return err
 	}
 
-	if baseInvoiceIDStr := c.Query("base-invoice-id"); baseInvoiceIDStr != "" {
-		baseInvoiceID, err := strconv.Atoi(baseInvoiceIDStr)
-		if err != nil {
-			return err
-		}
-		baseInvoice, err := services.RetrieveInvoice(c.Context(), baseInvoiceID)
-		if err != nil {
-			return err
-		}
-		return Render(c, layouts.Base(pages.InvoiceFormPage(baseInvoice, entities)))
+	baseInvoiceID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
 	}
 
-	invoice := models.NewInvoiceWithSamples(entities)
+	if baseInvoiceID == 0 {
+		invoice := models.NewInvoiceWithSamples(entities)
+		return Render(c, forms.InvoiceForm(invoice, entities))
+	}
 
-	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
-	return Render(c, layouts.Base(pages.InvoiceFormPage(invoice, entities)))
+	baseInvoice, err := services.RetrieveInvoice(c.Context(), baseInvoiceID)
+	if err != nil {
+		return err
+	}
+
+	c.Append("HX-Trigger-After-Settle", "open-invoice-form-dialog")
+	return Render(c, forms.InvoiceForm(baseInvoice, entities))
 }
 
 func ChooseInvoiceOperationPage(c *fiber.Ctx) error {
@@ -94,12 +95,13 @@ func CreateInvoice(c *fiber.Ctx) error {
 	invoice.Sender = sender
 	invoice.Recipient = recipient
 
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
 	if !invoice.IsValid() {
-		entities, err := services.ListEntities(c.Context(), userID)
-		if err != nil {
-			return err
-		}
-		return RetargetToForm(c, "invoice", forms.InvoiceForm(invoice, entities))
+		return Render(c, forms.InvoiceForm(invoice, entities))
 	}
 
 	err = services.CreateInvoice(c.Context(), invoice, userID)
@@ -107,11 +109,12 @@ func CreateInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
+
 	ssapi := siare.GetSSApiClient()
 	go ssapi.IssueInvoice(invoice)
 
-	c.Append("HX-Trigger-After-Swap", "reload-invoice-list")
-	return RetargetToPageHandler(c, "/invoices", InvoicesPage)
+	c.Append("HX-Trigger-After-Settle", "reload-invoice-list", "close-invoice-form-dialog")
+	return Render(c, forms.InvoiceForm(invoice, entities))
 }
 
 func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {

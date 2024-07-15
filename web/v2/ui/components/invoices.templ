@@ -8,7 +8,13 @@ import "strconv"
 import "github.com/cayo-rodrigues/nff/web/utils"
 
 templ InvoiceList(invoicesByDate []map[string][]*models.Invoice) {
-	<section id="invoice-list">
+	<section
+		id="invoice-list"
+		hx-get="/invoices/list"
+		hx-target="this"
+		hx-trigger="reload-invoice-list from:body"
+		hx-swap="outerHTML"
+	>
 		for _, dailyGroup := range invoicesByDate {
 			for date, invoicesOfTheDay := range dailyGroup {
 				@InvoiceListRow(date, invoicesOfTheDay)
@@ -46,15 +52,17 @@ templ InvoiceCard(i *models.Invoice) {
 					@shared.IconSm("eye")
 				}
 			</div>
-			<a
-				href={ templ.URL(fmt.Sprintf("/invoices/create?base-invoice-id=%d", i.ID)) }
-				hx-boost="true"
+			<div
+				hx-get={ fmt.Sprintf("/invoices/%d/form", i.ID) }
+				hx-target="#invoice-form"
+				hx-swap="outerHTML"
+				hx-trigger="click"
 				title="Usar como modelo"
 			>
 				@shared.InfoButton("xs") {
 					@shared.IconSm("edit")
 				}
-			</a>
+			</div>
 			<a
 				if i.PDF != "" {
 					href={ templ.URL(i.PDF) }

@@ -300,6 +300,14 @@ function CountNotificationItems(notificationsCount) {
     }
 }
 
+function OpenInvoiceFormDialog() {
+    document.querySelector('#invoice-form-dialog')?.showModal()
+}
+
+function CloseInvoiceFormDialog() {
+    document.querySelector('#invoice-form-dialog')?.close()
+}
+
 function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()
@@ -344,5 +352,13 @@ function Init() {
     document.addEventListener('notification-list-cleared', () => {
         CountNotificationItems(0)
     })
+
+    document.addEventListener('open-invoice-form-dialog', () => {
+        OpenInvoiceFormDialog()
+    })
+    document.addEventListener('close-invoice-form-dialog', () => {
+        CloseInvoiceFormDialog()
+    })
+
 }
 Init()

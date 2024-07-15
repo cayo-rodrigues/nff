@@ -83,13 +83,13 @@ func main() {
 	app.Delete("/entities/delete/:id", handlers.DeleteEntity)
 
 	app.Get("/invoices", handlers.InvoicesPage)
+	app.Post("/invoices", handlers.CreateInvoice)
 	app.Get("/invoices/choose-operation", handlers.ChooseInvoiceOperationPage)
 	app.Get("/invoices/list", handlers.ListInvoices)
 	app.Get("/invoices/form/get-sender-ie-input", handlers.GetSenderIeInput)
-	app.Get("/invoices/create", handlers.CreateInvoicePage)
-	app.Post("/invoices/create", handlers.CreateInvoice)
+	app.Get("/invoices/:id/form", handlers.GetInvoiceForm)
 	app.Get("/invoices/:id/items-details", handlers.RetrieveInvoiceItemsDetails)
-	app.Get("/invoices/:id/card", handlers.RetrieveInvoiceCancelCard)
+	app.Get("/invoices/:id/card", handlers.RetrieveInvoiceCard)
 
 	app.Get("/invoices/cancel", handlers.CancelInvoicePage)
 	app.Post("/invoices/cancel", handlers.CancelInvoice)
