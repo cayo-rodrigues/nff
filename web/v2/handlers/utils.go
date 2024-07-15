@@ -16,6 +16,10 @@ func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.Comp
 
 	c.Append("HX-Trigger-After-Swap", "rebuild-icons")
 
+	if c.Get("HX-Boosted") == "true" {
+		c.Append("HX-Trigger-After-Settle", "notification-list-loaded")
+	}
+
 	return adaptor.HTTPHandler(componentHandler)(c)
 }
 
