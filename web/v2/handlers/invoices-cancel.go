@@ -113,11 +113,25 @@ func GetCancelInvoiceForm(c *fiber.Ctx) error {
 		return err
 	}
 
-	baseCanceling, err := services.RetrieveCanceling(c.Context(), baseCancelingID, userID)
+	baseCanceling, err := services.RetrieveCanceling(c.Context(), baseCancelingID)
 	if err != nil {
 		return err
 	}
 
 	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
 	return Render(c, forms.CancelInvoiceForm(baseCanceling, entities))
+}
+
+func RetrieveInvoiceCancelCard(c *fiber.Ctx) error {
+	cancelingID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	canceling, err := services.RetrieveCanceling(c.Context(), cancelingID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoiceCancelCard(canceling))
 }

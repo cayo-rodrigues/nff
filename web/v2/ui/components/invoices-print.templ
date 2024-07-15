@@ -26,6 +26,7 @@ templ InvoicePrintListRow(date string, printingsOfTheDay []*models.InvoicePrint)
 	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
 		for _, p := range printingsOfTheDay {
 			@InvoicePrintCard(p)
+			@shared.OperationCardNotificationListener("invoices/print", p.ID, printingCardTarget(p), p.ReqStatus)
 		}
 	</ul>
 }
@@ -109,6 +110,10 @@ templ PrintingDetailsDialog(p *models.InvoicePrint) {
 
 func printingCardID(c *models.InvoicePrint) string {
 	return fmt.Sprintf("invoice-print-card-%d", c.ID)
+}
+
+func printingCardTarget(c *models.InvoicePrint) string {
+	return fmt.Sprintf("#invoice-print-card-%d", c.ID)
 }
 
 func printingDetailsDialogID(c *models.InvoicePrint) string {

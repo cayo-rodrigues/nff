@@ -28,15 +28,7 @@ templ MetricsListRow(date string, metricsOfTheDay []*models.Metrics) {
 	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 		for _, m := range metricsOfTheDay {
 			@MetricsCard(m)
-			if m.ReqStatus == "pending" {
-				<div
-					class="hidden"
-					hx-get={ fmt.Sprintf("/metrics/%d/card", m.ID) }
-					hx-trigger={ fmt.Sprintf("%s, load once", shared.NotificationEventName(ctx)) }
-					hx-target={ metricsCardTarget(m) }
-					hx-swap="outerHTML"
-				></div>
-			}
+			@shared.OperationCardNotificationListener("metrics", m.ID, metricsCardTarget(m), m.ReqStatus)
 		}
 	</ul>
 }

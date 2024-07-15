@@ -27,6 +27,7 @@ templ InvoiceCancelListRow(date string, cancelingsOfTheDay []*models.InvoiceCanc
 	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
 		for _, c := range cancelingsOfTheDay {
 			@InvoiceCancelCard(c)
+			@shared.OperationCardNotificationListener("invoices/cancel", c.ID, cancelingCardTarget(c), c.ReqStatus)
 		}
 	</ul>
 }
@@ -99,6 +100,10 @@ templ CancelingDetailsDialog(c *models.InvoiceCancel) {
 
 func cancelingCardID(c *models.InvoiceCancel) string {
 	return fmt.Sprintf("invoice-cancel-card-%d", c.ID)
+}
+
+func cancelingCardTarget(c *models.InvoiceCancel) string {
+	return fmt.Sprintf("#invoice-cancel-card-%d", c.ID)
 }
 
 func cancelingDetailsDialogID(c *models.InvoiceCancel) string {

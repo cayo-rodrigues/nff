@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
+	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
 func ListCancelings(ctx context.Context, userID int, filters ...map[string]string) ([]*models.InvoiceCancel, error) {
@@ -28,12 +29,13 @@ func CreateCanceling(ctx context.Context, c *models.InvoiceCancel, userID int) e
 	return storage.CreateInvoiceCanceling(ctx, c)
 }
 
-func RetrieveCanceling(ctx context.Context, cancelingID int, userID int) (*models.InvoiceCancel, error) {
+func RetrieveCanceling(ctx context.Context, cancelingID int) (*models.InvoiceCancel, error) {
+	userID := utils.GetUserData(ctx).ID
 	return storage.RetrieveInvoiceCanceling(ctx, cancelingID, userID)
 }
 
 func CreateCancelingFromInvoiceID(ctx context.Context, invoiceID, userID int) (*models.InvoiceCancel, error) {
-	invoice, err := RetrieveInvoice(ctx, invoiceID, userID)
+	invoice, err := RetrieveInvoice(ctx, invoiceID)
 	if err != nil {
 		return nil, err
 	}

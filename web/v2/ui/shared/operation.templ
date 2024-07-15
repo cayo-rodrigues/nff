@@ -1,5 +1,7 @@
 package shared
 
+import "fmt"
+
 type Operation interface {
 	GetStatus() string
 }
@@ -46,5 +48,18 @@ func GetTextColorByOperationStatus(o Operation) string {
 		return "text-gray-600"
 	default:
 		return ""
+	}
+}
+
+
+templ OperationCardNotificationListener(resourceName string, resourceID int, target string, reqStatus string) {
+	if reqStatus == "pending" {
+		<div
+			class="hidden"
+			hx-get={ fmt.Sprintf("/%s/%d/card", resourceName, resourceID) }
+			hx-trigger={ fmt.Sprintf("%s once, load once", NotificationEventName(ctx)) }
+			hx-target={ target }
+			hx-swap="outerHTML"
+		></div>
 	}
 }

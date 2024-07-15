@@ -89,18 +89,21 @@ func main() {
 	app.Get("/invoices/create", handlers.CreateInvoicePage)
 	app.Post("/invoices/create", handlers.CreateInvoice)
 	app.Get("/invoices/:id/items-details", handlers.RetrieveInvoiceItemsDetails)
+	app.Get("/invoices/:id/card", handlers.RetrieveInvoiceCancelCard)
 
 	app.Get("/invoices/cancel", handlers.CancelInvoicePage)
 	app.Post("/invoices/cancel", handlers.CancelInvoice)
 	app.Post("/invoices/cancel/:invoice_id", handlers.CancelInvoiceByID)
 	app.Get("/invoices/cancel/list", handlers.ListInvoiceCancelings)
 	app.Get("/invoices/cancel/:id/form", handlers.GetCancelInvoiceForm)
+	app.Get("/invoices/cancel/:id/card", handlers.RetrieveInvoiceCancelCard)
 
 	app.Get("/invoices/print", handlers.PrintInvoicePage)
 	app.Post("/invoices/print", handlers.PrintInvoice)
 	app.Post("/invoices/print/:record_id/:invoice_number/:entity_id", handlers.PrintInvoiceFromMetricsRecord)
 	app.Get("/invoices/print/list", handlers.ListInvoicePrintings)
 	app.Get("/invoices/print/:id/form", handlers.GetPrintInvoiceForm)
+	app.Get("/invoices/print/:id/card", handlers.RetrieveInvoicePrintCard)
 
 	app.Get("/metrics", handlers.MetricsPage)
 	app.Post("/metrics", handlers.GenerateMetrics)

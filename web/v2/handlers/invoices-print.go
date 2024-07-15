@@ -116,11 +116,25 @@ func GetPrintInvoiceForm(c *fiber.Ctx) error {
 		return err
 	}
 
-	basePrinting, err := services.RetrievePrinting(c.Context(), basePrintingID, userID)
+	basePrinting, err := services.RetrievePrinting(c.Context(), basePrintingID)
 	if err != nil {
 		return err
 	}
 
 	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
 	return Render(c, forms.PrintInvoiceForm(basePrinting, entities))
+}
+
+func RetrieveInvoicePrintCard(c *fiber.Ctx) error {
+	printingID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	printing, err := services.RetrievePrinting(c.Context(), printingID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoicePrintCard(printing))
 }

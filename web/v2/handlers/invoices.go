@@ -43,7 +43,7 @@ func CreateInvoicePage(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		baseInvoice, err := services.RetrieveInvoice(c.Context(), baseInvoiceID, userID)
+		baseInvoice, err := services.RetrieveInvoice(c.Context(), baseInvoiceID)
 		if err != nil {
 			return err
 		}
@@ -115,13 +115,12 @@ func CreateInvoice(c *fiber.Ctx) error {
 }
 
 func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID, userID)
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID)
 	if err != nil {
 		return err
 	}
@@ -140,4 +139,18 @@ func ListInvoices(c *fiber.Ctx) error {
 	invoicesByDate := services.GroupListByDate(invoices)
 
 	return Render(c, components.InvoiceList(invoicesByDate))
+}
+
+func RetrieveInvoiceCard(c *fiber.Ctx) error {
+	invoiceID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoiceCard(invoice))
 }

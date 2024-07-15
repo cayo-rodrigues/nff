@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
+	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
 func ListPrintings(ctx context.Context, userID int, filters ...map[string]string) ([]*models.InvoicePrint, error) {
@@ -28,7 +29,8 @@ func CreatePrinting(ctx context.Context, p *models.InvoicePrint, userID int) err
 	return storage.CreateInvoicePrinting(ctx, p)
 }
 
-func RetrievePrinting(ctx context.Context, printingID int, userID int) (*models.InvoicePrint, error) {
+func RetrievePrinting(ctx context.Context, printingID int) (*models.InvoicePrint, error) {
+	userID := utils.GetUserData(ctx).ID
 	return storage.RetrieveInvoicePrinting(ctx, printingID, userID)
 }
 

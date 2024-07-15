@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
+	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
 func CreateInvoice(ctx context.Context, invoice *models.Invoice, userID int) error {
@@ -32,7 +33,9 @@ func ListInvoices(ctx context.Context, userID int, filters ...map[string]string)
 	return storage.ListInvoices(ctx, userID, f)
 }
 
-func RetrieveInvoice(ctx context.Context, invoiceID int, userID int) (*models.Invoice, error) {
+func RetrieveInvoice(ctx context.Context, invoiceID int) (*models.Invoice, error) {
+	userID := utils.GetUserData(ctx).ID
+
 	// TODO
 	// DEIXAR BONITO
 	invoice, err := storage.RetrieveInvoice(ctx, invoiceID, userID, "")
