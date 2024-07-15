@@ -265,19 +265,22 @@ function HideNotificationCounter() {
 }
 
 
-function CountNotificationItems() {
-    const notificationDialog = document.querySelector('#notification-dialog')
-    if (!notificationDialog) {
-        return
-    }
-
-    const notificationList = notificationDialog.querySelector('#notification-list')
-    if (!notificationList) {
-        return
-    }
-
+function CountNotificationItems(notificationsCount) {
     const notificationCounter = document.querySelector('#notification-counter')
     if (!notificationCounter) {
+        return
+    }
+
+    if (notificationsCount !== undefined) {
+        notificationCounter.innerHTML = notificationsCount
+        if (notificationsCount === 0) {
+            notificationCounter.classList.add('hidden')
+        }
+        return
+    }
+
+    const notificationList = document.querySelector('#notification-dialog')?.querySelector('#notification-list')
+    if (!notificationList) {
         return
     }
 
@@ -335,11 +338,11 @@ function Init() {
         }
     })
 
-    document.addEventListener('notification-list-loaded', () => {
-        CountNotificationItems()
+    document.addEventListener('notification-list-loaded', (event) => {
+        CountNotificationItems(event?.detail?.value)
     })
     document.addEventListener('notification-list-cleared', () => {
-        CountNotificationItems()
+        CountNotificationItems(0)
     })
 }
 Init()

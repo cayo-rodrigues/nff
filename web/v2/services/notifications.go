@@ -51,3 +51,11 @@ func ClearNotifications(ctx context.Context) error {
 	return err
 }
 
+func GetLatestNotification(ctx context.Context) (*models.Notification, int){
+	notifications := GetNotifications(ctx)
+	notificationsCount := len(notifications)
+	if notificationsCount > 0 {
+		return notifications[0], notificationsCount
+	}
+	return new(models.Notification), notificationsCount
+}

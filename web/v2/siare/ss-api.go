@@ -154,7 +154,7 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 			if err != nil {
 				return
 			}
-			notifyOperationResult(ctx, c.DB.Redis, invoiceCancel.CreatedBy)
+			notifyOperationResult(ctx, c.DB.Redis, invoiceCancel.CreatedBy, invoiceCancel.ID)
 		}
 	}(invoiceCancel)
 
@@ -162,7 +162,7 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 }
 
 func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, recordID, userID int) error {
-	defer notifyOperationResult(context.Background(), c.DB.Redis, userID)
+	defer notifyOperationResult(context.Background(), c.DB.Redis, userID, p.ID)
 
 	err := c.PrintInvoice(p)
 	if err != nil {

@@ -107,8 +107,10 @@ func main() {
 	app.Get("/metrics/list", handlers.ListMetrics)
 	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
+	app.Get("/metrics/:id/card", handlers.RetrieveMetricsCard)
 
 	app.Get("/notifications", handlers.ListNotifications)
+	app.Get("/notifications/latest", handlers.GetLatestNotification)
 	app.Delete("/notifications", handlers.ClearNotifications)
 
 	app.Use(handlers.NotFoundPage)

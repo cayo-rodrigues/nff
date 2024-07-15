@@ -117,3 +117,18 @@ func RetrieveMetricsResultsDetails(c *fiber.Ctx) error {
 
 	return Render(c, components.MetricsResultsDetails(metrics))
 }
+
+func RetrieveMetricsCard(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+	metricsID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	metrics, err := services.RetrieveMetrics(c.Context(), metricsID, userID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.MetricsCard(metrics))
+}

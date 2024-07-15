@@ -38,6 +38,7 @@ func NotifyOperationsResults(c *fiber.Ctx) error {
 		case msg := <-ch:
 			message := Message{
 				Event: msg.Channel,
+				Data:  msg.Payload,
 			}
 			if err := sendEvent(c, message); err != nil {
 				log.Println("Error sending event: ", err)

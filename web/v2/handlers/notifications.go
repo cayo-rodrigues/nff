@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/shared"
@@ -20,4 +22,10 @@ func ClearNotifications(c *fiber.Ctx) error {
 	}
 	c.Append("HX-Trigger-After-Settle", "notification-list-cleared")
 	return Render(c, components.Nothing())
+}
+
+func GetLatestNotification(c *fiber.Ctx) error {
+	latestNotification, position := services.GetLatestNotification(c.Context())
+	c.Append("HX-Trigger-After-Settle", fmt.Sprintf(`{"notification-list-loaded": %d}`, position))
+	return Render(c, shared.NotificationCard(latestNotification, position))
 }
