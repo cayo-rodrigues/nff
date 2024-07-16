@@ -16,7 +16,8 @@ function AddInvoiceItemSection() {
         clone.style.opacity = 100
     }, 0)
 
-    window.scrollTo({ top: itemsContainer.scrollHeight, behavior: 'smooth' })
+    const invoiceFormDialog = document.querySelector('#invoice-form-dialog')
+    invoiceFormDialog.scrollTo({ top: invoiceFormDialog.scrollHeight, behavior: 'smooth' })
 
     EnumerateInvoiceItems(itemsContainer)
 }
@@ -47,7 +48,8 @@ function CopyInvoiceItemSection(section) {
         clone.style.opacity = 100
     }, 0)
 
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+    const invoiceFormDialog = document.querySelector('#invoice-form-dialog')
+    invoiceFormDialog.scrollTo({ top: invoiceFormDialog.scrollHeight, behavior: 'smooth' })
 
     EnumerateInvoiceItems(itemsContainer)
 }

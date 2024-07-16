@@ -92,24 +92,37 @@ templ EntityForm(e *models.Entity) {
 					})
 				</fieldset>
 			</div>
-			<div class="flex gap-6">
-				<div class="mt-4 flex-1">
+			<div class="grid grid-cols-2 gap-6 sm:grid-cols-3">
+				<div class={ fmt.Sprintf("col-span-full mt-4 sm:col-span-%s", getColSpanByAction(e)) }>
 					@shared.Button(getThemeByAction(e), "md", templ.Attributes{"type": "submit"}) {
 						@shared.Icon(getIconNameByAction(e))
 						<span>{ getTextByAction(e) }</span>
 					}
 				</div>
 				if e.ID != 0 {
-					<div class="mt-4 flex-1" hx-delete={ fmt.Sprintf("/entities/delete/%d", e.ID) }>
+					<div class="mt-4" hx-delete={ fmt.Sprintf("/entities/delete/%d", e.ID) }>
 						@shared.DefaultButton("md") {
 							@shared.Icon("trash-2")
 							<span>Deletar</span>
+						}
+					</div>
+					<div class="mt-4" hx-post="/entities/create">
+						@shared.SuccessButton("md") {
+							@shared.Icon("user-plus")
+							<span>Registrar</span>
 						}
 					</div>
 				}
 			</div>
 		</form>
 	</div>
+}
+
+func getColSpanByAction(e *models.Entity) string {
+	if e.ID == 0 {
+		return "full"
+	}
+	return "1"
 }
 
 func getThemeByAction(e *models.Entity) string {
