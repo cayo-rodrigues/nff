@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -26,6 +27,20 @@ func TrimSpaceFromBytesToFloat64(f []byte) (float64, error) {
 
 func ParseDate(date string) (time.Time, error) {
 	return time.Parse("2006-01-02", date)
+}
+
+func ParseDateAsBR(date string) (time.Time, error) {
+	loc, err := time.LoadLocation("America/Sao_Paulo")
+	if err != nil {
+		return time.Time{}, fmt.Errorf("failed to load location: %w", err)
+	}
+
+	parsedDate, err := time.ParseInLocation("2006-01-02", date, loc)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("failed to parse date: %w", err)
+	}
+
+	return parsedDate, nil
 }
 
 func FormatDate(date time.Time) string {

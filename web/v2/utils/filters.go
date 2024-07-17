@@ -5,11 +5,11 @@ import "time"
 func IsTodayHiddenFromFilters(filters map[string]string) bool {
 	filtersExcludeToday := false
 
-	fromDate, err := ParseDate(filters["from_date"])
+	fromDate, err := ParseDateAsBR(filters["from_date"])
 	if err != nil {
 		filtersExcludeToday = true
 	}
-	toDate, err := ParseDate(filters["to_date"])
+	toDate, err := ParseDateAsBR(filters["to_date"])
 	if err != nil {
 		filtersExcludeToday = true
 	}
