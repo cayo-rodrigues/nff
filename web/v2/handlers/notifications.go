@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/cayo-rodrigues/nff/web/services"
-	"github.com/cayo-rodrigues/nff/web/ui/components"
 	"github.com/cayo-rodrigues/nff/web/ui/shared"
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,7 +20,7 @@ func ClearNotifications(c *fiber.Ctx) error {
 		return err
 	}
 	c.Append("HX-Trigger-After-Settle", "notification-list-cleared")
-	return Render(c, components.Nothing())
+	return nil
 }
 
 func GetLatestNotification(c *fiber.Ctx) error {

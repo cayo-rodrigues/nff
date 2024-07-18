@@ -53,10 +53,10 @@ func CreateInvoicePrinting(ctx context.Context, printing *models.InvoicePrint) e
 		`INSERT INTO invoices_printings
 			(invoice_id, invoice_id_type, custom_file_name_prefix, entity_id, created_by)
 			VALUES ($1, $2, $3, $4, $5)
-		RETURNING id, req_status, req_msg`,
+		RETURNING id, req_status, req_msg, created_at, updated_at`,
 		printing.InvoiceID, printing.InvoiceIDType, printing.CustomFileNamePrefix, printing.Entity.ID, printing.CreatedBy,
 	)
-	err := row.Scan(&printing.ID, &printing.ReqStatus, &printing.ReqMsg)
+	err := row.Scan(&printing.ID, &printing.ReqStatus, &printing.ReqMsg, &printing.CreatedAt, &printing.UpdatedAt)
 	if err != nil {
 		log.Println("Error when running insert printing query: ", err)
 		return utils.InternalServerErr

@@ -19,7 +19,7 @@ func EntitiesPage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page", "notification-list-loaded")
 	return Render(c, layouts.Base(pages.EntitiesPage(entities)))
 }
 
@@ -81,7 +81,7 @@ func DeleteEntity(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return Render(c, components.Nothing())
+	return nil
 }
 
 func SearchEntities(c *fiber.Ctx) error {

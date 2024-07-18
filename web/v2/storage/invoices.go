@@ -58,12 +58,12 @@ func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
 				sender_id, recipient_id, created_by, sender_ie
 			)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-		RETURNING id, req_status, req_msg`,
+		RETURNING id, req_status, req_msg, created_at, updated_at`,
 		invoice.Number, invoice.Protocol, invoice.Operation, invoice.Cfop, invoice.IsFinalCustomer, invoice.IsIcmsContributor,
 		invoice.Shipping, invoice.AddShippingToTotal, invoice.Gta, invoice.ExtraNotes, invoice.CustomFileNamePrefix, invoice.FileName,
 		invoice.Sender.ID, invoice.Recipient.ID, invoice.CreatedBy, invoice.SenderIe,
 	)
-	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg)
+	err := row.Scan(&invoice.ID, &invoice.ReqStatus, &invoice.ReqMsg, &invoice.CreatedAt, &invoice.UpdatedAt)
 	if err != nil {
 		log.Println("Error when running insert invoice query: ", err)
 		return utils.InternalServerErr

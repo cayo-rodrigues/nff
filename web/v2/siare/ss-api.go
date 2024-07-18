@@ -138,31 +138,33 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	// TODO
 	// DEIXAR BONITO?
 	go func(invoiceCancel *models.InvoiceCancel) {
-		if invoiceCancel.ReqStatus == "success" {
-			invoice, err := storage.RetrieveInvoice(context.Background(), 0, invoiceCancel.CreatedBy, invoiceCancel.InvoiceNumber)
-			if err != nil {
-				return
-			}
-
-			invoice.ReqStatus = "canceled"
-			invoice.ReqMsg = fmt.Sprintf(
-				"Nota Fiscal havia sido emitida com sucesso, porém foi cancelada em %s.\nJustificativa: %s",
-				utils.FormatDatetimeAsBR(time.Now()),
-				invoiceCancel.Justification,
-			)
-			err = storage.UpdateInvoice(context.Background(), invoice)
-			if err != nil {
-				return
-			}
-			notifyOperationResult(ctx, c.DB.Redis, invoiceCancel.CreatedBy, invoiceCancel.ID)
+		if invoiceCancel.ReqStatus != "success" {
+			return
 		}
+		invoice, err := storage.RetrieveInvoice(context.Background(), 0, invoiceCancel.CreatedBy, invoiceCancel.InvoiceNumber)
+		if err != nil {
+			return
+		}
+
+		invoice.ReqStatus = "canceled"
+		invoice.ReqMsg = fmt.Sprintf(
+			"Nota Fiscal havia sido emitida com sucesso, porém foi cancelada em %s.\nJustificativa: %s",
+			utils.FormatDatetimeAsBR(time.Now()),
+			invoiceCancel.Justification,
+		)
+		err = storage.UpdateInvoice(context.Background(), invoice)
+		if err != nil {
+			return
+		}
+		notifyOperationResult(ctx, c.DB.Redis, invoiceCancel.CreatedBy, invoiceCancel.ID)
 	}(invoiceCancel)
 
 	return err
 }
 
 func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, recordID, userID int) error {
-	defer notifyOperationResult(context.Background(), c.DB.Redis, userID, p.ID)
+	ctx := context.Background()
+	defer notifyOperationResult(ctx, c.DB.Redis, userID, p.ID)
 
 	err := c.PrintInvoice(p)
 	if err != nil {

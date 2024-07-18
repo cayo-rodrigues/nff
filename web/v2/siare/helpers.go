@@ -58,7 +58,6 @@ func jsonUnmarchalErrLog(endpoint, resourceName string, resourceID int, err erro
 func notifyOperationResult(ctx context.Context, redisClient *database.Redis, userID int, resourceID int) {
 	channel := fmt.Sprintf("%d:operation-finished", userID)
 	redisClient.Publish(ctx, channel, resourceID)
-	fmt.Println("Notify opeartion result OK!")
 }
 
 func enqueueNotification(ctx context.Context, redisClient *database.Redis, userID int, n *models.Notification) {
@@ -74,8 +73,6 @@ func enqueueNotification(ctx context.Context, redisClient *database.Redis, userI
 	if err != nil {
 		log.Println("Failed to enqueue notification:", err)
 	}
-
-	fmt.Println("Enqueue notification OK!")
 }
 
 func finishOperation(ctx context.Context, redisClient *database.Redis, resourceName string, userID int, n models.Notifiable) {

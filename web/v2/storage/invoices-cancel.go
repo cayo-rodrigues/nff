@@ -55,10 +55,10 @@ func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 		`INSERT INTO invoices_cancelings
 			(invoice_number, year, justification, entity_id, created_by)
 			VALUES ($1, $2, $3, $4, $5)
-		RETURNING id, req_status, req_msg`,
+		RETURNING id, req_status, req_msg, created_at, updated_at`,
 		canceling.InvoiceNumber, canceling.Year, canceling.Justification, canceling.Entity.ID, canceling.CreatedBy,
 	)
-	err := row.Scan(&canceling.ID, &canceling.ReqStatus, &canceling.ReqMsg)
+	err := row.Scan(&canceling.ID, &canceling.ReqStatus, &canceling.ReqMsg, &canceling.CreatedAt, &canceling.UpdatedAt)
 	if err != nil {
 		log.Println("Error when running insert canceling query: ", err)
 		return utils.InternalServerErr

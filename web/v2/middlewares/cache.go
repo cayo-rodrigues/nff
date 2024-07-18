@@ -112,11 +112,11 @@ func getKeyFactors(c *fiber.Ctx) (int, string, string) {
 
 	switch {
 	case strings.HasPrefix(route, "/invoices/cancel"):
-		namespace = "invoices-cancel"
+		namespace = "invoice-cancel"
 	case strings.HasPrefix(route, "/invoices/print"):
-		namespace = "invoices-print"
+		namespace = "invoice-print"
 	case strings.HasPrefix(route, "/invoices"):
-		namespace = "invoices"
+		namespace = "invoice-issue"
 	default:
 		namespace = strings.Split(route, "/")[1]
 	}

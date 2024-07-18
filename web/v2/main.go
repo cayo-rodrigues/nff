@@ -68,9 +68,14 @@ func main() {
 	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
-	// app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)
+
+	app.Get("/notifications", handlers.ListNotifications)
+	app.Get("/notifications/latest", handlers.GetLatestNotification)
+	app.Delete("/notifications", handlers.ClearNotifications)
+
+	app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/", handlers.HomePage)
 
@@ -111,10 +116,6 @@ func main() {
 	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
 	app.Get("/metrics/:id/card", handlers.RetrieveMetricsCard)
-
-	app.Get("/notifications", handlers.ListNotifications)
-	app.Get("/notifications/latest", handlers.GetLatestNotification)
-	app.Delete("/notifications", handlers.ClearNotifications)
 
 	app.Use(handlers.NotFoundPage)
 

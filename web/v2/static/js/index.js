@@ -277,6 +277,8 @@ function CountNotificationItems(notificationsCount) {
         notificationCounter.innerHTML = notificationsCount
         if (notificationsCount === 0) {
             notificationCounter.classList.add('hidden')
+        } else {
+            notificationCounter.classList.remove('hidden')
         }
         return
     }

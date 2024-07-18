@@ -53,10 +53,10 @@ func CreateMetrics(ctx context.Context, metrics *models.Metrics) error {
 		`INSERT INTO metrics_history
 			(start_date, end_date, entity_id, created_by)
 			VALUES ($1, $2, $3, $4)
-		RETURNING id, req_status, req_msg`,
+		RETURNING id, req_status, req_msg, created_at, updated_at`,
 		metrics.StartDate, metrics.EndDate, metrics.Entity.ID, metrics.CreatedBy,
 	)
-	err := row.Scan(&metrics.ID, &metrics.ReqStatus, &metrics.ReqMsg)
+	err := row.Scan(&metrics.ID, &metrics.ReqStatus, &metrics.ReqMsg, &metrics.CreatedAt, &metrics.UpdatedAt)
 	if err != nil {
 		log.Println("Error when running insert metrics query: ", err)
 		return utils.InternalServerErr
