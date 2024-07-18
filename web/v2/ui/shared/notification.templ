@@ -73,14 +73,32 @@ templ NotificationCard(n *models.Notification, position int) {
 		</h3>
 		<ul class="grid grid-cols-1 gap-2">
 			<li><strong>Tipo:</strong> <span>{ n.OperationType }</span></li>
-			<li><strong>Iniciado às:</strong> <span>{ utils.FormatTime(n.CreatedAt) }</span></li>
-			<li>
-				<a href={ templ.URL(n.PageEndpoint) } target="_blank">
-					@DefaultButton("xs") {
+			<li><strong>Iniciado em:</strong> <span>{ utils.FormatDatetimeAsBR(n.CreatedAt) }</span></li>
+			<li class="grid grid-cols-3 gap-2">
+				<a
+					if n.InvoicePDF != "" {
+						class="col-span-2"
+					} else {
+						class="col-span-full"
+					}
+					href={ templ.URL(n.PageEndpoint) }
+					target="_blank"
+				>
+					@DefaultButtonLight("xs") {
 						<span>Ver Resultado</span>
 						@IconSm("external-link")
 					}
 				</a>
+				if n.InvoicePDF != "" {
+					<a
+						href={ templ.URL(n.InvoicePDF) }
+						title="Baixar NFA"
+					>
+						@DarkButton("xs") {
+							@IconSm("download-cloud")
+						}
+					</a>
+				}
 			</li>
 		</ul>
 	</li>

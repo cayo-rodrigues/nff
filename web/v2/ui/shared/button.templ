@@ -68,6 +68,12 @@ templ DefaultButton(size string) {
 	}
 }
 
+templ DefaultButtonLight(size string) {
+	@Button("default-light", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
 templ DefaultButtonOutline(size string, active ...bool) {
 	@Button(getThemeByActiveStatus("default-outline", active...), size, templ.Attributes{"type": "button"}) {
 		{ children... }
@@ -82,10 +88,11 @@ func getThemeByActiveStatus(theme string, active ...bool) string {
 }
 
 func GetButtonClassesByTheme(theme string, size string) string {
-	classes := "flex w-full transition border items-center justify-center rounded gap-3"
+	classes := "flex w-full transition border items-center justify-center rounded"
 
 	colors := ""
 	padding := ""
+	gap := ""
 
 	switch theme {
 	case "success":
@@ -100,6 +107,8 @@ func GetButtonClassesByTheme(theme string, size string) string {
 		colors = "bg-gray-600 border-gray-700 hover:bg-gray-700 active:bg-gray-800 text-gray-100"
 	case "default":
 		colors = "bg-gray-300 border-gray-400 hover:bg-gray-400 active:bg-gray-500"
+	case "default-light":
+		colors = "bg-gray-200 border-gray-300 hover:bg-gray-300 active:bg-gray-400"
 	case "default-outline":
 		colors = "border-gray-300 hover:bg-gray-200 active:bg-gray-300"
 	case "default-outline-active":
@@ -109,11 +118,14 @@ func GetButtonClassesByTheme(theme string, size string) string {
 	switch size {
 	case "xs":
 		padding = "p-1"
+		gap = "gap-2"
 	case "sm":
 		padding = "p-2"
+		gap = "gap-3"
 	case "md":
 		padding = "px-3 py-2 sm:py-3"
+		gap = "gap-3"
 	}
 
-	return classes + " " + colors + " " + padding
+	return classes + " " + colors + " " + padding + " " + gap
 }

@@ -31,6 +31,7 @@ func (p *InvoicePrint) AsNotification() *Notification {
 		Status:        p.ReqStatus,
 		OperationType: "Impressão/Download de NFA",
 		PageEndpoint:  "/invoices/print",
+		InvoicePDF:    p.InvoicePDF,
 		CreatedAt:     p.CreatedAt,
 		UserID:        p.CreatedBy,
 	}

@@ -43,6 +43,7 @@ func (i *Invoice) AsNotification() *Notification {
 		Status:        i.ReqStatus,
 		OperationType: "Emissão de NFA",
 		PageEndpoint:  "/invoices",
+		InvoicePDF:    i.PDF,
 		CreatedAt:     i.CreatedAt,
 		UserID:        i.CreatedBy,
 	}

@@ -156,6 +156,10 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 		if err != nil {
 			return
 		}
+
+		// TODO
+		// pode melhorar?
+		c.DB.Redis.ClearCache(ctx, invoiceCancel.CreatedBy, "invoice-issue")
 		notifyOperationResult(ctx, c.DB.Redis, invoiceCancel.CreatedBy, invoiceCancel.ID)
 	}(invoiceCancel)
 
@@ -163,7 +167,11 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 }
 
 func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, recordID, userID int) error {
+	// TODO
+	// pode melhorar?
 	ctx := context.Background()
+	defer c.DB.Redis.ClearCache(ctx, userID, "invoice-print")
+	defer c.DB.Redis.ClearCache(ctx, userID, "metrics")
 	defer notifyOperationResult(ctx, c.DB.Redis, userID, p.ID)
 
 	err := c.PrintInvoice(p)
