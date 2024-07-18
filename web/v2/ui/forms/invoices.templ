@@ -13,13 +13,18 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 		hx-target="this"
 		hx-swap="outerHTML"
 	>
-		<div class="gap-6 border-b border-gray-300 py-2 outline-0">
+		<div class="flex items-center justify-between gap-6 border-b border-gray-300 py-2 outline-0">
 			<div
-				class="lg:w-fit"
+				class="flex-1 lg:w-fit lg:flex-initial"
 			>
 				@shared.SubmitButton("sm") {
 					@shared.Icon("play-circle")
 					<span>Iniciar Operação</span>
+				}
+			</div>
+			<div onclick="CloseInvoiceFormDialog()">
+				@shared.DefaultButtonOutline("sm") {
+					@shared.IconSm("x")
 				}
 			</div>
 		</div>
