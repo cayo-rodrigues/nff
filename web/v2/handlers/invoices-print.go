@@ -33,7 +33,7 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 	printingsByDate := services.GroupListByDate(printingsList)
 	page := pages.InvoicesPrintPage(printingsByDate, printingForForm, entities)
 
-	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
 	return Render(c, layouts.Base(page))
 }
 

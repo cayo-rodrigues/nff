@@ -89,7 +89,6 @@ func main() {
 
 	app.Get("/invoices", handlers.InvoicesPage)
 	app.Post("/invoices", handlers.CreateInvoice)
-	app.Get("/invoices/choose-operation", handlers.ChooseInvoiceOperationPage)
 	app.Get("/invoices/list", handlers.ListInvoices)
 	app.Get("/invoices/form/get-sender-ie-input", handlers.GetSenderIeInput)
 	app.Get("/invoices/:id/form", handlers.GetInvoiceForm)

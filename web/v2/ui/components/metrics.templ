@@ -161,7 +161,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				</section>
 			}
 			if len(m.Records) != 0 {
-				<section class="rounded border border-gray-400">
+				<section class="rounded border border-gray-400 ">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "record"), metricsResultChevronIconTarget(m, "record")) }
 						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
@@ -173,8 +173,8 @@ templ MetricsResultsDetails(m *models.Metrics) {
 					</header>
 					<div id={ metricsResultDataID(m, "record") } class="hidden">
 						for _, r := range m.Records {
-							<div class="relative">
-								<h4 class="bg-gradient-to-r from-sky-100 px-4 py-2 text-lg italic">NFA-{ r.InvoiceNumber }</h4>
+							<div class="relative odd:bg-teal-50">
+								<h4 class="px-4 py-2 text-lg italic">NFA-{ r.InvoiceNumber }</h4>
 								@MetricsResultData(r)
 								<hr/>
 							</div>

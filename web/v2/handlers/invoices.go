@@ -27,7 +27,7 @@ func InvoicesPage(c *fiber.Ctx) error {
 
 	invoicesByDate := services.GroupListByDate(invoices)
 
-	c.Append("HX-Trigger-After-Settle", "highlight-current-filter, highlight-current-page")
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
 	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate)))
 }
 
@@ -55,10 +55,6 @@ func GetInvoiceForm(c *fiber.Ctx) error {
 
 	c.Append("HX-Trigger-After-Settle", "open-invoice-form-dialog")
 	return Render(c, forms.InvoiceForm(baseInvoice, entities))
-}
-
-func ChooseInvoiceOperationPage(c *fiber.Ctx) error {
-	return Render(c, layouts.Base(pages.ChooseInvoiceOperationPage()))
 }
 
 func GetSenderIeInput(c *fiber.Ctx) error {

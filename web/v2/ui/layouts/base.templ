@@ -22,9 +22,9 @@ templ Base(page templ.Component) {
 		<body
 			hx-ext="sse"
 			sse-connect="/sse/notify-operations-results"
-			class="flex h-screen flex-col overflow-y-scroll bg-gray-50 text-sm"
+			class="flex min-h-screen flex-col overflow-y-scroll bg-gray-50 text-sm"
 		>
-			<header>
+			<header class="sticky top-0 z-50">
 				@shared.Nav(utils.GetUserData(ctx).IsAuthenticated)
 			</header>
 			<main id="main" class="flex-1 px-4 pb-20 pt-4 sm:px-8 sm:py-6">

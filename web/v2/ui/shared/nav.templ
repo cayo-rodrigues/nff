@@ -1,7 +1,7 @@
 package shared
 
 templ Nav(isAuthenticated bool) {
-	<nav hx-boost="true" class="sticky top-0 flex w-full items-center justify-between bg-sky-700 px-4 py-1 text-white xl:pl-8">
+	<nav hx-boost="true" class="flex w-full items-center justify-between bg-sky-700 px-4 py-1 text-white xl:pl-8">
 		<h1 class="text-lg">
 			<a href="/" hx-indicator="#global-indicator">
 				Nota Fiscal Fácil
@@ -26,9 +26,17 @@ templ BurgerMenu(isAuthenticated bool) {
 					@IconSm("users")
 					<span>Entidades</span>
 				}
-				@MenuItem("/invoices/choose-operation") {
-					@IconSm("file-text")
-					<span>Notas Fiscais</span>
+				@MenuItem("/invoices") {
+					@IconSm("file-plus")
+					<span>Emitir NF</span>
+				}
+				@MenuItem("/invoices/cancel") {
+					@IconSm("slash")
+					<span>Cancelar NF</span>
+				}
+				@MenuItem("/invoices/print") {
+					@IconSm("printer")
+					<span>Imprimir NF</span>
 				}
 				@MenuItem("/metrics") {
 					@IconSm("activity")
