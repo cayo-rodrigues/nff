@@ -60,6 +60,11 @@ func notifyOperationResult(ctx context.Context, redisClient *database.Redis, use
 	redisClient.Publish(ctx, channel, resourceID)
 }
 
+func notifySingleOperationResult(ctx context.Context, redisClient *database.Redis, userID int, resourceID int, operationName string) {
+	channel := fmt.Sprintf("%d:%s-operation-finished", userID, operationName)
+	redisClient.Publish(ctx, channel, resourceID)
+}
+
 func enqueueNotification(ctx context.Context, redisClient *database.Redis, userID int, n *models.Notification) {
 	queueName := fmt.Sprintf("%d:notification-queue", userID)
 

@@ -187,20 +187,31 @@ templ MetricsResultsDetails(m *models.Metrics) {
 }
 
 templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult) {
-	<a
-		if r.InvoicePDF != "" {
-			href={ templ.URL(r.InvoicePDF) }
-		} else {
-			hx-post={ fmt.Sprintf("/invoices/print/%d/%s/%d", r.ID, r.InvoiceNumber, r.EntityID) }
-			hx-swap="none"
-		}
-		title="Baixar NFA"
-		class="absolute right-4 top-2 sm:col-span-2 lg:col-span-3"
+	<div
+		class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3"
 	>
-		@shared.DarkButton("xs") {
-			@shared.IconSm("download-cloud")
+		if r.InvoicePDF != "" {
+			<div class="text-green-600">
+				@shared.IconSm("check-circle")
+			</div>
+		} else {
+			<div class="text-sky-600" id={ fmt.Sprintf("download-invoice-from-record-loading-icon-%d", r.ID) }>
+			</div>
 		}
-	</a>
+		<a
+			if r.InvoicePDF != "" {
+				href={ templ.URL(r.InvoicePDF) }
+			} else {
+				hx-post={ fmt.Sprintf("/invoices/print/%d/%s/%d", r.ID, r.InvoiceNumber, r.EntityID) }
+				hx-swap="none"
+			}
+			title="Baixar NFA"
+		>
+			@shared.DarkButton("xs") {
+				@shared.IconSm("download-cloud")
+			}
+		</a>
+	</div>
 }
 
 templ MetricsResultData(r *models.MetricsResult) {

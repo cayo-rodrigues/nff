@@ -108,3 +108,8 @@ func NotificationEventName(ctx context.Context) string {
 	userData := utils.GetUserData(ctx)
 	return fmt.Sprintf("sse:%d:operation-finished", userData.ID)
 }
+
+func SingleNotificationEventName(ctx context.Context, operationName string) string {
+	userData := utils.GetUserData(ctx)
+	return fmt.Sprintf("sse:%d:%s-operation-finished", userData.ID, operationName)
+}
