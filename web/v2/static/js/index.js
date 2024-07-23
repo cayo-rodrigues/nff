@@ -324,7 +324,7 @@ function SelectCurrentEntityFilter() {
     const url = new URL(window.location);
     const params = new URLSearchParams(url.search)
 
-    const entityID = params.get("entity_filter")
+    const entityID = params.get("entity_filter") ?? ""
 
     const entityFilter = document.querySelector('#entity_filter')
     if (!entityFilter) {
