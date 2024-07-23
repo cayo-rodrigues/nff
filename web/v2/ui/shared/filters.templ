@@ -14,28 +14,23 @@ templ FiltersByDate(listTarget string, endpoint string) {
 			</legend>
 			<section class="grid w-full grid-cols-2 gap-2 px-2 py-2 sm:grid-cols-5 md:w-fit md:pl-5 lg:w-full xl:h-12 xl:items-center">
 				@DateFilterOption(listTarget, endpoint, 60) {
-					Últimos 60 dias 
+					<span>Últimos 60 dias</span>
 				}
 				@DateFilterOption(listTarget, endpoint, 30) {
-					Últimos 30 dias 
+					<span>Últimos 30 dias</span>
 				}
 				@DateFilterOption(listTarget, endpoint, 15) {
-					Últimos 15 dias 
+					<span>Últimos 15 dias</span>
 				}
 				@DateFilterOption(listTarget, endpoint, 7) {
-					Últimos 7 dias 
+					<span>Últimos 7 dias</span>
 				}
 				@DateFilterOption(listTarget, endpoint, 0) {
-					Hoje
+					<span>Hoje</span>
 				}
 			</section>
 		</fieldset>
 	</div>
-}
-
-script OnClickDateFilterOption(target string, theme string, queryParams string) {
-	HighlightButton(target, theme)
-	AppendQueryParams(queryParams)
 }
 
 templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
@@ -44,13 +39,11 @@ templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
 		hx-target={ listTarget }
 		hx-swap="outerHTML"
 		hx-trigger="click"
+		hx-include="#entity_filter"
 		id={ fmt.Sprintf("filter-button-%d", daysRange) }
-		onclick={ OnClickDateFilterOption(filterButtonTarget(daysRange), "default-outline", listQueryParams(daysRange)) }
 	>
 		@DefaultButtonOutline("xs") {
-			<span>
-				{ children... }
-			</span>
+			{ children... }
 		}
 	</div>
 }
@@ -67,10 +60,6 @@ func listQueryParams(daysRange int) string {
 	return fmt.Sprintf("from_date=%s&to_date=%s", from, to)
 }
 
-func filterButtonTarget(daysRange int) string {
-	return fmt.Sprintf("#filter-button-%d > button", daysRange)
-}
-
 // Entity filters
 templ FiltersByEntity(listTarget string, endpoint string, entities []*models.Entity) {
 	<div id="entity-filters-container" class="lg:col-span-2">
@@ -80,8 +69,12 @@ templ FiltersByEntity(listTarget string, endpoint string, entities []*models.Ent
 			</legend>
 			<section class="px-2 md:w-fit md:pl-5 lg:w-full">
 				@SelectInput(&InputData{
-					ID:      "entity-filter",
-					Options: &InputOptions{EntityOptions: entities},
+					ID:          "entity_filter",
+					Options:     &InputOptions{EntityOptions: entities},
+					FirstOption: &FirstInputOption{Label: "Todas as entidades"},
+					Attrs: templ.Attributes{
+						"onchange": "OnChangeEntityFilter()",
+					},
 				})
 			</section>
 		</fieldset>

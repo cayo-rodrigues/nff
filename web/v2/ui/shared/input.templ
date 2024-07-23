@@ -11,6 +11,12 @@ type InputOptions struct {
 	EntityOptions []*models.Entity
 }
 
+type FirstInputOption struct {
+	Value    string
+	Label    string
+	Disabled bool
+}
+
 type InputData struct {
 	ErrMsg        string
 	InputType     string
@@ -23,6 +29,7 @@ type InputData struct {
 	Step          string
 	Class         string
 	HxIndicatorID string
+	FirstOption   *FirstInputOption
 }
 
 func (data *InputData) Wide() *InputData {
@@ -104,6 +111,17 @@ templ SelectInput(data *InputData) {
 			name={ data.ID }
 			{ data.Attrs... }
 		>
+			if data.FirstOption != nil {
+				<option
+					value={ data.FirstOption.Value }
+					selected
+					if data.FirstOption.Disabled {
+						disabled
+					}
+				>
+					{ data.FirstOption.Label }
+				</option>
+			}
 			for _, strOpt := range data.Options.StringOptions {
 				<option
 					value={ strOpt }

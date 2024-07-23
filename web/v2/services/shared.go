@@ -1,6 +1,7 @@
 package services
 
 import (
+	"strings"
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/models"
@@ -17,9 +18,25 @@ func handleDateFilters(colName string, query map[string]string, f *models.Filter
 		toDate = utils.FormatDate(now)
 	}
 
+	// TODO
 	// verificar se o período selecionado é válido
 
 	f.And().AsDate(colName).Between(fromDate, toDate)
+}
+
+func handleEntityFilters(colName string, query map[string]string, f*models.Filters) {
+	entityID, ok := query["entity_filter"]
+
+	if !ok || entityID == "" {
+		return
+	}
+
+	if strings.HasPrefix(colName, "invoices.") {
+		f.And(colName + "sender_id = ").Placeholder(entityID).Or(colName + "recipient_id = ").Placeholder(entityID)
+		return
+	}
+
+	f.And(colName + " = ").Placeholder(entityID)
 }
 
 type CreatedAtGetter interface {

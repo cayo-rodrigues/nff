@@ -30,8 +30,8 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 	}
 
 	cancelingForForm := models.NewInvoiceCancelWithSamples(entities)
-	canclingsByDate := services.GroupListByDate(cancelingsList)
-	page := pages.InvoicesCancelingsPage(canclingsByDate, cancelingForForm, entities)
+	cancelingsByDate := services.GroupListByDate(cancelingsList)
+	page := pages.InvoicesCancelingsPage(cancelingsByDate, cancelingForForm, entities)
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
 	return Render(c, layouts.Base(page))

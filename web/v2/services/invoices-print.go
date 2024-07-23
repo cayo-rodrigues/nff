@@ -17,6 +17,7 @@ func ListPrintings(ctx context.Context, userID int, filters ...map[string]string
 
 	for _, filter := range filters {
 		handleDateFilters("invoices_printings.created_at", filter, f)
+		handleEntityFilters("invoices_printings.entity_id", filter, f)
 	}
 
 	f.OrderBy("invoices_printings.created_at").Desc()

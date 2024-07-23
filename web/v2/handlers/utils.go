@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
@@ -16,8 +18,15 @@ func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.Comp
 
 	c.Append("HX-Trigger-After-Swap", "rebuild-icons")
 
-	if c.Get("HX-Boosted") == "true" {
+	isPageRequest := c.Get("HX-Boosted") == "true"
+	isListRequest := strings.HasSuffix(c.Path(), "/list")
+
+	if isPageRequest {
 		c.Append("HX-Trigger-After-Settle", "notification-list-loaded")
+	}
+
+	if isPageRequest || isListRequest {
+		handleBrowserQueryParams(c)
 	}
 
 	return adaptor.HTTPHandler(componentHandler)(c)
@@ -37,4 +46,14 @@ func RetargetToForm(c *fiber.Ctx, resourceName string, form templ.Component, opt
 func RetargetToPageHandler(c *fiber.Ctx, url string, pageHandler fiber.Handler) error {
 	c.Append("HX-Location", url)
 	return pageHandler(c)
+}
+
+func handleBrowserQueryParams(c *fiber.Ctx) {
+	filters := c.Queries()
+	if len(filters) > 0 {
+		jsonFilters, err := json.Marshal(filters)
+		if err == nil {
+			c.Append("HX-Trigger-After-Settle", fmt.Sprintf(`{"append-query-params": %s}`, jsonFilters))
+		}
+	}
 }

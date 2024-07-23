@@ -27,6 +27,7 @@ func ListInvoices(ctx context.Context, userID int, filters ...map[string]string)
 
 	for _, filter := range filters {
 		handleDateFilters("invoices.created_at", filter, f)
+		handleEntityFilters("invoices.", filter, f)
 	}
 
 	f.OrderBy("invoices.created_at").Desc()

@@ -25,10 +25,15 @@ func InvoicesPage(c *fiber.Ctx) error {
 		return err
 	}
 
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
 	invoicesByDate := services.GroupListByDate(invoices)
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
-	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate)))
+	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate, entities)))
 }
 
 func GetInvoiceForm(c *fiber.Ctx) error {

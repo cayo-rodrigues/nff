@@ -17,6 +17,7 @@ func ListCancelings(ctx context.Context, userID int, filters ...map[string]strin
 
 	for _, filter := range filters {
 		handleDateFilters("invoices_cancelings.created_at", filter, f)
+		handleEntityFilters("invoices_cancelings.entity_id", filter, f)
 	}
 
 	f.OrderBy("invoices_cancelings.created_at").Desc()

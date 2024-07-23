@@ -91,12 +91,20 @@ function HighlightButton(target, theme) {
 
     document.querySelectorAll('.highlighted').forEach(btn => {
         btn.classList.remove(...classes)
+        const hxTrigger = btn.getAttribute('hx-trigger')
+        btn.setAttribute('hx-trigger', hxTrigger.split(',')[0])
+        htmx.process(btn)
     })
 
     const btn = document.querySelector(target)
-    if (btn) {
-        btn.classList.add(...classes)
+    if (!btn) {
+        return
     }
+
+    btn.classList.add(...classes)
+    const hxTrigger = btn.getAttribute('hx-trigger')
+    btn.setAttribute("hx-trigger", hxTrigger + ", entity-filter-changed from:document")
+    htmx.process(btn)
 }
 
 function AppendQueryParams(queryString) {
@@ -174,18 +182,14 @@ function GetCurrentQueryString() {
 
 function PreserveListFilters(event) {
     const pagePaths = ['/metrics', '/invoices', '/invoices/cancel', '/invoices/print']
-    const reqPath = event.detail.pathInfo.requestPath
+    const reqPath = event.detail.path
 
-    console.log(event)
-
-
-    const isListRequest = new RegExp('.*\/list$').test(reqPath)
-    const isPageRequest = pagePaths.includes(reqPath) && event.detail.boosted && event.detail.requestConfig.verb === 'get'
+    const isListRequest = reqPath.endsWith('/list')
+    const isPageRequest = pagePaths.includes(reqPath) && event.detail.boosted && event.detail.verb === 'get'
 
     if (isListRequest || isPageRequest) {
-        event.detail.pathInfo.requestPath += `?${GetCurrentQueryString()}` // NOT WORKING!!
+        event.detail.path += `?${GetCurrentQueryString()}`
     }
-    console.log('no fim', reqPath)
 }
 
 function OpenBurgerMenu() {
@@ -312,6 +316,23 @@ function CloseInvoiceFormDialog() {
     document.querySelector('#invoice-form-dialog')?.close()
 }
 
+function OnChangeEntityFilter() {
+    document.dispatchEvent(new CustomEvent('entity-filter-changed'))
+}
+
+function SelectCurrentEntityFilter() {
+    const url = new URL(window.location);
+    const params = new URLSearchParams(url.search)
+
+    const entityID = params.get("entity_filter")
+
+    const entityFilter = document.querySelector('#entity_filter')
+    if (!entityFilter) {
+        return
+    }
+    entityFilter.value = entityID
+}
+
 function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()
@@ -323,10 +344,12 @@ function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         HighlightCurrentFilterButton()
         HighlightCurrentPageButton()
+        SelectCurrentEntityFilter()
         CountNotificationItems()
     })
     document.addEventListener("highlight-current-filter", () => {
         HighlightCurrentFilterButton()
+        SelectCurrentEntityFilter()
     })
 
     document.addEventListener("highlight-current-page", () => {
@@ -337,7 +360,7 @@ function Init() {
         window.scrollTo({ top: 0, behavior: 'smooth' })
     })
 
-    document.addEventListener('htmx:beforeRequest', PreserveListFilters)
+    document.addEventListener('htmx:configRequest', PreserveListFilters)
 
     document.addEventListener('keyup', (event) => {
         if (event.code === 'Escape') {
@@ -364,5 +387,11 @@ function Init() {
         CloseInvoiceFormDialog()
     })
 
+    document.addEventListener('append-query-params', (event) => {
+        const filters = event.detail
+        AppendQueryParams(`from_date=${filters.from_date}&to_date=${filters.to_date}&entity_filter=${filters.entity_filter}`)
+        HighlightCurrentFilterButton()
+        SelectCurrentEntityFilter()
+    })
 }
 Init()

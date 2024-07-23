@@ -17,6 +17,7 @@ func ListMetrics(ctx context.Context, userID int, filters ...map[string]string) 
 	for i, filter := range filters {
 		if i == 0 {
 			handleDateFilters("metrics_history.created_at", filter, f)
+			handleEntityFilters("metrics_history.entity_id", filter, f)
 		}
 	}
 
