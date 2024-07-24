@@ -178,10 +178,12 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 				Options: &shared.InputOptions{StringOptions: models.InvoiceItemGroups[:]},
 			})
 			@shared.Input(&shared.InputData{
-				ID:     "ncm",
-				Label:  "NCM",
-				Value:  item.NCM,
-				ErrMsg: item.Errors["NCM"],
+				ID:          "ncm",
+				Label:       "NCM",
+				Value:       item.NCM,
+				Placeholder: "94019900",
+				ErrMsg:      item.Errors["NCM"],
+				Help:        &shared.InputHelpInfo{Title: "Como saber o NCM de um produto?", Link: "https://www2.fazenda.mg.gov.br/sol/ctrl/SOL/NFAE/CONSULTA_006?ITEM=0&ACAO=VISUALIZAR"},
 			})
 			@shared.Input(&shared.InputData{
 				ID:     "description",
