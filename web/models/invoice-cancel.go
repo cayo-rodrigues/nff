@@ -114,6 +114,6 @@ func (c *InvoiceCancel) FullScan(rows db.Scanner) error {
 
 		&c.Entity.ID, &c.Entity.Name, &c.Entity.UserType, &c.Entity.CpfCnpj, &c.Entity.Ie, &c.Entity.Email, &c.Entity.Password,
 		&c.Entity.Address.PostalCode, &c.Entity.Address.Neighborhood, &c.Entity.Address.StreetType, &c.Entity.Address.StreetName, &c.Entity.Address.Number,
-		&c.Entity.CreatedBy, &c.Entity.CreatedAt, &c.Entity.UpdatedAt,
+		&c.Entity.CreatedBy, &c.Entity.CreatedAt, &c.Entity.UpdatedAt, &c.Entity.OtherIes,
 	)
 }
