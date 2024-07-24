@@ -10,8 +10,11 @@ RUN templ generate
 
 RUN go build -o nff ./main.go
 
+RUN apk add --no-cache tzdata
+
 FROM scratch
 
 COPY --from=builder /app/nff /
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
 CMD [ "./nff" ]
