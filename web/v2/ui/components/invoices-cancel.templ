@@ -1,0 +1,115 @@
+package components
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "github.com/cayo-rodrigues/nff/web/ui/scripts"
+import "strconv"
+
+templ InvoicesCancelingsList(cancelingsByDate []map[string][]*models.InvoiceCancel) {
+	<section
+		id="canceling-list"
+		hx-get="/invoices/cancel/list"
+		hx-target="this"
+		hx-trigger="reload-canceling-list from:body"
+		hx-swap="outerHTML"
+	>
+		for _, dailyGroup := range cancelingsByDate {
+			for date, cancelingsOfTheDay := range dailyGroup {
+				@InvoiceCancelListRow(date, cancelingsOfTheDay)
+			}
+		}
+	</section>
+}
+
+templ InvoiceCancelListRow(date string, cancelingsOfTheDay []*models.InvoiceCancel) {
+	@shared.DateGroupSeparator(date)
+	<ul class="grid grid-cols-1 gap-4 py-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+		for _, c := range cancelingsOfTheDay {
+			@InvoiceCancelCard(c)
+			@shared.OperationCardNotificationListener("invoices/cancel", c.ID, cancelingCardTarget(c), c.ReqStatus)
+		}
+	</ul>
+}
+
+templ InvoiceCancelCard(c *models.InvoiceCancel) {
+	<li
+		id={ cancelingCardID(c) }
+		class="relative cursor-pointer rounded border border-gray-200 bg-white p-2 shadow shadow-gray-300 transition hover:shadow-gray-400"
+	>
+		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">
+			@shared.OperationStatus(c)
+		</h3>
+		<ul class="flex flex-col gap-1 p-2 pb-0 sm:w-10/12 md:w-9/12">
+			<li class="md:truncate"><span class="font-medium">Entidade:</span> { c.Entity.Name }</li>
+			<li class="md:truncate"><span class="font-medium">Número da nota:</span> { c.InvoiceNumber } </li>
+		</ul>
+		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-2 sm:p-0">
+			<div
+				onclick={ scripts.OpenDialog(cancelingDetailsDialogTarget(c)) }
+				title="Ver detalhes"
+			>
+				@shared.WarningButton("xs") {
+					@shared.IconSm("eye")
+				}
+			</div>
+			<div
+				hx-get={ fmt.Sprintf("/invoices/cancel/%d/form", c.ID) }
+				hx-target="#cancel-invoice-form"
+				hx-swap="outerHTML"
+				hx-trigger="click"
+				title="Usar como modelo"
+			>
+				@shared.InfoButton("xs") {
+					@shared.IconSm("edit")
+				}
+			</div>
+		</div>
+		@CancelingDetailsDialog(c)
+	</li>
+}
+
+templ CancelingDetailsDialog(c *models.InvoiceCancel) {
+	<dialog id={ cancelingDetailsDialogID(c) } class="w-full rounded sm:w-10/12 md:w-9/12 lg:w-7/12 xl:w-6/12 2xl:w-5/12">
+		<div class="rounded border border-gray-200 p-2 shadow shadow-gray-300">
+			<div class="relative rounded border border-gray-300 p-2">
+				<h3 class="flex items-center gap-2 break-words rounded text-base font-bold">
+					@shared.OperationStatus(c)
+				</h3>
+				<div
+					class="absolute -right-2 -top-2 rounded-full bg-white pb-1 pl-1 transition hover:bg-gray-100 active:bg-gray-200 sm:p-1"
+					onclick={ scripts.CloseDialog(cancelingDetailsDialogTarget(c)) }
+				>
+					@shared.Icon("x-circle")
+				</div>
+			</div>
+			if c.ReqStatus != "pending" && c.ReqMsg != "" {
+				<div class="border-b p-2 text-base">
+					<pre class={ shared.GetTextColorByOperationStatus(c) }>{ c.ReqMsg }</pre>
+				</div>
+			}
+			<ul class="grid gap-2 p-2 sm:grid-cols-2">
+				<li><span class="font-medium">Entidade:</span> { c.Entity.Name }</li>
+				<li><span class="font-medium">Número da nota:</span> { c.InvoiceNumber }</li>
+				<li><span class="font-medium">Justificativa:</span> { c.Justification }</li>
+				<li><span class="font-medium">Ano:</span> { strconv.Itoa(c.Year) }</li>
+			</ul>
+		</div>
+	</dialog>
+}
+
+func cancelingCardID(c *models.InvoiceCancel) string {
+	return fmt.Sprintf("invoice-cancel-card-%d", c.ID)
+}
+
+func cancelingCardTarget(c *models.InvoiceCancel) string {
+	return fmt.Sprintf("#invoice-cancel-card-%d", c.ID)
+}
+
+func cancelingDetailsDialogID(c *models.InvoiceCancel) string {
+	return fmt.Sprintf("invoice-cancel-details-%d", c.ID)
+}
+
+func cancelingDetailsDialogTarget(c *models.InvoiceCancel) string {
+	return fmt.Sprintf("#invoice-cancel-details-%d", c.ID)
+}

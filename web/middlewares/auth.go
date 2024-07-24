@@ -1,17 +1,11 @@
 package middlewares
 
 import (
-	"strings"
-
 	"github.com/cayo-rodrigues/nff/web/db"
 	"github.com/gofiber/fiber/v2"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
-	if strings.HasPrefix(c.Path(), "/.well-known/acme-challenge") {
-		return c.Next()
-	}
-
 	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return err

@@ -1,0 +1,26 @@
+package scripts
+
+script OpenDialog(target string) {
+	const dialog = document.querySelector(target)	
+	if (dialog) {
+		dialog.showModal()
+	}
+}
+
+script CloseDialog(target string) {
+	const dialog = document.querySelector(target)	
+	if (dialog) {
+		dialog.close()
+	}
+}
+
+script OpenDialogWithEvent(target string, events ...string) {
+	const dialog = document.querySelector(target)	
+	if (dialog) {
+		dialog.showModal()
+	}
+
+	for (let evt of events) {
+		document.dispatchEvent(new CustomEvent(evt))
+	}
+}

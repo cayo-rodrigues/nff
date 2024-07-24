@@ -23,7 +23,7 @@ class Invoice(Printable):
             data.get("add_shipping_to_total_value")
         )
         self.extra_notes: str = normalize_text(data.get("extra_notes"))
-        self.custom_file_name: str = normalize_text(
+        self.custom_file_name_prefix: str = normalize_text(
             data.get("custom_file_name"), keep_case=True, remove=["/", "\\"]
         )
 

@@ -15,10 +15,6 @@ import (
 )
 
 func CacheMiddleware(c *fiber.Ctx) error {
-	if strings.HasPrefix(c.Path(), "/.well-known/acme-challenge") {
-		return c.Next()
-	}
-
 	if fiber.IsMethodSafe(c.Method()) {
 		return useOrSetCache(c)
 	}

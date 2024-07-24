@@ -1,0 +1,56 @@
+services:
+  web:
+    container_name: nff-web-v2
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - PORT=8080
+      - DB_URL=postgres://nff:nff@db:5432/nff
+      - REDIS_URL=redis://rdb:6379/0
+      - START_FRESH=true
+      - SS_API_BASE_URL=https://bmabg5gxpykclea3u3roxajlxm0kywgy.lambda-url.sa-east-1.on.aws
+      - TZ=America/Sao_Paulo
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/home/app
+    depends_on:
+      - db
+      - rdb
+
+  db:
+    container_name: nff-db-v2
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=nff
+      - POSTGRES_PASSWORD=nff
+      - POSTGRES_DB=nff
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rdb:
+    container_name: nff-rdb-v2
+    image: redis:latest
+    ports:
+      - 6378:6379
+    volumes:
+      - redis_data:/var/lib/redis/data
+
+  migrations:
+    container_name: nff-migrations-v2
+    build:
+      context: .
+      dockerfile: Dockerfile.goose
+    environment:
+      - DB_URL=postgres://nff:nff@db:5432/nff
+      - CMD=up
+    volumes:
+      - ./database/migrations/:/migrations
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
+  redis_data:
+

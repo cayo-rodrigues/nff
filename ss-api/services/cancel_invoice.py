@@ -1,5 +1,5 @@
 from apis import Siare
-from constants.messages import ErrorMessages
+from constants.messages import ErrorMessages, SiareFeedbackMessages
 from models import InvoiceCanceling
 from utils import exceptions
 
@@ -24,7 +24,10 @@ def cancel_invoice(canceling_data: dict):
 
     error_feedback = siare.get_canceling_error_feedback()
     if error_feedback:
-        raise exceptions.CouldNotFinishCancelingError(msg=error_feedback)
+        req_status = "error"
+        if error_feedback == SiareFeedbackMessages.CANCELING_UNAVAILABLE:
+            req_status = "warning"
+        raise exceptions.CouldNotFinishCancelingError(msg=error_feedback, req_status=req_status)
 
     success_feedback = siare.get_canceling_success_feedback()
 
