@@ -6,7 +6,7 @@ provider:
   region: ${env:AWS_REGION, 'sa-east-1'}
   ecr:
     images:
-      img:
+      ssapi:
         path: ./
         platform: linux/amd64
 
@@ -15,4 +15,4 @@ functions:
     timeout: 600
     memorySize: 2048
     image:
-      name: img
+      name: ssapi
