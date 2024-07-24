@@ -36,6 +36,9 @@ jobs:
     env:
       RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup goose
         uses: mscno/setup-goose@v1
 
