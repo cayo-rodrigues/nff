@@ -12,8 +12,9 @@ def get_sample(sample_id: str, sample_type: str):
     if sample_id == "x":
         sample_id = str(random.randint(1, number_of_samples))
 
+    sample_id = "0"
     try:
-        return samples[sample_type][sample_id]
+        return samples[sample_type][int(sample_id)]
     except KeyError:
         print(
             f"{sample_type.title()} sample id not found.\n\n"

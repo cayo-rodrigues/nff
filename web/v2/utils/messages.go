@@ -1,13 +1,14 @@
 package utils
 
 const (
-	EntityNotFoundMsg    = "Entidade não encontrada"
-	InvoiceNotFoundMsg   = "NFA não encontrada"
-	CancelingNotFoundMsg = "Cancelamento de NFA não encontrado"
-	MetricsNotFoundMsg   = "Registro de métricas não encontrado"
-	PrintingNotFoundMsg  = "Impressão de NFA não encontrada"
-	UserNotFoundMsg      = "Usuário não encontrado"
-	InvalidLoginDataMsg  = "Dados de login inválidos"
+	EntityNotFoundMsg        = "Entidade não encontrada"
+	InvoiceNotFoundMsg       = "NFA não encontrada"
+	CancelingNotFoundMsg     = "Cancelamento de NFA não encontrado"
+	MetricsNotFoundMsg       = "Registro de métricas não encontrado"
+	MetricsResultNotFoundMsg = "Registro de resultado de métricas não encontrado"
+	PrintingNotFoundMsg      = "Impressão de NFA não encontrada"
+	UserNotFoundMsg          = "Usuário não encontrado"
+	InvalidLoginDataMsg      = "Dados de login inválidos"
 )
 
 const (

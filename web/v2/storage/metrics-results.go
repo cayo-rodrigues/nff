@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/cayo-rodrigues/nff/web/database"
@@ -111,7 +112,7 @@ func BulkCreateMetricsResults(ctx context.Context, results []*models.MetricsResu
 	return nil
 }
 
-func UpdateMetricsResultRecord(ctx context.Context, result *models.MetricsResult) error  {
+func UpdateMetricsResultRecord(ctx context.Context, result *models.MetricsResult) error {
 	db := database.GetDB()
 
 	cmd, err := db.PG.Exec(
@@ -132,4 +133,24 @@ func UpdateMetricsResultRecord(ctx context.Context, result *models.MetricsResult
 	}
 
 	return nil
+}
+
+func RetrieveMetricsResult(ctx context.Context, resultID int, userID int) (*models.MetricsResult, error) {
+	db := database.GetDB()
+
+	row := db.PG.QueryRow(ctx, "SELECT * FROM metrics_results WHERE id = $1 AND created_by = $2", resultID, userID)
+
+	result := models.NewMetricsResult()
+	err := Scan(row, result)
+	if err != nil {
+		log.Println("Error scaning metrics result row: ", err)
+		return nil, utils.InternalServerErr
+	}
+
+	if errors.Is(err, pgx.ErrNoRows) {
+		log.Printf("Metrics result with id %v not found: %v", resultID, err)
+		return nil, utils.MetricsResultNotFoundErr
+	}
+
+	return result, nil
 }
