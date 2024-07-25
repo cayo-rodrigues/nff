@@ -202,7 +202,6 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 	// TEMP!
 	agent.InsecureSkipVerify()
 	_, body, errs := agent.JSON(reqBody).Bytes()
-	fmt.Println("RESPONSE", string(body))
 
 	for _, err := range errs {
 		if err != nil {
@@ -260,7 +259,6 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	agent.QueryString(queryString)
 	agent.InsecureSkipVerify() // TEMP!
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
-	fmt.Println("RESPONSE", string(body))
 
 	for _, err := range errs {
 		if err != nil {

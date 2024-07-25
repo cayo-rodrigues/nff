@@ -52,10 +52,10 @@ templ NotificationDialog() {
 
 templ NotificationList(items []*models.Notification) {
 	<ul
-		hx-get="/notifications/latest"
+		hx-get="/notifications"
 		hx-trigger={ NotificationEventName(ctx) }
 		hx-target="this"
-		hx-swap="afterbegin"
+		hx-swap="outerHTML"
 		id="notification-list"
 		class="grid grid-cols-1 gap-2 rounded p-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4"
 	>
