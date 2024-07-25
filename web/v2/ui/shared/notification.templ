@@ -4,14 +4,17 @@ import "strconv"
 import "github.com/cayo-rodrigues/nff/web/utils"
 import "github.com/cayo-rodrigues/nff/web/models"
 import "fmt"
-import "github.com/cayo-rodrigues/nff/web/services"
 
-templ NotificationBell() {
+templ NotificationBell(isAuthenticated bool) {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
 		@IconSm("bell")
-		@NotificationCounter()
+		if isAuthenticated {
+			@NotificationCounter()
+		}
 	</button>
-	@NotificationDialog()
+	if isAuthenticated {
+		@NotificationDialog()
+	}
 }
 
 templ NotificationCounter() {
@@ -33,7 +36,15 @@ templ NotificationDialog() {
 				}
 			</div>
 		</div>
-		@NotificationList(services.GetNotifications(ctx))
+		@NotificationList(nil)
+		<div
+			class="hidden" 
+			hx-get="/notifications"
+			hx-trigger={ fmt.Sprintf("%s, load once", NotificationEventName(ctx)) }
+			hx-target="#notification-list"
+			hx-swap="outerHTML"
+		>
+		</div>
 		<div class="sticky bottom-0 border-t bg-white p-2">
 			<div
 				hx-delete="/notifications"
@@ -52,15 +63,13 @@ templ NotificationDialog() {
 
 templ NotificationList(items []*models.Notification) {
 	<ul
-		hx-get="/notifications"
-		hx-trigger={ NotificationEventName(ctx) }
-		hx-target="this"
-		hx-swap="outerHTML"
 		id="notification-list"
 		class="grid grid-cols-1 gap-2 rounded p-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4"
 	>
-		for i, item := range items {
-			@NotificationCard(item, len(items)-i)
+		if items != nil {
+			for i, item := range items {
+				@NotificationCard(item, len(items)-i)
+			}
 		}
 	</ul>
 }

@@ -1,11 +1,15 @@
 package handlers
 
 import (
+	"fmt"
+
+	"github.com/cayo-rodrigues/nff/web/database"
+	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
-	"github.com/cayo-rodrigues/nff/web/models"
-	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -30,6 +34,9 @@ func LoginUser(c *fiber.Ctx) error {
 		return err
 	}
 
+	redis := database.GetDB().Redis
+	redis.Publish(c.Context(), "0:operation-finished", 0)
+
 	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
 
@@ -38,6 +45,10 @@ func LogoutUser(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+	userID := utils.GetUserData(c.Context()).ID
+	redis := database.GetDB().Redis
+	redis.Publish(c.Context(), fmt.Sprintf("%d:operation-finished", userID), 0)
 
 	return RetargetToPageHandler(c, "/login", LoginPage)
 }

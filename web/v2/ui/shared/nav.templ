@@ -9,7 +9,7 @@ templ Nav(isAuthenticated bool) {
 		</h1>
 		<div class="flex items-center gap-6 sm:gap-8">
 			@ListMenu(isAuthenticated)
-			@NotificationBell()
+			@NotificationBell(isAuthenticated)
 			@BurgerMenu(isAuthenticated)
 		</div>
 	</nav>

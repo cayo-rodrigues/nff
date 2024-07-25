@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"github.com/cayo-rodrigues/nff/web/database"
+	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
-	"github.com/cayo-rodrigues/nff/web/models"
-	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -31,5 +32,7 @@ func RegisterUser(c *fiber.Ctx) error {
 		return err
 	}
 
+	redis := database.GetDB().Redis
+	redis.Publish(c.Context(), "0:operation-finished", 0)
 	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
