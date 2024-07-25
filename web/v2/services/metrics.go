@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
+	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
 func ListMetrics(ctx context.Context, userID int, filters ...map[string]string) ([]*models.Metrics, error) {
@@ -33,5 +34,10 @@ func CreateMetrics(ctx context.Context, m *models.Metrics, userID int) error {
 
 func RetrieveMetrics(ctx context.Context, metricsID int, userID int) (*models.Metrics, error) {
 	return storage.RetrieveMetrics(ctx, metricsID, userID)
+}
+
+func RetrieveMetricsResult(ctx context.Context, resultID int) (*models.MetricsResult, error) {
+	userID := utils.GetUserData(ctx).ID
+	return storage.RetrieveMetricsResult(ctx, resultID, userID)
 }
 

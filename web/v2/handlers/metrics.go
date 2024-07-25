@@ -132,3 +132,20 @@ func RetrieveMetricsCard(c *fiber.Ctx) error {
 
 	return Render(c, components.MetricsCard(metrics))
 }
+
+func GetDownloadFromRecordStatusIcon(c *fiber.Ctx) error {
+	recordID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	result, err := services.RetrieveMetricsResult(c.Context(), recordID)
+	if err != nil {
+		return err
+	}
+
+	if result.InvoicePDF != "" {
+		return Render(c, components.DownloadInvoiceFromRecordSuccessIcon(result))
+	}
+	return Render(c, components.DownloadInvoiceFromRecordLoadingIcon(result))
+}

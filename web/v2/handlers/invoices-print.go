@@ -87,7 +87,10 @@ func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
 	ssapi := siare.GetSSApiClient()
 	go ssapi.PrintInvoiceFromMetricsRecord(printing, recordID, userID)
 
-	return nil
+	record := models.NewMetricsResult()
+	record.ID = recordID
+
+	return Render(c, components.DownloadInvoiceFromRecordLoadingIcon(record))
 }
 
 func ListInvoicePrintings(c *fiber.Ctx) error {

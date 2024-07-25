@@ -186,24 +186,46 @@ templ MetricsResultsDetails(m *models.Metrics) {
 	</div>
 }
 
-templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult) {
+func downloadInvoiceFromRecordReqStatusID(r *models.MetricsResult) string {
+	return fmt.Sprintf("download-invoice-from-record-status-icon-%d", r.ID)
+}
+
+func downloadInvoiceFromRecordReqStatusTarget(r *models.MetricsResult) string {
+	return fmt.Sprintf("#download-invoice-from-record-status-icon-%d", r.ID)
+}
+
+templ DownloadInvoiceFromRecordLoadingIcon(r *models.MetricsResult) {
 	<div
-		class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3"
+		class="text-sky-600"
+		hx-get={ fmt.Sprintf("/metrics/%d/download-from-record-status-icon", r.ID) }
+		hx-trigger={ shared.NotificationEventName(ctx) }
+		hx-swap="innerHTML"
+		hx-target={ downloadInvoiceFromRecordReqStatusTarget(r) }
 	>
-		if r.InvoicePDF != "" {
-			<div class="text-green-600">
-				@shared.IconSm("check-circle")
-			</div>
-		} else {
-			<div class="text-sky-600" id={ fmt.Sprintf("download-invoice-from-record-loading-icon-%d", r.ID) }>
-			</div>
-		}
+		@shared.SpinningIcon("loader")
+	</div>
+}
+
+templ DownloadInvoiceFromRecordSuccessIcon(r *models.MetricsResult) {
+	if r.InvoicePDF != "" {
+		<div class="text-green-600">
+			@shared.IconSm("check-circle")
+		</div>
+	}
+}
+
+templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult) {
+	<div class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3">
+		<div id={ downloadInvoiceFromRecordReqStatusID(r) }>
+			@DownloadInvoiceFromRecordSuccessIcon(r)
+		</div>
 		<a
 			if r.InvoicePDF != "" {
 				href={ templ.URL(r.InvoicePDF) }
 			} else {
 				hx-post={ fmt.Sprintf("/invoices/print/%d/%s/%d", r.ID, r.InvoiceNumber, r.EntityID) }
-				hx-swap="none"
+				hx-swap="innerHTML"
+				hx-target={ downloadInvoiceFromRecordReqStatusTarget(r) }
 			}
 			title="Baixar NFA"
 		>

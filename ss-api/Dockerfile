@@ -28,4 +28,6 @@ COPY --from=build /opt/chromedriver-linux64 /opt/
 
 COPY . .
 
+RUN chmod -R 755 /var/task/handlers
+
 CMD [ "main.main" ]
