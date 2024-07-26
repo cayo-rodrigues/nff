@@ -7,7 +7,7 @@ on:
       - main
       - develop # TEMP!
     paths:
-      - "web/v2/**"
+      - "web/**"
       - ".github/workflows/nff_web_build_and_deploy.yaml"
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build project image
-        working-directory: ./web/v2
+        working-directory: ./web
         run: docker build -t $WEB_IMAGE_TAG .
 
       - name: Push images to Docker Hub
@@ -43,7 +43,7 @@ jobs:
         uses: mscno/setup-goose@v1
 
       - name: Apply migrations
-        working-directory: ./web/v2
+        working-directory: ./web
         run: |
           goose -dir ./database/migrations -v -s postgres $RDS_DB_URL up
 
