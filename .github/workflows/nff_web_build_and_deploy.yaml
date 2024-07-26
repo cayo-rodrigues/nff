@@ -15,7 +15,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
-      MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,24 +26,27 @@ jobs:
         working-directory: ./web
         run: docker build -t $WEB_IMAGE_TAG .
 
-      - name: Build goose image
-        working-directory: ./web
-        run: docker build -t $MIGRATIONS_IMAGE_TAG -f Dockerfile.goose .
-
       - name: Push images to Docker Hub
         run: |
           docker push $WEB_IMAGE_TAG
-          docker push $MIGRATIONS_IMAGE_TAG
 
   migrate:
     needs: build
     runs-on: ubuntu-latest
     env:
-      MIGRATIONS_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd-goose:${{ github.sha }}
       RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup goose
+        uses: mscno/setup-goose@v1
+
       - name: Apply migrations
-        run: docker run -e CMD=up -e DB_URL=$RDS_DB_URL $MIGRATIONS_IMAGE_TAG
+        working-directory: ./web
+        run: |
+          goose -dir ./database/migrations -v -s postgres $RDS_DB_URL up
+
 
   deploy:
     needs:
@@ -80,6 +82,7 @@ jobs:
               -p 8080:8080 \
               -e PORT=8080 \
               -e START_FRESH=true \
+              -e TZ=America/Sao_Paulo \
               -e DB_URL=$RDS_DB_URL \
               -e REDIS_URL=$ELASTICACHE_URL \
               -e SS_API_BASE_URL=$SS_API_BASE_URL \

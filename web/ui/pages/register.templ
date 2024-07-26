@@ -1,0 +1,10 @@
+package pages
+
+import "github.com/cayo-rodrigues/nff/web/ui/forms"
+import "github.com/cayo-rodrigues/nff/web/models"
+
+templ RegisterPage(u *models.User) {
+	<div class="mt-40 flex h-full items-center justify-center">
+		@forms.RegisterForm(u)
+	</div>
+}

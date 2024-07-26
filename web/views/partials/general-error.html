@@ -1,8 +1,0 @@
-{{ define "partials/general-error" }}
-    <dialog id="general-error-msg"
-        class="b-black w-1/3 rounded border px-8 py-8 text-center text-2xl shadow shadow-gray-300">
-        <p class="text-neutral-800">{{ . }}</p>
-        <button class="mt-6 rounded border border-gray-700 bg-red-600 px-8 py-2 text-gray-100"
-            onclick="this.closest('dialog').close()"> OK :(</button>
-    </dialog>
-{{ end }}

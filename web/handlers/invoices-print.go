@@ -1,209 +1,143 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
 	"strconv"
 
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/globals"
-	"github.com/cayo-rodrigues/nff/web/interfaces"
 	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/siare"
+	"github.com/cayo-rodrigues/nff/web/ui/components"
+	"github.com/cayo-rodrigues/nff/web/ui/forms"
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
 )
 
-type PrintInvoicesPage struct {
-	service       interfaces.PrintingService
-	entityService interfaces.EntityService
-	siareBGWorker interfaces.SiareBGWorker
-}
+func PrintInvoicePage(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
 
-func NewPrintInvoicesPage(service interfaces.PrintingService, entityService interfaces.EntityService, siareBGWorker interfaces.SiareBGWorker) *PrintInvoicesPage {
-	return &PrintInvoicesPage{
-		service:       service,
-		entityService: entityService,
-		siareBGWorker: siareBGWorker,
-	}
-}
-
-type PrintInvoicesPageData struct {
-	IsAuthenticated  bool
-	Filters          *models.ReqCardFilters
-	InvoicePrint     *models.InvoicePrint
-	InvoicePrintings []*models.InvoicePrint
-	GeneralError     string
-	FormMsg          string
-	FormSuccess      bool
-	FormSelectFields *models.InvoicePrintSelectFields
-	ResourceName     string
-}
-
-func (p *PrintInvoicesPage) NewEmptyData() *PrintInvoicesPageData {
-	return &PrintInvoicesPageData{
-		IsAuthenticated:  true,
-		Filters:          models.NewRequestCardFilters(),
-		FormSelectFields: models.NewInvoicePrintSelectFields(),
-		ResourceName:     "invoices/print",
-	}
-}
-
-func (p *PrintInvoicesPage) Render(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-
-	userID := c.Locals("UserID").(int)
-
-	entities, err := p.entityService.ListEntities(c.Context(), userID)
-	if err != nil {
-		pageData.GeneralError = err.Error()
-		c.Set("HX-Trigger-After-Settle", "general-error")
-	}
-
-	pageData.FormSelectFields.Entities = entities
-	pageData.InvoicePrint = models.NewEmptyInvoicePrint()
-
-	// get the latest 10 printings
-	printings, err := p.service.ListInvoicePrintings(c.Context(), userID, nil)
-	if err != nil {
-		pageData.GeneralError = err.Error()
-		c.Set("HX-Trigger-After-Settle", "general-error")
-		return c.Render("invoices-print", pageData, "layouts/base")
-	}
-
-	pageData.InvoicePrintings = printings
-
-	return c.Render("invoices-print", pageData, "layouts/base")
-}
-
-func (p *PrintInvoicesPage) PrintInvoice(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-	userID := c.Locals("UserID").(int)
-
-	entities, err := p.entityService.ListEntities(c.Context(), userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-	pageData.FormSelectFields.Entities = entities
-
-	entityID, err := strconv.Atoi(c.FormValue("entity"))
-	if err != nil {
-		log.Println("Error converting entity id from string to int: ", err)
-		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
-	}
-
-	entity, err := p.entityService.RetrieveEntity(c.Context(), entityID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	invoicePrint := models.NewInvoicePrintFromForm(c)
-	invoicePrint.Entity = entity
-	invoicePrint.CreatedBy = userID
-
-	if !invoicePrint.IsValid() {
-		pageData.InvoicePrint = invoicePrint
-		pageData.FormMsg = "Corrija os campos abaixo."
-		return utils.RetargetToForm(c, "invoice-print", pageData)
-	}
-
-	err = p.service.CreateInvoicePrinting(c.Context(), invoicePrint)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	go p.siareBGWorker.RequestInvoicePrinting(invoicePrint)
-
-	filters := models.NewRawFiltersFromForm(c)
-
-	printings, err := p.service.ListInvoicePrintings(c.Context(), userID, filters)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	c.Set("HX-Trigger-After-Settle", "invoice-print-required")
-
-	shouldWarnUser := utils.FiltersExcludeToday(filters)
-	if shouldWarnUser {
-		return utils.GeneralInfoResponse(c, globals.ReqCardNotVisibleMsg)
-	}
-	return c.Render("partials/requests-overview", printings)
-}
-
-func (p *PrintInvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
-	printingId, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.PrintingNotFoundErr)
-	}
-	userID := c.Locals("UserID").(int)
-	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingId, userID)
-
-	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
-	return c.Render("partials/request-card-details", printing)
-}
-
-func (p *PrintInvoicesPage) GetInvoicePrintForm(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-	userID := c.Locals("UserID").(int)
-
-	entities, err := p.entityService.ListEntities(c.Context(), userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-	pageData.FormSelectFields.Entities = entities
-
-	printingID, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.PrintingNotFoundErr)
-	}
-	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	pageData.InvoicePrint = printing
-
-	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
-	return c.Render("partials/forms/invoice-print-form", pageData)
-}
-
-func (p *PrintInvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
-	printingID, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.PrintingNotFoundErr)
-	}
-
-	key := fmt.Sprintf("reqstatus:printing:%v", printingID)
-	err = db.Redis.GetDel(c.Context(), key).Err()
-	if err == redis.Nil {
-		return c.Render("partials/request-card-status", "pending")
-	}
-	if err != nil {
-		log.Printf("Error reading redis key %v: %v\n", key, err)
-		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
-	}
-
-	userID := c.Locals("UserID").(int)
-
-	printing, err := p.service.RetrieveInvoicePrinting(c.Context(), printingID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	targetID := fmt.Sprintf("#request-card-%v", c.Params("id"))
-	c.Set("HX-Retarget", targetID)
-	c.Set("HX-Reswap", "outerHTML")
-	return c.Render("partials/request-card", printing)
-}
-
-func (p *PrintInvoicesPage) FilterRequests(c *fiber.Ctx) error {
-	userID := c.Locals("UserID").(int)
 	filters := c.Queries()
 
-	printings, err := p.service.ListInvoicePrintings(c.Context(), userID, filters)
+	printingsList, err := services.ListPrintings(c.Context(), userID, filters)
 	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
+		return err
 	}
 
-	return c.Render("partials/requests-overview", printings)
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
+	printingForForm := models.NewInvoicePrintWithSamples(entities)
+	printingsByDate := services.GroupListByDate(printingsList)
+	page := pages.InvoicesPrintPage(printingsByDate, printingForForm, entities)
+
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
+	return Render(c, layouts.Base(page))
+}
+
+func PrintInvoice(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
+	printing := models.NewInvoicePrintFromForm(c)
+
+	entity, err := services.RetrieveEntity(c.Context(), printing.Entity.ID, userID)
+	if err != nil {
+		return err
+	}
+	printing.Entity = entity
+
+	if !printing.IsValid() {
+		return Render(c, forms.PrintInvoiceForm(printing, entities))
+	}
+
+	err = services.CreatePrinting(c.Context(), printing, userID)
+	if err != nil {
+		return err
+	}
+
+	ssapi := siare.GetSSApiClient()
+	go ssapi.PrintInvoice(printing)
+
+	c.Append("HX-Trigger-After-Swap", "reload-printing-list")
+	return Render(c, forms.PrintInvoiceForm(printing, entities))
+}
+
+func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+
+	recordID, err := c.ParamsInt("record_id")
+	if err != nil {
+		return err
+	}
+	invoiceNumber := c.Params("invoice_number")
+	entityID, err := c.ParamsInt("entity_id")
+	if err != nil {
+		return err
+	}
+
+	printing, err := services.CreatePrintingFromMetricsRecord(c.Context(), invoiceNumber, entityID, userID)
+
+	ssapi := siare.GetSSApiClient()
+	go ssapi.PrintInvoiceFromMetricsRecord(printing, recordID, userID)
+
+	record := models.NewMetricsResult()
+	record.ID = recordID
+
+	return Render(c, components.DownloadInvoiceFromRecordLoadingIcon(record))
+}
+
+func ListInvoicePrintings(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+	filters := c.Queries()
+	printings, err := services.ListPrintings(c.Context(), userID, filters)
+	if err != nil {
+		return err
+	}
+
+	printingsByDate := services.GroupListByDate(printings)
+
+	return Render(c, components.InvoicesPrintingsList(printingsByDate))
+}
+
+func GetPrintInvoiceForm(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
+	basePrintingID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	basePrinting, err := services.RetrievePrinting(c.Context(), basePrintingID)
+	if err != nil {
+		return err
+	}
+
+	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
+	return Render(c, forms.PrintInvoiceForm(basePrinting, entities))
+}
+
+func RetrieveInvoicePrintCard(c *fiber.Ctx) error {
+	printingID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	printing, err := services.RetrievePrinting(c.Context(), printingID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoicePrintCard(printing))
 }

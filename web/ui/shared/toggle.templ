@@ -1,0 +1,15 @@
+package shared
+
+import "github.com/cayo-rodrigues/nff/web/ui/scripts"
+
+templ ToggleElementVisibilityButton(target string) {
+	<div class="-mb-2 mt-4 flex justify-center border-t sm:-mb-6">
+		<div class="w-fit -translate-y-3 transform bg-gray-50 px-2">
+			<div id="toggle-btn" onclick={ scripts.ToggleVerticalDrawer(target, "#toggle-btn svg") }>
+				@DefaultButtonOutline("xs") {
+					@IconXs("chevron-up")
+				}
+			</div>
+		</div>
+	</div>
+}

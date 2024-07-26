@@ -3,18 +3,9 @@ package models
 import (
 	"strings"
 	"time"
-	"unicode/utf8"
 
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/globals"
-	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
-
-type UserFormErrors struct {
-	Email    string
-	Password string
-}
 
 type User struct {
 	ID        int
@@ -22,53 +13,45 @@ type User struct {
 	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Errors    *UserFormErrors
+	Errors    ErrorMessages
 }
 
-func NewEmptyUser() *User {
-	return &User{
-		Email:    "",
-		Password: "",
-		Errors:   &UserFormErrors{},
-	}
+func NewUser() *User {
+	return &User{}
 }
 
 func NewUserFromForm(c *fiber.Ctx) *User {
 	return &User{
 		Email:    strings.TrimSpace(c.FormValue("email")),
 		Password: strings.TrimSpace(c.FormValue("password")),
-		Errors:   &UserFormErrors{},
 	}
 }
 
 func (u *User) IsValid() bool {
-	isValid := true
-
-	mandatoryFieldMsg := globals.MandatoryFieldMsg
-	valueTooLongMsg := globals.ValueTooLongMsg
-	invalidFormatMsg := globals.InvalidFormatMsg
-
-	hasEmail := u.Email != ""
-	hasPassword := u.Password != ""
-
-	hasValidEmailFormat := globals.ReEmail.MatchString(u.Email)
-
-	emailTooLong := utf8.RuneCount([]byte(u.Email)) > 128
-
-	fields := [4]*utils.Field{
-		{ErrCondition: !hasEmail, ErrField: &u.Errors.Email, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: !hasPassword, ErrField: &u.Errors.Password, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: hasEmail && !hasValidEmailFormat, ErrField: &u.Errors.Email, ErrMsg: &invalidFormatMsg},
-		{ErrCondition: emailTooLong, ErrField: &u.Errors.Email, ErrMsg: &valueTooLongMsg},
+	fields := Fields{
+		{
+			Name:  "Email",
+			Value: u.Email,
+			Rules: Rules(Required, Email, Max(128)),
+		},
+		{
+			Name:  "Password",
+			Value: u.Password,
+			Rules: Rules(Required),
+		},
 	}
-
-	for _, field := range fields {
-		utils.ValidateField(field, &isValid)
-	}
-
-	return isValid
+	errors, ok := Validate(fields)
+	u.Errors = errors
+	return ok
 }
 
-func (u *User) Scan(rows db.Scanner) error {
-	return rows.Scan(&u.ID, &u.Email, &u.Password, &u.CreatedAt, &u.UpdatedAt)
+func (u *User) Values() []any {
+	return []any{&u.ID, &u.Email, &u.Password, &u.CreatedAt, &u.UpdatedAt}
+}
+
+func (u *User) SetError(key, val string) {
+	if u.Errors == nil {
+		u.Errors = make(ErrorMessages)
+	}
+	u.Errors[key] = val
 }

@@ -1,0 +1,82 @@
+package shared
+
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/utils"
+import "time"
+import "github.com/cayo-rodrigues/nff/web/models"
+
+// Date filters
+templ FiltersByDate(listTarget string, endpoint string) {
+	<div id="filters-container" class="lg:col-span-5">
+		<fieldset class="relative rounded border border-gray-300 text-center sm:text-start">
+			<legend class="-left-4 top-2 rounded border border-gray-300 bg-gray-200 p-1 text-center md:absolute">
+				@IconSm("calendar")
+			</legend>
+			<section class="grid w-full grid-cols-2 gap-2 px-2 py-2 sm:grid-cols-5 md:w-fit md:pl-5 lg:w-full xl:h-12 xl:items-center">
+				@DateFilterOption(listTarget, endpoint, 60) {
+					<span>Últimos 60 dias</span>
+				}
+				@DateFilterOption(listTarget, endpoint, 30) {
+					<span>Últimos 30 dias</span>
+				}
+				@DateFilterOption(listTarget, endpoint, 15) {
+					<span>Últimos 15 dias</span>
+				}
+				@DateFilterOption(listTarget, endpoint, 7) {
+					<span>Últimos 7 dias</span>
+				}
+				@DateFilterOption(listTarget, endpoint, 0) {
+					<span>Hoje</span>
+				}
+			</section>
+		</fieldset>
+	</div>
+}
+
+templ DateFilterOption(listTarget string, endpoint string, daysRange int) {
+	<div
+		hx-get={ listUrl(endpoint, daysRange) }
+		hx-target={ listTarget }
+		hx-swap="outerHTML"
+		hx-trigger="click"
+		hx-include="#entity_filter"
+		id={ fmt.Sprintf("filter-button-%d", daysRange) }
+	>
+		@DefaultButtonOutline("xs") {
+			{ children... }
+		}
+	</div>
+}
+
+func listUrl(endpoint string, daysRange int) string {
+	queryParams := listQueryParams(daysRange)
+	return fmt.Sprintf("%s?%s", endpoint, queryParams)
+}
+
+func listQueryParams(daysRange int) string {
+	now := time.Now()
+	from := utils.FormatedNDaysBefore(now, daysRange)
+	to := utils.FormatDate(now)
+	return fmt.Sprintf("from_date=%s&to_date=%s", from, to)
+}
+
+// Entity filters
+templ FiltersByEntity(listTarget string, endpoint string, entities []*models.Entity) {
+	<div id="entity-filters-container" class="lg:col-span-2">
+		<fieldset class="relative rounded border border-gray-300 text-center sm:text-start">
+			<legend class="-left-4 top-2 rounded border border-gray-300 bg-gray-200 p-1 text-center md:absolute">
+				@IconSm("users")
+			</legend>
+			<section class="px-2 md:w-fit md:pl-5 lg:w-full">
+				@SelectInput(&InputData{
+					ID:          "entity_filter",
+					Options:     &InputOptions{EntityOptions: entities},
+					FirstOption: &FirstInputOption{Label: "Todas as entidades"},
+					Attrs: templ.Attributes{
+						"onchange": "OnChangeEntityFilter()",
+					},
+				})
+			</section>
+		</fieldset>
+	</div>
+}

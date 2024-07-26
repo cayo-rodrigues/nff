@@ -1,0 +1,198 @@
+package shared
+
+import "fmt"
+import "strconv"
+import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/ui/scripts"
+
+type InputOptions struct {
+	StringOptions []string
+	IntOptions    []int
+	EntityOptions []*models.Entity
+}
+
+type FirstInputOption struct {
+	Value    string
+	Label    string
+	Disabled bool
+}
+
+type InputHelpInfo struct {
+	Title string
+	Link  string
+}
+
+type InputData struct {
+	ErrMsg        string
+	InputType     string
+	ID            string
+	Value         string
+	Label         string
+	Placeholder   string
+	Attrs         templ.Attributes
+	Options       *InputOptions
+	Step          string
+	Class         string
+	HxIndicatorID string
+	FirstOption   *FirstInputOption
+	Help          *InputHelpInfo
+}
+
+func (data *InputData) Wide() *InputData {
+	data.Class = "flex flex-col gap-2 col-span-full"
+	if data.InputType == "password" {
+		data.Class += " relative"
+	}
+	return data
+}
+
+func (data *InputData) GetClassName() string {
+	if data.Class != "" {
+		return data.Class
+	}
+
+	className := "flex flex-col gap-2"
+
+	if data.InputType == "password" {
+		className += " relative"
+	}
+
+	return className
+}
+
+templ WideInput(data *InputData) {
+	@Input(data.Wide())
+}
+
+templ WideSelectInput(data *InputData) {
+	@SelectInput(data.Wide())
+}
+
+templ Input(data *InputData) {
+	<div class={ data.GetClassName() }>
+		<label class="flex items-center gap-2 truncate" for={ data.ID }>
+			<strong>{ data.Label }</strong>
+			if data.Help != nil {
+				<a
+					target="_blank"
+					href={ templ.URL(data.Help.Link) }
+					title={ data.Help.Title }
+					class="text-sky-500"
+				>
+					@IconXs("help-circle")
+				</a>
+			}
+		</label>
+		<input
+			class="h-8 rounded border border-gray-300 bg-white px-2 py-1 outline-0 focus-within:border-gray-500"
+			if data.InputType != "" {
+				type={ data.InputType }
+			} else {
+				type="text"
+			}
+			if data.InputType == "number" {
+				step={ data.Step }
+			}
+			id={ data.ID }
+			name={ data.ID }
+			value={ data.Value }
+			placeholder={ data.Placeholder }
+			{ data.Attrs... }
+		/>
+		<sub class="text-red-600">{ data.ErrMsg }</sub>
+		if data.InputType == "password" {
+			<button
+				id={ passwordToggleID(data) }
+				type="button"
+				class="absolute bottom-4 right-4"
+				onclick={ scripts.TogglePasswordVisibility(inputTarget(data), passwordToggleTarget(data)) }
+			>
+				@IconSm("eye-off")
+			</button>
+		}
+	</div>
+}
+
+templ SelectInput(data *InputData) {
+	<div class={ data.GetClassName() }>
+		<label class="flex items-center gap-2 truncate" for={ data.ID }>
+			<strong>{ data.Label }</strong>
+			if data.Help != nil {
+				<a
+					target="_blank"
+					href={ templ.URL(data.Help.Link) }
+					title={ data.Help.Title }
+					class="text-sky-500"
+				>
+					@IconXs("help-circle")
+				</a>
+			}
+			if data.HxIndicatorID != "" {
+				<span id={ data.HxIndicatorID }>
+					@LoadingIconXs()
+				</span>
+			}
+		</label>
+		<select
+			class="h-8 rounded border border-gray-300 bg-white px-2 py-1 outline-0 focus-within:border-gray-500"
+			id={ data.ID }
+			name={ data.ID }
+			{ data.Attrs... }
+		>
+			if data.FirstOption != nil {
+				<option
+					value={ data.FirstOption.Value }
+					selected
+					if data.FirstOption.Disabled {
+						disabled
+					}
+				>
+					{ data.FirstOption.Label }
+				</option>
+			}
+			for _, strOpt := range data.Options.StringOptions {
+				<option
+					value={ strOpt }
+					if data.Value == strOpt {
+						selected
+					}
+				>
+					{ strOpt }
+				</option>
+			}
+			for _, intOpt := range data.Options.IntOptions {
+				<option
+					value={ strconv.Itoa(intOpt) }
+					if data.Value == strconv.Itoa(intOpt) {
+						selected
+					}
+				>
+					{ strconv.Itoa(intOpt) }
+				</option>
+			}
+			for _, entityOpt := range data.Options.EntityOptions {
+				<option
+					value={ strconv.Itoa(entityOpt.ID) }
+					if data.Value == strconv.Itoa(entityOpt.ID) {
+						selected
+					}
+				>
+					{ entityOpt.Name }
+				</option>
+			}
+		</select>
+		<sub class="text-red-600">{ data.ErrMsg }</sub>
+	</div>
+}
+
+func passwordToggleID(data *InputData) string {
+	return fmt.Sprintf("password-toggle-%v", data.ID)
+}
+
+func passwordToggleTarget(data *InputData) string {
+	return fmt.Sprintf("#password-toggle-%v", data.ID)
+}
+
+func inputTarget(data *InputData) string {
+	return fmt.Sprintf("#%s", data.ID)
+}

@@ -1,0 +1,35 @@
+package pages
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "github.com/cayo-rodrigues/nff/web/ui/components"
+
+templ InvoicesPage(invoicesByDate []map[string][]*models.Invoice, entities []*models.Entity) {
+	<div class="flex flex-col gap-3">
+		<div class="flex flex-col gap-2 border-b pb-3 sm:flex-row">
+			<dialog id="invoice-form-dialog" class="m-auto h-full w-full rounded bg-gray-50 shadow shadow-gray-600">
+				<div id="invoice-form-dialog-content" class="p-4"></div>
+			</dialog>
+			<div
+				hx-get="/invoices/0/form"
+				hx-trigger="load once"
+				hx-target="#invoice-form-dialog-content"
+				hx-swap="innerHTML"
+				onclick="OpenInvoiceFormDialog()"
+			>
+				@shared.SuccessButton("sm") {
+					@shared.Icon("file-plus")
+					<span>Emitir Nota Fiscal</span>
+				}
+			</div>
+		</div>
+		<div class="flex flex-col gap-2 xl:flex-row xl:justify-between">
+			<h2 class="col-span-3 py-2 text-center text-base font-medium sm:py-3 md:py-0 md:text-left">Histórico de Operações (Notas Fiscais)</h2>
+			<div class="grid grid-cols-1 gap-2 lg:grid-cols-7 lg:gap-6 xl:w-3/4 2xl:w-3/5">
+				@shared.FiltersByDate("#invoice-list", "/invoices/list")
+				@shared.FiltersByEntity("#invoice-list", "/invoices/list", entities)
+			</div>
+		</div>
+		@components.InvoiceList(invoicesByDate)
+	</div>
+}

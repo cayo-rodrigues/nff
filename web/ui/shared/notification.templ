@@ -1,0 +1,125 @@
+package shared
+
+import "strconv"
+import "github.com/cayo-rodrigues/nff/web/utils"
+import "github.com/cayo-rodrigues/nff/web/models"
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/services"
+
+templ NotificationBell(isAuthenticated bool) {
+	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
+		@IconSm("bell")
+		if isAuthenticated {
+			@NotificationCounter()
+		}
+	</button>
+	if isAuthenticated {
+		@NotificationDialog()
+	}
+}
+
+templ NotificationCounter() {
+	<div
+		id="notification-counter"
+		class="absolute -right-3.5 -top-2 hidden rounded-full border border-red-800 bg-red-600 p-1 text-center text-xs xl:-right-1.5 xl:-top-0.5"
+	>
+		0
+	</div>
+}
+
+templ NotificationDialog() {
+	<dialog id="notification-dialog" class="rounded shadow shadow-gray-700">
+		<div class="sticky top-0 z-40 flex items-center justify-between border-b bg-gray-100 px-4 py-2">
+			<h2 class="text-lg font-bold">Notificações</h2>
+			<div onclick="CloseNotificationDialog()">
+				@DefaultButtonOutline("xs") {
+					@IconSm("x")
+				}
+			</div>
+		</div>
+		@NotificationList(services.GetNotifications(ctx))
+		<div
+			class="hidden" 
+			hx-get="/notifications"
+			hx-trigger={ fmt.Sprintf("%s, load once", NotificationEventName(ctx)) }
+			hx-target="#notification-list"
+			hx-swap="outerHTML"
+		>
+		</div>
+		<div class="sticky bottom-0 border-t bg-white p-2">
+			<div
+				hx-delete="/notifications"
+				hx-trigger="click"
+				hx-target="#notification-list"
+				hx-swap="innerHTML"
+				onclick="CloseNotificationDialog()"
+			>
+				@DefaultButtonOutline("xs") {
+					<span>Limpar Notificações</span>
+				}
+			</div>
+		</div>
+	</dialog>
+}
+
+templ NotificationList(items []*models.Notification) {
+	<ul
+		id="notification-list"
+		class="grid grid-cols-1 gap-2 rounded p-2 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 2xl:grid-cols-4"
+	>
+		if items != nil {
+			for i, item := range items {
+				@NotificationCard(item, len(items)-i)
+			}
+		}
+	</ul>
+}
+
+templ NotificationCard(n *models.Notification, position int) {
+	<li id={ fmt.Sprintf("notification-card-%d", n.ID) } class="relative grid grid-cols-1 gap-2 rounded p-2 shadow shadow-gray-600">
+		<span class="absolute -right-1 -top-1 rounded border border-gray-300 bg-gray-100 px-2 py-1">{ strconv.Itoa(position) }</span>
+		<h3 class="flex items-center gap-2 truncate rounded border border-gray-300 p-2 text-base font-bold">
+			@OperationStatus(n)
+		</h3>
+		<ul class="grid grid-cols-1 gap-2">
+			<li><strong>Tipo:</strong> <span>{ n.OperationType }</span></li>
+			<li><strong>Iniciado em:</strong> <span>{ utils.FormatDatetimeAsBR(n.CreatedAt) }</span></li>
+			<li class="grid grid-cols-3 gap-2">
+				<a
+					if n.InvoicePDF != "" {
+						class="col-span-2"
+					} else {
+						class="col-span-full"
+					}
+					href={ templ.URL(n.PageEndpoint) }
+					target="_blank"
+				>
+					@DefaultButtonLight("xs") {
+						<span>Ver Resultado</span>
+						@IconSm("external-link")
+					}
+				</a>
+				if n.InvoicePDF != "" {
+					<a
+						href={ templ.URL(n.InvoicePDF) }
+						title="Baixar NFA"
+					>
+						@DarkButton("xs") {
+							@IconSm("download-cloud")
+						}
+					</a>
+				}
+			</li>
+		</ul>
+	</li>
+}
+
+func NotificationEventName(ctx context.Context) string {
+	userData := utils.GetUserData(ctx)
+	return fmt.Sprintf("sse:%d:operation-finished", userData.ID)
+}
+
+func SingleNotificationEventName(ctx context.Context, operationName string) string {
+	userData := utils.GetUserData(ctx)
+	return fmt.Sprintf("sse:%d:%s-operation-finished", userData.ID, operationName)
+}

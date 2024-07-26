@@ -1,0 +1,226 @@
+package forms
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "strconv"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/utils"
+
+templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
+	<form
+		id="invoice-form"
+		hx-post="/invoices"
+		hx-target="this"
+		hx-swap="outerHTML"
+	>
+		<div class="flex items-center justify-between gap-6 border-b border-gray-300 py-2 outline-0">
+			<div
+				class="flex-1 lg:w-fit lg:flex-initial"
+			>
+				@shared.SubmitButton("sm") {
+					@shared.Icon("play-circle")
+					<span>Iniciar Operação</span>
+				}
+			</div>
+			<div onclick="CloseInvoiceFormDialog()">
+				@shared.DefaultButtonOutline("sm") {
+					@shared.IconSm("x")
+				}
+			</div>
+		</div>
+		<div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+			@shared.SelectInput(&shared.InputData{
+				ID:      "sender",
+				Label:   "Remetente",
+				Value:   strconv.Itoa(i.Sender.ID),
+				Options: &shared.InputOptions{EntityOptions: entities},
+				ErrMsg:  i.Errors["Sender"],
+				Attrs: templ.Attributes{
+					"hx-get":       "/invoices/form/get-sender-ie-input",
+					"hx-trigger":   "change",
+					"hx-target":    "#sender_ie",
+					"hx-select":    "#sender_ie",
+					"hx-swap":      "outerHTML",
+					"hx-indicator": "#available-ies-indicator",
+				},
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:            "sender_ie",
+				Label:         "IE do Remetente",
+				Value:         i.SenderIe,
+				Options:       &shared.InputOptions{StringOptions: i.Sender.AllIes()},
+				HxIndicatorID: "available-ies-indicator",
+				ErrMsg:        i.Errors["SenderIe"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "recipient",
+				Label:   "Destinatário",
+				Value:   strconv.Itoa(i.Recipient.ID),
+				Options: &shared.InputOptions{EntityOptions: entities},
+				ErrMsg:  i.Errors["Recipient"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "operation",
+				Label:   "Operação",
+				Value:   i.Operation,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceOperations[:]},
+				ErrMsg:  i.Errors["Operation"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "cfop",
+				Label:   "CFOP",
+				Value:   strconv.Itoa(i.Cfop),
+				Options: &shared.InputOptions{IntOptions: models.InvoiceCfops[:]},
+				ErrMsg:  i.Errors["Cfop"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "is_icms_contributor",
+				Label:   "Contribuinte ICMS",
+				Value:   i.IsIcmsContributor,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceIcmsOptions[:]},
+				ErrMsg:  i.Errors["IsIcmsContributor"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "is_final_customer",
+				Label:   "Consumidor Final",
+				Value:   i.IsFinalCustomer,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceBooleanField[:]},
+				ErrMsg:  i.Errors["IsFinalCustomer"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:        "shipping",
+				Label:     "Frete",
+				Value:     utils.Float64ToString(i.Shipping),
+				InputType: "number",
+				Step:      "0.01",
+				ErrMsg:    i.Errors["Shipping"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "add_shipping_to_total",
+				Label:   "Adicionar Frete ao Total",
+				Value:   i.AddShippingToTotal,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceBooleanField[:]},
+				ErrMsg:  i.Errors["AddShippingToTotal"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "gta",
+				Label:  "GTA",
+				Value:  i.Gta,
+				ErrMsg: i.Errors["Gta"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "extra_notes",
+				Label:  "Informações Complementares",
+				Value:  i.ExtraNotes,
+				ErrMsg: i.Errors["ExtraNotes"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "custom_file_name_prefix",
+				Label:  "Prefixo do Nome do Arquivo",
+				Value:  i.CustomFileNamePrefix,
+				ErrMsg: i.Errors["CustomFileNamePrefix"],
+			})
+		</div>
+		@InvoiceItemsHeading(i)
+		<div id="items-container" class="grid grid-cols-1">
+			for idx, item := range i.Items {
+				@InvoiceItemSection(item, idx+1)
+			}
+		</div>
+	</form>
+	<div id="item-example" class="hidden">
+		@InvoiceItemSection(models.NewInvoiceItem(), 0)
+	</div>
+}
+
+templ InvoiceItemsHeading(i *models.Invoice) {
+	<heading id="invoice-items-heading" class="sticky top-0 z-10 mb-2 flex items-center justify-between border-b border-gray-300 bg-gray-50 px-2 py-2">
+		<div class="py-2">
+			<h3 class="text-lg font-bold">Produtos</h3>
+		</div>
+		<div class="flex items-center gap-3 py-2 sm:gap-6">
+			<div
+				onclick="AddInvoiceItemSection()"
+			>
+				@shared.DefaultButtonOutline("sm") {
+					@shared.IconXs("plus")
+				}
+			</div>
+			<strong>Total:</strong>
+			<span id="items-count">{ strconv.Itoa(len(i.Items)) }</span>
+		</div>
+	</heading>
+}
+
+templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
+	<section id={ fmt.Sprintf("item-%d", idx) } class="mb-3 rounded border border-gray-600 hover:border-gray-700">
+		<div class="flex items-center justify-between border-b border-gray-600 bg-gray-600 px-2 py-1">
+			<h3 class="text-base font-medium text-white">Produto { strconv.Itoa(idx) }</h3>
+			<div class="flex items-center justify-end gap-2">
+				<div onclick="CopyInvoiceItemSection(this.closest('section'))">
+					@shared.InfoButton("xs") {
+						@shared.IconXs("copy")
+					}
+				</div>
+				<div onclick="RemoveInvoiceItemSection(this.closest('section'))">
+					@shared.DefaultButton("xs") {
+						@shared.IconXs("trash-2")
+					}
+				</div>
+			</div>
+		</div>
+		<div class="grid grid-cols-1 gap-4 rounded-b bg-white px-2 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+			@shared.SelectInput(&shared.InputData{
+				ID:      "group",
+				Label:   "Grupo",
+				Value:   item.Group,
+				ErrMsg:  item.Errors["Group"],
+				Options: &shared.InputOptions{StringOptions: models.InvoiceItemGroups[:]},
+			})
+			@shared.Input(&shared.InputData{
+				ID:          "ncm",
+				Label:       "NCM",
+				Value:       item.NCM,
+				Placeholder: "94019900",
+				ErrMsg:      item.Errors["NCM"],
+				Help:        &shared.InputHelpInfo{Title: "Como saber o NCM de um produto?", Link: "https://www2.fazenda.mg.gov.br/sol/ctrl/SOL/NFAE/CONSULTA_006?ITEM=0&ACAO=VISUALIZAR"},
+			})
+			@shared.Input(&shared.InputData{
+				ID:     "description",
+				Label:  "Descrição",
+				Value:  item.Description,
+				ErrMsg: item.Errors["Description"],
+			})
+			@shared.Input(&shared.InputData{
+				ID:        "quantity",
+				Label:     "Quantidade",
+				Value:     utils.Float64ToString(item.Quantity),
+				ErrMsg:    item.Errors["Quantity"],
+				InputType: "number",
+				Step:      "0.01",
+			})
+			@shared.Input(&shared.InputData{
+				ID:        "value_per_unity",
+				Label:     "Valor Unitário",
+				Value:     utils.Float64ToString(item.ValuePerUnity),
+				ErrMsg:    item.Errors["ValuePerUnity"],
+				InputType: "number",
+				Step:      "0.01",
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "origin",
+				Label:   "Origem",
+				Value:   item.Origin,
+				ErrMsg:  item.Errors["Origin"],
+				Options: &shared.InputOptions{StringOptions: models.InvoiceItemOrigins[:]},
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:      "unity_of_measurement",
+				Label:   "Unidade de Medida",
+				Value:   item.UnityOfMeasurement,
+				ErrMsg:  item.Errors["UnityOfMeasurement"],
+				Options: &shared.InputOptions{StringOptions: models.InvoiceItemUnitiesOfMeaasurement[:]},
+			})
+		</div>
+	</section>
+}

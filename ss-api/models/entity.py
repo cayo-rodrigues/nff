@@ -8,7 +8,7 @@ class Entity:
         self.email: str = normalize_text(data.get("email"))
         self.user_type: str = normalize_text(data.get("user_type"))
         self.ie: str = normalize_text(data.get("ie"), keep_case=True)
-        self.cpf_cnpj: str = normalize_text(data.get("cpf_cnpj"), keep_case=True)
+        self.cpf_cnpj: str = normalize_text(data.get("cpf_cnpj"), keep_case=True, remove=[".", "-", "/"])
         self.password: str = data.get("password", "")
 
         self.other_ies: list[str] = data.get("other_ies", [])

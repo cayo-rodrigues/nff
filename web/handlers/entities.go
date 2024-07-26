@@ -1,130 +1,95 @@
 package handlers
 
 import (
-	"fmt"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
-
-	"github.com/cayo-rodrigues/nff/web/interfaces"
 	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/ui/components"
+	"github.com/cayo-rodrigues/nff/web/ui/forms"
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/gofiber/fiber/v2"
 )
 
-type EntitiesPage struct {
-	service interfaces.EntityService
-}
-
-func NewEntitiesPage(entityService interfaces.EntityService) *EntitiesPage {
-	return &EntitiesPage{
-		service: entityService,
-	}
-}
-
-func (p *EntitiesPage) NewEmptyData() fiber.Map {
-	return fiber.Map{
-		"Entity":           models.NewEmptyEntity(),
-		"FormSelectFields": models.NewEntitySelectFields(),
-	}
-}
-
-func (p *EntitiesPage) Render(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-	userID := c.Locals("UserID").(int)
-
-	entities, err := p.service.ListEntities(c.Context(), userID)
+func EntitiesPage(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+	entities, err := services.ListEntities(c.Context(), userID)
 	if err != nil {
-		pageData["GeneralError"] = err.Error()
-		c.Set("HX-Trigger-After-Settle", "general-error")
+		return err
 	}
-
-	pageData["Entities"] = entities
-
-	return c.Render("entities", pageData, "layouts/base")
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
+	return Render(c, layouts.Base(pages.EntitiesPage(entities)))
 }
 
-func (p *EntitiesPage) CreateEntity(c *fiber.Ctx) error {
-	userID := c.Locals("UserID").(int)
+func CreateEntityPage(c *fiber.Ctx) error {
+	entity := models.NewEntity()
+	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
+}
+
+func EditEntityPage(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+	entityID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+	entity, err := services.RetrieveEntity(c.Context(), entityID, userID)
+	if err != nil {
+		return err
+	}
+	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
+}
+
+func CreateEntity(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
 	entity := models.NewEntityFromForm(c)
-	entity.CreatedBy = userID
-
 	if !entity.IsValid() {
-		pageData := p.NewEmptyData()
-		pageData["Entity"] = entity
-		return utils.RetargetToForm(c, "entity", pageData)
+		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err := p.service.CreateEntity(c.Context(), entity)
+	err := services.CreateEntity(c.Context(), entity, userID)
 	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
+		return err
 	}
 
-	eventMsg := fmt.Sprintf("{\"entity-created\": %v}", entity.ID)
-	c.Set("HX-Trigger-After-Settle", eventMsg)
-	return c.Render("partials/entity-card", entity)
+	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
 
-func (p *EntitiesPage) GetEntityForm(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-	userID := c.Locals("UserID").(int)
-
-	entityID, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
-	}
-
-	entity, err := p.service.RetrieveEntity(c.Context(), entityID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	entity.IsSelected = true
-	pageData["Entity"] = entity
-
-	return c.Render("partials/forms/entity-form", pageData)
-}
-
-func (p *EntitiesPage) UpdateEntity(c *fiber.Ctx) error {
+func UpdateEntity(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
 	entity := models.NewEntityFromForm(c)
-	entity.IsSelected = true
-
-	entityID, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
-	}
-	entity.ID = entityID
-
-	userID := c.Locals("UserID").(int)
-	entity.CreatedBy = userID
-
 	if !entity.IsValid() {
-		pageData := p.NewEmptyData()
-		pageData["Entity"] = entity
-		return utils.RetargetToForm(c, "entity", pageData)
+		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err = p.service.UpdateEntity(c.Context(), entity)
+	err := services.UpdateEntity(c.Context(), entity, userID)
 	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
+		return err
 	}
 
-	c.Set("HX-Trigger-After-Settle", "entity-updated")
-	return c.Render("partials/entity-card", entity)
+	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
 
-func (p *EntitiesPage) DeleteEntity(c *fiber.Ctx) error {
-	userID := c.Locals("UserID").(int)
+func DeleteEntity(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
 	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
+		return err
 	}
-	err = p.service.DeleteEntity(c.Context(), entityID, userID)
+	err = services.DeleteEntity(c.Context(), entityID, userID)
 	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
+		return err
 	}
+	return nil
+}
 
-	eventMsg := fmt.Sprintf("{\"entity-deleted\": %v}", entityID)
-	c.Set("HX-Trigger-After-Settle", eventMsg)
-
-	return c.Render("partials/forms/entity-form", p.NewEmptyData())
+func SearchEntities(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+	filters := c.Queries()
+	entities, err := services.ListEntities(c.Context(), userID, filters)
+	if err != nil {
+		return err
+	}
+	return Render(c, components.EntityList(entities))
 }

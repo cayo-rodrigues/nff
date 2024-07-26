@@ -8,14 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cayo-rodrigues/nff/web/db"
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
 )
 
 func CacheMiddleware(c *fiber.Ctx) error {
-	if strings.HasPrefix(c.Path(), "/.well-known/acme-challenge") {
+	if (strings.HasPrefix(c.Path(), "/sse")) {
 		return c.Next()
 	}
 
@@ -28,6 +28,8 @@ func CacheMiddleware(c *fiber.Ctx) error {
 
 func useOrSetCache(c *fiber.Ctx) error {
 	bodyKey, headersKey := genKeys(c)
+
+	db := database.GetDB()
 
 	cachedBody, err := db.Redis.Get(c.Context(), bodyKey).Bytes()
 	if err == redis.Nil {
@@ -66,6 +68,8 @@ func callNextAndSetCache(c *fiber.Ctx) error {
 	bodyBytes := response.Body()
 	headersBytes := response.Header.Header()
 
+	db := database.GetDB()
+
 	err := db.Redis.Set(c.Context(), bodyKey, bodyBytes, time.Hour).Err()
 	if err != nil {
 		log.Println("Error trying to set response body cache:", err)
@@ -90,7 +94,10 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 	if namespace == "entities" {
 		namespace = "*" // all other routes use entities, so we gotta clear all pages cache in this case
 	}
-	cacheStatus := utils.ClearCache(c.Context(), userID, namespace)
+
+	db := database.GetDB()
+
+	cacheStatus := db.Redis.ClearCache(c.Context(), userID, namespace)
 
 	c.Response().Header.Set("X-Cache", cacheStatus)
 
@@ -98,18 +105,18 @@ func callNextAndClearCache(c *fiber.Ctx) error {
 }
 
 func getKeyFactors(c *fiber.Ctx) (int, string, string) {
-	userID := c.Locals("UserID").(int)
+	userID := utils.GetUserData(c.Context()).ID
 	route := c.OriginalURL()
 
 	var namespace string
 
 	switch {
 	case strings.HasPrefix(route, "/invoices/cancel"):
-		namespace = "invoices-cancel"
+		namespace = "invoice-cancel"
 	case strings.HasPrefix(route, "/invoices/print"):
-		namespace = "invoices-print"
+		namespace = "invoice-print"
 	case strings.HasPrefix(route, "/invoices"):
-		namespace = "invoices"
+		namespace = "invoice-issue"
 	default:
 		namespace = strings.Split(route, "/")[1]
 	}

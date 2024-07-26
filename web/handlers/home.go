@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/gofiber/fiber/v2"
 )
 
-func Home(c *fiber.Ctx) error {
-	return c.Render("home", fiber.Map{}, "layouts/base")
+func HomePage(c *fiber.Ctx) error {
+	page := pages.HomePage()
+	return Render(c, layouts.Base(page))
 }

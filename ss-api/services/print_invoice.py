@@ -1,7 +1,7 @@
 from models import InvoicePrinting
 from utils import exceptions
 from apis import Siare
-from constants.messages import ErrorMessages, SuccessMessages
+from constants.messages import ErrorMessages, SiareFeedbackMessages, SuccessMessages
 from utils.aws import upload_to_s3
 
 
@@ -26,7 +26,10 @@ def print_invoice(data: dict):
 
     error_feedback = siare.get_print_invoice_search_error_feedback()
     if error_feedback:
-        raise exceptions.CouldNotFinishPrintingError(msg=error_feedback)
+        req_status = "error"
+        if error_feedback == SiareFeedbackMessages.PRINTING_UNAVAILABLE:
+            req_status = "warning"
+        raise exceptions.CouldNotFinishPrintingError(msg=error_feedback, req_status=req_status)
 
     siare.finish_print_invoice()
     siare.close_unfocused_windows()
@@ -34,7 +37,7 @@ def print_invoice(data: dict):
     invoice_id = invoice_printing.get_id_from_filename()
     invoice_file_path = invoice_printing.get_file_path()
     invoice_file_name = invoice_printing.get_file_name()
-    if invoice_printing.custom_file_name:
+    if invoice_printing.custom_file_name_prefix:
         invoice_file_name = invoice_printing.use_custom_file_name()
     pdf_url = upload_to_s3(file_path=invoice_file_path, s3_file_name=invoice_file_name)
 

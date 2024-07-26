@@ -1,4 +1,4 @@
-from constants.messages import ErrorMessages
+from constants.messages import ErrorMessages, WarningMessages
 
 
 class NFFBaseException(Exception):
@@ -59,7 +59,7 @@ class CouldNotFinishQueryError(NFFBaseException):
 
 
 class DownloadTimeoutError(NFFBaseException):
-    msg = ErrorMessages.DOWNLOAD_ERROR
+    msg = WarningMessages.DOWNLOAD_ERROR
     status_code = 418  # I'm a teapot
 
 

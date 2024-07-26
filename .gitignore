@@ -15,3 +15,4 @@ secrets.txt
 .serverless
 chromedriver-linux64*
 ss-api/tests/samples.json
+*_templ.go

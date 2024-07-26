@@ -3,52 +3,57 @@ package services
 import (
 	"context"
 	"errors"
-	"log"
 
-	"github.com/cayo-rodrigues/nff/web/db"
 	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/storage"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/jackc/pgx/v5"
 )
 
-type UserService struct{}
-
-func NewUserService() *UserService {
-	return &UserService{}
-}
-
-func (s *UserService) RetrieveUser(ctx context.Context, email string) (*models.User, error) {
-	row := db.PG.QueryRow(
-		ctx,
-		"SELECT * FROM users WHERE users.email = $1",
-		email,
-	)
-
-	user := models.NewEmptyUser()
-	err := user.Scan(row)
+func CreateUser(ctx context.Context, user *models.User) error {
+	_, err := storage.RetrieveUser(ctx, user.Email)
+	userAlreadyExists := true
 	if errors.Is(err, pgx.ErrNoRows) {
-		log.Printf("User with email %v not found: %v", email, err)
-		return nil, utils.UserNotFoundErr
+		userAlreadyExists = false
+	} else if err != nil {
+		return err
 	}
-	if err != nil {
-		log.Println("Error scaning user row, likely because it has not been found: ", err)
-		return nil, utils.InternalServerErr
+	if userAlreadyExists {
+		user.SetError("Email", utils.EmailNotAvailableMsg)
+		return err
 	}
 
-	return user, nil
-}
-
-func (s *UserService) CreateUser(ctx context.Context, user *models.User) error {
-	row := db.PG.QueryRow(
-		ctx,
-		`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`,
-		user.Email, user.Password,
-	)
-	err := row.Scan(&user.ID)
+	user.Password, err = utils.HashPassword(user.Password)
 	if err != nil {
-		log.Println("Error when running insert user query: ", err)
-		return utils.InternalServerErr
+		return err
+	}
+
+	err = storage.CreateUser(ctx, user)
+	if err != nil {
+		return err
 	}
 
 	return nil
+}
+
+func IsLoginDataValid(ctx context.Context, user *models.User) bool {
+	userFromDB, err := storage.RetrieveUser(ctx, user.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			user.SetError("Email", utils.InvalidLoginDataMsg)
+			user.SetError("Password", utils.InvalidLoginDataMsg)
+		}
+		return false
+	}
+
+	passwordsMatch := utils.IsPasswordCorrect(user.Password, userFromDB.Password)
+	if !passwordsMatch {
+		user.SetError("Email", utils.InvalidLoginDataMsg)
+		user.SetError("Password", utils.InvalidLoginDataMsg)
+		return false
+	}
+
+	user.ID = userFromDB.ID
+
+	return true
 }

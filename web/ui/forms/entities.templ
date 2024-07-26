@@ -1,0 +1,137 @@
+package forms
+
+import "github.com/cayo-rodrigues/nff/web/models"
+import "strconv"
+import "fmt"
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "strings"
+
+templ EntityForm(e *models.Entity) {
+	<div class="mt-4 w-full md:w-4/5 lg:w-3/5 xl:w-6/12" id="entity-form">
+		<form { getHxAttrsByAction(e)... }>
+			<input type="hidden" name="id" value={ strconv.Itoa(e.ID) }/>
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+				@shared.Input(&shared.InputData{
+					ID:     "name",
+					Label:  "Nome",
+					Value:  e.Name,
+					ErrMsg: e.Errors["Name"],
+				})
+				@shared.SelectInput(&shared.InputData{
+					ID:      "user_type",
+					Label:   "Tipo",
+					Value:   e.UserType,
+					Options: &shared.InputOptions{StringOptions: models.EntityUserTypes[:]},
+					ErrMsg:  e.Errors["UserType"],
+				})
+				@shared.Input(&shared.InputData{
+					ID:     "cpf_cnpj",
+					Label:  "CPF/CNPJ",
+					Value:  e.CpfCnpj,
+					ErrMsg: e.Errors["CpfCnpj"],
+				})
+				@shared.Input(&shared.InputData{
+					ID:     "ie",
+					Label:  "Inscrição Estadual",
+					Value:  e.Ie,
+					ErrMsg: e.Errors["Ie"],
+				})
+				@shared.Input(&shared.InputData{
+					ID:        "email",
+					Label:     "E-mail",
+					Value:     e.Email,
+					ErrMsg:    e.Errors["Email"],
+					InputType: "email",
+				})
+				@shared.Input(&shared.InputData{
+					ID:        "password",
+					Label:     "Senha",
+					Value:     e.Password,
+					ErrMsg:    e.Errors["Password"],
+					InputType: "password",
+				})
+				@shared.WideInput(&shared.InputData{
+					ID:          "other_ies",
+					Label:       "Outras IEs",
+					Value:       strings.Join(e.OtherIes, ", "),
+					Placeholder: "Separe por vírgulas",
+					ErrMsg:      e.Errors["OtherIes"],
+				})
+				<fieldset class="col-span-full grid grid-cols-1 gap-4 rounded border border-gray-300 px-2 sm:grid-cols-2 lg:grid-cols-3">
+					<legend class="px-2 text-center">Endereço</legend>
+					@shared.Input(&shared.InputData{
+						ID:     "postal_code",
+						Label:  "CEP",
+						Value:  e.PostalCode,
+						ErrMsg: e.Errors["PostalCode"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "neighborhood",
+						Label:  "Bairro",
+						Value:  e.Neighborhood,
+						ErrMsg: e.Errors["Neighborhood"],
+					})
+					@shared.SelectInput(&shared.InputData{
+						ID:      "street_type",
+						Label:   "Logradouro (tipo)",
+						Value:   e.StreetType,
+						Options: &shared.InputOptions{StringOptions: models.EntityAddressStreetTypes[:]},
+						ErrMsg:  e.Errors["StreetType"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "street_name",
+						Label:  "Logradouro (nome)",
+						Value:  e.StreetName,
+						ErrMsg: e.Errors["StreetName"],
+					})
+					@shared.Input(&shared.InputData{
+						ID:     "number",
+						Label:  "Número da casa",
+						Value:  e.Number,
+						ErrMsg: e.Errors["Number"],
+					})
+				</fieldset>
+			</div>
+			<div class="grid grid-cols-2 gap-6 sm:grid-cols-3">
+				if e.ID != 0 {
+					<div class="col-span-2 mt-4 sm:col-span-1">
+						@shared.SubmitInfoButton("md") {
+							@shared.Icon("edit")
+							<span>Atualizar</span>
+						}
+					</div>
+					<div class="mt-4" hx-delete={ fmt.Sprintf("/entities/delete/%d", e.ID) }>
+						@shared.DefaultButton("md") {
+							@shared.Icon("trash-2")
+							<span>Deletar</span>
+						}
+					</div>
+					<div class="mt-4" hx-post="/entities/create">
+						@shared.SuccessButton("md") {
+							@shared.Icon("user-plus")
+							<span>Registrar</span>
+						}
+					</div>
+				} else {
+					<div class="col-span-full mt-4">
+						@shared.SubmitButton("md") {
+							@shared.Icon("user-plus")
+							<span>Registrar</span>
+						}
+					</div>
+				}
+			</div>
+		</form>
+	</div>
+}
+
+func getHxAttrsByAction(e *models.Entity) templ.Attributes {
+	if e.ID == 0 {
+		return templ.Attributes{
+			"hx-post": "/entities/create",
+		}
+	}
+	return templ.Attributes{
+		"hx-put": fmt.Sprintf("/entities/update/%d", e.ID),
+	}
+}

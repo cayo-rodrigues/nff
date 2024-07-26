@@ -2,32 +2,15 @@ package models
 
 import (
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/globals"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
-type MetricsSelectFields struct {
-	Entities []*Entity
-}
-
-func NewMetricsSelectFields() *MetricsSelectFields {
-	return &MetricsSelectFields{
-		Entities: []*Entity{},
-	}
-}
-
-type MetricsFormErrors struct {
-	Entity    string
-	StartDate string
-	EndDate   string
-}
-
-type MetricsQuery struct {
+type Metrics struct {
 	ID        int
 	Entity    *Entity
 	StartDate time.Time
@@ -35,12 +18,31 @@ type MetricsQuery struct {
 	CreatedBy int
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Errors    *MetricsFormErrors
+	Errors    ErrorMessages
 	*MetricsResult
 }
 
+func (m *Metrics) AsNotification() *Notification {
+	return &Notification{
+		ID:            m.ID,
+		Status:        m.ReqStatus,
+		OperationType: "Cálculo de Métricas",
+		PageEndpoint:  "/metrics",
+		CreatedAt:     m.CreatedAt,
+		UserID:        m.CreatedBy,
+	}
+}
+
+func (m *Metrics) GetCreatedAt() time.Time {
+	return m.CreatedAt
+}
+
+func (m *Metrics) GetStatus() string {
+	return m.ReqStatus
+}
+
 type MetricsResult struct {
-	ID              int
+	ID              int              `json:"-"`
 	Type            string           `json:"type"`
 	TotalIncome     string           `json:"total_income"`
 	TotalExpenses   string           `json:"total_expenses"`
@@ -54,113 +56,91 @@ type MetricsResult struct {
 	ReqStatus       string           `json:"status"`
 	ReqMsg          string           `json:"msg"`
 	MonthName       string           `json:"month_name"`
-	InvoiceNumber   string           `json:"invoice_id"`
+	InvoiceNumber   string           `json:"invoice_id"` // AJUSTAR NOME NA SS-API para invoice_number
 	InvoicePDF      string           `json:"invoice_pdf"`
 	IssueDate       time.Time        `json:"issue_date"`
 	Months          []*MetricsResult `json:"months"`
 	Records         []*MetricsResult `json:"records"`
-	MetricsID       int
-	EntityID        int
-	CreatedBy       int
-	CreatedAt       time.Time
+	Total           *MetricsResult   `json:"total"`
+	MetricsID       int              `json:"-"`
+	EntityID        int              `json:"-"`
+	CreatedBy       int              `json:"-"`
+	CreatedAt       time.Time        `json:"-"`
 }
 
-func NewEmptyMetricsQuery() *MetricsQuery {
-	return &MetricsQuery{
-		Entity:        NewEmptyEntity(),
-		MetricsResult: &MetricsResult{},
-		Errors:        &MetricsFormErrors{},
+func NewMetrics() *Metrics {
+	return &Metrics{
+		Entity: NewEntity(),
+		MetricsResult: &MetricsResult{
+			Months:  []*MetricsResult{},
+			Records: []*MetricsResult{},
+			Total:   &MetricsResult{},
+		},
+		EndDate: time.Now(),
 	}
 
 }
 
-func NewMetricsQueryFromForm(c *fiber.Ctx) *MetricsQuery {
-	startDate, err := utils.ParseDate(strings.TrimSpace(c.FormValue("start_date")))
+func NewMetricsResult() *MetricsResult {
+	return &MetricsResult{}
+}
+
+func NewMetricsFromForm(c *fiber.Ctx) *Metrics {
+	m := NewMetrics()
+
+	startDate, err := utils.ParseDateAsBR(strings.TrimSpace(c.FormValue("start_date")))
 	if err != nil {
 		log.Println("Error converting input start date string to time.Time:", err)
 	}
-	endDate, err := utils.ParseDate(strings.TrimSpace(c.FormValue("end_date")))
+	endDate, err := utils.ParseDateAsBR(strings.TrimSpace(c.FormValue("end_date")))
 	if err != nil {
 		log.Println("Error converting input end date string to time.Time:", err)
 	}
+	entityID, err := strconv.Atoi(c.FormValue("entity"))
+	if err != nil {
+		entityID = 0
+	}
 
-	return &MetricsQuery{
-		StartDate:     startDate,
-		EndDate:       endDate,
-		MetricsResult: &MetricsResult{},
-		Errors:        &MetricsFormErrors{},
+	m.Entity.ID = entityID
+	m.StartDate = startDate
+	m.EndDate = endDate
+
+	return m
+}
+
+func (m *Metrics) IsValid() bool {
+	fields := Fields{
+		{
+			Name:  "StartDate",
+			Value: m.StartDate,
+			Rules: Rules(Required, NotAfter(m.EndDate), MaxTimeRange(m.EndDate, 365)),
+		},
+		{
+			Name:  "EndDate",
+			Value: m.EndDate,
+			Rules: Rules(Required),
+		},
+	}
+	errors, ok := Validate(fields)
+	m.Errors = errors
+	return ok
+}
+
+func (m *Metrics) Values() []any {
+	return []any{
+		&m.ID, &m.StartDate, &m.EndDate, &m.ReqStatus, &m.ReqMsg,
+		&m.Entity.ID, &m.CreatedBy, &m.CreatedAt, &m.UpdatedAt,
 	}
 }
 
-func (q *MetricsQuery) IsValid() bool {
-	isValid := true
-
-	mandatoryFieldMsg := globals.MandatoryFieldMsg
-	ilogicalDatesMsg := globals.IlogicalDatesMsg
-	timeRangeTooLongMsg := globals.TimeRangeTooLongMsg
-
-	startDateIsEmpty := q.StartDate.IsZero()
-	endDateIsEmpty := q.EndDate.IsZero()
-	startDateGreaterThanEndDate := q.StartDate.After(q.EndDate)
-	timeRangeTooLong := int(q.EndDate.Sub(q.StartDate).Hours()/24) > 365
-	hasEntity := q.Entity != nil
-
-	fields := [5]*utils.Field{
-		{ErrCondition: startDateIsEmpty, ErrField: &q.Errors.StartDate, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: endDateIsEmpty, ErrField: &q.Errors.EndDate, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: startDateGreaterThanEndDate, ErrField: &q.Errors.StartDate, ErrMsg: &ilogicalDatesMsg},
-		{ErrCondition: timeRangeTooLong, ErrField: &q.Errors.StartDate, ErrMsg: &timeRangeTooLongMsg},
-		{ErrCondition: !hasEntity, ErrField: &q.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
-	}
-
-	for _, field := range fields {
-		utils.ValidateField(field, &isValid)
-	}
-
-	return isValid
-}
-
-func (q *MetricsQuery) Scan(rows db.Scanner) error {
-	return rows.Scan(
-		&q.ID, &q.StartDate, &q.EndDate,
-		&q.TotalIncome, &q.TotalExpenses, &q.AvgIncome,
-		&q.AvgExpenses, &q.Diff, &q.IsPositive,
-		&q.TotalRecords, &q.PositiveRecords, &q.NegativeRecords,
-		&q.ReqStatus, &q.ReqMsg, &q.Entity.ID,
-		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
-	)
-}
-
-func (q *MetricsQuery) FullScan(rows db.Scanner) error {
-	return rows.Scan(
-		&q.ID, &q.StartDate, &q.EndDate,
-		&q.TotalIncome, &q.TotalExpenses, &q.AvgIncome,
-		&q.AvgExpenses, &q.Diff, &q.IsPositive,
-		&q.TotalRecords, &q.PositiveRecords, &q.NegativeRecords,
-		&q.ReqStatus, &q.ReqMsg, &q.Entity.ID,
-		&q.CreatedBy, &q.CreatedAt, &q.UpdatedAt,
-
-		&q.Entity.ID, &q.Entity.Name, &q.Entity.UserType, &q.Entity.CpfCnpj, &q.Entity.Ie, &q.Entity.Email, &q.Entity.Password,
-		&q.Entity.Address.PostalCode, &q.Entity.Address.Neighborhood, &q.Entity.Address.StreetType, &q.Entity.Address.StreetName, &q.Entity.Address.Number,
-		&q.Entity.CreatedBy, &q.Entity.CreatedAt, &q.Entity.UpdatedAt,
-	)
-}
-
-func (r *MetricsResult) Scan(rows db.Scanner) error {
-	var issueDate any
-
-	err := rows.Scan(
+func (r *MetricsResult) Values() []any {
+	return []any{
 		&r.ID, &r.Type, &r.MonthName,
 		&r.TotalIncome, &r.TotalExpenses, &r.AvgIncome,
 		&r.AvgExpenses, &r.Diff, &r.IsPositive,
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
-		&issueDate, &r.InvoiceNumber, &r.EntityID,
-	)
-
-	if v, ok := issueDate.(time.Time); ok {
-		r.IssueDate = v
+		&r.IssueDate, &r.InvoiceNumber, &r.EntityID,
+		&r.InvoicePDF,
 	}
-
-	return err
 }

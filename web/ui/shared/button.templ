@@ -1,0 +1,122 @@
+package shared
+
+templ Button(theme string, size string, attrs templ.Attributes) {
+	<button class={ GetButtonClassesByTheme(theme, size) } { attrs... }>
+		{ children... }
+	</button>
+}
+
+templ SubmitButton(size string) {
+	@Button("success", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
+templ SubmitInfoButton(size string) {
+	@Button("info", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
+templ SubmitErrorButton(size string) {
+	@Button("error", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
+templ SubmitDarkButton(size string) {
+	@Button("dark", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
+templ SuccessButton(size string) {
+	@Button("success", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ WarningButton(size string) {
+	@Button("warning", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ ErrorButton(size string) {
+	@Button("error", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ InfoButton(size string) {
+	@Button("info", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ DarkButton(size string) {
+	@Button("dark", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ DefaultButton(size string) {
+	@Button("default", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ DefaultButtonLight(size string) {
+	@Button("default-light", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+templ DefaultButtonOutline(size string) {
+	@Button("default-outline", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
+func GetButtonClassesByTheme(theme string, size string) string {
+	classes := "flex w-full transition border items-center justify-center rounded"
+
+	colors := ""
+	padding := ""
+	gap := ""
+
+	switch theme {
+	case "success":
+		colors = "bg-green-400 border-green-500 hover:bg-green-500 active:bg-green-600"
+	case "warning":
+		colors = "bg-yellow-400 border-yellow-500 hover:bg-yellow-500 active:bg-yellow-600"
+	case "error":
+		colors = "bg-red-600 border-red-700 hover:bg-red-700 active:bg-red-800 text-gray-100"
+	case "info":
+		colors = "bg-sky-400 border-sky-500 hover:bg-sky-500 active:bg-sky-600"
+	case "dark":
+		colors = "bg-gray-600 border-gray-700 hover:bg-gray-700 active:bg-gray-800 text-gray-100"
+	case "default":
+		colors = "bg-gray-300 border-gray-400 hover:bg-gray-400 active:bg-gray-500"
+	case "default-light":
+		colors = "bg-gray-200 border-gray-300 hover:bg-gray-300 active:bg-gray-400"
+	case "default-outline":
+		colors = "border-gray-300 hover:bg-gray-200 active:bg-gray-300"
+	case "default-outline-active":
+		colors = "bg-gray-200 border-gray-400 hover:bg-gray-200 active:bg-gray-300 font-medium highlighted"
+	}
+
+	switch size {
+	case "xs":
+		padding = "p-1"
+		gap = "gap-2"
+	case "sm":
+		padding = "p-2"
+		gap = "gap-3"
+	case "md":
+		padding = "px-3 py-2 sm:py-3"
+		gap = "gap-3"
+	}
+
+	return classes + " " + colors + " " + padding + " " + gap
+}

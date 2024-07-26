@@ -1,0 +1,37 @@
+package shared
+
+templ Icon(name string) {
+	<i data-feather={ name }></i>
+}
+
+templ IconSm(name string) {
+	<i data-feather={ name } class="h-5 w-5"></i>
+}
+
+templ IconXs(name string) {
+	<i data-feather={ name } class="h-4 w-4"></i>
+}
+
+templ SpinningIcon(name string) {
+	<i data-feather={ name } class="animate-spin-slow"></i>
+}
+
+templ SpinningIconSm(name string) {
+	<i data-feather={ name } class="h-5 w-5 animate-spin-slow"></i>
+}
+
+templ SpinningIconXs(name string) {
+	<i data-feather={ name } class="h-4 w-4 animate-spin-slow"></i>
+}
+
+templ LoadingIcon() {
+	<i data-feather="loader" class="hx-indicator animate-spin opacity-70"></i>
+}
+
+templ LoadingIconSm() {
+	<i data-feather="loader" class="hx-indicator h-5 w-5 animate-spin opacity-70"></i>
+}
+
+templ LoadingIconXs() {
+	<i data-feather="loader" class="hx-indicator h-4 w-4 animate-spin opacity-70"></i>
+}

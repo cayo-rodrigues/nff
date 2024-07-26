@@ -7,12 +7,10 @@ provider:
   ecr:
     images:
       img:
-        path: ./
-        platform: linux/amd64
+        path: .
 
 functions:
   main:
     timeout: 600
     memorySize: 2048
-    image:
-      name: img
+    image: img

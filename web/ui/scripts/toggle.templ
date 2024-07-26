@@ -1,0 +1,56 @@
+package scripts
+
+script ToggleAccordion(accordionTarget, iconTarget string) {
+    const accordionContent = document.querySelector(accordionTarget)
+    accordionContent.classList.toggle('hidden')
+
+    const currentIcon = document.querySelector(iconTarget)
+    currentIcon.classList.add('transition-all', 'duration-300')
+    currentIcon.classList.toggle('transform')
+    currentIcon.classList.toggle('rotate-180')
+}
+
+script ToggleVerticalDrawer(elementTarget, btnIconTarget string) {
+    const elem = document.querySelector(elementTarget)
+    const icon = document.querySelector(btnIconTarget)
+
+    elem.classList.add('transition-all', 'duration-300')
+    icon.classList.add('transition-all', 'duration-300')
+
+    if (elem.classList.contains('hidden')) {
+        elem.classList.remove('hidden')
+
+        setTimeout(() => {
+            elem.style.marginTop = '-0px'
+            elem.style.opacity = 100
+            icon.classList.remove('transform', 'rotate-180')
+        }, 0)
+
+        return
+    }
+
+    const inputGap2 = 8
+    elem.style.marginTop = `-${elem.offsetHeight + inputGap2}px`
+    elem.style.opacity = 0
+    icon.classList.add('transform', 'rotate-180')
+
+    setTimeout(() => {
+        elem.classList.add('hidden')
+    }, 300)
+}
+
+script TogglePasswordVisibility(inputTarget, iconBtnTarget string) {
+    const input = document.querySelector(inputTarget)
+    const iconBtn = document.querySelector(iconBtnTarget)
+
+    if (input.type === 'password') {
+        input.type = 'text'
+        iconBtn.innerHTML = '<i data-feather="eye" class="h-5 w-5"></i>'
+	
+    } else {
+        input.type = 'password'
+        iconBtn.innerHTML = '<i data-feather="eye-off" class="h-5 w-5"></i>'
+    }
+
+    document.dispatchEvent(new CustomEvent('rebuild-icons'))
+}

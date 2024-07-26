@@ -1,0 +1,65 @@
+package shared
+
+import "fmt"
+
+type Operation interface {
+	GetStatus() string
+}
+
+templ OperationStatus(o Operation) {
+	switch o.GetStatus() {
+		case "success":
+			<div class="text-green-600">
+				@Icon("check-circle")
+			</div>
+			<span class="text-green-700">Sucesso</span>
+		case "warning":
+			<div class="text-yellow-600">
+				@Icon("alert-triangle")
+			</div>
+			<span class="text-yellow-700">Aviso</span>
+		case "error":
+			<div class="text-red-600">
+				@Icon("x-circle")
+			</div>
+			<span class="text-red-700">Erro</span>
+		case "canceled":
+			<div class="text-gray-500">
+				@Icon("slash")
+			</div>
+			<span class="text-gray-600">Cancelada</span>
+		default:
+			<div class="animate-spin-slow text-sky-600">
+				@Icon("loader")
+			</div>
+			<span>Em andamento...</span>
+	}
+}
+
+func GetTextColorByOperationStatus(o Operation) string {
+	switch o.GetStatus() {
+	case "success":
+		return "text-green-700 whitespace-pre-wrap"
+	case "warning":
+		return "text-yellow-700 whitespace-pre-wrap"
+	case "error":
+		return "text-red-700 whitespace-pre-wrap"
+	case "canceled":
+		return "text-gray-600 whitespace-pre-wrap"
+	default:
+		return "whitespace-pre-wrap"
+	}
+}
+
+
+templ OperationCardNotificationListener(resourceName string, resourceID int, target string, reqStatus string) {
+	if reqStatus == "pending" {
+		<div
+			class="hidden"
+			hx-get={ fmt.Sprintf("/%s/%d/card", resourceName, resourceID) }
+			hx-trigger={ fmt.Sprintf("%s once, load once", NotificationEventName(ctx)) }
+			hx-target={ target }
+			hx-swap="outerHTML"
+		></div>
+	}
+}

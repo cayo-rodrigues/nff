@@ -1,76 +1,38 @@
 package handlers
 
 import (
-	"errors"
-	"fmt"
-
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/interfaces"
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/models"
-	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/ui/forms"
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/gofiber/fiber/v2"
 )
 
-type RegisterPage struct {
-	userService interfaces.UserService
+func RegisterPage(c *fiber.Ctx) error {
+	user := models.NewUser()
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
+	return Render(c, layouts.Base(pages.RegisterPage(user)))
 }
 
-func NewRegisterPage(userService interfaces.UserService) *RegisterPage {
-	return &RegisterPage{
-		userService: userService,
-	}
-}
-
-func (p *RegisterPage) Render(c *fiber.Ctx) error {
-	return c.Render("register", fiber.Map{}, "layouts/base")
-}
-
-func (p *RegisterPage) CreateUser(c *fiber.Ctx) error {
+func RegisterUser(c *fiber.Ctx) error {
 	user := models.NewUserFromForm(c)
-	formData := fiber.Map{
-		"Email":    user.Email,
-		"Password": user.Password,
-	}
-
 	if !user.IsValid() {
-		formData["Errors"] = user.Errors
-		return utils.RetargetToForm(c, "register", formData)
+		return RetargetToForm(c, "register", forms.RegisterForm(user))
 	}
 
-	_, err := p.userService.RetrieveUser(c.Context(), user.Email)
-	userAlreadyExists := true
-	if errors.Is(err, utils.UserNotFoundErr) {
-		userAlreadyExists = false
-	} else if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-	if userAlreadyExists {
-		user.Errors.Email = "Email indisponível"
-		formData["Errors"] = user.Errors
-		return utils.RetargetToForm(c, "register", formData)
-	}
-
-	user.Password, err = utils.HashPassword(user.Password)
-	if err != nil {
-		fmt.Println("Error hashing new user password:", err)
-		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
-	}
-
-	err = p.userService.CreateUser(c.Context(), user)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	sess, err := db.SessionStore.Get(c)
-	if err != nil {
-		return err
-	}
-	sess.Set("IsAuthenticated", true)
-	sess.Set("UserID", user.ID)
-	err = sess.Save()
+	err := services.CreateUser(c.Context(), user)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect("/entities")
+	err = services.SaveUserSession(c, user.ID)
+	if err != nil {
+		return err
+	}
+
+	redis := database.GetDB().Redis
+	redis.Publish(c.Context(), "0:operation-finished", 0)
+	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
