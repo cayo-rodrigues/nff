@@ -3,58 +3,29 @@ package models
 import (
 	"log"
 	"time"
-	"unicode/utf8"
 
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/globals"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
-type InvoiceItemSelectFields struct {
-	Groups               *globals.SiareInvoiceItemGroups
-	Origins              *globals.SiareInvoiceItemOrigins
-	UnitiesOfMeasurement *globals.SiareUnitiesOfMeasurement
-}
-
-func NewInvoiceItemSelectFields() *InvoiceItemSelectFields {
-	return &InvoiceItemSelectFields{
-		Groups:               &globals.InvoiceItemGroups,
-		Origins:              &globals.InvoiceItemOrigins,
-		UnitiesOfMeasurement: &globals.InvoiceItemUnitiesOfMeaasurement,
-	}
-}
-
-type InvoiceItemFormError struct {
-	Group              string
-	Description        string
-	Origin             string
-	UnityOfMeasurement string
-	Quantity           string
-	ValuePerUnity      string
-	NCM                string
-}
-
 type InvoiceItem struct {
-	ID                 int                   `json:"-"`
-	Group              string                `json:"group"`
-	Description        string                `json:"description"`
-	Origin             string                `json:"origin"`
-	UnityOfMeasurement string                `json:"unity_of_measurement"`
-	Quantity           float64               `json:"quantity"`
-	ValuePerUnity      float64               `json:"value_per_unity"`
-	InvoiceID          int                   `json:"-"`
-	Errors             *InvoiceItemFormError `json:"-"`
-	CreatedBy          int                   `json:"-"`
-	CreatedAt          time.Time             `json:"-"`
-	UpdatedAt          time.Time             `json:"-"`
-	NCM                string                `json:"ncm"`
+	ID                 int           `json:"-"`
+	Group              string        `json:"group"`
+	Description        string        `json:"description"`
+	Origin             string        `json:"origin"`
+	UnityOfMeasurement string        `json:"unity_of_measurement"`
+	Quantity           float64       `json:"quantity"`
+	ValuePerUnity      float64       `json:"value_per_unity"`
+	InvoiceID          int           `json:"-"`
+	CreatedBy          int           `json:"-"`
+	CreatedAt          time.Time     `json:"-"`
+	UpdatedAt          time.Time     `json:"-"`
+	NCM                string        `json:"ncm"`
+	Errors             ErrorMessages `json:"-"`
 }
 
-func NewEmptyInvoiceItem() *InvoiceItem {
-	return &InvoiceItem{
-		Errors: &InvoiceItemFormError{},
-	}
+func NewInvoiceItem() *InvoiceItem {
+	return &InvoiceItem{}
 }
 
 func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
@@ -73,7 +44,7 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
 
 	itemsQuantity := len(groups) // it could be any field
 	for i := 0; i < itemsQuantity; i++ {
-		item := NewEmptyInvoiceItem()
+		item := NewInvoiceItem()
 
 		item.Group = utils.TrimSpaceBytes(groups[i])
 		item.NCM = utils.TrimSpaceBytes(ncms[i])
@@ -96,44 +67,53 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
 }
 
 func (i *InvoiceItem) IsValid() bool {
-	isValid := true
-
-	mandatoryFieldMsg := globals.MandatoryFieldMsg
-	unacceptableValueMsg := globals.UnacceptableValueMsg
-	valueTooLongMsg := globals.ValueTooLongMsg
-
-	hasDescription := i.Description != ""
-	hasQuantity := i.Quantity != 0.0
-	hasValuePerUnity := i.ValuePerUnity != 0.0
-	hasNCM := i.NCM != ""
-
-	descriptionTooLong := utf8.RuneCount([]byte(i.Description)) > 128
-	ncmTooLong := utf8.RuneCount([]byte(i.NCM)) > 16
-
-	fields := [5]*utils.Field{
-		{ErrCondition: !hasDescription, ErrField: &i.Errors.Description, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: !hasQuantity, ErrField: &i.Errors.Quantity, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: !hasValuePerUnity, ErrField: &i.Errors.ValuePerUnity, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: descriptionTooLong, ErrField: &i.Errors.Description, ErrMsg: &valueTooLongMsg},
-		{ErrCondition: hasNCM && ncmTooLong, ErrField: &i.Errors.NCM, ErrMsg: &valueTooLongMsg},
+	fields := Fields{
+		{
+			Name:  "Group",
+			Value: i.Group,
+			Rules: Rules(OneOf(InvoiceItemGroups[:])),
+		},
+		{
+			Name:  "NCM",
+			Value: i.NCM,
+			Rules: Rules(Max(16)),
+		},
+		{
+			Name:  "Description",
+			Value: i.Description,
+			Rules: Rules(Required, Max(128)),
+		},
+		{
+			Name:  "Origin",
+			Value: i.Origin,
+			Rules: Rules(OneOf(InvoiceItemOrigins[:])),
+		},
+		{
+			Name:  "UnityOfMeasurement",
+			Value: i.UnityOfMeasurement,
+			Rules: Rules(OneOf(InvoiceItemUnitiesOfMeaasurement[:])),
+		},
+		{
+			Name:  "Quantity",
+			Value: i.Quantity,
+			Rules: Rules(Required),
+		},
+		{
+			Name:  "ValuePerUnity",
+			Value: i.ValuePerUnity,
+			Rules: Rules(Required),
+		},
 	}
-
-	for _, field := range fields {
-		utils.ValidateField(field, &isValid)
-	}
-
-	utils.ValidateListField(i.Group, globals.InvoiceItemGroups[:], &i.Errors.Group, &unacceptableValueMsg, &isValid)
-	utils.ValidateListField(i.Origin, globals.InvoiceItemOrigins[:], &i.Errors.Origin, &unacceptableValueMsg, &isValid)
-	utils.ValidateListField(i.UnityOfMeasurement, globals.InvoiceItemUnitiesOfMeaasurement[:], &i.Errors.UnityOfMeasurement, &unacceptableValueMsg, &isValid)
-
-	return isValid
+	errors, ok := Validate(fields)
+	i.Errors = errors
+	return ok
 }
 
-func (i *InvoiceItem) Scan(rows db.Scanner) error {
-	return rows.Scan(
+func (i *InvoiceItem) Values() []any {
+	return []any{
 		&i.ID, &i.Group, &i.Description, &i.Origin,
 		&i.UnityOfMeasurement, &i.Quantity, &i.ValuePerUnity, &i.InvoiceID,
 		&i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
 		&i.NCM,
-	)
+	}
 }

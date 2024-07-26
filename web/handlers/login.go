@@ -1,83 +1,54 @@
 package handlers
 
 import (
-	"errors"
+	"fmt"
 
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/interfaces"
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/ui/forms"
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
-type LoginPage struct {
-	userService interfaces.UserService
+func LoginPage(c *fiber.Ctx) error {
+	user := models.NewUser()
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
+	return Render(c, layouts.Base(pages.LoginPage(user)))
 }
 
-func NewLoginPage(userService interfaces.UserService) *LoginPage {
-	return &LoginPage{
-		userService: userService,
-	}
-}
-
-func (p *LoginPage) Render(c *fiber.Ctx) error {
-	return c.Render("login", nil, "layouts/base")
-}
-
-func (p *LoginPage) Login(c *fiber.Ctx) error {
-	loginData := models.NewUserFromForm(c)
-	formData := fiber.Map{
-		"Email":    loginData.Email,
-		"Password": loginData.Password,
+func LoginUser(c *fiber.Ctx) error {
+	user := models.NewUserFromForm(c)
+	if !user.IsValid() {
+		return RetargetToForm(c, "login", forms.LoginForm(user))
 	}
 
-	if !loginData.IsValid() {
-		formData["Errors"] = loginData.Errors
-		return utils.RetargetToForm(c, "login", formData)
+	if !services.IsLoginDataValid(c.Context(), user) {
+		return RetargetToForm(c, "login", forms.LoginForm(user))
 	}
 
-	user, err := p.userService.RetrieveUser(c.Context(), loginData.Email)
-	if errors.Is(err, utils.UserNotFoundErr) {
-		loginData.Errors.Email = err.Error()
-		formData["Errors"] = loginData.Errors
-		return utils.RetargetToForm(c, "login", formData)
-	}
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	passwordsMatch := utils.IsPasswordCorrect(loginData.Password, user.Password)
-	if !passwordsMatch {
-		loginData.Errors.Password = "Senha incorreta"
-		formData["Errors"] = loginData.Errors
-		return utils.RetargetToForm(c, "login", formData)
-	}
-
-	sess, err := db.SessionStore.Get(c)
-	if err != nil {
-		return err
-	}
-	sess.Set("IsAuthenticated", true)
-	sess.Set("UserID", user.ID)
-	err = sess.Save()
+	err := services.SaveUserSession(c, user.ID)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect("/entities", fiber.StatusFound)
+	redis := database.GetDB().Redis
+	redis.Publish(c.Context(), "0:operation-finished", 0)
+
+	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
 
-func Logout(c *fiber.Ctx) error {
-	sess, err := db.SessionStore.Get(c)
-	if err != nil {
-		return err
-	}
-	sess.Set("IsAuthenticated", false)
-	sess.Set("UserID", 0)
-	err = sess.Save()
+func LogoutUser(c *fiber.Ctx) error {
+	err := services.DestroyUserSession(c)
 	if err != nil {
 		return err
 	}
 
-	return c.Redirect("/")
+	userID := utils.GetUserData(c.Context()).ID
+	redis := database.GetDB().Redis
+	redis.Publish(c.Context(), fmt.Sprintf("%d:operation-finished", userID), 0)
+
+	return RetargetToPageHandler(c, "/login", LoginPage)
 }

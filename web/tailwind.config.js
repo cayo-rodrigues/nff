@@ -1,14 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./views/*.html",
-    "./views/layouts/*.html",
-    "./views/partials/*.html",
-    "./views/partials/forms/*.html",
-    "./static/scripts/*.js",
+    "./static/js/**.js",
+    "./static/css/**.css",
+    "./ui/**.templ",
+    "./ui/forms/**.templ",
+    "./ui/pages/**.templ",
+    "./ui/layouts/**.templ",
+    "./ui/scripts/**.templ",
+    "./ui/shared/**.templ",
+    "./ui/components/**.templ",
   ],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        'spin-slow': 'spin 2s linear infinite',
+      }
+    },
   },
   plugins: [],
 };
+

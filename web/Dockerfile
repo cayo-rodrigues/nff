@@ -1,15 +1,20 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
+RUN go install github.com/a-h/templ/cmd/templ@v0.2.707
+
 COPY . .
 
-RUN go build -o nff ./cmd/web/main.go
+RUN templ generate
+
+RUN go build -o nff ./main.go
+
+RUN apk add --no-cache tzdata
 
 FROM scratch
 
 COPY --from=builder /app/nff /
-COPY --from=builder /app/views /views/
-COPY --from=builder /app/static /static/
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
 CMD [ "./nff" ]

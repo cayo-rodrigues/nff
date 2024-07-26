@@ -1,30 +1,48 @@
 package middlewares
 
 import (
-	"github.com/cayo-rodrigues/nff/web/db"
+	"context"
+
+	"github.com/cayo-rodrigues/nff/web/handlers"
+	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
-	sess, err := db.SessionStore.Get(c)
+	isAuthenticated, userID, err := services.GetUserSession(c)
 	if err != nil {
 		return err
 	}
 
-	isAuthenticated, authOk := sess.Get("IsAuthenticated").(bool)
-	userID, idOk := sess.Get("UserID").(int)
+	if !isAuthenticated || userID == 0 {
+		err := services.DestroyUserSession(c)
+		if err != nil {
+			return err
+		}
 
-	if !authOk || !idOk || !isAuthenticated || userID == 0 {
-		c.Locals("IsAuthenticated", false)
-		c.Locals("UserID", 0)
-		if c.Path() != "/" {
-			sess.Destroy()
-			return c.Redirect("/login")
+		switch c.Path() {
+		case "/":
+			return c.Next()
+		case "/sse/notify-operations-results":
+			return c.Next()
+		default:
+			return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
+
 		}
 	}
 
-	// maybe we could refresh the user session here
-	c.Locals("IsAuthenticated", isAuthenticated)
-	c.Locals("UserID", userID)
+	// refresh user session
+	services.SaveUserSession(c, userID)
+
+	// save user data to request context
+	userData := &utils.UserData{
+		ID:              userID,
+		IsAuthenticated: isAuthenticated,
+	}
+	ctx := context.WithValue(c.Context(), "UserData", userData)
+	adaptor.CopyContextToFiberContext(ctx, c.Context())
+
 	return c.Next()
 }

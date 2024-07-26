@@ -1,124 +1,137 @@
 package models
 
 import (
+	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
 
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/globals"
 	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
-type InvoicePrintSelectFields struct {
-	Entities       []*Entity
-	InvoiceIDTypes *globals.SiareInvoiceIDTypes
-}
-
-func NewInvoicePrintSelectFields() *InvoicePrintSelectFields {
-	return &InvoicePrintSelectFields{
-		Entities:       []*Entity{},
-		InvoiceIDTypes: &globals.InvoiceIDTypes,
-	}
-}
-
-type InvoicePrintFormErrors struct {
-	InvoiceID      string
-	InvoiceIDType  string
-	Entity         string
-	CustomFileName string
-}
-
 type InvoicePrint struct {
-	ID             int
-	InvoiceID      string                  `json:"invoice_id"`
-	InvoiceIDType  string                  `json:"invoice_id_type"`
-	InvoicePDF     string                  `json:"invoice_pdf"`
-	Entity         *Entity                 `json:"entity"`
-	Errors         *InvoicePrintFormErrors `json:"-"`
-	ReqStatus      string                  `json:"-"`
-	ReqMsg         string                  `json:"-"`
-	CreatedBy      int                     `json:"-"`
-	CreatedAt      time.Time               `json:"-"`
-	UpdatedAt      time.Time               `json:"-"`
-	CustomFileName string                  `json:"custom_file_name"`
+	ID                   int
+	InvoiceID            string        `json:"invoice_id"` // ATUALIZAR SS-API PARA USAR invoice_number_or_protocol
+	InvoiceIDType        string        `json:"invoice_id_type"`
+	InvoicePDF           string        `json:"invoice_pdf"`
+	Entity               *Entity       `json:"entity"`
+	ReqStatus            string        `json:"-"`
+	ReqMsg               string        `json:"-"`
+	CreatedBy            int           `json:"-"`
+	CreatedAt            time.Time     `json:"-"`
+	UpdatedAt            time.Time     `json:"-"`
+	CustomFileNamePrefix string        `json:"custom_file_name"` // ATUALIZAR SS-API PARA USAR custom_file_name_prefix
+	FileName             string        `json:"file_name"`
+	Errors               ErrorMessages `json:"-"`
 }
 
-func NewEmptyInvoicePrint() *InvoicePrint {
-	return &InvoicePrint{
-		Entity: NewEmptyEntity(),
-		Errors: &InvoicePrintFormErrors{},
+func (p *InvoicePrint) AsNotification() *Notification {
+	return &Notification{
+		ID:            p.ID,
+		Status:        p.ReqStatus,
+		OperationType: "Impressão/Download de NFA",
+		PageEndpoint:  "/invoices/print",
+		InvoicePDF:    p.InvoicePDF,
+		CreatedAt:     p.CreatedAt,
+		UserID:        p.CreatedBy,
 	}
+}
+
+func (p *InvoicePrint) GetCreatedAt() time.Time {
+	return p.CreatedAt
+}
+
+func (p *InvoicePrint) GetStatus() string {
+	return p.ReqStatus
+}
+
+func NewInvoicePrint() *InvoicePrint {
+	return &InvoicePrint{
+		Entity: NewEntity(),
+	}
+}
+
+func NewInvoicePrintWithSamples(entities []*Entity) *InvoicePrint {
+	printing := NewInvoicePrint()
+	if len(entities) > 0 {
+		printing.Entity = entities[0]
+	}
+
+	return printing
 }
 
 func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
-	invoicePrint := NewEmptyInvoicePrint()
+	invoicePrint := NewInvoicePrint()
 
 	invoicePrint.InvoiceID = strings.TrimSpace(c.FormValue("invoice_id"))
-	invoicePrint.InvoiceIDType = strings.TrimSpace(c.FormValue("invoice_id_type"))
-	invoicePrint.CustomFileName = strings.TrimSpace(c.FormValue("custom_file_name"))
+	invoicePrint.CustomFileNamePrefix = strings.TrimSpace(c.FormValue("custom_file_name_prefix"))
+
+	entityID, err := strconv.Atoi(c.FormValue("entity"))
+	if err != nil {
+		entityID = 0
+	}
+	invoicePrint.Entity.ID = entityID
 
 	return invoicePrint
 }
 
-func (i *InvoicePrint) IsValid() bool {
-	isValid := true
+func (p *InvoicePrint) IsValid() bool {
+	fields := Fields{
+		{
+			Name:  "InvoiceID",
+			Value: p.InvoiceID,
+			Rules: Rules(Required),
+		},
+		{
+			Name:  "CustomFileNamePrefix",
+			Value: p.CustomFileNamePrefix,
+			Rules: Rules(Max(64)),
+		},
+	}
+	errors, ok := Validate(fields)
+	p.Errors = errors
 
-	mandatoryFieldMsg := globals.MandatoryFieldMsg
-	valueTooLongMsg := globals.ValueTooLongMsg
-	invalidFormatMsg := globals.InvalidFormatMsg
-	unacceptableValueMsg := globals.UnacceptableValueMsg
-
-	hasEntity := i.Entity != nil
-	hasInvoiceId := i.InvoiceID != ""
-	hasInvoiceIdType := i.InvoiceIDType != ""
-	hasCustomFileName := i.CustomFileName != ""
-
-	hasValidInvoiceNumberFormat := globals.ReSiareNFANumber.MatchString(i.InvoiceID)
-	hasValidInvoiceProtocolFormat := globals.ReSiareNFAProtocol.MatchString(i.InvoiceID)
-
-	customFileNameTooLong := utf8.RuneCount([]byte(i.CustomFileName)) > 64
-
-	idTypeIsNumber := i.InvoiceIDType == globals.InvoiceIDTypes[0]
-	idTypeIsProtocol := i.InvoiceIDType == globals.InvoiceIDTypes[1]
-
-	fields := [6]*utils.Field{
-		{ErrCondition: !hasEntity, ErrField: &i.Errors.Entity, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: !hasInvoiceId, ErrField: &i.Errors.InvoiceID, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: !hasInvoiceIdType, ErrField: &i.Errors.InvoiceIDType, ErrMsg: &mandatoryFieldMsg},
-		{ErrCondition: hasInvoiceId && idTypeIsNumber && !hasValidInvoiceNumberFormat, ErrField: &i.Errors.InvoiceID, ErrMsg: &invalidFormatMsg},
-		{ErrCondition: hasInvoiceId && idTypeIsProtocol && !hasValidInvoiceProtocolFormat, ErrField: &i.Errors.InvoiceID, ErrMsg: &invalidFormatMsg},
-		{ErrCondition: hasCustomFileName && customFileNameTooLong, ErrField: &i.Errors.CustomFileName, ErrMsg: &valueTooLongMsg},
+	if !p.InvoiceIDFormatIsValid() {
+		return false
 	}
 
-	for _, field := range fields {
-		utils.ValidateField(field, &isValid)
-	}
-
-	utils.ValidateListField(i.InvoiceIDType, globals.InvoiceIDTypes[:], &i.Errors.InvoiceIDType, &unacceptableValueMsg, &isValid)
-
-	return isValid
+	return ok
 }
 
-func (p *InvoicePrint) Scan(rows db.Scanner) error {
-	return rows.Scan(
+func (p *InvoicePrint) InvoiceIDFormatIsValid() bool {
+	if p.Errors == nil {
+		p.Errors = make(ErrorMessages)
+	}
+	_, hasVal := p.Errors["InvoiceID"]
+	if hasVal {
+		return true
+	}
+
+	isNumber := SiareNFANumberRegex.MatchString(p.InvoiceID)
+	if isNumber {
+		p.InvoiceIDType = InvoiceIDTypes.NFANumber()
+		return true
+	}
+
+	isProtocol := SiareNFAProtocolRegex.MatchString(p.InvoiceID)
+	if isProtocol {
+		p.InvoiceIDType = InvoiceIDTypes.NFAProtocol()
+		return true
+	}
+
+	p.Errors["InvoiceID"] = utils.InvalidFormatMsg
+	return false
+}
+
+func (p *InvoicePrint) Values() []any {
+	// TODO
+	// TROCAR CUSTOM_FILE_NAME PARA CUSTOM_FILE_NAME_PREFIX
+	// ADICIONAR COLUNA FILE_NAME
+	// AJUSTAR SS-API DE ACORDO
+	return []any{
 		&p.ID, &p.InvoiceID, &p.InvoiceIDType, &p.InvoicePDF,
 		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
 		&p.CreatedBy, &p.CreatedAt, &p.UpdatedAt,
-		&p.CustomFileName,
-	)
-}
-
-func (p *InvoicePrint) FullScan(rows db.Scanner) error {
-	return rows.Scan(
-		&p.ID, &p.InvoiceID, &p.InvoiceIDType, &p.InvoicePDF,
-		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
-		&p.CreatedBy, &p.CreatedAt, &p.UpdatedAt,
-		&p.CustomFileName,
-
-		&p.Entity.ID, &p.Entity.Name, &p.Entity.UserType, &p.Entity.CpfCnpj, &p.Entity.Ie, &p.Entity.Email, &p.Entity.Password,
-		&p.Entity.Address.PostalCode, &p.Entity.Address.Neighborhood, &p.Entity.Address.StreetType, &p.Entity.Address.StreetName, &p.Entity.Address.Number,
-		&p.Entity.CreatedBy, &p.Entity.CreatedAt, &p.Entity.UpdatedAt, &p.Entity.OtherIes,
-	)
+		&p.CustomFileNamePrefix, &p.FileName,
+	}
 }

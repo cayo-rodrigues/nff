@@ -8,13 +8,15 @@ import (
 	"log"
 	"time"
 
-	"github.com/cayo-rodrigues/nff/web/db"
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/redis/go-redis/v9"
 )
 
 func ClearCache(ctx context.Context, userID int, namespace string) string {
 	keysPattern := fmt.Sprintf("*:%v:*:%v", userID, namespace)
 	cacheStatus := "cleared"
+
+	db := database.GetDB()
 
 	keys, err := db.Redis.Keys(ctx, keysPattern).Result()
 	if err != nil {
@@ -36,6 +38,8 @@ func ClearCache(ctx context.Context, userID int, namespace string) string {
 func GetDecodedCache(ctx context.Context, userID int, namespace string, dest interface{}) error {
 	key := fmt.Sprintf("db:%v:the-route-doesnt-matter-here:%v", userID, namespace)
 
+	db := database.GetDB()
+
 	cachedValue, err := db.Redis.Get(ctx, key).Bytes()
 	if err == redis.Nil {
 		return err
@@ -52,7 +56,6 @@ func GetDecodedCache(ctx context.Context, userID int, namespace string, dest int
 		return err
 	}
 
-	fmt.Printf("Returing %s cache at db level with success\n", namespace)
 	return nil
 }
 
@@ -67,13 +70,14 @@ func SetEncodedCache(ctx context.Context, userID int, namespace string, value in
 		return err
 	}
 
+	db := database.GetDB()
+
 	err = db.Redis.Set(ctx, key, buf.Bytes(), exp).Err()
 	if err != nil {
 		log.Printf("Error trying to set %s cache at db level: %v\n", namespace, err)
 		return err
 	}
 
-	fmt.Printf("Set %s cache at db level with success\n", namespace)
 	return nil
 }
 
@@ -82,6 +86,8 @@ func PurgeAllCachedData(ctx context.Context) string {
 
 	keysPattern := "*:*:*:*"
 	cacheStatus := "cleared"
+
+	db := database.GetDB()
 
 	keys, err := db.Redis.Keys(ctx, keysPattern).Result()
 	if err != nil {

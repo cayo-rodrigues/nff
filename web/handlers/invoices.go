@@ -1,256 +1,160 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
 	"strconv"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
-
-	"github.com/cayo-rodrigues/nff/web/db"
-	"github.com/cayo-rodrigues/nff/web/globals"
-	"github.com/cayo-rodrigues/nff/web/interfaces"
 	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/services"
+	"github.com/cayo-rodrigues/nff/web/siare"
+	"github.com/cayo-rodrigues/nff/web/ui/components"
+	"github.com/cayo-rodrigues/nff/web/ui/forms"
+	"github.com/cayo-rodrigues/nff/web/ui/layouts"
+	"github.com/cayo-rodrigues/nff/web/ui/pages"
+	"github.com/cayo-rodrigues/nff/web/ui/shared"
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/gofiber/fiber/v2"
 )
 
-type InvoicesPage struct {
-	service       interfaces.InvoiceService
-	entityService interfaces.EntityService
-	siareBGWorker interfaces.SiareBGWorker
+func InvoicesPage(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+
+	filters := c.Queries()
+
+	invoices, err := services.ListInvoices(c.Context(), userID, filters)
+	if err != nil {
+		return err
+	}
+
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
+
+	invoicesByDate := services.GroupListByDate(invoices)
+
+	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
+	return Render(c, layouts.Base(pages.InvoicesPage(invoicesByDate, entities)))
 }
 
-func NewInvoicesPage(service interfaces.InvoiceService, entityService interfaces.EntityService, siareBGWorker interfaces.SiareBGWorker) *InvoicesPage {
-	return &InvoicesPage{
-		service:       service,
-		entityService: entityService,
-		siareBGWorker: siareBGWorker,
+func GetInvoiceForm(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
 	}
+
+	baseInvoiceID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	if baseInvoiceID == 0 {
+		invoice := models.NewInvoiceWithSamples(entities)
+		return Render(c, forms.InvoiceForm(invoice, entities))
+	}
+
+	baseInvoice, err := services.RetrieveInvoice(c.Context(), baseInvoiceID)
+	if err != nil {
+		return err
+	}
+
+	c.Append("HX-Trigger-After-Settle", "open-invoice-form-dialog")
+	return Render(c, forms.InvoiceForm(baseInvoice, entities))
 }
 
-type InvoicesPageData struct {
-	IsAuthenticated  bool
-	Filters          *models.ReqCardFilters
-	Invoices         []*models.Invoice
-	Invoice          *models.Invoice
-	GeneralError     string
-	FormMsg          string
-	FormSelectFields *models.InvoiceSelectFields
-	ResourceName     string
+func GetSenderIeInput(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
+	entityID, err := strconv.Atoi(c.Query("sender"))
+	if err != nil {
+		return err
+	}
+	entity, err := services.RetrieveEntity(c.Context(), entityID, userID)
+
+	return Render(c, shared.SelectInput(&shared.InputData{
+		ID:      "sender_ie",
+		Label:   "IE do Remetente",
+		Value:   entity.Ie,
+		Options: &shared.InputOptions{StringOptions: entity.AllIes()},
+	}))
 }
 
-func (p *InvoicesPage) NewEmptyData() *InvoicesPageData {
-	return &InvoicesPageData{
-		IsAuthenticated:  true,
-		Filters:          models.NewRequestCardFilters(),
-		FormSelectFields: models.NewInvoiceSelectFields(),
-		ResourceName:     "invoices",
-	}
-}
-
-func (p *InvoicesPage) Render(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-	userID := c.Locals("UserID").(int)
-
-	// TODO async data aggregation with go routines
-	entities, err := p.entityService.ListEntities(c.Context(), userID)
-	if err != nil {
-		pageData.GeneralError = err.Error()
-		c.Set("HX-Trigger-After-Settle", "general-error")
-		return c.Render("invoices", pageData, "layouts/base")
-	}
-
-	pageData.FormSelectFields.Entities = entities
-	pageData.Invoice = models.NewEmptyInvoice()
-	pageData.Invoice.Sender = entities[0]
-
-	invoices, err := p.service.ListInvoices(c.Context(), userID, nil)
-	if err != nil {
-		pageData.GeneralError = err.Error()
-		c.Set("HX-Trigger-After-Settle", "general-error")
-		return c.Render("invoices", pageData, "layouts/base")
-	}
-
-	pageData.Invoices = invoices
-
-	return c.Render("invoices", pageData, "layouts/base")
-}
-
-func (p *InvoicesPage) RequireInvoice(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-	userID := c.Locals("UserID").(int)
-
-	// TODO async data aggregation with go routines
-	senderID, err := strconv.Atoi(c.FormValue("sender"))
-	if err != nil {
-		log.Println("Error converting sender id from string to int: ", err)
-		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
-	}
-	recipientID, err := strconv.Atoi(c.FormValue("recipient"))
-	if err != nil {
-		log.Println("Error converting recipient id from string to int: ", err)
-		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
-	}
-
-	sender, err := p.entityService.RetrieveEntity(c.Context(), senderID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-	recipient, err := p.entityService.RetrieveEntity(c.Context(), recipientID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
+func CreateInvoice(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
 
 	invoice := models.NewInvoiceFromForm(c)
 
+	sender, err := services.RetrieveEntity(c.Context(), invoice.Sender.ID, userID)
+	if err != nil {
+		return err
+	}
+
+	recipient, err := services.RetrieveEntity(c.Context(), invoice.Recipient.ID, userID)
+	if err != nil {
+		return err
+	}
+
 	invoice.Sender = sender
 	invoice.Recipient = recipient
-	invoice.CreatedBy = userID
+
+	entities, err := services.ListEntities(c.Context(), userID)
+	if err != nil {
+		return err
+	}
 
 	if !invoice.IsValid() {
-		pageData.FormMsg = "Corrija os campos abaixo."
-		pageData.Invoice = invoice
-
-		entities, err := p.entityService.ListEntities(c.Context(), userID)
-		if err != nil {
-			return utils.GeneralErrorResponse(c, err)
-		}
-		pageData.FormSelectFields.Entities = entities
-
-		return utils.RetargetToForm(c, "invoice", pageData)
+		return Render(c, forms.InvoiceForm(invoice, entities))
 	}
 
-	err = p.service.CreateInvoice(c.Context(), invoice)
+	err = services.CreateInvoice(c.Context(), invoice, userID)
 	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
+		return err
 	}
 
-	go p.siareBGWorker.RequestInvoice(invoice)
 
-	filters := models.NewRawFiltersFromForm(c)
+	ssapi := siare.GetSSApiClient()
+	go ssapi.IssueInvoice(invoice)
 
-	invoices, err := p.service.ListInvoices(c.Context(), userID, filters)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	c.Set("HX-Trigger-After-Settle", "invoice-required")
-
-	shouldWarnUser := utils.FiltersExcludeToday(filters)
-	if shouldWarnUser {
-		return utils.GeneralInfoResponse(c, globals.ReqCardNotVisibleMsg)
-	}
-	return c.Render("partials/requests-overview", invoices)
+	c.Append("HX-Trigger-After-Settle", "reload-invoice-list", "close-invoice-form-dialog")
+	return Render(c, forms.InvoiceForm(invoice, entities))
 }
 
-func (p *InvoicesPage) GetItemFormSection(c *fiber.Ctx) error {
-	item := models.NewEmptyInvoiceItem()
-	c.Set("HX-Trigger-After-Settle", "enumerate-item-sections")
-	return c.Render("partials/forms/invoice-form-item-section", item)
-}
-
-func (p *InvoicesPage) GetRequestCardDetails(c *fiber.Ctx) error {
+func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {
 	invoiceID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
+		return err
 	}
 
-	userID := c.Locals("UserID").(int)
-
-	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceID, userID)
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID)
 	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
+		return err
 	}
 
-	c.Set("HX-Trigger-After-Settle", "open-request-card-details")
-	return c.Render("partials/request-card-details", invoice)
+	return Render(c, components.InvoiceItemsDetails(invoice))
 }
 
-func (p *InvoicesPage) GetInvoiceForm(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-	userID := c.Locals("UserID").(int)
-
-	// TODO async data aggregation with go routines
-
-	entities, err := p.entityService.ListEntities(c.Context(), userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-	pageData.FormSelectFields.Entities = entities
-
-	invoiceID, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
-	}
-	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	pageData.Invoice = invoice
-
-	c.Set("HX-Trigger-After-Settle", "scroll-to-top")
-	return c.Render("partials/forms/invoice-form", pageData)
-}
-
-func (p *InvoicesPage) LoadAvailableIesInput(c *fiber.Ctx) error {
-	pageData := p.NewEmptyData()
-
-	entityID, err := strconv.Atoi(c.Query("sender"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.EntityNotFoundErr)
-	}
-	userID := c.Locals("UserID").(int)
-	entity, err := p.entityService.RetrieveEntity(c.Context(), entityID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-	invoice := models.NewEmptyInvoice()
-	invoice.Sender = entity
-
-	pageData.Invoice = invoice
-
-	return c.Render("partials/forms/invoice-form", pageData)
-}
-
-func (p *InvoicesPage) GetRequestStatus(c *fiber.Ctx) error {
-	invoiceID, err := strconv.Atoi(c.Params("id"))
-	if err != nil {
-		return utils.GeneralErrorResponse(c, utils.InvoiceNotFoundErr)
-	}
-
-	key := fmt.Sprintf("reqstatus:invoice:%v", invoiceID)
-	err = db.Redis.GetDel(c.Context(), key).Err()
-	if err == redis.Nil {
-		return c.Render("partials/request-card-status", "pending")
-	}
-	if err != nil {
-		log.Printf("Error reading redis key %v: %v\n", key, err)
-		return utils.GeneralErrorResponse(c, utils.InternalServerErr)
-	}
-
-	userID := c.Locals("UserID").(int)
-
-	invoice, err := p.service.RetrieveInvoice(c.Context(), invoiceID, userID)
-	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
-	}
-
-	targetID := fmt.Sprintf("#request-card-%v", c.Params("id"))
-	c.Set("HX-Retarget", targetID)
-	c.Set("HX-Reswap", "outerHTML")
-	return c.Render("partials/request-card", invoice)
-}
-
-func (p *InvoicesPage) FilterRequests(c *fiber.Ctx) error {
-	userID := c.Locals("UserID").(int)
+func ListInvoices(c *fiber.Ctx) error {
+	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
-
-	invoices, err := p.service.ListInvoices(c.Context(), userID, filters)
+	invoices, err := services.ListInvoices(c.Context(), userID, filters)
 	if err != nil {
-		return utils.GeneralErrorResponse(c, err)
+		return err
 	}
 
-	return c.Render("partials/requests-overview", invoices)
+	invoicesByDate := services.GroupListByDate(invoices)
+
+	return Render(c, components.InvoiceList(invoicesByDate))
+}
+
+func RetrieveInvoiceCard(c *fiber.Ctx) error {
+	invoiceID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	invoice, err := services.RetrieveInvoice(c.Context(), invoiceID)
+	if err != nil {
+		return err
+	}
+
+	return Render(c, components.InvoiceCard(invoice))
 }
