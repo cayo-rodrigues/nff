@@ -21,10 +21,6 @@ func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.Comp
 	isPageRequest := c.Get("HX-Boosted") == "true"
 	isListRequest := strings.HasSuffix(c.Path(), "/list")
 
-	if isPageRequest {
-		c.Append("HX-Trigger-After-Settle", "notification-list-loaded")
-	}
-
 	if isPageRequest || isListRequest {
 		handleBrowserQueryParams(c)
 	}

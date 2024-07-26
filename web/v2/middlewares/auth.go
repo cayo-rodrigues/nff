@@ -24,7 +24,9 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 		switch c.Path() {
 		case "/":
-			return handlers.RetargetToPageHandler(c, "/", handlers.HomePage)
+			return c.Next()
+		case "/sse/notify-operations-results":
+			return c.Next()
 		default:
 			return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
 

@@ -65,9 +65,10 @@ func main() {
 
 	app.Get("/login", handlers.LoginPage)
 	app.Post("/login", handlers.LoginUser)
-	app.Get("/logout", handlers.LogoutUser)
 
 	app.Use(middlewares.AuthMiddleware)
+
+	app.Get("/logout", handlers.LogoutUser)
 
 	app.Get("/sse/notify-operations-results", sse.NotifyOperationsResults)
 
