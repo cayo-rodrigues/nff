@@ -14,8 +14,7 @@ import (
 )
 
 func EntitiesPage(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
@@ -29,12 +28,11 @@ func CreateEntityPage(c *fiber.Ctx) error {
 }
 
 func EditEntityPage(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
-	entity, err := services.RetrieveEntity(c.Context(), entityID, userID)
+	entity, err := services.RetrieveEntity(c.Context(), entityID)
 	if err != nil {
 		return err
 	}
@@ -85,9 +83,8 @@ func DeleteEntity(c *fiber.Ctx) error {
 }
 
 func SearchEntities(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
-	entities, err := services.ListEntities(c.Context(), userID, filters)
+	entities, err := services.ListEntities(c.Context(), filters)
 	if err != nil {
 		return err
 	}

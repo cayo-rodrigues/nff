@@ -25,10 +25,6 @@ func TrimSpaceFromBytesToFloat64(f []byte) (float64, error) {
 	return TrimSpaceFloat64(TrimSpaceBytes(f))
 }
 
-func ParseDate(date string) (time.Time, error) {
-	return time.Parse("2006-01-02", date)
-}
-
 func ParseDateAsBR(date string) (time.Time, error) {
 	loc, err := time.LoadLocation("America/Sao_Paulo")
 	if err != nil {
@@ -50,13 +46,6 @@ func FormatDate(date time.Time) string {
 	return date.Format("2006-01-02")
 }
 
-func FormatTime(t time.Time) string {
-	if t.IsZero() {
-		return ""
-	}
-	return t.Format("15:04:05")
-}
-
 func FormatDateAsBR(date time.Time) string {
 	if date.IsZero() {
 		return ""
@@ -68,22 +57,12 @@ func FormatDatetimeAsBR(dt time.Time) string {
 	if dt.IsZero() {
 		return ""
 	}
-	return dt.Format("02/01/2006 às 15:04")
-}
-
-func IsToday(date string) bool {
-	today := FormatDate(time.Now())
-	return today == date
+	return dt.Format("02/01/2006 às 15:04:05")
 }
 
 func IsTodayBR(date string) bool {
 	today := FormatDateAsBR(time.Now())
 	return today == date
-}
-
-func IsYesterday(date string) bool {
-	yesterday := time.Now().AddDate(0, 0, -1)
-	return date == FormatDate(yesterday)
 }
 
 func IsYesterdayBR(date string) bool {
@@ -103,14 +82,18 @@ func Float64ToString(f float64) string {
 	return strconv.FormatFloat(f, 'f', 2, 64)
 }
 
-type UserData struct {
+type ReqUserData struct {
 	ID              int
 	IsAuthenticated bool
 }
 
-func GetUserData(ctx context.Context) *UserData {
-	if userData, ok := ctx.Value("UserData").(*UserData); ok {
+func GetUserData(ctx context.Context) *ReqUserData {
+	if userData, ok := ctx.Value("UserData").(*ReqUserData); ok {
 		return userData
 	}
-	return new(UserData)
+	return new(ReqUserData)
+}
+
+func GetUserID(ctx context.Context) int {
+	return GetUserData(ctx).ID
 }

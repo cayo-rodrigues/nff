@@ -8,7 +8,9 @@ import (
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func ListMetrics(ctx context.Context, userID int, filters ...map[string]string) ([]*models.Metrics, error) {
+func ListMetrics(ctx context.Context, filters ...map[string]string) ([]*models.Metrics, error) {
+	userID := utils.GetUserData(ctx).ID
+
 	f := models.NewFilters().Where("metrics_history.created_by = ").Placeholder(userID)
 
 	if filters == nil {

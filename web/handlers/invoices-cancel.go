@@ -10,21 +10,18 @@ import (
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
-	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
 func CancelInvoicePage(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
 	filters := c.Queries()
 
-	cancelingsList, err := services.ListCancelings(c.Context(), userID, filters)
+	cancelingsList, err := services.ListCancelings(c.Context(), filters)
 	if err != nil {
 		return err
 	}
 
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
@@ -38,16 +35,14 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 }
 
 func CancelInvoice(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
 
 	canceling := models.NewInvoiceCancelFromForm(c)
 
-	entity, err := services.RetrieveEntity(c.Context(), canceling.Entity.ID, userID)
+	entity, err := services.RetrieveEntity(c.Context(), canceling.Entity.ID)
 	if err != nil {
 		return err
 	}
@@ -57,7 +52,7 @@ func CancelInvoice(c *fiber.Ctx) error {
 		return Render(c, forms.CancelInvoiceForm(canceling, entities))
 	}
 
-	err = services.CreateCanceling(c.Context(), canceling, userID)
+	err = services.CreateCanceling(c.Context(), canceling)
 	if err != nil {
 		return err
 	}
@@ -70,13 +65,12 @@ func CancelInvoice(c *fiber.Ctx) error {
 }
 
 func CancelInvoiceByID(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	invoiceID, err := c.ParamsInt("invoice_id")
 	if err != nil {
 		return err
 	}
 
-	canceling, err := services.CreateCancelingFromInvoiceID(c.Context(), invoiceID, userID)
+	canceling, err := services.CreateCancelingFromInvoiceID(c.Context(), invoiceID)
 	if err != nil {
 		return err
 	}
@@ -88,9 +82,8 @@ func CancelInvoiceByID(c *fiber.Ctx) error {
 }
 
 func ListInvoiceCancelings(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
-	cancelings, err := services.ListCancelings(c.Context(), userID, filters)
+	cancelings, err := services.ListCancelings(c.Context(), filters)
 	if err != nil {
 		return err
 	}
@@ -101,9 +94,7 @@ func ListInvoiceCancelings(c *fiber.Ctx) error {
 }
 
 func GetCancelInvoiceForm(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}

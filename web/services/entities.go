@@ -5,6 +5,7 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
+	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
 func CreateEntity(ctx context.Context, entity *models.Entity, userID int) error {
@@ -12,7 +13,9 @@ func CreateEntity(ctx context.Context, entity *models.Entity, userID int) error 
 	return storage.CreateEntity(ctx, entity)
 }
 
-func ListEntities(ctx context.Context, userID int, filters ...map[string]string) ([]*models.Entity, error) {
+func ListEntities(ctx context.Context, filters ...map[string]string) ([]*models.Entity, error) {
+	userID := utils.GetUserData(ctx).ID
+
 	f := models.NewFilters().Where("created_by = ").Placeholder(userID)
 
 	for _, filter := range filters {
@@ -30,7 +33,8 @@ func ListEntities(ctx context.Context, userID int, filters ...map[string]string)
 	return storage.ListEntities(ctx, userID, f)
 }
 
-func RetrieveEntity(ctx context.Context, entityID int, userID int) (*models.Entity, error) {
+func RetrieveEntity(ctx context.Context, entityID int) (*models.Entity, error) {
+	userID := utils.GetUserID(ctx)
 	entity, err := storage.RetrieveEntity(ctx, entityID, userID)
 	if err != nil {
 		return nil, err

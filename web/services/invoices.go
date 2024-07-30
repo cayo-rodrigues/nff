@@ -8,7 +8,8 @@ import (
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func CreateInvoice(ctx context.Context, invoice *models.Invoice, userID int) error {
+func CreateInvoice(ctx context.Context, invoice *models.Invoice) error {
+	userID := utils.GetUserID(ctx)
 	invoice.CreatedBy = userID
 	err := storage.CreateInvoice(ctx, invoice)
 	if err != nil {
