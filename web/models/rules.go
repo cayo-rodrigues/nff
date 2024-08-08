@@ -27,7 +27,8 @@ func (rs *RuleSet) WithMessage(msg string) RuleFunc {
 
 type RuleFunc func() *RuleSet
 
-type Fields []*struct {
+type Fields []*Field
+type Field struct {
 	Name  string
 	Value any
 	Rules []*RuleSet
