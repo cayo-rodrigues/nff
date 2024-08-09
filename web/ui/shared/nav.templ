@@ -20,7 +20,11 @@ templ BurgerMenu(isAuthenticated bool) {
 		<button id="burger-menu-btn" class="translate-y-0.5 transform xl:hidden" onclick="OpenBurgerMenu()">
 			@Icon("menu")
 		</button>
-		<ul id="burger-menu" hx-boost="true" class="absolute -right-4 top-8 z-30 hidden w-36 gap-2 rounded-s bg-sky-800 p-1 shadow shadow-black">
+		<ul
+			id="burger-menu"
+			hx-boost="true"
+			class="absolute -right-4 top-8 z-30 hidden w-36 gap-2 rounded-s bg-sky-800 p-1 shadow shadow-black"
+		>
 			if isAuthenticated {
 				@MenuItem("/entities") {
 					@IconSm("users")
@@ -104,7 +108,10 @@ templ ListMenu(isAuthenticated bool) {
 
 templ MenuItem(url string) {
 	<a href={ templ.URL(url) }>
-		<li id={ url } class="flex h-full w-full flex-1 cursor-pointer items-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95 xl:justify-center">
+		<li
+			id={ url }
+			class="flex h-full w-full flex-1 cursor-pointer items-center gap-2 rounded px-2 py-1 transition hover:bg-sky-800 active:scale-95 xl:justify-center"
+		>
 			{ children... }
 		</li>
 	</a>
@@ -124,7 +131,11 @@ templ SubMenu(id, labelIcon, labelText string) {
 
 templ SubMenuItem(url string) {
 	<a href={ templ.URL(url) }>
-		<li id={ url } data-submenu-item="true" class="flex gap-2 rounded px-2 py-1 transition hover:bg-sky-900 active:scale-90">
+		<li
+			id={ url }
+			data-submenu-item="true"
+			class="flex gap-2 rounded px-2 py-1 transition hover:bg-sky-900 active:scale-90"
+		>
 			{ children... }
 		</li>
 	</a>
