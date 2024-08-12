@@ -32,6 +32,10 @@ type Address struct {
 	Number       string `json:"number"`
 }
 
+func (a *Address) Values() []any {
+	return []any{a.PostalCode, a.Neighborhood, a.StreetType, a.StreetName, a.Number}
+}
+
 func NewEntity() *Entity {
 	return &Entity{
 		Address: &Address{},
@@ -93,7 +97,7 @@ func (e *Entity) IsValid() bool {
 			Value: e.Ie,
 			Rules: Rules(
 				Match(IEMGRegex),
-				RequiredUnless(All(e.PostalCode, e.Neighborhood, e.StreetType, e.StreetName, e.Number)),
+				RequiredUnless(All(e.Address.Values()...)),
 			),
 		},
 		{

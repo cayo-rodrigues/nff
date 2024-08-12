@@ -148,9 +148,9 @@ class Siare(Browser):
 
             self.wait_until_document_is_ready()
 
-        if invoice.recipient.ie:
+        if invoice.recipient_ie:
             xpath = XPaths.INVOICE_RECIPIENT_IE_INPUT
-            handle_recipient_ie_or_cpf_cnpj(xpath, invoice.recipient.ie)
+            handle_recipient_ie_or_cpf_cnpj(xpath, invoice.recipient_ie)
         else:
             xpath = XPaths.INVOICE_RECIPIENT_CPF_CNPJ_INPUT
             handle_recipient_ie_or_cpf_cnpj(xpath, invoice.recipient.cpf_cnpj)

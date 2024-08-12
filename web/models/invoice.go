@@ -179,7 +179,10 @@ func (i *Invoice) IsValid() bool {
 		{
 			Name:  "RecipientIe",
 			Value: i.RecipientIe,
-			Rules: Rules(Required, Match(IEMGRegex)),
+			Rules: Rules(
+				RequiredUnless(All(i.Recipient.Address.Values()...)),
+				Match(IEMGRegex),
+			),
 		},
 		{
 			Name:  "Sender",
