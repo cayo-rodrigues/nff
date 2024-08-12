@@ -61,8 +61,9 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	defer finishOperation(ctx, c.DB.Redis, resourceName, invoice.CreatedBy, invoice)
 
 	reqBody := SSApiInvoiceRequest{
-		Invoice:        invoice,
-		ShouldDownload: true,
+		Invoice:            invoice,
+		ShouldDownload:     true,
+		ShouldAbortMission: false,
 	}
 
 	agent := fiber.Post(c.BaseUrl + c.Endpoints.IssueInvoice)

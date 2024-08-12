@@ -54,7 +54,10 @@ def request_invoice(invoice_data: dict):
     siare.fill_invoice_aditional_data(invoice)
 
     if invoice_data.get("should_abort_mission"):
-        return {"msg": "Mission aborted with success"}
+        return {
+            "msg": "Mission aborted with success",
+            "status": "warning",
+        }
 
     siare.finish_invoice()
 
