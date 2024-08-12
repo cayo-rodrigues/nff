@@ -1,22 +1,17 @@
 package forms
 
-import "github.com/cayo-rodrigues/nff/web/models"
-import "strconv"
-import "github.com/cayo-rodrigues/nff/web/ui/shared"
-import "fmt"
-import "github.com/cayo-rodrigues/nff/web/utils"
+import (
+	"fmt"
+	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/ui/shared"
+	"github.com/cayo-rodrigues/nff/web/utils"
+	"strconv"
+)
 
 templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
-	<form
-		id="invoice-form"
-		hx-post="/invoices"
-		hx-target="this"
-		hx-swap="outerHTML"
-	>
+	<form id="invoice-form" hx-post="/invoices" hx-target="this" hx-swap="outerHTML">
 		<div class="flex items-center justify-between gap-6 border-b border-gray-300 py-2 outline-0">
-			<div
-				class="flex-1 lg:w-fit lg:flex-initial"
-			>
+			<div class="flex-1 lg:w-fit lg:flex-initial">
 				@shared.SubmitButton("sm") {
 					@shared.Icon("play-circle")
 					<span>Iniciar Operação</span>
@@ -28,7 +23,9 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				}
 			</div>
 		</div>
-		<div class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+		<div
+			class="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
+		>
 			@shared.SelectInput(&shared.InputData{
 				ID:      "sender",
 				Label:   "Remetente",
@@ -41,7 +38,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 					"hx-target":    "#sender_ie",
 					"hx-select":    "#sender_ie",
 					"hx-swap":      "outerHTML",
-					"hx-indicator": "#available-ies-indicator",
+					"hx-indicator": "#available-sender-ies-indicator",
 				},
 			})
 			@shared.SelectInput(&shared.InputData{
@@ -49,7 +46,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				Label:         "IE do Remetente",
 				Value:         i.SenderIe,
 				Options:       &shared.InputOptions{StringOptions: i.Sender.AllIes()},
-				HxIndicatorID: "available-ies-indicator",
+				HxIndicatorID: "available-sender-ies-indicator",
 				ErrMsg:        i.Errors["SenderIe"],
 			})
 			@shared.SelectInput(&shared.InputData{
@@ -58,6 +55,22 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				Value:   strconv.Itoa(i.Recipient.ID),
 				Options: &shared.InputOptions{EntityOptions: entities},
 				ErrMsg:  i.Errors["Recipient"],
+				Attrs: templ.Attributes{
+					"hx-get":       "/invoices/form/get-recipient-ie-input",
+					"hx-trigger":   "change",
+					"hx-target":    "#recipient_ie",
+					"hx-select":    "#recipient_ie",
+					"hx-swap":      "outerHTML",
+					"hx-indicator": "#available-recipient-ies-indicator",
+				},
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:            "recipient_ie",
+				Label:         "IE do Destinatário",
+				Value:         i.SenderIe,
+				Options:       &shared.InputOptions{StringOptions: i.Recipient.AllIes()},
+				HxIndicatorID: "available-recipient-ies-indicator",
+				ErrMsg:        i.Errors["RecipientIe"],
 			})
 			@shared.SelectInput(&shared.InputData{
 				ID:      "operation",
@@ -134,14 +147,15 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 }
 
 templ InvoiceItemsHeading(i *models.Invoice) {
-	<heading id="invoice-items-heading" class="sticky top-0 z-10 mb-2 flex items-center justify-between border-b border-gray-300 bg-gray-50 px-2 py-2">
+	<heading
+		id="invoice-items-heading"
+		class="sticky top-0 z-10 mb-2 flex items-center justify-between border-b border-gray-300 bg-gray-50 px-2 py-2"
+	>
 		<div class="py-2">
 			<h3 class="text-lg font-bold">Produtos</h3>
 		</div>
 		<div class="flex items-center gap-3 py-2 sm:gap-6">
-			<div
-				onclick="AddInvoiceItemSection()"
-			>
+			<div onclick="AddInvoiceItemSection()">
 				@shared.DefaultButtonOutline("sm") {
 					@shared.IconXs("plus")
 				}
@@ -169,7 +183,9 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 				</div>
 			</div>
 		</div>
-		<div class="grid grid-cols-1 gap-4 rounded-b bg-white px-2 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7">
+		<div
+			class="grid grid-cols-1 gap-4 rounded-b bg-white px-2 py-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7"
+		>
 			@shared.SelectInput(&shared.InputData{
 				ID:      "group",
 				Label:   "Grupo",

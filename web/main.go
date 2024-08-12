@@ -92,6 +92,7 @@ func main() {
 	app.Post("/invoices", handlers.CreateInvoice)
 	app.Get("/invoices/list", handlers.ListInvoices)
 	app.Get("/invoices/form/get-sender-ie-input", handlers.GetSenderIeInput)
+	app.Get("/invoices/form/get-recipient-ie-input", handlers.GetRecipientIeInput)
 	app.Get("/invoices/:id/form", handlers.GetInvoiceForm)
 	app.Get("/invoices/:id/items-details", handlers.RetrieveInvoiceItemsDetails)
 	app.Get("/invoices/:id/card", handlers.RetrieveInvoiceCard)

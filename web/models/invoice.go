@@ -23,6 +23,7 @@ type Invoice struct {
 	Gta                  string         `json:"gta"`
 	Sender               *Entity        `json:"sender"`
 	SenderIe             string         `json:"sender_ie"`
+	RecipientIe          string         `json:"recipient_ie"`
 	Recipient            *Entity        `json:"recipient"`
 	ReqStatus            string         `json:"-"`
 	ReqMsg               string         `json:"-"`
@@ -73,6 +74,7 @@ func NewInvoiceWithSamples(entities []*Entity) *Invoice {
 	invoice := NewInvoice()
 	if len(entities) > 0 {
 		invoice.Sender = entities[0]
+		invoice.Recipient = entities[0]
 	}
 	if len(invoice.Items) == 0 {
 		invoice.Items = append(invoice.Items, NewInvoiceItem())
@@ -102,6 +104,7 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	invoice.ExtraNotes = strings.TrimSpace(c.FormValue("extra_notes"))
 	invoice.CustomFileNamePrefix = strings.TrimSpace(c.FormValue("custom_file_name_prefix"))
 	invoice.SenderIe = strings.TrimSpace(c.FormValue("sender_ie"))
+	invoice.RecipientIe = strings.TrimSpace(c.FormValue("recipient_ie"))
 
 	senderID, err := strconv.Atoi(c.FormValue("sender"))
 	if err != nil {
@@ -174,6 +177,11 @@ func (i *Invoice) IsValid() bool {
 			Rules: Rules(Required, Match(IEMGRegex)),
 		},
 		{
+			Name:  "RecipientIe",
+			Value: i.RecipientIe,
+			Rules: Rules(Required, Match(IEMGRegex)),
+		},
+		{
 			Name:  "Sender",
 			Value: i.Sender.ID,
 			Rules: Rules(Required),
@@ -199,6 +207,6 @@ func (i *Invoice) Values() []any {
 		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
 		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
-		&i.ExtraNotes, &i.CustomFileNamePrefix, &i.SenderIe, &i.FileName,
+		&i.ExtraNotes, &i.CustomFileNamePrefix, &i.SenderIe, &i.FileName, &i.RecipientIe,
 	}
 }

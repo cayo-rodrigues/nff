@@ -66,11 +66,28 @@ func GetSenderIeInput(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
 	entity, err := services.RetrieveEntity(c.Context(), entityID)
 
 	return Render(c, shared.SelectInput(&shared.InputData{
 		ID:      "sender_ie",
 		Label:   "IE do Remetente",
+		Value:   entity.Ie,
+		Options: &shared.InputOptions{StringOptions: entity.AllIes()},
+	}))
+}
+
+func GetRecipientIeInput(c *fiber.Ctx) error {
+	entityID, err := strconv.Atoi(c.Query("recipient"))
+	if err != nil {
+		return err
+	}
+
+	entity, err := services.RetrieveEntity(c.Context(), entityID)
+
+	return Render(c, shared.SelectInput(&shared.InputData{
+		ID:      "recipient_ie",
+		Label:   "IE do Destinatário",
 		Value:   entity.Ie,
 		Options: &shared.InputOptions{StringOptions: entity.AllIes()},
 	}))
@@ -106,7 +123,6 @@ func CreateInvoice(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-
 
 	ssapi := siare.GetSSApiClient()
 	go ssapi.IssueInvoice(invoice)
