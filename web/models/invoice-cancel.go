@@ -7,21 +7,22 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
 )
 
 type InvoiceCancel struct {
-	ID            int           `json:"-"`
-	InvoiceNumber string        `json:"invoice_id"` // MUDAR NA SS-API PARA invoice_number
-	Year          int           `json:"year"`
-	Justification string        `json:"justification"`
-	Entity        *Entity       `json:"entity"`
-	ReqStatus     string        `json:"-"`
-	ReqMsg        string        `json:"-"`
-	CreatedBy     int           `json:"-"`
-	CreatedAt     time.Time     `json:"-"`
-	UpdatedAt     time.Time     `json:"-"`
-	Errors        ErrorMessages `json:"-"`
+	ID            int                `json:"-"`
+	InvoiceNumber string             `json:"invoice_id"` // MUDAR NA SS-API PARA invoice_number
+	Year          int                `json:"year"`
+	Justification string             `json:"justification"`
+	Entity        *Entity            `json:"entity"`
+	ReqStatus     string             `json:"-"`
+	ReqMsg        string             `json:"-"`
+	CreatedBy     int                `json:"-"`
+	CreatedAt     time.Time          `json:"-"`
+	UpdatedAt     time.Time          `json:"-"`
+	Errors        safe.ErrorMessages `json:"-"`
 }
 
 func (c *InvoiceCancel) AsNotification() *Notification {
@@ -81,24 +82,24 @@ func NewInvoiceCancelFromForm(c *fiber.Ctx) *InvoiceCancel {
 }
 
 func (c *InvoiceCancel) IsValid() bool {
-	fields := Fields{
+	fields := safe.Fields{
 		{
 			Name:  "InvoiceNumber",
 			Value: c.InvoiceNumber,
-			Rules: Rules(Required, Match(SiareNFANumberRegex)),
+			Rules: safe.Rules{safe.Required(), safe.Match(SiareNFANumberRegex)},
 		},
 		{
 			Name:  "Year",
 			Value: c.Year,
-			Rules: Rules(Required, Max(time.Now().Year())),
+			Rules: safe.Rules{safe.Required(), safe.Max(time.Now().Year())},
 		},
 		{
 			Name:  "Justification",
 			Value: c.Justification,
-			Rules: Rules(Required, Max(128)),
+			Rules: safe.Rules{safe.Required(), safe.Max(128)},
 		},
 	}
-	errors, ok := Validate(fields)
+	errors, ok := safe.Validate(fields)
 	c.Errors = errors
 	return ok
 }

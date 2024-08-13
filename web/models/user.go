@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/cayo-rodrigues/safe"
 )
 
 type User struct {
@@ -13,7 +14,7 @@ type User struct {
 	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Errors    ErrorMessages
+	Errors    safe.ErrorMessages
 }
 
 func NewUser() *User {
@@ -28,19 +29,20 @@ func NewUserFromForm(c *fiber.Ctx) *User {
 }
 
 func (u *User) IsValid() bool {
-	fields := Fields{
+	
+	fields := safe.Fields{
 		{
 			Name:  "Email",
 			Value: u.Email,
-			Rules: Rules(Required, Email, Max(128)),
+			Rules: safe.Rules{safe.Required(), safe.Email(), safe.Max(128)},
 		},
 		{
 			Name:  "Password",
 			Value: u.Password,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 	}
-	errors, ok := Validate(fields)
+	errors, ok := safe.Validate(fields)
 	u.Errors = errors
 	return ok
 }
@@ -51,7 +53,7 @@ func (u *User) Values() []any {
 
 func (u *User) SetError(key, val string) {
 	if u.Errors == nil {
-		u.Errors = make(ErrorMessages)
+		u.Errors = make(safe.ErrorMessages)
 	}
 	u.Errors[key] = val
 }

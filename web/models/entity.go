@@ -5,22 +5,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Entity struct {
-	ID        int           `json:"-"`
-	Name      string        `json:"-"`
-	UserType  string        `json:"user_type"`
-	Ie        string        `json:"ie"`
-	OtherIes  []string      `json:"other_ies"`
-	CpfCnpj   string        `json:"cpf_cnpj"`
-	Email     string        `json:"email"`
-	Password  string        `json:"password"`
-	CreatedBy int           `json:"-"`
-	CreatedAt time.Time     `json:"-"`
-	UpdatedAt time.Time     `json:"-"`
-	Errors    ErrorMessages `json:"-"`
+	ID        int                `json:"-"`
+	Name      string             `json:"-"`
+	UserType  string             `json:"user_type"`
+	Ie        string             `json:"ie"`
+	OtherIes  []string           `json:"other_ies"`
+	CpfCnpj   string             `json:"cpf_cnpj"`
+	Email     string             `json:"email"`
+	Password  string             `json:"password"`
+	CreatedBy int                `json:"-"`
+	CreatedAt time.Time          `json:"-"`
+	UpdatedAt time.Time          `json:"-"`
+	Errors    safe.ErrorMessages `json:"-"`
 	*Address
 }
 
@@ -76,67 +77,67 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 }
 
 func (e *Entity) IsValid() bool {
-	fields := Fields{
+	fields := safe.Fields{
 		{
 			Name:  "Name",
 			Value: e.Name,
-			Rules: Rules(Required, Max(128)),
+			Rules: safe.Rules{safe.Required(), safe.Max(128)},
 		},
 		{
 			Name:  "UserType",
 			Value: e.UserType,
-			Rules: Rules(Required, OneOf(EntityUserTypes[:])),
+			Rules: safe.Rules{safe.Required(), safe.OneOf(EntityUserTypes[:])},
 		},
 		{
 			Name:  "CpfCnpj",
 			Value: e.CpfCnpj,
-			Rules: Rules(Match(CPFRegex, CNPJRegex)),
+			Rules: safe.Rules{safe.CpfCnpj()},
 		},
 		{
 			Name:  "Ie",
 			Value: e.Ie,
-			Rules: Rules(
-				Match(IEMGRegex),
-				RequiredUnless(All(e.Address.Values()...)),
-			),
+			Rules: safe.Rules{
+				safe.Match(IEMGRegex),
+				safe.RequiredUnless(safe.All(e.Address.Values()...)),
+			},
 		},
 		{
 			Name:  "Email",
 			Value: e.Email,
-			Rules: Rules(Email, Max(128)),
+			Rules: safe.Rules{safe.Email(), safe.Max(128)},
 		},
 		{
 			Name:  "PostalCode",
 			Value: e.PostalCode,
-			Rules: Rules(Match(PostalCodeRegex)),
+			Rules: safe.Rules{safe.Match(safe.CepRegex)},
 		},
 		{
 			Name:  "Neighborhood",
 			Value: e.Neighborhood,
-			Rules: Rules(Max(64)),
+			Rules: safe.Rules{safe.Max(64)},
 		},
 		{
 			Name:  "StreetType",
 			Value: e.StreetType,
-			Rules: Rules(OneOf(EntityAddressStreetTypes[:])),
+			Rules: safe.Rules{safe.OneOf(EntityAddressStreetTypes[:])},
 		},
 		{
 			Name:  "StreetName",
 			Value: e.StreetName,
-			Rules: Rules(Max(64)),
+			Rules: safe.Rules{safe.Max(64)},
 		},
 		{
 			Name:  "Number",
 			Value: e.Number,
-			Rules: Rules(Match(AddressNumberRegex)),
+			Rules: safe.Rules{safe.Match(safe.AddressNumberRegex)},
 		},
 		{
 			Name:  "OtherIes",
 			Value: e.OtherIes,
-			Rules: Rules(MatchList(IEMGRegex), UniqueList[string]),
+			Rules: safe.Rules{safe.MatchList(IEMGRegex), safe.UniqueList[string]()},
 		},
 	}
-	errors, isValid := Validate(fields)
+	errors, isValid := safe.Validate(fields)
 	e.Errors = errors
 	return isValid
 }
