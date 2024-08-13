@@ -134,7 +134,7 @@ func (i *Invoice) IsValid() bool {
 		{
 			Name:  "Cfop",
 			Value: i.Cfop,
-			Rules: safe.Rules{CfopRule(i.Operation)},
+			Rules: safe.Rules{safe.OneOf(InvoiceCfops.ByOperation(i.Operation)[:])},
 		},
 		{
 			Name:  "IsIcmsContributor",
