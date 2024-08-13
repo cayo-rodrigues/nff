@@ -49,6 +49,9 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
 
 		item.Group = utils.TrimSpaceBytes(groups[i])
 		item.NCM = utils.TrimSpaceBytes(ncms[i])
+		if item.NCM == "" {
+			item.NCM = InvoiceItemDefaultNCM
+		}
 		item.Description = utils.TrimSpaceBytes(descriptions[i])
 		item.Origin = utils.TrimSpaceBytes(origins[i])
 		item.UnityOfMeasurement = utils.TrimSpaceBytes(unitiesOfMeasurement[i])

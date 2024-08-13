@@ -93,6 +93,17 @@ func GetRecipientIeInput(c *fiber.Ctx) error {
 	}))
 }
 
+func GetCfopsInput(c *fiber.Ctx) error {
+	operation := c.Query("operation")
+
+	return Render(c, shared.SelectInput(&shared.InputData{
+		ID:            "cfop",
+		Label:         "CFOP",
+		Options:       &shared.InputOptions{StringOptions: models.InvoiceCfops.ByOperation(operation)},
+		HxIndicatorID: "invoice-cfops-indicator",
+	}))
+}
+
 func CreateInvoice(c *fiber.Ctx) error {
 
 	invoice := models.NewInvoiceFromForm(c)

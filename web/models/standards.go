@@ -36,23 +36,67 @@ var InvoiceOperations = SiareInvoiceOperations{
 	"REMESSA",
 }
 
-type SiareInvoiceCfops [14]int
+func (o *SiareInvoiceOperations) VENDA() string {
+	return o[0]
+}
 
-var InvoiceCfops = SiareInvoiceCfops{
-	5101,
-	5102,
-	5103,
-	5105,
-	5111,
-	5113,
-	5116,
-	5118,
-	5122,
-	5159,
-	5160,
-	5401,
-	5402,
-	5551,
+func (o *SiareInvoiceOperations) REMESSA() string {
+	return o[1]
+}
+
+type SiareInvoiceCfops struct {
+	VENDA   [14]string
+	REMESSA [22]string
+}
+
+func (cfops *SiareInvoiceCfops) ByOperation(invoiceOperation string) []string {
+	switch invoiceOperation {
+	case InvoiceOperations.VENDA():
+		return cfops.VENDA[:]
+	default:
+		return cfops.REMESSA[:]
+	}
+}
+
+var InvoiceCfops = &SiareInvoiceCfops{
+	VENDA: [14]string{
+		"5101 - venda de produção do estabelecimento",
+		"5102 - venda de mercadoria adquirida ou recebida de terceiros, ou qualquer venda de mercadoria efetuada pelo MEI com exceção das saidas classificadas nos codigos 5501, 5502, 5504 e 5505",
+		"5103 - venda de produção do estabelecimento, efetuada fora do estabelecimento",
+		"5105 - venda de produçãodo estabelecimento que não deva por transitar",
+		"5111 - venda de produção do estabelecimento remetida anteriormente em consignação industrial",
+		"5113 - venda de produção do estabelecimento remetida anteriormente em consignação mercantil",
+		"5116 - venda de produção do estabelecimento originada de encomenda para entrega",
+		"5118 - venda de produção do estabelecimento entregue ao destinario por conta e ordem do adquirente originario, em venda ordem",
+		"5122 - venda de produção do estabelecimento remetida para industrialização, por conta e ordem do adquirente, sem transitar pelo estabelecimento do adquirente",
+		"5159 - fornecimento de produção do estabelecimento de ato cooperativo",
+		"5160 - fornecimento de mercadoria adquirida ou recebida de terceiros de ato cooperativo",
+		"5401 - venda de produção do estabelecimento em operação com produto sujeito ao regime de substituição tributaria, na condição de contribuinte substituto",
+		"5402 - venda de produção do estabelecimento de produto sujeito ao regime de substituição tributaria, em operação entre operação entre contribuintes substitutos do mesmo produto",
+		"5551 - venda de bem do ativo imobilizado"},
+	REMESSA: [22]string{
+		"5131 - Remessa de produção do estabelecimento, com previsão de posterior ajuste ou fixação de preço, de ato cooperativo",
+		"5132 - Fixação de preço de produção do estabelecimento, inclusive quando remetidas anteriormente com previsão de posterior ajuste ou fixação de preço de ato cooperativo",
+		"5414 - Remessa de produção do estabelecimento para venda fora do estabelecimento em operação com produto sujeito ao regime de substituição tributária",
+		"5415 - Remessa de mercadoria adquirida ou recebida de terceiros para venda fora do estabelecimento, em operação com mercadoria sujeita ao regime de substituição tributária",
+		"5451 - Remessa de animal e de insumo para estabelecimento produtor",
+		"5452 - Remessa de insumo - Sistema de Integração e Parceria Rural",
+		"5501 - Remessa de produção do estabelecimento, com fim específico de exportação",
+		"5554 - Remessa de bem do ativo imobilizado para uso fora do estabelecimento",
+		"5901 - Remessa para industrialização por encomenda",
+		"5904 - Remessa para venda fora do estabelecimento, ou qualquer remessa efetuada pelo MEI com exceção das classificadas nos códigos 5.502 e 5.505.",
+		"5905 - Remessa para depósito fechado ou armazém geral",
+		"5908 - Remessa de bem por conta de contrato de comodato",
+		"5910 - Remessa em bonificação, doação ou brinde",
+		"5911 - Remessa de amostra grátis",
+		"5912 - Remessa de mercadoria ou bem para demonstração",
+		"5914 - Remessa de mercadoria ou bem para exposição ou feira",
+		"5915 - Remessa de mercadoria ou bem para conserto ou reparo",
+		"5917 - Remessa de mercadoria em consignação mercantil ou industrial",
+		"5920 - Remessa de vasilhame ou sacaria",
+		"5923 - Remessa de mercadoria por conta e ordem de terceiros, em venda à ordem",
+		"5924 - Remessa para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente",
+		"5934 - Remessa simbólica de mercadoria depositada em armazém geral ou depósito fechado"},
 }
 
 type SiareInvoiceIcmsOptions [3]string
@@ -90,6 +134,8 @@ var InvoiceIDTypes = SiareInvoiceIDTypes{
 }
 
 // INVOICE ITEMS
+
+var InvoiceItemDefaultNCM = "94019900"
 
 type SiareInvoiceItemGroups [82]string
 

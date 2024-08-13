@@ -16,7 +16,7 @@ type Invoice struct {
 	Number               string             `json:"invoice_id"` // TROCAR PARA invoice_number NA SS-API
 	Protocol             string             `json:"-"`
 	Operation            string             `json:"operation"`
-	Cfop                 int                `json:"cfop,string"`
+	Cfop                 string             `json:"cfop"`
 	IsFinalCustomer      string             `json:"is_final_customer"`
 	IsIcmsContributor    string             `json:"icms"`
 	Shipping             float64            `json:"shipping"`
@@ -81,6 +81,8 @@ func NewInvoiceWithSamples(entities []*Entity) *Invoice {
 		invoice.Items = append(invoice.Items, NewInvoiceItem())
 	}
 
+	invoice.Operation = InvoiceOperations.VENDA()
+
 	return invoice
 }
 
@@ -90,10 +92,7 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	invoice := NewInvoice()
 
 	invoice.Operation = strings.TrimSpace(c.FormValue("operation"))
-	invoice.Cfop, err = utils.TrimSpaceInt(c.FormValue("cfop"))
-	if err != nil {
-		log.Println("Error converting invoice cfop from string to int: ", err)
-	}
+	invoice.Cfop = strings.TrimSpace(c.FormValue("cfop"))
 	invoice.IsIcmsContributor = strings.TrimSpace(c.FormValue("is_icms_contributor"))
 	invoice.IsFinalCustomer = strings.TrimSpace(c.FormValue("is_final_customer"))
 	invoice.Shipping, err = utils.TrimSpaceFloat64(c.FormValue("shipping"))
@@ -135,7 +134,7 @@ func (i *Invoice) IsValid() bool {
 		{
 			Name:  "Cfop",
 			Value: i.Cfop,
-			Rules: safe.Rules{safe.OneOf(InvoiceCfops[:])},
+			Rules: safe.Rules{CfopRule(i.Operation)},
 		},
 		{
 			Name:  "IsIcmsContributor",

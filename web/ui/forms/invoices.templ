@@ -67,7 +67,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 			@shared.SelectInput(&shared.InputData{
 				ID:            "recipient_ie",
 				Label:         "IE do Destinatário",
-				Value:         i.SenderIe,
+				Value:         i.RecipientIe,
 				Options:       &shared.InputOptions{StringOptions: i.Recipient.AllIes()},
 				HxIndicatorID: "available-recipient-ies-indicator",
 				ErrMsg:        i.Errors["RecipientIe"],
@@ -77,13 +77,22 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				Label:   "Operação",
 				Value:   i.Operation,
 				Options: &shared.InputOptions{StringOptions: models.InvoiceOperations[:]},
+				Attrs: templ.Attributes{
+					"hx-get":       "/invoices/form/get-cfops-input",
+					"hx-trigger":   "change",
+					"hx-target":    "#cfop",
+					"hx-select":    "#cfop",
+					"hx-swap":      "outerHTML",
+					"hx-indicator": "#invoice-cfops-indicator",
+				},
 				ErrMsg:  i.Errors["Operation"],
 			})
 			@shared.SelectInput(&shared.InputData{
 				ID:      "cfop",
 				Label:   "CFOP",
-				Value:   strconv.Itoa(i.Cfop),
-				Options: &shared.InputOptions{IntOptions: models.InvoiceCfops[:]},
+				Value:   i.Cfop,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceCfops.ByOperation(i.Operation)},
+				HxIndicatorID: "invoice-cfops-indicator",
 				ErrMsg:  i.Errors["Cfop"],
 			})
 			@shared.SelectInput(&shared.InputData{
@@ -197,7 +206,7 @@ templ InvoiceItemSection(item *models.InvoiceItem, idx int) {
 				ID:          "ncm",
 				Label:       "NCM",
 				Value:       item.NCM,
-				Placeholder: "94019900",
+				Placeholder: models.InvoiceItemDefaultNCM,
 				ErrMsg:      item.Errors["NCM"],
 				Help:        &shared.InputHelpInfo{Title: "Como saber o NCM de um produto?", Link: "https://www2.fazenda.mg.gov.br/sol/ctrl/SOL/NFAE/CONSULTA_006?ITEM=0&ACAO=VISUALIZAR"},
 			})
