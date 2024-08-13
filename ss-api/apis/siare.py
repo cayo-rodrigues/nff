@@ -116,8 +116,8 @@ class Siare(Browser):
 
         cfops_box = self.filter_elements(By.TAG_NAME, "span", root)
         for cfop in cfops_box:
-            cfop_inner_html = cfop.get_attribute("innerHTML")
-            if cfop_inner_html and invoice.cfop == cfop_inner_html.split(" -")[0]:
+            cfop_inner_html = normalize_text(cfop.get_attribute("innerHTML"))
+            if cfop_inner_html and invoice.cfop == cfop_inner_html:
                 cfop.click()
                 break
 

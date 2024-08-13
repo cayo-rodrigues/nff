@@ -60,20 +60,21 @@ func (cfops *SiareInvoiceCfops) ByOperation(invoiceOperation string) []string {
 
 var InvoiceCfops = &SiareInvoiceCfops{
 	VENDA: [14]string{
-		"5101 - venda de produção do estabelecimento",
-		"5102 - venda de mercadoria adquirida ou recebida de terceiros, ou qualquer venda de mercadoria efetuada pelo MEI com exceção das saidas classificadas nos codigos 5501, 5502, 5504 e 5505",
-		"5103 - venda de produção do estabelecimento, efetuada fora do estabelecimento",
-		"5105 - venda de produçãodo estabelecimento que não deva por transitar",
-		"5111 - venda de produção do estabelecimento remetida anteriormente em consignação industrial",
-		"5113 - venda de produção do estabelecimento remetida anteriormente em consignação mercantil",
-		"5116 - venda de produção do estabelecimento originada de encomenda para entrega",
-		"5118 - venda de produção do estabelecimento entregue ao destinario por conta e ordem do adquirente originario, em venda ordem",
-		"5122 - venda de produção do estabelecimento remetida para industrialização, por conta e ordem do adquirente, sem transitar pelo estabelecimento do adquirente",
-		"5159 - fornecimento de produção do estabelecimento de ato cooperativo",
-		"5160 - fornecimento de mercadoria adquirida ou recebida de terceiros de ato cooperativo",
-		"5401 - venda de produção do estabelecimento em operação com produto sujeito ao regime de substituição tributaria, na condição de contribuinte substituto",
-		"5402 - venda de produção do estabelecimento de produto sujeito ao regime de substituição tributaria, em operação entre operação entre contribuintes substitutos do mesmo produto",
-		"5551 - venda de bem do ativo imobilizado"},
+		"5101 - Venda de produção do estabelecimento",
+		"5102 - Venda de mercadoria adquirida ou recebida de terceiros, ou qualquer venda de mercadoria efetuada pelo MEI com exceção das saídas classificadas nos códigos 5.501, 5.502, 5.504 e 5.505.",
+		"5103 - Venda de produção do estabelecimento, efetuada fora do estabelecimento",
+		"5105 - Venda de produção do estabelecimento que não deva por ele transitar",
+		"5111 - Venda de produção do estabelecimento remetida anteriormente em consignação industrial",
+		"5113 - Venda de produção do estabelecimento remetida anteriormente em consignação mercantil",
+		"5116 - Venda de produção do estabelecimento originada de encomenda para entrega futura",
+		"5118 - Venda de produção do estabelecimento entregue ao destinatário por conta e ordem do adquirente originário, em venda à ordem",
+		"5122 - Venda de produção do estabelecimento remetida para industrialização, por conta e ordem do adquirente, sem transitar pelo estabelecimento do adquirente",
+		"5159 - Fornecimento de produção do estabelecimento de ato cooperativo",
+		"5160 - Fornecimento de mercadoria adquirida ou recebida de terceiros de ato cooperativo",
+		"5401 - Venda de produção do estabelecimento em operação com produto sujeito ao regime de substituição tributária, na condição de contribuinte substituto",
+		"5402 - Venda de produção do estabelecimento de produto sujeito ao regime de substituição tributária, em operação entre contribuintes substitutos do mesmo produto",
+		"5551 - Venda de bem do ativo imobilizado",
+	},
 	REMESSA: [22]string{
 		"5131 - Remessa de produção do estabelecimento, com previsão de posterior ajuste ou fixação de preço, de ato cooperativo",
 		"5132 - Fixação de preço de produção do estabelecimento, inclusive quando remetidas anteriormente com previsão de posterior ajuste ou fixação de preço de ato cooperativo",
@@ -96,7 +97,8 @@ var InvoiceCfops = &SiareInvoiceCfops{
 		"5920 - Remessa de vasilhame ou sacaria",
 		"5923 - Remessa de mercadoria por conta e ordem de terceiros, em venda à ordem",
 		"5924 - Remessa para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente",
-		"5934 - Remessa simbólica de mercadoria depositada em armazém geral ou depósito fechado"},
+		"5934 - Remessa simbólica de mercadoria depositada em armazém geral ou depósito fechado",
+	},
 }
 
 type SiareInvoiceIcmsOptions [3]string
