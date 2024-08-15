@@ -1,6 +1,7 @@
 package models
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -49,6 +50,7 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 		id = 0
 	}
 
+
 	entity := &Entity{
 		ID:       id,
 		Name:     strings.TrimSpace(c.FormValue("name")),
@@ -66,10 +68,14 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 		},
 	}
 
+	re := regexp.MustCompile(`[ ./]`)
+	entity.Ie = re.ReplaceAllString(entity.Ie, "")
+
 	ies := c.FormValue("other_ies")
 	if ies != "" {
 		for _, ie := range strings.Split(ies, ",") {
-			entity.OtherIes = append(entity.OtherIes, strings.TrimSpace(ie))
+			ie = re.ReplaceAllString(ie, "")
+			entity.OtherIes = append(entity.OtherIes, ie)
 		}
 	}
 

@@ -163,7 +163,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				</section>
 			}
 			if len(m.Records) != 0 {
-				<section class="rounded border border-gray-400 ">
+				<section class="rounded border border-gray-400">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "record"), metricsResultChevronIconTarget(m, "record")) }
 						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
@@ -241,9 +241,6 @@ templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult) {
 templ MetricsResultData(r *models.MetricsResult) {
 	<ul class="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 xl:grid-cols-3">
 		if r.Type == "record" {
-			<li>
-				<strong>Remetente</strong>: <span>{ r.InvoiceSender }</span>
-			</li>
 			if r.IsPositive {
 				<li>
 					<strong>Lucro</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>
@@ -255,6 +252,9 @@ templ MetricsResultData(r *models.MetricsResult) {
 			}
 			<li>
 				<strong>Data de emissão</strong>: <span>{ utils.FormatDateAsBR(r.IssueDate) } </span>
+			</li>
+			<li class="col-span-full">
+				<strong>Remetente</strong>: <span>{ r.InvoiceSender }</span>
 			</li>
 			@DownloadInvoiceFromMetricsRecordButton(r)
 		} else {
