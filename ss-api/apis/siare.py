@@ -470,7 +470,9 @@ class Siare(Browser):
         if entity.other_ies is None:
             entity.other_ies = []
 
-        is_income = entity.ie == invoice_sender_ie or invoice_sender_ie in entity.other_ies
+        is_income = (
+            entity.ie == invoice_sender_ie or invoice_sender_ie in entity.other_ies
+        )
         if is_income:
             results.total_income += invoice_value
             results.positive_entries += 1
@@ -479,7 +481,9 @@ class Siare(Browser):
             results.negative_entries += 1
 
         if results.include_records:
-            self.include_individual_record(results, data, is_income, invoice_value)
+            self.include_individual_record(
+                results, data, is_income, invoice_value, invoice_sender_ie
+            )
 
     def include_individual_record(
         self,
@@ -487,6 +491,7 @@ class Siare(Browser):
         row_data: list[WebElement],
         is_income: bool,
         invoice_value: float,
+        invoice_sender: str,
     ):
         raw_issue_date = normalize_text(row_data[5].text)
         formated_issue_date = datetime.strptime(raw_issue_date, "%d/%m/%Y").strftime(
@@ -500,9 +505,12 @@ class Siare(Browser):
             is_child=True,
             kind="record",
             invoice_id=invoice_id,
+            invoice_sender=invoice_sender,
         )
 
-        if is_income:
+        individual_record.is_positive = is_income
+
+        if individual_record.is_positive:
             individual_record.total_income = invoice_value
         else:
             individual_record.total_expenses = invoice_value
