@@ -1,11 +1,13 @@
 package components
 
-import "github.com/cayo-rodrigues/nff/web/models"
-import "fmt"
-import "github.com/cayo-rodrigues/nff/web/ui/shared"
-import "github.com/cayo-rodrigues/nff/web/ui/scripts"
-import "github.com/cayo-rodrigues/nff/web/utils"
-import "strconv"
+import (
+	"fmt"
+	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/ui/scripts"
+	"github.com/cayo-rodrigues/nff/web/ui/shared"
+	"github.com/cayo-rodrigues/nff/web/utils"
+	"strconv"
+)
 
 templ MetricsList(metricsByDate []map[string][]*models.Metrics) {
 	<section
@@ -173,8 +175,8 @@ templ MetricsResultsDetails(m *models.Metrics) {
 					</header>
 					<div id={ metricsResultDataID(m, "record") } class="hidden">
 						for _, r := range m.Records {
-							<div class="relative odd:bg-teal-50">
-								<h4 class="px-4 py-2 text-lg italic">NFA-{ r.InvoiceNumber }</h4>
+							<div class="relative odd:bg-sky-50">
+								<h4 class="px-4 py-2 text-lg">NFA-{ r.InvoiceNumber }</h4>
 								@MetricsResultData(r)
 								<hr/>
 							</div>
@@ -240,11 +242,17 @@ templ MetricsResultData(r *models.MetricsResult) {
 	<ul class="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 xl:grid-cols-3">
 		if r.Type == "record" {
 			<li>
-				<strong>Lucro</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>
+				<strong>Remetente</strong>: <span>{ r.InvoiceSender }</span>
 			</li>
-			<li>
-				<strong>Despesa</strong>: <span class="text-red-600">R$ { r.TotalExpenses }</span>
-			</li>
+			if r.IsPositive {
+				<li>
+					<strong>Lucro</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>
+				</li>
+			} else {
+				<li>
+					<strong>Despesa</strong>: <span class="text-red-600">R$ { r.TotalExpenses }</span>
+				</li>
+			}
 			<li>
 				<strong>Data de emissão</strong>: <span>{ utils.FormatDateAsBR(r.IssueDate) } </span>
 			</li>

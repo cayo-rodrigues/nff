@@ -60,6 +60,7 @@ type MetricsResult struct {
 	InvoiceNumber   string           `json:"invoice_id"` // AJUSTAR NOME NA SS-API para invoice_number
 	InvoicePDF      string           `json:"invoice_pdf"`
 	IssueDate       time.Time        `json:"issue_date"`
+	InvoiceSender   string           `json:"invoice_sender"`
 	Months          []*MetricsResult `json:"months"`
 	Records         []*MetricsResult `json:"records"`
 	Total           *MetricsResult   `json:"total"`
@@ -142,6 +143,6 @@ func (r *MetricsResult) Values() []any {
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
 		&r.IssueDate, &r.InvoiceNumber, &r.EntityID,
-		&r.InvoicePDF,
+		&r.InvoicePDF, &r.InvoiceSender,
 	}
 }
