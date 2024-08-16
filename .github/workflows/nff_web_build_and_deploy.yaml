@@ -56,7 +56,7 @@ jobs:
     env:
       WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
       PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-      HOSTNAME: ${{ secrets.EC2_SSH_HOST }}
+      HOSTNAME: ${{ secrets.EC2_SSH_HOST_2 }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
       RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
       ELASTICACHE_URL: ${{ secrets.ELASTICACHE_URL }}
@@ -70,10 +70,10 @@ jobs:
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
-            sudo docker system prune -af --volumes &&
-            sudo docker ps -q | xargs -r sudo docker stop &&
-            sudo docker ps -q | xargs -r sudo docker rm &&
-            sudo docker run \
+            docker system prune -af --volumes &&
+            docker ps -q | xargs -r docker stop &&
+            docker ps -q | xargs -r docker rm &&
+            docker run \
               --rm \
               --detach \
               --name nff-web \
@@ -87,7 +87,7 @@ jobs:
               -e REDIS_URL=$ELASTICACHE_URL \
               -e SS_API_BASE_URL=$SS_API_BASE_URL \
               $WEB_IMAGE_TAG &&
-            sudo docker system prune -af --volumes
+            docker system prune -af --volumes
           "
 
       - name: Clean up private key

@@ -15,6 +15,22 @@ func (f *Filters) Where(condition string) *Filters {
 	return f
 }
 
+func (f *Filters) In(values []any) *Filters {
+	f.query.WriteString(" IN (")
+
+	for i, v := range values {
+		f.Placeholder(v)
+
+		if i != len(values)-1 {
+			f.query.WriteString(", ")
+		}
+	}
+
+	f.query.WriteString(")")
+
+	return f
+}
+
 func (f *Filters) And(condition ...string) *Filters {
 	conditionsCount := len(condition)
 	if conditionsCount == 0 {
@@ -90,7 +106,7 @@ func (f *Filters) Desc() *Filters {
 	return f
 }
 
-func (f *Filters) Between(x, y any) *Filters  {
+func (f *Filters) Between(x, y any) *Filters {
 	f.query.WriteString(" BETWEEN ")
 	f.Placeholder(x).And("").Placeholder(y)
 	return f

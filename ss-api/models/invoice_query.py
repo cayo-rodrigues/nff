@@ -5,7 +5,7 @@ from constants.db import MandatoryFields, PrettyModelFields
 from models.entity import Entity
 
 
-class InvoiceQueryResults():
+class InvoiceQueryResults:
     def __init__(self, **data) -> None:
         self.positive_entries: int = data.get("positive_entries", 0)
         self.negative_entries: int = data.get("negative_entries", 0)
@@ -29,6 +29,8 @@ class InvoiceQueryResults():
         self.issue_date: str = data.get("issue_date", "")
         self.pdf_url: str = data.get("pdf_url", "")
         self.invoice_id: str = data.get("invoice_id", "")
+
+        self.invoice_sender: str = data.get("invoice_sender", "")
 
         self.include_records: bool = data.get("include_records", False)
 
@@ -85,16 +87,20 @@ class InvoiceQueryResults():
         results = {
             "total_income": self.pretty_total_income,
             "total_expenses": self.pretty_total_expenses,
+            "is_positive": self.is_positive,
         }
 
         if self.kind == "month":
             results.update({"month_name": self.month_name})
 
         if self.kind == "record":
-            results.update({
-                "issue_date": self.issue_date,
-                "invoice_id": self.invoice_id,
-            })
+            results.update(
+                {
+                    "issue_date": self.issue_date,
+                    "invoice_id": self.invoice_id,
+                    "invoice_sender": self.invoice_sender,
+                }
+            )
 
         if self.kind != "record":
             results.update(
@@ -105,7 +111,6 @@ class InvoiceQueryResults():
                     "positive_records": self.positive_entries,
                     "negative_records": self.negative_entries,
                     "diff": self.pretty_diff,
-                    "is_positive": self.is_positive,
                 }.items()
             )
 

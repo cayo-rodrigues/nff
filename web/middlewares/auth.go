@@ -37,7 +37,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	services.SaveUserSession(c, userID)
 
 	// save user data to request context
-	userData := &utils.UserData{
+	userData := &utils.ReqUserData{
 		ID:              userID,
 		IsAuthenticated: isAuthenticated,
 	}

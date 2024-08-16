@@ -6,7 +6,8 @@ import "github.com/cayo-rodrigues/nff/web/models"
 
 type SSApiInvoiceRequest struct {
 	*models.Invoice
-	ShouldDownload bool `json:"should_download"`
+	ShouldDownload     bool `json:"should_download"`
+	ShouldAbortMission bool `json:"should_abort_mission"`
 }
 
 type SSApiInvoiceResponse struct {

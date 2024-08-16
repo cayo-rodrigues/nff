@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,7 +19,7 @@ type Metrics struct {
 	CreatedBy int
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Errors    ErrorMessages
+	Errors    safe.ErrorMessages
 	*MetricsResult
 }
 
@@ -59,6 +60,7 @@ type MetricsResult struct {
 	InvoiceNumber   string           `json:"invoice_id"` // AJUSTAR NOME NA SS-API para invoice_number
 	InvoicePDF      string           `json:"invoice_pdf"`
 	IssueDate       time.Time        `json:"issue_date"`
+	InvoiceSender   string           `json:"invoice_sender"`
 	Months          []*MetricsResult `json:"months"`
 	Records         []*MetricsResult `json:"records"`
 	Total           *MetricsResult   `json:"total"`
@@ -109,19 +111,19 @@ func NewMetricsFromForm(c *fiber.Ctx) *Metrics {
 }
 
 func (m *Metrics) IsValid() bool {
-	fields := Fields{
+	fields := safe.Fields{
 		{
 			Name:  "StartDate",
 			Value: m.StartDate,
-			Rules: Rules(Required, NotAfter(m.EndDate), MaxTimeRange(m.EndDate, 365)),
+			Rules: safe.Rules{safe.Required(), safe.NotAfter(m.EndDate), safe.MaxDaysRange(m.EndDate, 365)},
 		},
 		{
 			Name:  "EndDate",
 			Value: m.EndDate,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 	}
-	errors, ok := Validate(fields)
+	errors, ok := safe.Validate(fields)
 	m.Errors = errors
 	return ok
 }
@@ -141,6 +143,6 @@ func (r *MetricsResult) Values() []any {
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
 		&r.IssueDate, &r.InvoiceNumber, &r.EntityID,
-		&r.InvoicePDF,
+		&r.InvoicePDF, &r.InvoiceSender,
 	}
 }

@@ -35,8 +35,10 @@ func RetrievePrinting(ctx context.Context, printingID int) (*models.InvoicePrint
 	return storage.RetrieveInvoicePrinting(ctx, printingID, userID)
 }
 
-func CreatePrintingFromMetricsRecord(ctx context.Context, invoiceNumber string, entityID, userID int) (*models.InvoicePrint, error) {
-	entity, err := RetrieveEntity(ctx, entityID, userID)
+func CreatePrintingFromMetricsRecord(ctx context.Context, invoiceNumber string, entityID int) (*models.InvoicePrint, error) {
+	userID := utils.GetUserID(ctx)
+
+	entity, err := RetrieveEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
 	}

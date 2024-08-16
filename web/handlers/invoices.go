@@ -25,7 +25,7 @@ func InvoicesPage(c *fiber.Ctx) error {
 		return err
 	}
 
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
@@ -37,8 +37,7 @@ func InvoicesPage(c *fiber.Ctx) error {
 }
 
 func GetInvoiceForm(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
@@ -63,12 +62,12 @@ func GetInvoiceForm(c *fiber.Ctx) error {
 }
 
 func GetSenderIeInput(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	entityID, err := strconv.Atoi(c.Query("sender"))
 	if err != nil {
 		return err
 	}
-	entity, err := services.RetrieveEntity(c.Context(), entityID, userID)
+
+	entity, err := services.RetrieveEntity(c.Context(), entityID)
 
 	return Render(c, shared.SelectInput(&shared.InputData{
 		ID:      "sender_ie",
@@ -78,17 +77,43 @@ func GetSenderIeInput(c *fiber.Ctx) error {
 	}))
 }
 
-func CreateInvoice(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
-	invoice := models.NewInvoiceFromForm(c)
-
-	sender, err := services.RetrieveEntity(c.Context(), invoice.Sender.ID, userID)
+func GetRecipientIeInput(c *fiber.Ctx) error {
+	entityID, err := strconv.Atoi(c.Query("recipient"))
 	if err != nil {
 		return err
 	}
 
-	recipient, err := services.RetrieveEntity(c.Context(), invoice.Recipient.ID, userID)
+	entity, err := services.RetrieveEntity(c.Context(), entityID)
+
+	return Render(c, shared.SelectInput(&shared.InputData{
+		ID:      "recipient_ie",
+		Label:   "IE do Destinatário",
+		Value:   entity.Ie,
+		Options: &shared.InputOptions{StringOptions: entity.AllIes()},
+	}))
+}
+
+func GetCfopsInput(c *fiber.Ctx) error {
+	operation := c.Query("operation")
+
+	return Render(c, shared.SelectInput(&shared.InputData{
+		ID:            "cfop",
+		Label:         "CFOP",
+		Options:       &shared.InputOptions{StringOptions: models.InvoiceCfops.ByOperation(operation)},
+		HxIndicatorID: "invoice-cfops-indicator",
+	}))
+}
+
+func CreateInvoice(c *fiber.Ctx) error {
+
+	invoice := models.NewInvoiceFromForm(c)
+
+	sender, err := services.RetrieveEntity(c.Context(), invoice.Sender.ID)
+	if err != nil {
+		return err
+	}
+
+	recipient, err := services.RetrieveEntity(c.Context(), invoice.Recipient.ID)
 	if err != nil {
 		return err
 	}
@@ -96,7 +121,7 @@ func CreateInvoice(c *fiber.Ctx) error {
 	invoice.Sender = sender
 	invoice.Recipient = recipient
 
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
@@ -105,11 +130,10 @@ func CreateInvoice(c *fiber.Ctx) error {
 		return Render(c, forms.InvoiceForm(invoice, entities))
 	}
 
-	err = services.CreateInvoice(c.Context(), invoice, userID)
+	err = services.CreateInvoice(c.Context(), invoice)
 	if err != nil {
 		return err
 	}
-
 
 	ssapi := siare.GetSSApiClient()
 	go ssapi.IssueInvoice(invoice)

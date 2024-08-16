@@ -87,6 +87,7 @@ func BulkCreateMetricsResults(ctx context.Context, results []*models.MetricsResu
 			result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
 			result.MetricsID, result.CreatedBy,
 			result.IssueDate, result.InvoiceNumber, result.EntityID,
+			result.InvoiceSender,
 		})
 	}
 
@@ -101,6 +102,7 @@ func BulkCreateMetricsResults(ctx context.Context, results []*models.MetricsResu
 			"total_records", "positive_records", "negative_records",
 			"metrics_id", "created_by",
 			"issue_date", "invoice_id", "entity_id",
+			"invoice_sender",
 		},
 		pgx.CopyFromRows(rows),
 	)

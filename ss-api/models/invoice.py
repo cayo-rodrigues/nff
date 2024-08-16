@@ -15,7 +15,7 @@ class Invoice(Printable):
     def __init__(self, data: dict) -> None:
         self.operation: str = normalize_text(data.get("operation"))
         self.gta: str = normalize_text(data.get("gta"))
-        self.cfop: str = normalize_text(data.get("cfop"), keep_case=True)
+        self.cfop: str = normalize_text(data.get("cfop"))
         self.is_final_customer: bool | None = str_to_boolean(data.get("is_final_customer"))
         self.icms: str = decode_icms_contributor_status(data.get("icms"))
         self.shipping: str = to_BRL(data.get("shipping"))
@@ -33,6 +33,7 @@ class Invoice(Printable):
         self.recipient: Entity = Entity(data.get("recipient", {}))
 
         self.sender_ie: str = normalize_text(data.get("sender_ie", ""), keep_case=True)
+        self.recipient_ie: str = normalize_text(data.get("recipient_ie", ""), keep_case=True)
 
         self.items: list[InvoiceItem] = [
             InvoiceItem(data=item) for item in data.get("items", [])

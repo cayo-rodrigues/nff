@@ -6,23 +6,24 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
 )
 
 type InvoicePrint struct {
 	ID                   int
-	InvoiceID            string        `json:"invoice_id"` // ATUALIZAR SS-API PARA USAR invoice_number_or_protocol
-	InvoiceIDType        string        `json:"invoice_id_type"`
-	InvoicePDF           string        `json:"invoice_pdf"`
-	Entity               *Entity       `json:"entity"`
-	ReqStatus            string        `json:"-"`
-	ReqMsg               string        `json:"-"`
-	CreatedBy            int           `json:"-"`
-	CreatedAt            time.Time     `json:"-"`
-	UpdatedAt            time.Time     `json:"-"`
-	CustomFileNamePrefix string        `json:"custom_file_name"` // ATUALIZAR SS-API PARA USAR custom_file_name_prefix
-	FileName             string        `json:"file_name"`
-	Errors               ErrorMessages `json:"-"`
+	InvoiceID            string             `json:"invoice_id"` // ATUALIZAR SS-API PARA USAR invoice_number_or_protocol
+	InvoiceIDType        string             `json:"invoice_id_type"`
+	InvoicePDF           string             `json:"invoice_pdf"`
+	Entity               *Entity            `json:"entity"`
+	ReqStatus            string             `json:"-"`
+	ReqMsg               string             `json:"-"`
+	CreatedBy            int                `json:"-"`
+	CreatedAt            time.Time          `json:"-"`
+	UpdatedAt            time.Time          `json:"-"`
+	CustomFileNamePrefix string             `json:"custom_file_name"` // ATUALIZAR SS-API PARA USAR custom_file_name_prefix
+	FileName             string             `json:"file_name"`
+	Errors               safe.ErrorMessages `json:"-"`
 }
 
 func (p *InvoicePrint) AsNotification() *Notification {
@@ -76,19 +77,24 @@ func NewInvoicePrintFromForm(c *fiber.Ctx) *InvoicePrint {
 }
 
 func (p *InvoicePrint) IsValid() bool {
-	fields := Fields{
+	fields := safe.Fields{
 		{
 			Name:  "InvoiceID",
 			Value: p.InvoiceID,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 		{
 			Name:  "CustomFileNamePrefix",
 			Value: p.CustomFileNamePrefix,
-			Rules: Rules(Max(64)),
+			Rules: safe.Rules{safe.Max(64)},
+		},
+		{
+			Name:  "Entity",
+			Value: p.Entity,
+			Rules: safe.Rules{safe.Required()},
 		},
 	}
-	errors, ok := Validate(fields)
+	errors, ok := safe.Validate(fields)
 	p.Errors = errors
 
 	if !p.InvoiceIDFormatIsValid() {
@@ -100,7 +106,7 @@ func (p *InvoicePrint) IsValid() bool {
 
 func (p *InvoicePrint) InvoiceIDFormatIsValid() bool {
 	if p.Errors == nil {
-		p.Errors = make(ErrorMessages)
+		p.Errors = make(safe.ErrorMessages)
 	}
 	_, hasVal := p.Errors["InvoiceID"]
 	if hasVal {

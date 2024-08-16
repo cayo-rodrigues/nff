@@ -15,15 +15,14 @@ import (
 )
 
 func MetricsPage(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
 
 	filters := c.Queries()
 
-	metricsList, err := services.ListMetrics(c.Context(), userID, filters)
+	metricsList, err := services.ListMetrics(c.Context(), filters)
 	if err != nil {
 		return err
 	}
@@ -41,13 +40,13 @@ func GenerateMetrics(c *fiber.Ctx) error {
 
 	metrics := models.NewMetricsFromForm(c)
 
-	entity, err := services.RetrieveEntity(c.Context(), metrics.Entity.ID, userID)
+	entity, err := services.RetrieveEntity(c.Context(), metrics.Entity.ID)
 	if err != nil {
 		return err
 	}
 	metrics.Entity = entity
 
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
@@ -69,9 +68,8 @@ func GenerateMetrics(c *fiber.Ctx) error {
 }
 
 func ListMetrics(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
-	metrics, err := services.ListMetrics(c.Context(), userID, filters)
+	metrics, err := services.ListMetrics(c.Context(), filters)
 	if err != nil {
 		return err
 	}
@@ -94,7 +92,7 @@ func GetMetricsForm(c *fiber.Ctx) error {
 		return err
 	}
 
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}

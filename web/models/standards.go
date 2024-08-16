@@ -4,14 +4,7 @@ import (
 	"regexp"
 )
 
-var EmailRegex = regexp.MustCompile(`[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+`)
-var PhoneRegex = regexp.MustCompile(`(?:(?:\+|00)?(55)\s?)?(?:\(?([1-9][0-9])\)?\s?)(?:((?:9\d|[2-9])\d{3})\-?(\d{4}))`)
-var WhateverRegex = regexp.MustCompile(`.*`)
 var IEMGRegex = regexp.MustCompile(`^\d{3}.?\d{3}.?\d{3}\/?\d{4}$`)
-var CPFRegex = regexp.MustCompile(`^\d{3}.?\d{3}.?\d{3}\-?\d{2}$`)
-var CNPJRegex = regexp.MustCompile(`^(\d{2}.?\d{3}.?\d{3}\/?\d{4}\-?\d{2})$`)
-var PostalCodeRegex = regexp.MustCompile(`(^\d{5})\-?(\d{3}$)`)
-var AddressNumberRegex = regexp.MustCompile(`^(?:s\/n|S\/n|S\/N|s\/N)|^(\d)*$`)
 var SiareNFANumberRegex = regexp.MustCompile(`^(\d{3}\.\d{3}\.\d{3}|\d{9})$`)
 var SiareNFAProtocolRegex = regexp.MustCompile(`^(\d{13})$`)
 var GTARegex = regexp.MustCompile(`^([a-zA-Z]-\d{1,6}(;\s*[a-zA-Z]-\d{1,6})*$)`)
@@ -43,23 +36,69 @@ var InvoiceOperations = SiareInvoiceOperations{
 	"REMESSA",
 }
 
-type SiareInvoiceCfops [14]int
+func (o *SiareInvoiceOperations) VENDA() string {
+	return o[0]
+}
 
-var InvoiceCfops = SiareInvoiceCfops{
-	5101,
-	5102,
-	5103,
-	5105,
-	5111,
-	5113,
-	5116,
-	5118,
-	5122,
-	5159,
-	5160,
-	5401,
-	5402,
-	5551,
+func (o *SiareInvoiceOperations) REMESSA() string {
+	return o[1]
+}
+
+type SiareInvoiceCfops struct {
+	VENDA   [14]string
+	REMESSA [22]string
+}
+
+func (cfops *SiareInvoiceCfops) ByOperation(invoiceOperation string) []string {
+	switch invoiceOperation {
+	case InvoiceOperations.VENDA():
+		return cfops.VENDA[:]
+	default:
+		return cfops.REMESSA[:]
+	}
+}
+
+var InvoiceCfops = &SiareInvoiceCfops{
+	VENDA: [14]string{
+		"5101 - Venda de produção do estabelecimento",
+		"5102 - Venda de mercadoria adquirida ou recebida de terceiros, ou qualquer venda de mercadoria efetuada pelo MEI com exceção das saídas classificadas nos códigos 5.501, 5.502, 5.504 e 5.505.",
+		"5103 - Venda de produção do estabelecimento, efetuada fora do estabelecimento",
+		"5105 - Venda de produção do estabelecimento que não deva por ele transitar",
+		"5111 - Venda de produção do estabelecimento remetida anteriormente em consignação industrial",
+		"5113 - Venda de produção do estabelecimento remetida anteriormente em consignação mercantil",
+		"5116 - Venda de produção do estabelecimento originada de encomenda para entrega futura",
+		"5118 - Venda de produção do estabelecimento entregue ao destinatário por conta e ordem do adquirente originário, em venda à ordem",
+		"5122 - Venda de produção do estabelecimento remetida para industrialização, por conta e ordem do adquirente, sem transitar pelo estabelecimento do adquirente",
+		"5159 - Fornecimento de produção do estabelecimento de ato cooperativo",
+		"5160 - Fornecimento de mercadoria adquirida ou recebida de terceiros de ato cooperativo",
+		"5401 - Venda de produção do estabelecimento em operação com produto sujeito ao regime de substituição tributária, na condição de contribuinte substituto",
+		"5402 - Venda de produção do estabelecimento de produto sujeito ao regime de substituição tributária, em operação entre contribuintes substitutos do mesmo produto",
+		"5551 - Venda de bem do ativo imobilizado",
+	},
+	REMESSA: [22]string{
+		"5131 - Remessa de produção do estabelecimento, com previsão de posterior ajuste ou fixação de preço, de ato cooperativo",
+		"5132 - Fixação de preço de produção do estabelecimento, inclusive quando remetidas anteriormente com previsão de posterior ajuste ou fixação de preço de ato cooperativo",
+		"5414 - Remessa de produção do estabelecimento para venda fora do estabelecimento em operação com produto sujeito ao regime de substituição tributária",
+		"5415 - Remessa de mercadoria adquirida ou recebida de terceiros para venda fora do estabelecimento, em operação com mercadoria sujeita ao regime de substituição tributária",
+		"5451 - Remessa de animal e de insumo para estabelecimento produtor",
+		"5452 - Remessa de insumo - Sistema de Integração e Parceria Rural",
+		"5501 - Remessa de produção do estabelecimento, com fim específico de exportação",
+		"5554 - Remessa de bem do ativo imobilizado para uso fora do estabelecimento",
+		"5901 - Remessa para industrialização por encomenda",
+		"5904 - Remessa para venda fora do estabelecimento, ou qualquer remessa efetuada pelo MEI com exceção das classificadas nos códigos 5.502 e 5.505.",
+		"5905 - Remessa para depósito fechado ou armazém geral",
+		"5908 - Remessa de bem por conta de contrato de comodato",
+		"5910 - Remessa em bonificação, doação ou brinde",
+		"5911 - Remessa de amostra grátis",
+		"5912 - Remessa de mercadoria ou bem para demonstração",
+		"5914 - Remessa de mercadoria ou bem para exposição ou feira",
+		"5915 - Remessa de mercadoria ou bem para conserto ou reparo",
+		"5917 - Remessa de mercadoria em consignação mercantil ou industrial",
+		"5920 - Remessa de vasilhame ou sacaria",
+		"5923 - Remessa de mercadoria por conta e ordem de terceiros, em venda à ordem",
+		"5924 - Remessa para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente",
+		"5934 - Remessa simbólica de mercadoria depositada em armazém geral ou depósito fechado",
+	},
 }
 
 type SiareInvoiceIcmsOptions [3]string
@@ -97,6 +136,8 @@ var InvoiceIDTypes = SiareInvoiceIDTypes{
 }
 
 // INVOICE ITEMS
+
+var InvoiceItemDefaultNCM = "94019900"
 
 type SiareInvoiceItemGroups [82]string
 

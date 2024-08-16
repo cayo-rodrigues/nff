@@ -24,7 +24,7 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 		return err
 	}
 
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
@@ -40,14 +40,14 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 func PrintInvoice(c *fiber.Ctx) error {
 	userID := utils.GetUserData(c.Context()).ID
 
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}
 
 	printing := models.NewInvoicePrintFromForm(c)
 
-	entity, err := services.RetrieveEntity(c.Context(), printing.Entity.ID, userID)
+	entity, err := services.RetrieveEntity(c.Context(), printing.Entity.ID)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func PrintInvoice(c *fiber.Ctx) error {
 }
 
 func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
+	userID := utils.GetUserID(c.Context())
 
 	recordID, err := c.ParamsInt("record_id")
 	if err != nil {
@@ -82,7 +82,7 @@ func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
 		return err
 	}
 
-	printing, err := services.CreatePrintingFromMetricsRecord(c.Context(), invoiceNumber, entityID, userID)
+	printing, err := services.CreatePrintingFromMetricsRecord(c.Context(), invoiceNumber, entityID)
 
 	ssapi := siare.GetSSApiClient()
 	go ssapi.PrintInvoiceFromMetricsRecord(printing, recordID, userID)
@@ -107,9 +107,7 @@ func ListInvoicePrintings(c *fiber.Ctx) error {
 }
 
 func GetPrintInvoiceForm(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
-	entities, err := services.ListEntities(c.Context(), userID)
+	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
 	}

@@ -8,7 +8,9 @@ import (
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func ListCancelings(ctx context.Context, userID int, filters ...map[string]string) ([]*models.InvoiceCancel, error) {
+func ListCancelings(ctx context.Context, filters ...map[string]string) ([]*models.InvoiceCancel, error) {
+	userID := utils.GetUserID(ctx)
+
 	f := models.NewFilters().Where("invoices_cancelings.created_by = ").Placeholder(userID)
 
 	if filters == nil {
@@ -25,17 +27,19 @@ func ListCancelings(ctx context.Context, userID int, filters ...map[string]strin
 	return storage.ListInvoiceCancelings(ctx, userID, f)
 }
 
-func CreateCanceling(ctx context.Context, c *models.InvoiceCancel, userID int) error {
-	c.CreatedBy = userID
+func CreateCanceling(ctx context.Context, c *models.InvoiceCancel) error {
+	c.CreatedBy = utils.GetUserID(ctx)
 	return storage.CreateInvoiceCanceling(ctx, c)
 }
 
 func RetrieveCanceling(ctx context.Context, cancelingID int) (*models.InvoiceCancel, error) {
-	userID := utils.GetUserData(ctx).ID
+	userID := utils.GetUserID(ctx)
 	return storage.RetrieveInvoiceCanceling(ctx, cancelingID, userID)
 }
 
-func CreateCancelingFromInvoiceID(ctx context.Context, invoiceID, userID int) (*models.InvoiceCancel, error) {
+func CreateCancelingFromInvoiceID(ctx context.Context, invoiceID int) (*models.InvoiceCancel, error) {
+	userID := utils.GetUserID(ctx)
+
 	invoice, err := RetrieveInvoice(ctx, invoiceID)
 	if err != nil {
 		return nil, err

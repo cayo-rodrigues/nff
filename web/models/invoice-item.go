@@ -5,23 +5,24 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
 )
 
 type InvoiceItem struct {
-	ID                 int           `json:"-"`
-	Group              string        `json:"group"`
-	Description        string        `json:"description"`
-	Origin             string        `json:"origin"`
-	UnityOfMeasurement string        `json:"unity_of_measurement"`
-	Quantity           float64       `json:"quantity"`
-	ValuePerUnity      float64       `json:"value_per_unity"`
-	InvoiceID          int           `json:"-"`
-	CreatedBy          int           `json:"-"`
-	CreatedAt          time.Time     `json:"-"`
-	UpdatedAt          time.Time     `json:"-"`
-	NCM                string        `json:"ncm"`
-	Errors             ErrorMessages `json:"-"`
+	ID                 int                `json:"-"`
+	Group              string             `json:"group"`
+	Description        string             `json:"description"`
+	Origin             string             `json:"origin"`
+	UnityOfMeasurement string             `json:"unity_of_measurement"`
+	Quantity           float64            `json:"quantity"`
+	ValuePerUnity      float64            `json:"value_per_unity"`
+	InvoiceID          int                `json:"-"`
+	CreatedBy          int                `json:"-"`
+	CreatedAt          time.Time          `json:"-"`
+	UpdatedAt          time.Time          `json:"-"`
+	NCM                string             `json:"ncm"`
+	Errors             safe.ErrorMessages `json:"-"`
 }
 
 func NewInvoiceItem() *InvoiceItem {
@@ -48,6 +49,9 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
 
 		item.Group = utils.TrimSpaceBytes(groups[i])
 		item.NCM = utils.TrimSpaceBytes(ncms[i])
+		if item.NCM == "" {
+			item.NCM = InvoiceItemDefaultNCM
+		}
 		item.Description = utils.TrimSpaceBytes(descriptions[i])
 		item.Origin = utils.TrimSpaceBytes(origins[i])
 		item.UnityOfMeasurement = utils.TrimSpaceBytes(unitiesOfMeasurement[i])
@@ -67,44 +71,44 @@ func NewInvoiceItemsFromForm(c *fiber.Ctx) []*InvoiceItem {
 }
 
 func (i *InvoiceItem) IsValid() bool {
-	fields := Fields{
+	fields := safe.Fields{
 		{
 			Name:  "Group",
 			Value: i.Group,
-			Rules: Rules(OneOf(InvoiceItemGroups[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceItemGroups[:])},
 		},
 		{
 			Name:  "NCM",
 			Value: i.NCM,
-			Rules: Rules(Max(16)),
+			Rules: safe.Rules{safe.Max(16)},
 		},
 		{
 			Name:  "Description",
 			Value: i.Description,
-			Rules: Rules(Required, Max(128)),
+			Rules: safe.Rules{safe.Required(), safe.Max(128)},
 		},
 		{
 			Name:  "Origin",
 			Value: i.Origin,
-			Rules: Rules(OneOf(InvoiceItemOrigins[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceItemOrigins[:])},
 		},
 		{
 			Name:  "UnityOfMeasurement",
 			Value: i.UnityOfMeasurement,
-			Rules: Rules(OneOf(InvoiceItemUnitiesOfMeaasurement[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceItemUnitiesOfMeaasurement[:])},
 		},
 		{
 			Name:  "Quantity",
 			Value: i.Quantity,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 		{
 			Name:  "ValuePerUnity",
 			Value: i.ValuePerUnity,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 	}
-	errors, ok := Validate(fields)
+	errors, ok := safe.Validate(fields)
 	i.Errors = errors
 	return ok
 }

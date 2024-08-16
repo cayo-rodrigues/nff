@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -61,8 +63,9 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	defer finishOperation(ctx, c.DB.Redis, resourceName, invoice.CreatedBy, invoice)
 
 	reqBody := SSApiInvoiceRequest{
-		Invoice:        invoice,
-		ShouldDownload: true,
+		Invoice:            invoice,
+		ShouldDownload:     true,
+		ShouldAbortMission: false,
 	}
 
 	agent := fiber.Post(c.BaseUrl + c.Endpoints.IssueInvoice)
@@ -280,6 +283,53 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	metrics.MetricsResult = response.MetricsResult
 	metrics.ReqStatus = response.ReqStatus
 	metrics.ReqMsg = response.ReqMsg
+
+	otherEntitiesIes := []any{}
+	for _, record := range metrics.MetricsResult.Records {
+		if record.IsPositive {
+			record.InvoiceSender = fmt.Sprintf("%s - %s", record.InvoiceSender, metrics.Entity.Name)
+		} else {
+			otherEntitiesIes = append(otherEntitiesIes, record.InvoiceSender)
+		}
+	}
+	f := models.NewFilters().Where("ie").In(otherEntitiesIes).Or("other_ies && ").Placeholder(otherEntitiesIes)
+
+	query := new(strings.Builder)
+	query.WriteString("SELECT name, ie, other_ies FROM entities")
+	query.WriteString(f.String())
+
+	db := database.GetDB()
+
+	rows, _ := db.PG.Query(ctx, query.String(), f.Values()...)
+	defer rows.Close()
+
+	for rows.Next() {
+		var entityName, entityIe string
+		var entityOtherIes []string
+		if err := rows.Scan(&entityName, &entityIe, &entityOtherIes); err != nil {
+			log.Printf("Error scanning entity rows: %v", err)
+			continue
+		}
+
+		for _, record := range metrics.MetricsResult.Records {
+			if record.InvoiceSender == entityIe {
+				record.InvoiceSender = fmt.Sprintf("%s - %s", entityIe, entityName)
+				break
+			}
+			foundSecondaryIe := false
+			for _, secondaryIe := range entityOtherIes {
+				if record.InvoiceSender == secondaryIe {
+					record.InvoiceSender = fmt.Sprintf("%s - %s", secondaryIe, entityName)
+					foundSecondaryIe = true
+					break
+				}
+			}
+
+			if foundSecondaryIe {
+				break
+			}
+		}
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(4)

@@ -7,34 +7,36 @@ import (
 	"time"
 
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Invoice struct {
-	ID                   int            `json:"-"`
-	Number               string         `json:"invoice_id"` // TROCAR PARA invoice_number NA SS-API
-	Protocol             string         `json:"-"`
-	Operation            string         `json:"operation"`
-	Cfop                 int            `json:"cfop,string"`
-	IsFinalCustomer      string         `json:"is_final_customer"`
-	IsIcmsContributor    string         `json:"icms"`
-	Shipping             float64        `json:"shipping"`
-	AddShippingToTotal   string         `json:"add_shipping_to_total_value"`
-	Gta                  string         `json:"gta"`
-	Sender               *Entity        `json:"sender"`
-	SenderIe             string         `json:"sender_ie"`
-	Recipient            *Entity        `json:"recipient"`
-	ReqStatus            string         `json:"-"`
-	ReqMsg               string         `json:"-"`
-	PDF                  string         `json:"invoice_pdf"`
-	CreatedBy            int            `json:"-"`
-	CreatedAt            time.Time      `json:"-"`
-	UpdatedAt            time.Time      `json:"-"`
-	ExtraNotes           string         `json:"extra_notes"`
-	CustomFileNamePrefix string         `json:"custom_file_name"` // TROCAR PARA custom_file_name_prefix NA SS-API
-	FileName             string         `json:"file_name"`
-	Items                []*InvoiceItem `json:"items"`
-	Errors               ErrorMessages  `json:"-"`
+	ID                   int                `json:"-"`
+	Number               string             `json:"invoice_id"` // TROCAR PARA invoice_number NA SS-API
+	Protocol             string             `json:"-"`
+	Operation            string             `json:"operation"`
+	Cfop                 string             `json:"cfop"`
+	IsFinalCustomer      string             `json:"is_final_customer"`
+	IsIcmsContributor    string             `json:"icms"`
+	Shipping             float64            `json:"shipping"`
+	AddShippingToTotal   string             `json:"add_shipping_to_total_value"`
+	Gta                  string             `json:"gta"`
+	Sender               *Entity            `json:"sender"`
+	SenderIe             string             `json:"sender_ie"`
+	RecipientIe          string             `json:"recipient_ie"`
+	Recipient            *Entity            `json:"recipient"`
+	ReqStatus            string             `json:"-"`
+	ReqMsg               string             `json:"-"`
+	PDF                  string             `json:"invoice_pdf"`
+	CreatedBy            int                `json:"-"`
+	CreatedAt            time.Time          `json:"-"`
+	UpdatedAt            time.Time          `json:"-"`
+	ExtraNotes           string             `json:"extra_notes"`
+	CustomFileNamePrefix string             `json:"custom_file_name"` // TROCAR PARA custom_file_name_prefix NA SS-API
+	FileName             string             `json:"file_name"`
+	Items                []*InvoiceItem     `json:"items"`
+	Errors               safe.ErrorMessages `json:"-"`
 }
 
 func (i *Invoice) AsNotification() *Notification {
@@ -73,10 +75,13 @@ func NewInvoiceWithSamples(entities []*Entity) *Invoice {
 	invoice := NewInvoice()
 	if len(entities) > 0 {
 		invoice.Sender = entities[0]
+		invoice.Recipient = entities[0]
 	}
 	if len(invoice.Items) == 0 {
 		invoice.Items = append(invoice.Items, NewInvoiceItem())
 	}
+
+	invoice.Operation = InvoiceOperations.VENDA()
 
 	return invoice
 }
@@ -87,10 +92,7 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	invoice := NewInvoice()
 
 	invoice.Operation = strings.TrimSpace(c.FormValue("operation"))
-	invoice.Cfop, err = utils.TrimSpaceInt(c.FormValue("cfop"))
-	if err != nil {
-		log.Println("Error converting invoice cfop from string to int: ", err)
-	}
+	invoice.Cfop = strings.TrimSpace(c.FormValue("cfop"))
 	invoice.IsIcmsContributor = strings.TrimSpace(c.FormValue("is_icms_contributor"))
 	invoice.IsFinalCustomer = strings.TrimSpace(c.FormValue("is_final_customer"))
 	invoice.Shipping, err = utils.TrimSpaceFloat64(c.FormValue("shipping"))
@@ -102,6 +104,7 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 	invoice.ExtraNotes = strings.TrimSpace(c.FormValue("extra_notes"))
 	invoice.CustomFileNamePrefix = strings.TrimSpace(c.FormValue("custom_file_name_prefix"))
 	invoice.SenderIe = strings.TrimSpace(c.FormValue("sender_ie"))
+	invoice.RecipientIe = strings.TrimSpace(c.FormValue("recipient_ie"))
 
 	senderID, err := strconv.Atoi(c.FormValue("sender"))
 	if err != nil {
@@ -122,69 +125,77 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 }
 
 func (i *Invoice) IsValid() bool {
-	fields := Fields{
+	fields := safe.Fields{
 		{
 			Name:  "Operation",
 			Value: i.Operation,
-			Rules: Rules(OneOf(InvoiceOperations[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceOperations[:])},
 		},
 		{
 			Name:  "Cfop",
 			Value: i.Cfop,
-			Rules: Rules(OneOf(InvoiceCfops[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceCfops.ByOperation(i.Operation)[:])},
 		},
 		{
 			Name:  "IsIcmsContributor",
 			Value: i.IsIcmsContributor,
-			Rules: Rules(OneOf(InvoiceIcmsOptions[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceIcmsOptions[:])},
 		},
 		{
 			Name:  "IsFinalCustomer",
 			Value: i.IsFinalCustomer,
-			Rules: Rules(OneOf(InvoiceBooleanField[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceBooleanField[:])},
 		},
 		{
 			Name:  "Shipping",
 			Value: i.Shipping,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 		{
 			Name:  "AddShippingToTotal",
 			Value: i.AddShippingToTotal,
-			Rules: Rules(OneOf(InvoiceBooleanField[:])),
+			Rules: safe.Rules{safe.OneOf(InvoiceBooleanField[:])},
 		},
 		{
 			Name:  "Gta",
 			Value: i.Gta,
-			Rules: Rules(Match(GTARegex), Max(16)),
+			Rules: safe.Rules{safe.Match(GTARegex), safe.Max(16)},
 		},
 		{
 			Name:  "ExtraNotes",
 			Value: i.ExtraNotes,
-			Rules: Rules(Max(512)),
+			Rules: safe.Rules{safe.Max(512)},
 		},
 		{
 			Name:  "CustomFileNamePrefix",
 			Value: i.CustomFileNamePrefix,
-			Rules: Rules(Max(64)),
+			Rules: safe.Rules{safe.Max(64)},
 		},
 		{
 			Name:  "SenderIe",
 			Value: i.SenderIe,
-			Rules: Rules(Required, Match(IEMGRegex)),
+			Rules: safe.Rules{safe.Required(), safe.Match(IEMGRegex)},
+		},
+		{
+			Name:  "RecipientIe",
+			Value: i.RecipientIe,
+			Rules: safe.Rules{
+				safe.RequiredUnless(safe.All(i.Recipient.Address.Values()...)),
+				safe.Match(IEMGRegex),
+			},
 		},
 		{
 			Name:  "Sender",
 			Value: i.Sender.ID,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 		{
 			Name:  "Recipient",
 			Value: i.Recipient.ID,
-			Rules: Rules(Required),
+			Rules: safe.Rules{safe.Required()},
 		},
 	}
-	errors, ok := Validate(fields)
+	errors, ok := safe.Validate(fields)
 	i.Errors = errors
 
 	for _, item := range i.Items {
@@ -199,6 +210,6 @@ func (i *Invoice) Values() []any {
 		&i.ID, &i.Number, &i.Protocol, &i.Operation, &i.Cfop, &i.IsFinalCustomer, &i.IsIcmsContributor,
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
 		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
-		&i.ExtraNotes, &i.CustomFileNamePrefix, &i.SenderIe, &i.FileName,
+		&i.ExtraNotes, &i.CustomFileNamePrefix, &i.SenderIe, &i.FileName, &i.RecipientIe,
 	}
 }
