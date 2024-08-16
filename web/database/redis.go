@@ -43,8 +43,8 @@ func (r *Redis) DestroyAllCachedData(ctx context.Context) string {
 	return cacheStatus
 }
 
-func (r *Redis) GetDecodedCache(ctx context.Context, userID int, namespace string, dest interface{}) error {
-	key := fmt.Sprintf("db:%v:the-route-doesnt-matter-here:%v", userID, namespace)
+func (r *Redis) GetDecodedCache(ctx context.Context, userID int, namespace string, filters string, dest interface{}) error {
+	key := fmt.Sprintf("db:%v:%v:%v", userID, filters, namespace)
 
 	cachedValue, err := r.Get(ctx, key).Bytes()
 	if err == redis.Nil {
@@ -65,8 +65,8 @@ func (r *Redis) GetDecodedCache(ctx context.Context, userID int, namespace strin
 	return nil
 }
 
-func (r *Redis) SetEncodedCache(ctx context.Context, userID int, namespace string, value interface{}, exp time.Duration) error {
-	key := fmt.Sprintf("db:%v:the-route-doesnt-matter-here:%v", userID, namespace)
+func (r *Redis) SetEncodedCache(ctx context.Context, userID int, namespace string, filters string, value interface{}, exp time.Duration) error {
+	key := fmt.Sprintf("db:%v:%v:%v", userID, filters, namespace)
 
 	var buf bytes.Buffer
 	encoder := gob.NewEncoder(&buf)

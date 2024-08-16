@@ -13,19 +13,18 @@ import (
 )
 
 func ListEntities(ctx context.Context, userID int, filters *models.Filters) (entities []*models.Entity, err error) {
-	// namespace := "entities"
+	namespace := "entities"
+	filtersStr := filters.String()
 
 	db := database.GetDB()
 
-	// if len(filters) == 0 {
-	// 	if db.Redis.GetDecodedCache(ctx, userID, namespace, &entities); entities != nil {
-	// 		return entities, nil
-	// 	}
-	// }
+	if db.Redis.GetDecodedCache(ctx, userID, namespace, filtersStr, &entities); entities != nil {
+		return entities, nil
+	}
 
 	query := new(strings.Builder)
 	query.WriteString("SELECT * FROM entities")
-	query.WriteString(filters.String())
+	query.WriteString(filtersStr)
 
 	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
@@ -40,7 +39,7 @@ func ListEntities(ctx context.Context, userID int, filters *models.Filters) (ent
 		entities = append(entities, entity)
 	}
 
-	// db.Redis.SetEncodedCache(ctx, userID, namespace, entities, time.Hour)
+	db.Redis.SetEncodedCache(ctx, userID, namespace, filtersStr, entities, time.Hour)
 
 	return entities, nil
 }
