@@ -34,7 +34,7 @@ jobs:
           go build -o nff main.go
 
       - name: Upload binary as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nff
           path: ./web/nff
@@ -76,7 +76,7 @@ jobs:
           chmod 600 private_key.pem
 
       - name: Download binary artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: nff
           path: .
