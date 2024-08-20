@@ -96,7 +96,7 @@ jobs:
             export START_FRESH=true &&
             export TZ=America/Sao_Paulo &&
             export PORT=80 &&
-            nohup ./nff > nff.log 2>&1 &
+            sudo nohup ./nff > nff.log 2>&1 &
           "
 
       - name: Clean up private key
