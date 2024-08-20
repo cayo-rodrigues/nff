@@ -79,7 +79,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: nff
-          path: ./nff
+          path: .
 
       - name: Transfer binary to EC2
         run: |
