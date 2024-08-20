@@ -96,7 +96,7 @@ jobs:
             export START_FRESH=true &&
             export TZ=America/Sao_Paulo &&
             export PORT=80 &&
-            sudo nohup ./nff > nff.log 2>&1 & || { echo 'Failed to start nff'; exit 1; }
+            sudo nohup ./nff > nff.log 2>&1 || { echo 'Failed to start nff'; exit 1; }
           "
 
       - name: Clean up private key
