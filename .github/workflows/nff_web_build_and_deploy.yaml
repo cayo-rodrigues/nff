@@ -13,8 +13,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,7 +25,7 @@ jobs:
       - name: Generate templ code
         working-directory: ./web
         run: |
-          go install github.com/a-h/templ/cmd/templ@v0.2.747
+          go install github.com/a-h/templ/cmd/templ@v0.2.707
           templ generate -path ./ui
 
       - name: Build project binary
