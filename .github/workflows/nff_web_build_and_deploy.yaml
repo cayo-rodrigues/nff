@@ -94,7 +94,8 @@ jobs:
               sudo pkill nff
             else
               echo 'No nff process running, continuing...'
-            fi &&export DB_URL=$RDS_DB_URL &&
+            fi && 
+            export DB_URL=$RDS_DB_URL &&
             export REDIS_URL=$ELASTICACHE_URL &&
             export SS_API_BASE_URL=$SS_API_BASE_URL &&
             export START_FRESH=true &&
