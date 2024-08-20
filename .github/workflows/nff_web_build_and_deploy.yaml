@@ -89,19 +89,13 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
             chmod +x nff &&
-            if pgrep nff > /dev/null; then
-              echo 'Stopping running nff process...'
-              sudo pkill nff
-            else
-              echo 'No nff process running, continuing...'
-            fi && 
             export DB_URL=$RDS_DB_URL &&
             export REDIS_URL=$ELASTICACHE_URL &&
             export SS_API_BASE_URL=$SS_API_BASE_URL &&
             export START_FRESH=true &&
             export TZ=America/Sao_Paulo &&
             export PORT=80 &&
-            sudo nohup ./nff > nff.log 2>&1 || { echo 'Failed to start nff'; exit 1; }
+            sudo nohup ./nff > nff.log 2>&1 || { echo 'Failed to start nff'; cat nff.log; exit 1; }
           "
 
       - name: Clean up private key
