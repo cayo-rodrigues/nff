@@ -63,12 +63,29 @@ jobs:
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
+
+      - name: Transfer Nginx Conf to EC2
+        working-directory: ./web
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key.pem ./nginx/nginx.conf ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
+
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
+            # Remove any running container, image or volume
             docker system prune -af --volumes &&
             docker ps -q | xargs -r docker stop &&
             docker ps -q | xargs -r docker rm &&
+
+            # Run Nginx container
+            docker run --name nginx -d \
+              -p 80:80 \
+              -p 443:443 \
+              -v /home/${USER_NAME}/nginx.conf:/etc/nginx/nginx.conf:ro \
+              -v /etc/letsencrypt:/etc/letsencrypt:ro \
+              nginx:alpine &&
+
+            # Run nff container
             docker run \
               --rm \
               --detach \
