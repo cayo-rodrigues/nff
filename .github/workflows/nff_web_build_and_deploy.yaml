@@ -25,6 +25,7 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build project image
+        working-directory: ./web
         run: docker build -t $WEB_IMAGE_TAG .
 
       - name: Push images to Docker Hub
@@ -73,7 +74,7 @@ jobs:
 
       - name: Transfer Nginx Conf to EC2
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem ./nginx/nginx.conf ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
+          scp -o StrictHostKeyChecking=no -i private_key.pem ./web/nginx/nginx.conf ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
 
       - name: Connect to EC2 instance and deploy
         run: |
