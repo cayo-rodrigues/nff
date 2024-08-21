@@ -85,7 +85,10 @@ jobs:
             docker ps -q | xargs -r docker rm &&
 
             # Run Nginx container
-            docker run --name nginx -d \
+            docker run \
+              --rm \
+              --detach \
+              --name nff-nginx \
               -p 80:80 \
               -p 443:443 \
               -v /home/${USER_NAME}/nginx.conf:/etc/nginx/nginx.conf:ro \
