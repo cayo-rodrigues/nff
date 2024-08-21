@@ -68,9 +68,8 @@ jobs:
           chmod 600 private_key.pem
 
       - name: Transfer Nginx Conf to EC2
-        working-directory: ./web
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem ./nginx/nginx.conf ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
+          scp -o StrictHostKeyChecking=no -i private_key.pem ./web/nginx/nginx.conf ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
 
       - name: Connect to EC2 instance and deploy
         run: |
