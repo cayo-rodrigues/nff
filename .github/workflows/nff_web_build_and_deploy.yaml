@@ -59,6 +59,9 @@ jobs:
       ELASTICACHE_URL: ${{ secrets.ELASTICACHE_URL }}
       SS_API_BASE_URL: ${{ secrets.SS_API_BASE_URL }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up SSH
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
