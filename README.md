@@ -38,6 +38,6 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [ ] Cancelamento de NF através do protocolo
 - [ ] Login/Cadastro com Google
 - [x] Bom uso de cache
-- [ ] DNS e HTTPS
+- [x] DNS e HTTPS
 - [x] Agregar métricas por mês
 - [ ] Emissão de Notas Fiscais Especiais
