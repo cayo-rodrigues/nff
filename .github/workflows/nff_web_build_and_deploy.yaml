@@ -83,7 +83,7 @@ jobs:
             docker system prune -af --volumes &&
             docker ps -q | xargs -r docker stop &&
             docker ps -q | xargs -r docker rm &&
-            docker network prune --force --filter label=nff-network &&
+            docker network prune --force &&
 
             docker network create nff-network &&
 
