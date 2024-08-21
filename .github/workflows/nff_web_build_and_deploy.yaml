@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          filter: web
+          filter: ./web
 
       - name: Docker login
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          filter: web/database/migrations
+          filter: ./web/database/migrations
 
       - name: Setup goose
         uses: mscno/setup-goose@v1
@@ -64,7 +64,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          filter: web/nginx
+          filter: ./web/nginx
 
       - name: Set up SSH
         run: |
