@@ -87,17 +87,6 @@ jobs:
 
             docker network create nff-network &&
 
-            # Run Nginx container
-            docker run \
-              --network nff-network \
-              --detach \
-              --name nff-nginx \
-              -p 80:80 \
-              -p 443:443 \
-              -v /home/${USER_NAME}/nginx.conf:/etc/nginx/nginx.conf:ro \
-              -v /etc/letsencrypt:/etc/letsencrypt:ro \
-              nginx:alpine &&
-
             # Run nff container
             docker run \
               --network nff-network \
@@ -111,7 +100,18 @@ jobs:
               -e DB_URL=$RDS_DB_URL \
               -e REDIS_URL=$ELASTICACHE_URL \
               -e SS_API_BASE_URL=$SS_API_BASE_URL \
-              $WEB_IMAGE_TAG
+              $WEB_IMAGE_TAG &&
+
+            # Run Nginx container
+            docker run \
+              --network nff-network \
+              --detach \
+              --name nff-nginx \
+              -p 80:80 \
+              -p 443:443 \
+              -v /home/${USER_NAME}/nginx.conf:/etc/nginx/nginx.conf:ro \
+              -v /etc/letsencrypt:/etc/letsencrypt:ro \
+              nginx:alpine
           "
       - name: Clean up private key
         run: rm private_key.pem
