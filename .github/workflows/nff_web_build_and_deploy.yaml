@@ -79,13 +79,14 @@ jobs:
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
-            # Remove any running container, image or volume
+            # Remove any running container, image, volume or network
             docker system prune -af --volumes &&
             docker ps -q | xargs -r docker stop &&
             docker ps -q | xargs -r docker rm &&
 
             # Run Nginx container
             docker run \
+              --network nff-network \
               --rm \
               --detach \
               --name nff-nginx \
@@ -97,6 +98,7 @@ jobs:
 
             # Run nff container
             docker run \
+              --network nff-network \
               --rm \
               --detach \
               --name nff-web \
