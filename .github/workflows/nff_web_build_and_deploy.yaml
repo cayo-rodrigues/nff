@@ -13,32 +13,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Go Faster
-        uses: WillAbides/setup-go-faster@v1.14.0
-        with:
-         go-version: 1.22.5
+      - name: Docker login
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Generate templ code
+      - name: Build project image
         working-directory: ./web
+        run: docker build -t $WEB_IMAGE_TAG .
+
+      - name: Push images to Docker Hub
         run: |
-          go install github.com/a-h/templ/cmd/templ@v0.2.707
-          templ generate -path ./ui
-
-      - name: Build project binary
-        working-directory: ./web
-        run: |
-          go build -o nff main.go
-
-      - name: Upload binary as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nff
-          path: ./web/nff
-
+          docker push $WEB_IMAGE_TAG
   migrate:
     needs: build
     runs-on: ubuntu-latest
@@ -55,14 +45,13 @@ jobs:
         working-directory: ./web
         run: |
           goose -dir ./database/migrations -v -s postgres $RDS_DB_URL up
-
-
   deploy:
     needs:
       - build
       - migrate
     runs-on: ubuntu-latest
     env:
+      WEB_IMAGE_TAG: ${{ secrets.DOCKERHUB_USERNAME }}/nff-web-prd:${{ github.sha }}
       PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       HOSTNAME: ${{ secrets.EC2_SSH_HOST_2 }}
       USER_NAME: ${{ secrets.EC2_USER_NAME }}
@@ -70,34 +59,31 @@ jobs:
       ELASTICACHE_URL: ${{ secrets.ELASTICACHE_URL }}
       SS_API_BASE_URL: ${{ secrets.SS_API_BASE_URL }}
     steps:
-      - name: Set up private key
+      - name: Set up SSH
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
-
-      - name: Download binary artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: nff
-          path: .
-
-      - name: Transfer binary to EC2
-        run: |
-          scp -o StrictHostKeyChecking=no -i private_key.pem ./nff ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
-      
-      - name: Deploy binary on EC2
+      - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
-            chmod +x nff &&
-            sudo nohup env \ 
-              DB_URL=$RDS_DB_URL \
-              REDIS_URL=$ELASTICACHE_URL \
-              SS_API_BASE_URL=$SS_API_BASE_URL \
-              START_FRESH=true \
-              TZ=America/Sao_Paulo \
-              PORT=80 \
-              ./nff > nff.log 2>&1 || { echo 'Failed to start nff'; cat nff.log; exit 1; }
+            docker system prune -af --volumes &&
+            docker ps -q | xargs -r docker stop &&
+            docker ps -q | xargs -r docker rm &&
+            docker run \
+              --rm \
+              --detach \
+              --name nff-web \
+              -p 80:8080 \
+              -p 443:8080 \
+              -p 8080:8080 \
+              -e PORT=8080 \
+              -e START_FRESH=true \
+              -e TZ=America/Sao_Paulo \
+              -e DB_URL=$RDS_DB_URL \
+              -e REDIS_URL=$ELASTICACHE_URL \
+              -e SS_API_BASE_URL=$SS_API_BASE_URL \
+              $WEB_IMAGE_TAG &&
+            docker system prune -af --volumes
           "
-
       - name: Clean up private key
         run: rm private_key.pem
