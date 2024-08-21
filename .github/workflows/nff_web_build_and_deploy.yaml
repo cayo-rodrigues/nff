@@ -107,8 +107,7 @@ jobs:
               -e DB_URL=$RDS_DB_URL \
               -e REDIS_URL=$ELASTICACHE_URL \
               -e SS_API_BASE_URL=$SS_API_BASE_URL \
-              $WEB_IMAGE_TAG &&
-            docker system prune -af --volumes
+              $WEB_IMAGE_TAG
           "
       - name: Clean up private key
         run: rm private_key.pem
