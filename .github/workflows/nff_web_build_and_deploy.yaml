@@ -84,6 +84,8 @@ jobs:
             docker ps -q | xargs -r docker stop &&
             docker ps -q | xargs -r docker rm &&
 
+            docker network create nff-network &&
+
             # Run Nginx container
             docker run \
               --network nff-network \
