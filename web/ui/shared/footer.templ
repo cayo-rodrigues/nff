@@ -1,7 +1,60 @@
 package shared
 
+import "fmt"
+
 templ Footer() {
 	<footer class="bg-sky-900 p-4 text-white md:px-8 md:py-6">
-		<h3>Contato</h3>
+		<div class="grid grid-cols-1 gap-2 sm:gap-0 xl:grid-cols-2">
+			<section class="flex justify-center xl:justify-start">
+				<ul class="flex items-center gap-2">
+					<a href="mailto:cayo.rodrigues1914@gmail.com">
+						<li class="flex items-center gap-2 rounded-full border-2 border-transparent p-2 transition-all hover:border-white">
+							@Icon("mail")
+						</li>
+					</a>
+					<a href="https://github.com/cayo-rodrigues/nff" target="_blank">
+						<li class="flex items-center gap-2 rounded-full border-2 border-transparent p-2 transition-all hover:border-white">
+							@Icon("github")
+						</li>
+					</a>
+					<a href="https://www.linkedin.com/in/cayo-rodrigues/" target="_blank">
+						<li class="flex items-center gap-2 rounded-full border-2 border-transparent p-2 transition-all hover:border-white">
+							@Icon("linkedin")
+						</li>
+					</a>
+					<a href="https://wa.me/+5535999445697" target="_blank">
+						<li class="flex items-center gap-2 rounded-full border-2 border-transparent p-2 transition-all hover:border-white">
+							@Icon("phone")
+						</li>
+					</a>
+				</ul>
+			</section>
+			<section class="flex justify-center xl:justify-end">
+				<ul class="flex flex-col gap-2 sm:flex-row">
+					<a href={ templ.SafeURL(githubIssueUrl("bug_report")) } target="_blank">
+						@PhantomLightButton("md") {
+							@Icon("flag")
+							<span>Reporte um bug</span>
+						}
+					</a>
+					<a href={ templ.SafeURL(githubIssueUrl("feature_request")) } target="_blank">
+						@PhantomLightButton("md") {
+							@Icon("package")
+							<span>Peça uma feature</span>
+						}
+					</a>
+					<a href={ templ.SafeURL(githubIssueUrl("feedback")) } target="_blank">
+						@PhantomLightButton("md") {
+							@Icon("smile")
+							<span>Dê um feedback</span>
+						}
+					</a>
+				</ul>
+			</section>
+		</div>
 	</footer>
+}
+
+func githubIssueUrl(templateName string) string {
+	return fmt.Sprintf("https://github.com/cayo-rodrigues/nff/issues/new?assignees=cayo-rodrigues&labels=&template=%s.md&title=", templateName)
 }

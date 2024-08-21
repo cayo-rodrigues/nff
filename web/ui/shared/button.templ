@@ -78,6 +78,12 @@ templ DefaultButtonOutline(size string) {
 	}
 }
 
+templ PhantomLightButton(size string) {
+	@Button("phantom-light", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
 func GetButtonClassesByTheme(theme string, size string) string {
 	classes := "flex w-full transition border items-center justify-center rounded"
 
@@ -104,6 +110,8 @@ func GetButtonClassesByTheme(theme string, size string) string {
 		colors = "border-gray-300 hover:bg-gray-200 active:bg-gray-300"
 	case "default-outline-active":
 		colors = "bg-gray-200 border-gray-400 hover:bg-gray-200 active:bg-gray-300 font-medium highlighted"
+	case "phantom-light":
+		colors = "border-transparent hover:border-gray-300 active:border-gray-200"
 	}
 
 	switch size {
