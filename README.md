@@ -6,9 +6,7 @@ Este projeto tem o objetivo de automatizar processos repetitivos que funcionári
 
 ## Demonstração
 
-### [Clique aqui para ver o projeto em produção](http://ec2-52-67-84-134.sa-east-1.compute.amazonaws.com/)
-
-Pelo fato de por enquanto ainda não serem usados certificados ssl (https), o navegador pode exibir um aviso de `Não seguro`.
+### [Clique aqui para ver o projeto em produção](https://notafiscalfacil.com)
 
 > A nota fiscal emitida no vídeo é apenas para fins demonstrativos
 
@@ -35,9 +33,8 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [x] Filtros por entidade no histórico de requerimentos
 - [x] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos
 - [ ] Gerenciamento de modelos de nota fiscal
-- [ ] Cancelamento de NF através do protocolo
 - [ ] Login/Cadastro com Google
 - [x] Bom uso de cache
-- [ ] DNS e HTTPS
+- [x] DNS e HTTPS
 - [x] Agregar métricas por mês
 - [ ] Emissão de Notas Fiscais Especiais

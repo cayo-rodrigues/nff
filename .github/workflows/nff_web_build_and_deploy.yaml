@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: web/
 
       - name: Docker login
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
@@ -26,10 +28,9 @@ jobs:
         working-directory: ./web
         run: docker build -t $WEB_IMAGE_TAG .
 
-      - name: Push images to Docker Hub
+      - name: Push image to Docker Hub
         run: |
           docker push $WEB_IMAGE_TAG
-
   migrate:
     needs: build
     runs-on: ubuntu-latest
@@ -38,16 +39,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: web/database/migrations/
 
       - name: Setup goose
         uses: mscno/setup-goose@v1
 
       - name: Apply migrations
-        working-directory: ./web
         run: |
-          goose -dir ./database/migrations -v -s postgres $RDS_DB_URL up
-
-
+          goose -dir ./web/database/migrations -v -s postgres $RDS_DB_URL up
   deploy:
     needs:
       - build
@@ -62,23 +62,37 @@ jobs:
       ELASTICACHE_URL: ${{ secrets.ELASTICACHE_URL }}
       SS_API_BASE_URL: ${{ secrets.SS_API_BASE_URL }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: web/nginx/
+
       - name: Set up SSH
         run: |
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
 
+      - name: Transfer Nginx Conf to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key.pem ./web/nginx/nginx.conf ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
+
       - name: Connect to EC2 instance and deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
+            # Remove any running container, image, volume or network
             docker system prune -af --volumes &&
             docker ps -q | xargs -r docker stop &&
             docker ps -q | xargs -r docker rm &&
+            docker network prune --force &&
+
+            docker network create nff-network &&
+
+            # Run nff container
             docker run \
+              --network nff-network \
               --rm \
               --detach \
               --name nff-web \
-              -p 80:8080 \
-              -p 443:8080 \
               -p 8080:8080 \
               -e PORT=8080 \
               -e START_FRESH=true \
@@ -87,8 +101,17 @@ jobs:
               -e REDIS_URL=$ELASTICACHE_URL \
               -e SS_API_BASE_URL=$SS_API_BASE_URL \
               $WEB_IMAGE_TAG &&
-            docker system prune -af --volumes
-          "
 
+            # Run Nginx container
+            docker run \
+              --network nff-network \
+              --detach \
+              --name nff-nginx \
+              -p 80:80 \
+              -p 443:443 \
+              -v /home/${USER_NAME}/nginx.conf:/etc/nginx/nginx.conf:ro \
+              -v /etc/letsencrypt:/etc/letsencrypt:ro \
+              nginx:alpine
+          "
       - name: Clean up private key
         run: rm private_key.pem
