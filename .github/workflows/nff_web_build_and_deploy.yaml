@@ -89,7 +89,6 @@ jobs:
             # Run Nginx container
             docker run \
               --network nff-network \
-              --rm \
               --detach \
               --name nff-nginx \
               -p 80:80 \
