@@ -28,7 +28,7 @@ jobs:
         working-directory: ./web
         run: docker build -t $WEB_IMAGE_TAG .
 
-      - name: Push images to Docker Hub
+      - name: Push image to Docker Hub
         run: |
           docker push $WEB_IMAGE_TAG
   migrate:
@@ -47,7 +47,7 @@ jobs:
 
       - name: Apply migrations
         run: |
-          goose -dir ./migrations -v -s postgres $RDS_DB_URL up
+          goose -dir ./web/database/migrations -v -s postgres $RDS_DB_URL up
   deploy:
     needs:
       - build
