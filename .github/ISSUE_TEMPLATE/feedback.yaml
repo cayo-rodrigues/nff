@@ -1,4 +1,4 @@
-name: Dê um feedback
+name: Deixe um Feedback
 description: Diga como têm sido sua experiência com o NFF e o que poderia melhorar
 title: "[Feedback]: "
 assignees:
@@ -37,11 +37,11 @@ body:
       label: De 1 a 5, qual nota você daria para o NFF?
       multiple: false
       options:
-        - ':star:'
-        - ':star::star:'
-        - ':star::star::star:'
-        - ':star::star::star::star:'
-        - ':star::star::star::star::star:'
+        - '⭐'
+        - '⭐⭐'
+        - '⭐⭐⭐'
+        - '⭐⭐⭐⭐'
+        - '⭐⭐⭐⭐⭐'
     validations:
       required: true
 

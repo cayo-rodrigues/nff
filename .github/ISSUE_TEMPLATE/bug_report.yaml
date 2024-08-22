@@ -29,6 +29,16 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: when-happened
+    attributes:
+      label: Quando aconteceu?
+      description: |
+        Tente se lembrar pelo menos do dia.
+      placeholder: 01/01/2000
+    validations:
+      required: false
+
   - type: textarea
     id: steps-to-reproduce
     attributes:
