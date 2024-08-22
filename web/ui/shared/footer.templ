@@ -56,5 +56,9 @@ templ Footer() {
 }
 
 func githubIssueUrl(templateName string) string {
+	switch templateName {
+		case "bug_report":
+			return "https://github.com/cayo-rodrigues/nff/issues/new?assignees=cayo-rodrigues&labels=bug&projects=&template=bug_report.yaml&title=%5BBug%5D%3A+"
+	}
 	return fmt.Sprintf("https://github.com/cayo-rodrigues/nff/issues/new?assignees=cayo-rodrigues&labels=&template=%s.md&title=", templateName)
 }
