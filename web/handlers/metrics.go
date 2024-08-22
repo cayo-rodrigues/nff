@@ -10,7 +10,6 @@ import (
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
-	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -36,8 +35,6 @@ func MetricsPage(c *fiber.Ctx) error {
 }
 
 func GenerateMetrics(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
 	metrics := models.NewMetricsFromForm(c)
 
 	entity, err := services.RetrieveEntity(c.Context(), metrics.Entity.ID)
@@ -55,7 +52,7 @@ func GenerateMetrics(c *fiber.Ctx) error {
 		return Render(c, forms.MetricsForm(metrics, entities))
 	}
 
-	err = services.CreateMetrics(c.Context(), metrics, userID)
+	err = services.CreateMetrics(c.Context(), metrics)
 	if err != nil {
 		return err
 	}
@@ -80,14 +77,12 @@ func ListMetrics(c *fiber.Ctx) error {
 }
 
 func GetMetricsForm(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
 	baseMetricsID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	baseMetrics, err := services.RetrieveMetrics(c.Context(), baseMetricsID, userID)
+	baseMetrics, err := services.RetrieveMetrics(c.Context(), baseMetricsID)
 	if err != nil {
 		return err
 	}
@@ -102,13 +97,12 @@ func GetMetricsForm(c *fiber.Ctx) error {
 }
 
 func RetrieveMetricsResultsDetails(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	metricsID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	metrics, err := services.RetrieveMetrics(c.Context(), metricsID, userID)
+	metrics, err := services.RetrieveMetrics(c.Context(), metricsID)
 	if err != nil {
 		return err
 	}
@@ -117,13 +111,12 @@ func RetrieveMetricsResultsDetails(c *fiber.Ctx) error {
 }
 
 func RetrieveMetricsCard(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	metricsID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
 
-	metrics, err := services.RetrieveMetrics(c.Context(), metricsID, userID)
+	metrics, err := services.RetrieveMetrics(c.Context(), metricsID)
 	if err != nil {
 		return err
 	}

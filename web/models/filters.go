@@ -138,6 +138,19 @@ func (f *Filters) ValuesCount() int {
 	return len(f.values)
 }
 
+func (f *Filters) StringValues() string {
+	var valuesStr strings.Builder
+	valuesStr.WriteString(" (Values: ")
+	for i, val := range f.values {
+		valuesStr.WriteString(fmt.Sprintf("$%d = %v", i+1, val))
+		if i != len(f.values)-1 {
+			valuesStr.WriteString(", ")
+		}
+	}
+	valuesStr.WriteString(")")
+	return valuesStr.String()
+}
+
 func (f *Filters) Placeholder(value any) *Filters {
 	position := f.ValuesCount() + 1
 	f.AppendValue(value)

@@ -15,11 +15,9 @@ import (
 )
 
 func PrintInvoicePage(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
 	filters := c.Queries()
 
-	printingsList, err := services.ListPrintings(c.Context(), userID, filters)
+	printingsList, err := services.ListPrintings(c.Context(), filters)
 	if err != nil {
 		return err
 	}
@@ -38,8 +36,6 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 }
 
 func PrintInvoice(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
-
 	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
@@ -57,7 +53,7 @@ func PrintInvoice(c *fiber.Ctx) error {
 		return Render(c, forms.PrintInvoiceForm(printing, entities))
 	}
 
-	err = services.CreatePrinting(c.Context(), printing, userID)
+	err = services.CreatePrinting(c.Context(), printing)
 	if err != nil {
 		return err
 	}
@@ -94,9 +90,8 @@ func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
 }
 
 func ListInvoicePrintings(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	filters := c.Queries()
-	printings, err := services.ListPrintings(c.Context(), userID, filters)
+	printings, err := services.ListPrintings(c.Context(), filters)
 	if err != nil {
 		return err
 	}

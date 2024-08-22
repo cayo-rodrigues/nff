@@ -9,7 +9,6 @@ import (
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
-	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -40,13 +39,12 @@ func EditEntityPage(c *fiber.Ctx) error {
 }
 
 func CreateEntity(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err := services.CreateEntity(c.Context(), entity, userID)
+	err := services.CreateEntity(c.Context(), entity)
 	if err != nil {
 		return err
 	}
@@ -55,13 +53,12 @@ func CreateEntity(c *fiber.Ctx) error {
 }
 
 func UpdateEntity(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err := services.UpdateEntity(c.Context(), entity, userID)
+	err := services.UpdateEntity(c.Context(), entity)
 	if err != nil {
 		return err
 	}
@@ -70,12 +67,11 @@ func UpdateEntity(c *fiber.Ctx) error {
 }
 
 func DeleteEntity(c *fiber.Ctx) error {
-	userID := utils.GetUserData(c.Context()).ID
 	entityID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return err
 	}
-	err = services.DeleteEntity(c.Context(), entityID, userID)
+	err = services.DeleteEntity(c.Context(), entityID)
 	if err != nil {
 		return err
 	}

@@ -8,7 +8,8 @@ import (
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func ListPrintings(ctx context.Context, userID int, filters ...map[string]string) ([]*models.InvoicePrint, error) {
+func ListPrintings(ctx context.Context, filters ...map[string]string) ([]*models.InvoicePrint, error) {
+	userID := utils.GetUserID(ctx)
 	f := models.NewFilters().Where("invoices_printings.created_by = ").Placeholder(userID)
 
 	if filters == nil {
@@ -25,19 +26,18 @@ func ListPrintings(ctx context.Context, userID int, filters ...map[string]string
 	return storage.ListInvoicePrintings(ctx, userID, f)
 }
 
-func CreatePrinting(ctx context.Context, p *models.InvoicePrint, userID int) error {
+func CreatePrinting(ctx context.Context, p *models.InvoicePrint) error {
+	userID := utils.GetUserID(ctx)
 	p.CreatedBy = userID
 	return storage.CreateInvoicePrinting(ctx, p)
 }
 
 func RetrievePrinting(ctx context.Context, printingID int) (*models.InvoicePrint, error) {
-	userID := utils.GetUserData(ctx).ID
+	userID := utils.GetUserID(ctx)
 	return storage.RetrieveInvoicePrinting(ctx, printingID, userID)
 }
 
 func CreatePrintingFromMetricsRecord(ctx context.Context, invoiceNumber string, entityID int) (*models.InvoicePrint, error) {
-	userID := utils.GetUserID(ctx)
-
 	entity, err := RetrieveEntity(ctx, entityID)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func CreatePrintingFromMetricsRecord(ctx context.Context, invoiceNumber string, 
 	p.InvoiceIDType = models.InvoiceIDTypes.NFANumber()
 	p.Entity = entity
 
-	err = CreatePrinting(ctx, p, userID)
+	err = CreatePrinting(ctx, p)
 	if err != nil {
 		return nil, err
 	}
