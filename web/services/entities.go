@@ -8,13 +8,14 @@ import (
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
-func CreateEntity(ctx context.Context, entity *models.Entity, userID int) error {
+func CreateEntity(ctx context.Context, entity *models.Entity) error {
+	userID := utils.GetUserID(ctx)
 	entity.CreatedBy = userID
 	return storage.CreateEntity(ctx, entity)
 }
 
 func ListEntities(ctx context.Context, filters ...map[string]string) ([]*models.Entity, error) {
-	userID := utils.GetUserData(ctx).ID
+	userID := utils.GetUserID(ctx)
 
 	f := models.NewFilters().Where("created_by = ").Placeholder(userID)
 
@@ -35,18 +36,16 @@ func ListEntities(ctx context.Context, filters ...map[string]string) ([]*models.
 
 func RetrieveEntity(ctx context.Context, entityID int) (*models.Entity, error) {
 	userID := utils.GetUserID(ctx)
-	entity, err := storage.RetrieveEntity(ctx, entityID, userID)
-	if err != nil {
-		return nil, err
-	}
-	return entity, nil
+	return storage.RetrieveEntity(ctx, entityID, userID)
 }
 
-func UpdateEntity(ctx context.Context, entity *models.Entity, userID int) error {
+func UpdateEntity(ctx context.Context, entity *models.Entity) error {
+	userID := utils.GetUserID(ctx)
 	entity.CreatedBy = userID
 	return storage.UpdateEntity(ctx, entity)
 }
 
-func DeleteEntity(ctx context.Context, entityID int, userID int) error {
+func DeleteEntity(ctx context.Context, entityID int) error {
+	userID := utils.GetUserID(ctx)
 	return storage.DeleteEntity(ctx, entityID, userID)
 }
