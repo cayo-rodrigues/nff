@@ -1,6 +1,7 @@
 name: Deixe um Feedback
 description: Diga como têm sido sua experiência com o NFF e o que poderia melhorar
 title: "[Feedback]: "
+labels: ["feedback"]
 assignees:
   - cayo-rodrigues
 
