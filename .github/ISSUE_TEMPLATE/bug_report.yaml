@@ -35,23 +35,28 @@ body:
       label: Como reproduzir o erro?
       description: Descreva de forma lógica os passos para reproduzir o problema.
       placeholder: |
-          1. Clicar ali,
-          2. Digitar X no campo Y,
-          3. ...
+          1. Acessar a página "frutas",
+          2. Digitar "abacaxi" no campo "maçã",
+          3. Voltar à página anterior
+          4. Os ícones somem
+          5. Ao apertar F5 eles reaparecem normalmente
     validations:
       required: false
 
-  - type: dropdown
+  - type: checkboxes
     id: browsers
     attributes:
       label: Em quais navegadores o bug acontece?
-      multiple: true
       options:
-        - Firefox
-        - Chrome
-        - Safari
-        - Microsoft Edge
-        - Opera
-        - Outro
-    validations:
-      required: false
+        - label: Firefox
+          required: false
+        - label: Chrome
+          required: false
+        - label: Safari
+          required: false
+        - label: Microsoft Edge
+          required: false
+        - label: Opera
+          required: false
+        - label: Outros
+          required: false

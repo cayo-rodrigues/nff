@@ -1,0 +1,56 @@
+name: Dê um feedback
+description: Diga como têm sido sua experiência com o NFF e o que poderia melhorar
+title: "[Feedback]: "
+assignees:
+  - cayo-rodrigues
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+          Obrigado por deixar seu feedback!
+
+  - type: textarea
+    id: what-we-do-right
+    attributes:
+      label: O que você vê de bom no NFF?
+      description: |
+        Por exemplo, quais funcionalidades você mais usa?
+        Por que essa ferramenta é útil para você?
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-we-do-wrong
+    attributes:
+      label: O que você vê que poderia melhorar no NFF?
+      description: |
+        Por exemplo, tem alguma funcionalidade que você considera inútil?
+        Tem algo que poderia funcionar diferente ou está faltando?
+        Pode ser sincero!
+    validations:
+      required: false
+
+  - type: dropdown
+    id: rating
+    attributes:
+      label: De 1 a 5, qual nota você daria para o NFF?
+      multiple: false
+      options:
+        - ':star:'
+        - ':star::star:'
+        - ':star::star::star:'
+        - ':star::star::star::star:'
+        - ':star::star::star::star::star:'
+    validations:
+      required: true
+
+  - type: textarea
+    id: free-input
+    attributes:
+      label: Tem algo mais que você gostaria de dizer?
+      description: |
+        Esse é o momento!
+    validations:
+      required: false
+

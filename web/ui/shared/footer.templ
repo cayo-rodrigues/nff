@@ -1,7 +1,5 @@
 package shared
 
-import "fmt"
-
 templ Footer() {
 	<footer class="bg-sky-900 p-4 text-white md:px-8 md:py-6">
 		<div class="grid grid-cols-1 gap-2 sm:gap-0 xl:grid-cols-2">
@@ -37,12 +35,6 @@ templ Footer() {
 							<span>Reporte um bug</span>
 						}
 					</a>
-					<a href={ templ.SafeURL(githubIssueUrl("feature_request")) } target="_blank">
-						@PhantomLightButton("md") {
-							@Icon("package")
-							<span>Peça uma feature</span>
-						}
-					</a>
 					<a href={ templ.SafeURL(githubIssueUrl("feedback")) } target="_blank">
 						@PhantomLightButton("md") {
 							@Icon("smile")
@@ -56,5 +48,11 @@ templ Footer() {
 }
 
 func githubIssueUrl(templateName string) string {
-	return fmt.Sprintf("https://github.com/cayo-rodrigues/nff/issues/new?assignees=cayo-rodrigues&labels=&template=%s.md&title=", templateName)
+	switch templateName {
+		case "bug_report":
+			return "https://github.com/cayo-rodrigues/nff/issues/new?assignees=cayo-rodrigues&labels=bug&projects=&template=bug_report.yaml&title=%5BBug%5D%3A+"
+		case "feedback":
+			return "https://github.com/cayo-rodrigues/nff/issues/new?assignees=cayo-rodrigues&projects=&template=feedback.yaml&title=%5BFeedback%5D%3A+"
+	}
+	return ""
 }
