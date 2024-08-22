@@ -1,7 +1,7 @@
 name: Reporte um Bug
 description: Envie um relatório de bug.
 title: "[Bug]: "
-labels: ["bug", "triage"]
+labels: ["bug"]
 assignees:
   - cayo-rodrigues
 body:
@@ -13,7 +13,7 @@ body:
   - type: input
     id: contact
     attributes:
-      label: Contact Details
+      label: Contato
       description: Como nós podemos entrar em contato com você se precisarmos de mais informações?
       placeholder: ex. email@example.com
     validations:
@@ -25,7 +25,7 @@ body:
       label: O que aconteceu?
       description: |
         Por favor, também nos diga o que você esperava que acontecesse.
-        Além disso, você pode incluir imagens/vídeos arrastando-os para este campo.
+        Você pode incluir imagens/vídeos arrastando-os para este campo.
     validations:
       required: true
 
@@ -33,10 +33,10 @@ body:
     id: steps-to-reproduce
     attributes:
       label: Como reproduzir o erro?
-      description: Descreva de forma lógica os passos para reproduzir o problema. (Opcional)
+      description: Descreva de forma lógica os passos para reproduzir o problema.
       placeholder: |
-          1. Clicar ali
-          2. Digitar X no campo Y
+          1. Clicar ali,
+          2. Digitar X no campo Y,
           3. ...
     validations:
       required: false
@@ -44,7 +44,7 @@ body:
   - type: dropdown
     id: browsers
     attributes:
-      label: Em quais navegadores o bug acontece? (Opcional)
+      label: Em quais navegadores o bug acontece?
       multiple: true
       options:
         - Firefox
