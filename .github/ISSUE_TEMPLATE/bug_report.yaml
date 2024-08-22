@@ -1,0 +1,57 @@
+name: Reporte um Bug
+description: Envie um relatório de bug.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - cayo-rodrigues
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por tirar tempo para relatar um bug!
+
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: Como nós podemos entrar em contato com você se precisarmos de mais informações?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: O que aconteceu?
+      description: |
+        Por favor, também nos diga o que você esperava que acontecesse.
+        Além disso, você pode incluir imagens/vídeos arrastando-os para este campo.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Como reproduzir o erro?
+      description: Descreva de forma lógica os passos para reproduzir o problema. (Opcional)
+      placeholder: |
+          1. Clicar ali
+          2. Digitar X no campo Y
+          3. ...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: Em quais navegadores o bug acontece? (Opcional)
+      multiple: true
+      options:
+        - Firefox
+        - Chrome
+        - Safari
+        - Microsoft Edge
+        - Opera
+        - Outro
+    validations:
+      required: false
