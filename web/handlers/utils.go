@@ -20,8 +20,9 @@ func Render(c *fiber.Ctx, component templ.Component, options ...func(*templ.Comp
 
 	isPageRequest := c.Get("HX-Boosted") == "true"
 	isListRequest := strings.HasSuffix(c.Path(), "/list")
+	isSearchRequest := strings.HasSuffix(c.Path(), "/search")
 
-	if isPageRequest || isListRequest {
+	if isPageRequest || isListRequest || isSearchRequest {
 		handleBrowserQueryParams(c)
 	}
 
@@ -49,7 +50,7 @@ func handleBrowserQueryParams(c *fiber.Ctx) {
 	if len(filters) > 0 {
 		jsonFilters, err := json.Marshal(filters)
 		if err == nil {
-			c.Append("HX-Trigger-After-Settle", fmt.Sprintf(`{"append-query-params": %s}`, jsonFilters))
+			c.Append("HX-Trigger-After-Settle", fmt.Sprintf(`{"append-query-params": { "queries": %s }}`, jsonFilters))
 		}
 	}
 }
