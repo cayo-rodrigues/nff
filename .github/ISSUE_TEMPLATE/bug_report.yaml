@@ -19,6 +19,13 @@ body:
     validations:
       required: false
 
+  - type: input
+    id: user-email
+    attributes:
+      label: Qual o email cadastrado na sua conta do NFF?
+    validations:
+      required: true
+
   - type: textarea
     id: what-happened
     attributes:

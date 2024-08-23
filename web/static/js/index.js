@@ -109,7 +109,7 @@ function HighlightButton(target, theme) {
 
 function AppendQueryParams(queryString) {
     const url = new URL(window.location);
-    const params = new URLSearchParams(url.search);
+    const params = new URLSearchParams();
 
     queryString.split('&').forEach(param => {
         const [key, val] = param.split('=')
@@ -188,7 +188,21 @@ function PreserveListFilters(event) {
     const isPageRequest = pagePaths.includes(reqPath) && event.detail.boosted && event.detail.verb === 'get'
 
     if (isListRequest || isPageRequest) {
-        event.detail.path += `?${GetCurrentQueryString()}`
+        event.detail.path += `?${GetCurrentQueryString().replace(/q=[^&]*(&|$)/, "")}`
+    }
+}
+
+function PreserveSearchFilters(event) {
+    const entitiesPagePath = '/entities'
+    const reqPath = event.detail.path
+
+    if (reqPath === entitiesPagePath && event.detail.boosted && event.detail.verb === 'get') {
+        const url = new URL(window.location);
+        const params = new URLSearchParams(url.search)
+        const q = params.get("q") ?? ""
+        if (q) {
+            event.detail.path += `?q=${q}`
+        }
     }
 }
 
@@ -333,6 +347,18 @@ function SelectCurrentEntityFilter() {
     entityFilter.value = entityID
 }
 
+function FillEntitySearchBar() {
+    const searchBar = document.querySelector("#search-bar")
+    if (!searchBar) {
+        return
+    }
+
+    const url = new URL(window.location);
+    const params = new URLSearchParams(url.search)
+
+    searchBar.value = params.get("q") ?? ""
+}
+
 function Init() {
     document.addEventListener("DOMContentLoaded", () => {
         feather.replace()
@@ -346,6 +372,7 @@ function Init() {
         HighlightCurrentPageButton()
         SelectCurrentEntityFilter()
         CountNotificationItems()
+        FillEntitySearchBar()
     })
     document.addEventListener("highlight-current-filter", () => {
         HighlightCurrentFilterButton()
@@ -361,6 +388,7 @@ function Init() {
     })
 
     document.addEventListener('htmx:configRequest', PreserveListFilters)
+    document.addEventListener('htmx:configRequest', PreserveSearchFilters)
 
     document.addEventListener('keyup', (event) => {
         if (event.code === 'Escape') {
@@ -388,8 +416,19 @@ function Init() {
     })
 
     document.addEventListener('append-query-params', (event) => {
-        const filters = event.detail
-        AppendQueryParams(`from_date=${filters.from_date}&to_date=${filters.to_date}&entity_filter=${filters.entity_filter}`)
+        const filters = event.detail.queries
+        
+        const queryString = Object.entries(filters).reduce((acc, [key, value], index, array) => {
+            acc += `${key}=${value}`
+
+            if (index !== array.length - 1) {
+                acc += "&"
+            }
+
+            return acc
+        }, "")
+
+        AppendQueryParams(queryString)
         HighlightCurrentFilterButton()
         SelectCurrentEntityFilter()
     })

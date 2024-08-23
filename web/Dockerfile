@@ -6,7 +6,7 @@ RUN go install github.com/a-h/templ/cmd/templ@v0.2.707
 
 COPY . .
 
-RUN templ generate
+RUN templ generate && go mod tidy
 
 RUN go build -o nff ./main.go
 

@@ -13,7 +13,7 @@ import (
 )
 
 func EntitiesPage(c *fiber.Ctx) error {
-	entities, err := services.ListEntities(c.Context())
+	entities, err := services.ListEntities(c.Context(), c.Queries())
 	if err != nil {
 		return err
 	}
