@@ -3,8 +3,9 @@ package shared
 templ Nav(isAuthenticated bool) {
 	<nav hx-boost="true" class="flex w-full items-center justify-between bg-sky-700 px-4 py-1 text-white xl:pl-8">
 		<h1 class="text-lg">
-			<a href="/" hx-indicator="#global-indicator">
-				Nota Fiscal Fácil
+			<a href="/" hx-indicator="#global-indicator" class="flex items-center gap-2">
+				<img src="/static/icons/logo.png" alt="finger snap" width="40px"> 
+				<span>Nota Fiscal Fácil</span>
 			</a>
 		</h1>
 		<div class="flex items-center gap-6 sm:gap-8">
