@@ -47,13 +47,20 @@ func MetricsPage(c *fiber.Ctx) error {
 func GenerateMetrics(c *fiber.Ctx) error {
 	metrics := models.NewMetricsFromForm(c)
 
-	entity, err := services.RetrieveEntity(c.Context(), metrics.Entity.ID)
-	if err != nil {
-		return err
-	}
-	metrics.Entity = entity
+	var entities []*models.Entity
 
-	entities, err := services.ListEntities(c.Context())
+	err := utils.Concurrent(
+		func() error {
+			var err error
+			metrics.Entity, err = services.RetrieveEntity(c.Context(), metrics.Entity.ID)
+			return err
+		},
+		func() error {
+			var err error
+			entities, err = services.ListEntities(c.Context())
+			return err
+		},
+	)
 	if err != nil {
 		return err
 	}
@@ -92,12 +99,21 @@ func GetMetricsForm(c *fiber.Ctx) error {
 		return err
 	}
 
-	baseMetrics, err := services.RetrieveMetrics(c.Context(), baseMetricsID)
-	if err != nil {
-		return err
-	}
+	var baseMetrics *models.Metrics
+	var entities []*models.Entity
 
-	entities, err := services.ListEntities(c.Context())
+	err = utils.Concurrent(
+		func() error {
+			var err error
+			baseMetrics, err = services.RetrieveMetrics(c.Context(), baseMetricsID)
+			return err
+		},
+		func() error {
+			var err error
+			entities, err = services.ListEntities(c.Context())
+			return err
+		},
+	)
 	if err != nil {
 		return err
 	}
