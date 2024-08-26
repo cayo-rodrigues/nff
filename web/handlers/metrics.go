@@ -10,18 +10,28 @@ import (
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
 func MetricsPage(c *fiber.Ctx) error {
-	entities, err := services.ListEntities(c.Context())
-	if err != nil {
-		return err
-	}
+	var entities []*models.Entity
+	var metricsList []*models.Metrics
 
-	filters := c.Queries()
+	err := utils.Concurrent(
+		func() error {
+			var err error
+			entities, err = services.ListEntities(c.Context())
+			return err
+		},
+		func() error {
+			var err error
+			filters := c.Queries()
+			metricsList, err = services.ListMetrics(c.Context(), filters)
+			return err
+		},
+	)
 
-	metricsList, err := services.ListMetrics(c.Context(), filters)
 	if err != nil {
 		return err
 	}
