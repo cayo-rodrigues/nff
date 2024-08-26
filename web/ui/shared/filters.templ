@@ -12,10 +12,7 @@ templ FiltersByDate(listTarget string, endpoint string) {
 			<legend class="-left-4 top-2 rounded border border-gray-300 bg-gray-200 p-1 text-center md:absolute">
 				@IconSm("calendar")
 			</legend>
-			<section class="grid w-full grid-cols-2 gap-2 px-2 py-2 sm:grid-cols-5 md:w-fit md:pl-5 lg:w-full xl:h-12 xl:items-center">
-				@DateFilterOption(listTarget, endpoint, 60) {
-					<span>Últimos 60 dias</span>
-				}
+			<section class="grid w-full grid-cols-2 gap-2 px-2 py-2 sm:grid-cols-4 md:pl-5 xl:h-12 xl:items-center">
 				@DateFilterOption(listTarget, endpoint, 30) {
 					<span>Últimos 30 dias</span>
 				}
@@ -67,7 +64,7 @@ templ FiltersByEntity(listTarget string, endpoint string, entities []*models.Ent
 			<legend class="-left-4 top-2 rounded border border-gray-300 bg-gray-200 p-1 text-center md:absolute">
 				@IconSm("users")
 			</legend>
-			<section class="px-2 md:w-fit md:pl-5 lg:w-full">
+			<section class="px-2 md:pl-5">
 				@SelectInput(&InputData{
 					ID:          "entity_filter",
 					Options:     &InputOptions{EntityOptions: entities},
