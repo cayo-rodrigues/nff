@@ -1,5 +1,7 @@
 package pages
 
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+
 templ HomePage() {
 	<h1 class="my-2 text-2xl font-medium">Bem vindo ao NFF - Nota Fiscal Fácil!</h1>
 	<p class="border-l-4 border-gray-500 pl-3 text-base text-gray-700">Você vai ver que realmente é <strong>fácil</strong>.</p>
@@ -35,13 +37,51 @@ templ HomePage() {
 	</ul>
 	<h3 class="my-4 text-xl">O NFF resolve tudo isso pra você! </h3>
 	<p class="my-2 text-base">Confira as vantagens que você pode ter:</p>
-	<ul class="my-2 list-disc pl-6 text-base">
-		<li>Emissão de notas em menos de <strong>1 minuto</strong></li>
-		<li>Cancelamento e impressão de notas em menos de <strong>20 segundos</strong></li>
-		<li>Cálculo de métricas do <em>ano inteiro</em> em apenas <strong>4 minutos</strong></li>
-		<li>Um registro <em>seguro</em> e <em>prático</em> dos dados dos produtores para os quais você presta serviço</li>
+	<ul class="my-4 grid grid-cols-1 gap-4 text-base xl:grid-cols-3">
+		@BenefitsCard("clock", "Velocidade") {
+			<li>
+				<span>Emissão de notas em menos de <strong>1 minuto</strong></span>
+			</li>
+			<li>
+				<span>Cancelamento e impressão de notas em menos de <strong>20 segundos</strong></span>
+			</li>
+			<li>
+				<span>Cálculo de métricas do <em>ano inteiro</em> em apenas <strong>4 minutos</strong></span>
+			</li>
+		}
+		@BenefitsCard("lock", "Segurança") {
+			<li>
+				<span>Um registro <em>seguro</em> e <em>prático</em> dos dados dos produtores para os quais você presta serviço</span>
+			</li>
+			<li>
+				<span>Senhas de produtores protegidas de forma que <strong>apenas você</strong> pode vê-las</span>
+			</li>
+		}
+		@BenefitsCard("thumbs-up", "Facilidade") {
+			<li>
+			<span>Interface super intuitiva</span>
+			</li>
+			<li>
+			<span>Muito <em>mais produtividade</em>, gastando bem <em>menos tempo</em></span>
+			</li>
+			<li>
+			<span>Deixe as máquinas trabalharem para você!</span>
+			</li>
+		}
 	</ul>
 	<h2 class="my-4 text-xl">Como funciona?</h2>
 	<p class="my-2 text-base">Como já dito, é simples. Veja um vídeo do NFF em ação.</p>
 	<video width="" height="" controls></video>
+}
+
+templ BenefitsCard(iconName, title string) {
+	<li class="flex flex-col gap-4 rounded p-6 shadow shadow-gray-500">
+		<h3 class="flex gap-2 text-xl">
+			@shared.Icon(iconName)
+			<span>{ title }</span>
+		</h3>
+		<ul class="my-2 flex list-disc flex-col gap-2 pl-6 text-base">
+			{ children... }
+		</ul>
+	</li>
 }
