@@ -17,53 +17,57 @@ templ HomePage() {
 		</a>.
 		Basicamente, uma forma de <strong>facilitar sua vida e economizar tempo</strong>.
 	</p>
-	<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
-		<section>
-			<h2 class="my-4 flex items-center gap-2 text-xl">
+	<div class="grid grid-cols-1 gap-4 py-4 xl:grid-cols-2">
+		<section class="rounded bg-gradient-to-r from-gray-800 to-gray-600 px-4 pb-4 text-gray-100 shadow shadow-gray-400">
+			<h2 class="py-4 text-xl">
 				<span>O que o NFF faz?</span>
-				<div class="text-green-600">
-					@shared.Icon("check-circle")
-				</div>
 			</h2>
+			<hr/>
 			<p class="my-2 text-base">
 				Com ele você:
 			</p>
-			<ul class="my-2 list-disc pl-6 text-base">
-				<li>
+			<ul class="my-2 pl-4 text-base">
+				@IconicListItem("check-circle", "green") {
 					Preenche e reaproveita facilmente os dados do vendedor, comprador e produtos da sua NFA
-				</li>
-				<li>
+				}
+				@IconicListItem("check-circle", "green") {
 					Cancela notas com um clique (<em>literalmente</em>)
-				</li>
-				<li>
+				}
+				@IconicListItem("check-circle", "green") {
 					Baixa notas fiscais
-				</li>
-				<li>
+				}
+				@IconicListItem("check-circle", "green") {
 					Busca automáticamente <strong>todas</strong> as notas emitidas por você e para você, dentro do sistema do Siare
-				</li>
-				<li>Consulta o total em R$ de compra e venda no período de sua escolha</li>
-				<li>Tem um lugar para guardar os dados de vendedores e compradores</li>
+				}
+				@IconicListItem("check-circle", "green") {
+					Calcula o total em R$ de compra e venda no período de sua escolha
+				}
+				@IconicListItem("check-circle", "green") {
+					Tem um lugar para guardar os dados de vendedores e compradores
+				}
 			</ul>
 		</section>
-		<section>
-			<h2 class="my-4 flex items-center gap-2 text-xl">
+		<section class="rounded bg-gradient-to-r from-gray-800 to-gray-600 px-4 pb-4 text-gray-100 shadow shadow-gray-400">
+			<h2 class="py-4 text-xl">
 				<span>O que o NFF <em>não</em> faz?</span>
-				<div class="text-red-600">
-					@shared.Icon("x-circle")
-				</div>
 			</h2>
+			<hr/>
 			<p class="my-2 text-base">
 				Ele não:
 			</p>
-			<ul class="my-2 list-disc pl-6 text-base">
-				<li>Emite notas fiscais especiais</li>
-				<li>Emite notas fiscais internacionais</li>
+			<ul class="my-2 pl-4 text-base">
+				@IconicListItem("x-circle", "red") {
+					Emite notas fiscais especiais
+				}
+				@IconicListItem("x-circle", "red") {
+					Emite notas fiscais internacionais
+				}
 			</ul>
 		</section>
 	</div>
 	<h3 class="my-4 text-xl">Confira as vantagens que você pode ter:</h3>
 	<ul class="my-4 grid grid-cols-1 gap-4 text-base xl:grid-cols-3">
-		@BenefitsCard("clock", "Velocidade") {
+		@BenefitsCard("clock", "Velocidade", "cyan") {
 			<li>
 				<span>Emissão de notas em menos de <strong>1 minuto</strong></span>
 			</li>
@@ -74,7 +78,7 @@ templ HomePage() {
 				<span>Cálculo de métricas do <em>ano inteiro</em> em apenas <strong>4 minutos</strong></span>
 			</li>
 		}
-		@BenefitsCard("lock", "Segurança") {
+		@BenefitsCard("lock", "Segurança", "yellow") {
 			<li>
 				<span>Um registro <em>seguro</em> e <em>prático</em> dos dados dos produtores para os quais você presta serviço</span>
 			</li>
@@ -82,7 +86,7 @@ templ HomePage() {
 				<span>Senhas de produtores protegidas de forma que <strong>apenas você</strong> pode vê-las</span>
 			</li>
 		}
-		@BenefitsCard("thumbs-up", "Facilidade") {
+		@BenefitsCard("thumbs-up", "Facilidade", "pink") {
 			<li>
 				<span>Interface super intuitiva</span>
 			</li>
@@ -99,14 +103,47 @@ templ HomePage() {
 	<video width="" height="" controls></video>
 }
 
-templ BenefitsCard(iconName, title string) {
-	<li class="flex flex-col gap-4 rounded p-6 shadow shadow-gray-500">
-		<h3 class="flex gap-2 text-xl">
-			@shared.Icon(iconName)
+templ BenefitsCard(iconName, title, theme string) {
+	<li class="flex flex-col gap-4 rounded bg-gradient-to-r from-gray-800 to-gray-600 p-6 text-gray-100 shadow shadow-gray-500">
+		<h3 class="flex items-center gap-2 text-xl">
+			<div
+				if theme == "cyan" {
+					class="text-cyan-400"
+				}
+				else
+				if theme == "yellow" {
+					class="text-yellow-300"
+				}
+				else
+				if theme == "pink" {
+					class="text-pink-400"
+				}
+			>
+				@shared.Icon(iconName)
+			</div>
 			<span>{ title }</span>
 		</h3>
 		<ul class="my-2 flex list-disc flex-col gap-2 pl-6 text-base">
 			{ children... }
 		</ul>
+	</li>
+}
+
+templ IconicListItem(iconName, iconColor string) {
+	<li class="flex items-center gap-2 py-1">
+		<div
+			if iconColor == "green" {
+				class="text-green-600"
+			}
+			else
+			if iconColor == "red" {
+				class="text-red-600"
+			}
+		>
+			@shared.IconSm(iconName)
+		</div>
+		<span>
+			{ children... }
+		</span>
 	</li>
 }
