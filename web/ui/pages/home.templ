@@ -5,38 +5,53 @@ import "github.com/cayo-rodrigues/nff/web/ui/shared"
 templ HomePage() {
 	<h1 class="my-2 text-2xl font-medium">Bem vindo ao NFF - Nota Fiscal Fácil!</h1>
 	<p class="border-l-4 border-gray-500 pl-3 text-base text-gray-700">Você vai ver que realmente é <strong>fácil</strong>.</p>
-	<h2 class="my-4 text-xl">Mas o que é o NFF? Onde vive? O que come?</h2>
+	<h2 class="my-4 text-xl">Mas o que é NFF?</h2>
 	<p class="my-2 text-base">
-		<em>NFF (<b>N</b>ota <b>F</b>iscal <b>F</b>ácil)</em> é um sistema online que <strong>facilita sua vida e economiza seu tempo</strong>.
+		Um sistema simplificado de emissão e busca de notas fiscais no  
+		<a
+			class="text-blue-500 underline visited:text-purple-600 hover:text-blue-700"
+			href="https://www2.fazenda.mg.gov.br/sol/"
+			target="_blank"
+		>
+			Siare - MG
+		</a>.
+		Basicamente, uma forma de <strong>facilitar sua vida e economizar tempo</strong>.
 	</p>
-	<ul class="my-2 list-disc pl-6 text-base">
-		<li>
-			Quantas vezes você já precisou emitir notas fiscais no 
-			<a
-				class="text-blue-500 underline visited:text-purple-600 hover:text-blue-700"
-				href="https://www2.fazenda.mg.gov.br/sol/"
-				target="_blank"
-			>
-				Siare
-			</a>, para produtores rurais?
-		</li>
-		<li>Quantas vezes já precisou cancelar ou imprimir uma nota específica?</li>
-		<li>
-			E quantas vezes produtores vieram a sua procura no final do ano para poder saber qual foi o lucro e a despesa total deles durante aquele ano,
-			afim de fazerem a declaração do imposto de renda para a Receita Federal?
-		</li>
-		<li>Por acaso você já precisou consultar NFA no Siare e olhar registro por registro, para poder fazer esse cálculo?</li>
-	</ul>
-	<p class="my-2 text-base">
-		Talvez você já tenha se perguntado:
-	</p>
-	<ul class="my-2 list-disc pl-6 text-base">
-		<li>E se houvesse um sistema mais <em>simples e rápido</em> para emitir, cancelar e imprimir notas?</li>
-		<li>E se você pudesse realizar diversas operações <em>ao mesmo tempo</em> para quantos produtores quisesse?</li>
-		<li>E se fosse possível calcular entrada e saída do ano todo auto<b>mágicamente</b>, e ainda possuir acesso a cada registro individual?</li>
-	</ul>
-	<h3 class="my-4 text-xl">O NFF resolve tudo isso pra você! </h3>
-	<p class="my-2 text-base">Confira as vantagens que você pode ter:</p>
+	<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+		<section>
+			<h2 class="my-4 text-xl">O que o NFF faz?</h2>
+			<p class="my-2 text-base">
+				Com ele você:
+			</p>
+			<ul class="my-2 list-disc pl-6 text-base">
+				<li>
+					Preenche e reaproveita facilmente os dados do vendedor, comprador e produtos da sua NFA
+				</li>
+				<li>
+					Cancela notas com um clique (<em>literalmente</em>)
+				</li>
+				<li>
+					Baixa notas fiscais
+				</li>
+				<li>
+					Busca automáticamente <strong>todas</strong> as notas emitidas por você e para você, dentro do sistema do Siare
+				</li>
+				<li>Consulta o total em R$ de compra e venda no período de sua escolha</li>
+				<li>Tem um lugar para guardar os dados de vendedores e compradores</li>
+			</ul>
+		</section>
+		<section>
+			<h2 class="my-4 text-xl">O que o NFF <em>não</em> faz?</h2>
+			<p class="my-2 text-base">
+				Ele não:
+			</p>
+			<ul class="my-2 list-disc pl-6 text-base">
+				<li>Emite notas fiscais especiais</li>
+				<li>Emite notas fiscais internacionais</li>
+			</ul>
+		</section>
+	</div>
+	<h3 class="my-4 text-xl">Confira as vantagens que você pode ter:</h3>
 	<ul class="my-4 grid grid-cols-1 gap-4 text-base xl:grid-cols-3">
 		@BenefitsCard("clock", "Velocidade") {
 			<li>
@@ -59,13 +74,13 @@ templ HomePage() {
 		}
 		@BenefitsCard("thumbs-up", "Facilidade") {
 			<li>
-			<span>Interface super intuitiva</span>
+				<span>Interface super intuitiva</span>
 			</li>
 			<li>
-			<span>Muito <em>mais produtividade</em>, gastando bem <em>menos tempo</em></span>
+				<span>Muito <em>mais produtividade</em>, gastando bem <em>menos tempo</em></span>
 			</li>
 			<li>
-			<span>Deixe as máquinas trabalharem para você!</span>
+				<span>Deixe as máquinas trabalharem para você!</span>
 			</li>
 		}
 	</ul>
