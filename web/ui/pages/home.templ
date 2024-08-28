@@ -9,7 +9,7 @@ templ HomePage() {
 	<p class="my-2 text-base">
 		Um sistema simplificado de emissão e busca de notas fiscais no  
 		<a
-			class="text-blue-500 underline visited:text-purple-600 hover:text-blue-700"
+			class="text-blue-500 underline hover:text-blue-700"
 			href="https://www2.fazenda.mg.gov.br/sol/"
 			target="_blank"
 		>
@@ -19,7 +19,12 @@ templ HomePage() {
 	</p>
 	<div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
 		<section>
-			<h2 class="my-4 text-xl">O que o NFF faz?</h2>
+			<h2 class="my-4 flex items-center gap-2 text-xl">
+				<span>O que o NFF faz?</span>
+				<div class="text-green-600">
+					@shared.Icon("check-circle")
+				</div>
+			</h2>
 			<p class="my-2 text-base">
 				Com ele você:
 			</p>
@@ -41,7 +46,12 @@ templ HomePage() {
 			</ul>
 		</section>
 		<section>
-			<h2 class="my-4 text-xl">O que o NFF <em>não</em> faz?</h2>
+			<h2 class="my-4 flex items-center gap-2 text-xl">
+				<span>O que o NFF <em>não</em> faz?</span>
+				<div class="text-red-600">
+					@shared.Icon("x-circle")
+				</div>
+			</h2>
 			<p class="my-2 text-base">
 				Ele não:
 			</p>
