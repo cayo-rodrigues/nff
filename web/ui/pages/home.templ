@@ -18,9 +18,9 @@ templ HomePage() {
 		Basicamente, uma forma de <strong>facilitar sua vida e economizar tempo</strong>.
 	</p>
 	<div class="grid grid-cols-1 gap-4 py-4 xl:grid-cols-2">
-		<section class="rounded bg-gradient-to-r from-gray-800 to-gray-600 px-4 pb-4 text-gray-100 shadow shadow-gray-400">
+		@IconicListContainer() {
 			<h2 class="py-4 text-xl">
-				<span>O que o NFF faz?</span>
+				<strong>O que o NFF faz?</strong>
 			</h2>
 			<hr/>
 			<p class="my-2 text-base">
@@ -46,10 +46,10 @@ templ HomePage() {
 					Tem um lugar para guardar os dados de vendedores e compradores
 				}
 			</ul>
-		</section>
-		<section class="rounded bg-gradient-to-r from-gray-800 to-gray-600 px-4 pb-4 text-gray-100 shadow shadow-gray-400">
+		}
+		@IconicListContainer() {
 			<h2 class="py-4 text-xl">
-				<span>O que o NFF <em>não</em> faz?</span>
+				<strong>O que o NFF <em>não</em> faz?</strong>
 			</h2>
 			<hr/>
 			<p class="my-2 text-base">
@@ -63,7 +63,7 @@ templ HomePage() {
 					Emite notas fiscais internacionais
 				}
 			</ul>
-		</section>
+		}
 	</div>
 	<h3 class="my-4 text-xl">Confira as vantagens que você pode ter:</h3>
 	<ul class="my-4 grid grid-cols-1 gap-4 text-base xl:grid-cols-3">
@@ -121,7 +121,7 @@ templ BenefitsCard(iconName, title, theme string) {
 			>
 				@shared.Icon(iconName)
 			</div>
-			<span>{ title }</span>
+			<strong>{ title }</strong>
 		</h3>
 		<ul class="my-2 flex list-disc flex-col gap-2 pl-6 text-base">
 			{ children... }
@@ -146,4 +146,10 @@ templ IconicListItem(iconName, iconColor string) {
 			{ children... }
 		</span>
 	</li>
+}
+
+templ IconicListContainer() {
+	<section class="rounded bg-gradient-to-r from-gray-800 to-gray-600 px-4 pb-4 text-gray-100 shadow shadow-gray-400">
+		{ children... }
+	</section>
 }
