@@ -17,6 +17,7 @@ jobs:
       AWS_REGION: ${{ secrets.SS_API_AWS_REGION }} 
       AWS_ACCESS_KEY_ID: ${{ secrets.SS_API_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.SS_API_AWS_SECRET_ACCESS_KEY }}
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SS_API_SERVERLESS_ACCESS_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,4 +29,4 @@ jobs:
 
       - name: Deploy to AWS Lambda
         working-directory: ./ss-api
-        run: sls deploy --verbose --force
+        run: sls deploy --verbose
