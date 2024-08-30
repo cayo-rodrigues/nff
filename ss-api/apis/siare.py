@@ -91,6 +91,13 @@ class Siare(Browser):
         self.get_and_click(xpath)
 
     def fill_invoice_basic_data(self, invoice: Invoice) -> None:
+        if invoice.is_interstate:
+            xpath = XPaths.INVOICE_BASIC_DATA_INTERSTATE_SELECT_INPUT
+            self.get_and_click(xpath)
+
+            xpath = XPaths.INVOICE_BASIC_DATA_INTERSTATE_OPTION
+            self.get_and_click(xpath)
+
         xpath = XPaths.INVOICE_BASIC_DATA_OPERATION_SELECT_INPUT
         self.get_and_click(xpath)
 
@@ -143,10 +150,11 @@ class Siare(Browser):
         def handle_recipient_ie_or_cpf_cnpj(input_xpath: str, value: str) -> None:
             self.type_into_element(input_xpath, value)
 
-            xpath = XPaths.INVOICE_RECIPIENT_SEARCH_BUTTON
-            self.get_and_click(xpath)
+            if not invoice.is_interstate:
+                xpath = XPaths.INVOICE_RECIPIENT_SEARCH_BUTTON
+                self.get_and_click(xpath)
 
-            self.wait_until_document_is_ready()
+                self.wait_until_document_is_ready()
 
         if invoice.recipient_ie:
             xpath = XPaths.INVOICE_RECIPIENT_IE_INPUT
@@ -155,6 +163,7 @@ class Siare(Browser):
             xpath = XPaths.INVOICE_RECIPIENT_CPF_CNPJ_INPUT
             handle_recipient_ie_or_cpf_cnpj(xpath, invoice.recipient.cpf_cnpj)
 
+        if not invoice.recipient_ie or invoice.is_interstate:
             xpath = XPaths.INVOICE_RECIPIENT_OPEN_ADDRESS_WINDOW
             self.get_and_click(xpath)
 

@@ -1,9 +1,11 @@
 package shared
 
-import "fmt"
-import "strconv"
-import "github.com/cayo-rodrigues/nff/web/models"
-import "github.com/cayo-rodrigues/nff/web/ui/scripts"
+import (
+	"fmt"
+	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/ui/scripts"
+	"strconv"
+)
 
 type InputOptions struct {
 	StringOptions []string
@@ -151,14 +153,16 @@ templ SelectInput(data *InputData) {
 				</option>
 			}
 			for _, strOpt := range data.Options.StringOptions {
-				<option
-					value={ strOpt }
-					if data.Value == strOpt {
-						selected
-					}
-				>
-					{ strOpt }
-				</option>
+				if strOpt != "" {
+					<option
+						value={ strOpt }
+						if data.Value == strOpt {
+							selected
+						}
+					>
+						{ strOpt }
+					</option>
+				}
 			}
 			for _, intOpt := range data.Options.IntOptions {
 				<option

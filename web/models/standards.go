@@ -45,7 +45,7 @@ func (o *SiareInvoiceOperations) REMESSA() string {
 }
 
 type SiareInvoiceCfops struct {
-	VENDA   [14]string
+	VENDA   [16]string
 	REMESSA [22]string
 }
 
@@ -59,7 +59,7 @@ func (cfops *SiareInvoiceCfops) ByOperation(invoiceOperation string) []string {
 }
 
 var InvoiceCfops = &SiareInvoiceCfops{
-	VENDA: [14]string{
+	VENDA: [16]string{
 		"5101 - Venda de produção do estabelecimento",
 		"5102 - Venda de mercadoria adquirida ou recebida de terceiros, ou qualquer venda de mercadoria efetuada pelo MEI com exceção das saídas classificadas nos códigos 5.501, 5.502, 5.504 e 5.505.",
 		"5103 - Venda de produção do estabelecimento, efetuada fora do estabelecimento",
@@ -98,6 +98,50 @@ var InvoiceCfops = &SiareInvoiceCfops{
 		"5923 - Remessa de mercadoria por conta e ordem de terceiros, em venda à ordem",
 		"5924 - Remessa para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente",
 		"5934 - Remessa simbólica de mercadoria depositada em armazém geral ou depósito fechado",
+	},
+}
+
+var InterstateInvoiceCfops = &SiareInvoiceCfops{
+	VENDA: [16]string{
+		"6101 - Venda de produção do estabelecimento",
+		"6102 - Venda de mercadoria adquirida ou recebida de terceiros, ou qualquer venda de mercadoria efetuada pelo MEI com exceção das saídas classificadas nos códigos 6.501, 6.502, 6.504 e 6.505.",
+		"6103 - Venda de produção do estabelecimento, efetuada fora do estabelecimento",
+		"6105 - Venda de produção do estabelecimento que não deva por ele transitar",
+		"6107 - Venda de produção do estabelecimento, destinada a não contribuinte",
+		"6109 - Venda de produção do estabelecimento, destinada à Zona Franca de Manaus ou Áreas de Livre Comércio",
+		"6111 - Venda de produção do estabelecimento remetida anteriormente em consignação industrial",
+		"6113 - Venda de produção do estabelecimento remetida anteriormente em consignação mercantil",
+		"6116 - Venda de produção do estabelecimento originada de encomenda para entrega futura",
+		"6118 - Venda de produção do estabelecimento entregue ao destinatário por conta e ordem do adquirente originário, em venda à ordem",
+		"6122 - Venda de produção do estabelecimento remetida para industrialização, por conta e ordem do adquirente, sem transitar pelo estabelecimento do adquirente",
+		"6159 - Fornecimento de produção do estabelecimento de ato cooperativo",
+		"6160 - Fornecimento de mercadoria adquirida ou recebida de terceiros de ato cooperativo",
+		"6401 - Venda de produção do estabelecimento em operação com produto sujeito ao regime de substituição tributária, na condição de contribuinte substituto",
+		"6402 - Venda de produção do estabelecimento de produto sujeito ao regime de substituição tributária, em operação entre contribuintes substitutos do mesmo produto",
+		"6551 - Venda de bem do ativo imobilizado",
+	},
+	REMESSA: [22]string{
+		"6131 - Remessa de produção de estabelecimento, com previsão de posterior ajuste ou fixação de preço de ato cooperativo",
+		"6132 - Fixação de preço de produção do estabelecimento, inclusive quando remetidas anteriormente com previsão de posterior ajuste ou fixação de preço ou fixação de preço de ato cooperativo",
+		"6414 - Remessa de produção do estabelecimento para venda fora do estabelecimento em operação com produto sujeito ao regime de substituição tributária",
+		"6451 - Remessa de animal - Sistema de Integração e Parceria Rural",
+		"6452 - Remessa de insumo - Sistema de Integração e Parceria Rural",
+		"6501 - Remessa de produção do estabelecimento, com fim específico de exportação",
+		"6554 - Remessa de bem do ativo imobilizado para uso fora do estabelecimento",
+		"6901 - Remessa para industrialização por encomenda",
+		"6904 - Remessa para venda fora do estabelecimento, ou qualquer remessa efetuada pelo MEI com exceção das classificadas nos códigos 6.502 e 6.505.",
+		"6905 - Remessa para depósito fechado ou armazém geral",
+		"6908 - Remessa de bem por conta de contrato de comodato",
+		"6910 - Remessa em bonificação, doação ou brinde",
+		"6911 - Remessa de amostra grátis",
+		"6912 - Remessa de mercadoria ou bem para demonstração",
+		"6914 - Remessa de mercadoria ou bem para exposição ou feira",
+		"6915 - Remessa de mercadoria ou bem para conserto ou reparo",
+		"6917 - Remessa de mercadoria em consignação mercantil ou industrial",
+		"6920 - Remessa de vasilhame ou sacaria",
+		"6923 - Remessa de mercadoria por conta e ordem de terceiros, em venda à ordem ou em operações com armazém geral ou depósito fechado",
+		"6924 - Remessa para industrialização por conta e ordem do adquirente da mercadoria, quando esta não transitar pelo estabelecimento do adquirente",
+		"6934 - Remessa simbólica de mercadoria depositada em armazém geral ou depósito fechado",
 	},
 }
 

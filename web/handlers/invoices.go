@@ -95,11 +95,17 @@ func GetRecipientIeInput(c *fiber.Ctx) error {
 
 func GetCfopsInput(c *fiber.Ctx) error {
 	operation := c.Query("operation")
+	isInterstate := c.Query("is_interstate")
+
+	cfops := models.InvoiceCfops
+	if isInterstate == "Sim" {
+		cfops = models.InterstateInvoiceCfops
+	}
 
 	return Render(c, shared.SelectInput(&shared.InputData{
 		ID:            "cfop",
 		Label:         "CFOP",
-		Options:       &shared.InputOptions{StringOptions: models.InvoiceCfops.ByOperation(operation)},
+		Options:       &shared.InputOptions{StringOptions: cfops.ByOperation(operation)},
 		HxIndicatorID: "invoice-cfops-indicator",
 	}))
 }
