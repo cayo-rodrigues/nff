@@ -1,4 +1,4 @@
-name: nff_ss_api_build_and_deploy
+name: nff_ss_api_deploy
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
       - develop # TEMP!
     paths:
       - "ss-api/**"
-      - ".github/workflows/nff_ss_api_build_and_deploy.yaml"
+      - ".github/workflows/nff_ss_api_deploy.yaml"
 
 jobs:
   deploy:
