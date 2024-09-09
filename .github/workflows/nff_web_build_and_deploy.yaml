@@ -67,6 +67,7 @@ jobs:
           go-version: v1.23
 
       - name: Apply migrations
+        working-directory: ./migrations/
         run: |
           make run up TURSO_DATABASE_URL=$TURSO_DATABASE_URL TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN
 
