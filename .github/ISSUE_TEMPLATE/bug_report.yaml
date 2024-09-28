@@ -59,21 +59,3 @@ body:
           5. Ao apertar F5 eles reaparecem normalmente
     validations:
       required: false
-
-  - type: checkboxes
-    id: browsers
-    attributes:
-      label: Em quais navegadores o bug acontece?
-      options:
-        - label: Firefox
-          required: false
-        - label: Chrome
-          required: false
-        - label: Safari
-          required: false
-        - label: Microsoft Edge
-          required: false
-        - label: Opera
-          required: false
-        - label: Outros
-          required: false

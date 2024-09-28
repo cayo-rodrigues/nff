@@ -16,6 +16,7 @@ type Invoice struct {
 	Number               string             `json:"invoice_id"` // TROCAR PARA invoice_number NA SS-API
 	Protocol             string             `json:"-"`
 	Operation            string             `json:"operation"`
+	IsInterstate         string             `json:"is_interstate"`
 	Cfop                 string             `json:"cfop"`
 	IsFinalCustomer      string             `json:"is_final_customer"`
 	IsIcmsContributor    string             `json:"icms"`
@@ -93,6 +94,7 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 
 	invoice.Operation = strings.TrimSpace(c.FormValue("operation"))
 	invoice.Cfop = strings.TrimSpace(c.FormValue("cfop"))
+	invoice.IsInterstate = strings.TrimSpace(c.FormValue("is_interstate"))
 	invoice.IsIcmsContributor = strings.TrimSpace(c.FormValue("is_icms_contributor"))
 	invoice.IsFinalCustomer = strings.TrimSpace(c.FormValue("is_final_customer"))
 	invoice.Shipping, err = utils.TrimSpaceFloat64(c.FormValue("shipping"))
@@ -125,6 +127,10 @@ func NewInvoiceFromForm(c *fiber.Ctx) *Invoice {
 }
 
 func (i *Invoice) IsValid() bool {
+	cfops := InvoiceCfops
+	if i.IsInterstate == "Sim" {
+		cfops = InterstateInvoiceCfops
+	}
 	fields := safe.Fields{
 		{
 			Name:  "Operation",
@@ -132,9 +138,14 @@ func (i *Invoice) IsValid() bool {
 			Rules: safe.Rules{safe.OneOf(InvoiceOperations[:])},
 		},
 		{
+			Name:  "IsInterstate",
+			Value: i.IsInterstate,
+			Rules: safe.Rules{safe.OneOf(InvoiceBooleanField[:])},
+		},
+		{
 			Name:  "Cfop",
 			Value: i.Cfop,
-			Rules: safe.Rules{safe.OneOf(InvoiceCfops.ByOperation(i.Operation)[:])},
+			Rules: safe.Rules{safe.OneOf(cfops.ByOperation(i.Operation)[:])},
 		},
 		{
 			Name:  "IsIcmsContributor",
@@ -211,5 +222,6 @@ func (i *Invoice) Values() []any {
 		&i.Shipping, &i.AddShippingToTotal, &i.Gta, &i.PDF, &i.ReqStatus, &i.ReqMsg,
 		&i.Sender.ID, &i.Recipient.ID, &i.CreatedBy, &i.CreatedAt, &i.UpdatedAt,
 		&i.ExtraNotes, &i.CustomFileNamePrefix, &i.SenderIe, &i.FileName, &i.RecipientIe,
+		&i.IsInterstate,
 	}
 }

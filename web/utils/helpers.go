@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -96,4 +97,28 @@ func GetUserData(ctx context.Context) *ReqUserData {
 
 func GetUserID(ctx context.Context) int {
 	return GetUserData(ctx).ID
+}
+
+func Concurrent(tasks ...func() error) error {
+	var wg sync.WaitGroup
+	errors := make(chan error, len(tasks))
+
+	for _, task := range tasks {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := task(); err != nil {
+				errors <- err
+			}
+		}()
+	}
+
+	wg.Wait()
+	close(errors)
+
+	if len(errors) > 0 {
+		return <-errors
+	}
+
+	return nil
 }

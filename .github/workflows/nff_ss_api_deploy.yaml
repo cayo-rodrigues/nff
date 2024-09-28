@@ -1,0 +1,32 @@
+name: nff_ss_api_deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - develop # TEMP!
+    paths:
+      - "ss-api/**"
+      - ".github/workflows/nff_ss_api_deploy.yaml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.SS_API_AWS_REGION }} 
+      AWS_ACCESS_KEY_ID: ${{ secrets.SS_API_AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SS_API_AWS_SECRET_ACCESS_KEY }}
+      SERVERLESS_ACCESS_KEY: ${{ secrets.SS_API_SERVERLESS_ACCESS_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: ss-api/
+
+      - name: Install Serverless
+        run: npm i -g serverless
+
+      - name: Deploy to AWS Lambda
+        working-directory: ./ss-api
+        run: sls deploy --verbose

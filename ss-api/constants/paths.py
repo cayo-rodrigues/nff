@@ -22,6 +22,8 @@ class XPaths:
     LOGIN_ERROR_FEEDBACK = '//*[@id="mensagem"]'
 
     # require invoice page
+    INVOICE_BASIC_DATA_INTERSTATE_SELECT_INPUT = '//*[@id="tpNota"]/tbody/tr[3]/td[2]/div/input'
+    INVOICE_BASIC_DATA_INTERSTATE_OPTION = '//*[@id="tpNota"]/tbody/tr[3]/td[2]/div/div[2]/span[2]'
     INVOICE_BASIC_DATA_OPERATION_SELECT_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[4]/td[2]/div/div[1]"
     INVOICE_BASIC_DATA_OPERATION_BOX = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[4]/td[2]/div/div[2]"
     INVOICE_BASIC_DATA_CONFIRMATION_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[3]/td[2]/a[1]"

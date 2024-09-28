@@ -13,6 +13,7 @@ from .invoice_item import InvoiceItem
 
 class Invoice(Printable):
     def __init__(self, data: dict) -> None:
+        self.is_interstate: bool | None = str_to_boolean(data.get("is_interstate"))
         self.operation: str = normalize_text(data.get("operation"))
         self.gta: str = normalize_text(data.get("gta"))
         self.cfop: str = normalize_text(data.get("cfop"))

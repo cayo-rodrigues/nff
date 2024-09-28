@@ -84,16 +84,33 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 					"hx-select":    "#cfop",
 					"hx-swap":      "outerHTML",
 					"hx-indicator": "#invoice-cfops-indicator",
+					"hx-include":   "#is_interstate",
 				},
-				ErrMsg:  i.Errors["Operation"],
+				ErrMsg: i.Errors["Operation"],
 			})
 			@shared.SelectInput(&shared.InputData{
-				ID:      "cfop",
-				Label:   "CFOP",
-				Value:   i.Cfop,
-				Options: &shared.InputOptions{StringOptions: models.InvoiceCfops.ByOperation(i.Operation)},
+				ID:      "is_interstate",
+				Label:   "Circulação Interestadual",
+				Value:   i.IsInterstate,
+				Options: &shared.InputOptions{StringOptions: models.InvoiceBooleanField.Reverse()[:]},
+				Attrs: templ.Attributes{
+					"hx-get":       "/invoices/form/get-cfops-input",
+					"hx-trigger":   "change",
+					"hx-target":    "#cfop",
+					"hx-select":    "#cfop",
+					"hx-swap":      "outerHTML",
+					"hx-indicator": "#invoice-cfops-indicator",
+					"hx-include":   "#operation",
+				},
+				ErrMsg: i.Errors["IsInterstate"],
+			})
+			@shared.SelectInput(&shared.InputData{
+				ID:            "cfop",
+				Label:         "CFOP",
+				Value:         i.Cfop,
+				Options:       &shared.InputOptions{StringOptions: models.InvoiceCfops.ByOperation(i.Operation)},
 				HxIndicatorID: "invoice-cfops-indicator",
-				ErrMsg:  i.Errors["Cfop"],
+				ErrMsg:        i.Errors["Cfop"],
 			})
 			@shared.SelectInput(&shared.InputData{
 				ID:      "is_icms_contributor",

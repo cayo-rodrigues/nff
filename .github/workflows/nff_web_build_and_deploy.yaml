@@ -48,6 +48,29 @@ jobs:
       - name: Apply migrations
         run: |
           goose -dir ./web/database/migrations -v -s postgres $RDS_DB_URL up
+
+  migrate_turso:
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: migrations/
+
+      - name: Setup Go Faster
+        uses: WillAbides/setup-go-faster@v1.14.0
+        with:
+          go-version: v1.23
+
+      - name: Apply migrations
+        working-directory: ./migrations/
+        run: |
+          make run up TURSO_DATABASE_URL=$TURSO_DATABASE_URL TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN
+
   deploy:
     needs:
       - build
@@ -61,6 +84,8 @@ jobs:
       RDS_DB_URL: ${{ secrets.RDS_DB_URL }}
       ELASTICACHE_URL: ${{ secrets.ELASTICACHE_URL }}
       SS_API_BASE_URL: ${{ secrets.SS_API_BASE_URL }}
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -96,6 +121,8 @@ jobs:
               -e PORT=8080 \
               -e START_FRESH=true \
               -e TZ=America/Sao_Paulo \
+              -e TURSO_DATABASE_URL=$TURSO_DATABASE_URL \
+              -e TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN \
               -e DB_URL=$RDS_DB_URL \
               -e REDIS_URL=$ELASTICACHE_URL \
               -e SS_API_BASE_URL=$SS_API_BASE_URL \
@@ -108,6 +135,8 @@ jobs:
               -e PORT=8080 \
               -e START_FRESH=true \
               -e TZ=America/Sao_Paulo \
+              -e TURSO_DATABASE_URL=$TURSO_DATABASE_URL \
+              -e TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN \
               -e DB_URL=$RDS_DB_URL \
               -e REDIS_URL=$ELASTICACHE_URL \
               -e SS_API_BASE_URL=$SS_API_BASE_URL \

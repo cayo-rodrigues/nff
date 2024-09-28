@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -11,11 +12,13 @@ import (
 	fredis "github.com/gofiber/storage/redis/v3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
 var instance *Database
 
 type Database struct {
+	SQLite       *sql.DB
 	PG           *pgxpool.Pool
 	Redis        *Redis
 	SessionStore *session.Store
@@ -41,7 +44,12 @@ func NewDatabase() (*Database, error) {
 	instance = new(Database)
 	instance.Redis = new(Redis)
 
-	err := initPG()
+	err := initSQLite()
+	if err != nil {
+		return nil, err
+	}
+
+	err = initPG()
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +68,75 @@ func NewDatabase() (*Database, error) {
 // Should be called only after NewDatabase is called, otherwise returns nil
 func GetDB() *Database {
 	return instance
+}
+
+// Should be called only after NewDatabase is called, otherwise returns nil
+func GetSQLite() *sql.DB {
+	db := GetDB()
+	if db != nil {
+		return db.SQLite
+	}
+	return nil
+}
+
+// Should be called only after NewDatabase is called, otherwise returns nil
+func GetPG() *pgxpool.Pool {
+	db := GetDB()
+	if db != nil {
+		return db.PG
+	}
+	return nil
+}
+
+// Should be called only after NewDatabase is called, otherwise returns nil
+func GetRedis() *Redis {
+	db := GetDB()
+	if db != nil {
+		return db.Redis
+	}
+	return nil
+}
+
+// Should be called only after NewDatabase is called, otherwise returns nil
+func GetSessionStore() *session.Store {
+	db := GetDB()
+	if db != nil {
+		return db.SessionStore
+	}
+	return nil
+}
+
+func initSQLite() error {
+	fmt.Println("Initializing SQLite connection...")
+	if instance.SQLite != nil {
+		fmt.Println("Reusing existing instance.SQLite connection")
+		return nil
+	}
+
+	tursoDatabaseUrl := os.Getenv("TURSO_DATABASE_URL")
+	if tursoDatabaseUrl == "" {
+		return errors.New("TURSO_DATABASE_URL env missing or empty")
+	}
+
+	authToken := os.Getenv("TURSO_AUTH_TOKEN")
+	if authToken == "" {
+		return errors.New("TURSO_AUTH_TOKEN env missing or empty")
+	}
+
+	fullURL := fmt.Sprintf("%s?authToken=%s", tursoDatabaseUrl, authToken)
+
+	sqliteDB, err := sql.Open("libsql", fullURL)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Failed to open DB %s: %v\n", fullURL, err))
+	}
+
+	if err := sqliteDB.Ping(); err != nil {
+		return errors.New(fmt.Sprintf("SQLite Database connection is not OK, ping failed:", err))
+	}
+
+	instance.SQLite = sqliteDB
+	fmt.Println("New instance.SQLite connection OK")
+	return nil
 }
 
 func initPG() error {
