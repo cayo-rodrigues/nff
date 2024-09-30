@@ -11,9 +11,9 @@ import (
 func RetrieveUser(ctx context.Context, email string) (*models.User, error) {
 	db := database.GetDB()
 
-	row := db.PG.QueryRow(
+	row := db.SQLite.QueryRowContext(
 		ctx,
-		"SELECT * FROM users WHERE users.email = $1",
+		"SELECT * FROM users WHERE users.email = ?",
 		email,
 	)
 
@@ -30,9 +30,9 @@ func RetrieveUser(ctx context.Context, email string) (*models.User, error) {
 func CreateUser(ctx context.Context, user *models.User) error {
 	db := database.GetDB()
 
-	row := db.PG.QueryRow(
+	row := db.SQLite.QueryRowContext(
 		ctx,
-		`INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id`,
+		`INSERT INTO users (email, password) VALUES (?, ?) RETURNING id`,
 		user.Email, user.Password,
 	)
 	err := row.Scan(&user.ID)

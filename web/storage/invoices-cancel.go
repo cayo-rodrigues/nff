@@ -2,12 +2,12 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	"strings"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/models"
@@ -27,7 +27,7 @@ func ListInvoiceCancelings(ctx context.Context, userID int, filters *models.Filt
 
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
+	rows, _ := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
 
 	cancelings := []*models.InvoiceCancel{}
@@ -50,11 +50,11 @@ func ListInvoiceCancelings(ctx context.Context, userID int, filters *models.Filt
 func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
 	db := database.GetDB()
 
-	row := db.PG.QueryRow(
+	row := db.SQLite.QueryRowContext(
 		ctx,
 		`INSERT INTO invoices_cancelings
 			(invoice_number, year, justification, entity_id, created_by)
-			VALUES ($1, $2, $3, $4, $5)
+			VALUES (?, ?, ?, ?, ?)
 		RETURNING id, req_status, req_msg, created_at, updated_at`,
 		canceling.InvoiceNumber, canceling.Year, canceling.Justification, canceling.Entity.ID, canceling.CreatedBy,
 	)
@@ -70,18 +70,18 @@ func CreateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel
 func RetrieveInvoiceCanceling(ctx context.Context, cancelingID int, userID int) (*models.InvoiceCancel, error) {
 	db := database.GetDB()
 
-	row := db.PG.QueryRow(
+	row := db.SQLite.QueryRowContext(
 		ctx,
 		`SELECT *
 			FROM invoices_cancelings
 				JOIN entities ON entities.id = invoices_cancelings.entity_id
-		WHERE invoices_cancelings.id = $1 AND invoices_cancelings.created_by = $2`,
+		WHERE invoices_cancelings.id = ? AND invoices_cancelings.created_by = ?`,
 		cancelingID, userID,
 	)
 
 	canceling := models.NewInvoiceCancel()
 	err := Scan(row, canceling, canceling.Entity)
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, sql.ErrNoRows) {
 		log.Printf("Invoice canceling with id %v not found: %v", cancelingID, err)
 		return nil, utils.CancelingNotFoundErr
 	}
@@ -96,18 +96,23 @@ func RetrieveInvoiceCanceling(ctx context.Context, cancelingID int, userID int) 
 func UpdateInvoiceCanceling(ctx context.Context, canceling *models.InvoiceCancel) error {
 	db := database.GetDB()
 
-	result, err := db.PG.Exec(
+	result, err := db.SQLite.ExecContext(
 		ctx,
 		` UPDATE invoices_cancelings
-			SET req_status = $1, req_msg = $2, updated_at = $3
-		WHERE id = $4 AND created_by = $5`,
+			SET req_status = ?, req_msg = ?, updated_at = ?
+		WHERE id = ? AND created_by = ?`,
 		canceling.ReqStatus, canceling.ReqMsg, time.Now(), canceling.ID, canceling.CreatedBy,
 	)
 	if err != nil {
 		log.Printf("Error when running update invoice canceling query. Canceling id: %d. Err: %v\n", canceling.ID, err)
 		return utils.InternalServerErr
 	}
-	if result.RowsAffected() == 0 {
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("Error when getting rows affected by update invoice canceling query. Canceling id: %d. Err: %v\n", canceling.ID, err)
+		return utils.InternalServerErr
+	}
+	if rowsAffected == 0 {
 		log.Printf("Canceling with id %v not found when running update query", canceling.ID)
 		return utils.CancelingNotFoundErr
 	}

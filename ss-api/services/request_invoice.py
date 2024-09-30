@@ -48,7 +48,7 @@ def request_invoice(invoice_data: dict):
     siare.fill_invoice_shipping_data(invoice)
 
     if siare.open_transport_tab():
-        siare.fill_invoice_transport_data()
+        siare.fill_invoice_transport_data(invoice)
 
     siare.open_aditional_data_tab()
     siare.fill_invoice_aditional_data(invoice)

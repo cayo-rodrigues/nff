@@ -107,6 +107,8 @@ func NewMetricsFromForm(c *fiber.Ctx) *Metrics {
 	m.StartDate = startDate
 	m.EndDate = endDate
 
+	println("METRICS FROM FORM ENTITY ID:", m.Entity.ID, "\n")
+
 	return m
 }
 

@@ -299,17 +299,35 @@ class Siare(Browser):
 
         self.wait_until_document_is_ready()
 
-    def fill_invoice_transport_data(self):
-        xpath = XPaths.INVOICE_TRANSPORT_HIRED_SHIPPING_TYPE_RADIO_INPUT
-        self.get_and_click(xpath)
+    def fill_invoice_transport_data(self, invoice: Invoice):
+        if invoice.shipping_type == "none":
+            xpath = XPaths.INVOICE_TRANSPORT_NO_SHIPPING_TYPE_RADIO_INPUT
+            self.get_and_click(xpath)
+            self.wait_until_document_is_ready()
+            return
 
-        self.wait_until_document_is_ready()
+        if invoice.shipping_type == "own":
+            xpath = XPaths.INVOICE_TRANSPORT_OWN_SHIPPING_TYPE_RADIO_INPUT
+            self.get_and_click(xpath)
+        elif invoice.shipping_type == "hired":
+            xpath = XPaths.INVOICE_TRANSPORT_HIRED_SHIPPING_TYPE_RADIO_INPUT
+            self.get_and_click(xpath)
+            self.wait_until_document_is_ready()
+            if invoice.shipping_already_hired:
+                xpath = XPaths.INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE
+                self.get_and_click(xpath)
 
-        xpath = XPaths.INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE
-        self.get_and_click(xpath)
 
-        xpath = XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_SENDER_RADIO_INPUT
-        self.get_and_click(xpath)
+        if invoice.shipping_charge_on == "sender":
+            self.get_and_click(XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_SENDER_RADIO_INPUT)
+        elif invoice.shipping_charge_on == "recipient":
+            self.get_and_click(XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_RECIPIENT_RADIO_INPUT)
+        elif invoice.shipping_charge_on == "others" and invoice.shipping_type == "hired":
+            self.get_and_click(XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_OTHERS_RADIO_INPUT)
+
+        if invoice.shipping_already_hired:
+            # preencher dados do transportador
+            ...
 
         self.wait_until_document_is_ready()
 

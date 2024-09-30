@@ -21,7 +21,7 @@ func handleDateFilters(colName string, query map[string]string, f *models.Filter
 	// TODO
 	// verificar se o período selecionado é válido
 
-	f.And().AsDate(colName).Between(fromDate, toDate)
+	f.And().Date(colName).Between(fromDate, toDate)
 }
 
 func handleEntityFilters(colName string, query map[string]string, f*models.Filters) {

@@ -10,7 +10,6 @@ import (
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 	fredis "github.com/gofiber/storage/redis/v3"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
@@ -19,14 +18,13 @@ var instance *Database
 
 type Database struct {
 	SQLite       *sql.DB
-	PG           *pgxpool.Pool
 	Redis        *Redis
 	SessionStore *session.Store
 }
 
 func (db *Database) Close() {
-	if db.PG != nil {
-		db.PG.Close()
+	if db.SQLite != nil {
+		db.SQLite.Close()
 	}
 	if db.Redis.Client != nil {
 		db.Redis.Close()
@@ -45,11 +43,6 @@ func NewDatabase() (*Database, error) {
 	instance.Redis = new(Redis)
 
 	err := initSQLite()
-	if err != nil {
-		return nil, err
-	}
-
-	err = initPG()
 	if err != nil {
 		return nil, err
 	}
@@ -75,15 +68,6 @@ func GetSQLite() *sql.DB {
 	db := GetDB()
 	if db != nil {
 		return db.SQLite
-	}
-	return nil
-}
-
-// Should be called only after NewDatabase is called, otherwise returns nil
-func GetPG() *pgxpool.Pool {
-	db := GetDB()
-	if db != nil {
-		return db.PG
 	}
 	return nil
 }
@@ -136,35 +120,6 @@ func initSQLite() error {
 
 	instance.SQLite = sqliteDB
 	fmt.Println("New instance.SQLite connection OK")
-	return nil
-}
-
-func initPG() error {
-	fmt.Println("Initializing PG connection...")
-
-	if instance.PG != nil {
-		fmt.Println("Reusing existing instance.PG connection")
-		return nil
-	}
-
-	DB_URL := os.Getenv("DB_URL")
-	if DB_URL == "" {
-		return errors.New("DB_URL env missing or empty")
-	}
-
-	dbpool, err := pgxpool.New(context.Background(), DB_URL)
-	if err != nil {
-		return err
-	}
-
-	err = dbpool.Ping(context.Background())
-	if err != nil {
-		return errors.New(fmt.Sprintf("PG connection is not OK, ping failed: %v", err))
-	}
-
-	instance.PG = dbpool
-
-	fmt.Println("New instance.PG connection OK")
 	return nil
 }
 

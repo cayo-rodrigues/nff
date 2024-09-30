@@ -76,7 +76,7 @@ func main() {
 	app.Get("/notifications/latest", handlers.GetLatestNotification)
 	app.Delete("/notifications", handlers.ClearNotifications)
 
-	app.Use(middlewares.CacheMiddleware)
+	// app.Use(middlewares.CacheMiddleware)
 
 	app.Get("/", handlers.HomePage)
 
