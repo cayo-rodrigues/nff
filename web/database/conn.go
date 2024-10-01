@@ -6,18 +6,26 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 	fredis "github.com/gofiber/storage/redis/v3"
 	"github.com/redis/go-redis/v9"
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	"github.com/tursodatabase/go-libsql"
 )
 
 var instance *Database
 
+type SQLlite struct {
+	*sql.DB
+	dbName    string
+	tempDir   string
+	connector *libsql.Connector
+}
+
 type Database struct {
-	SQLite       *sql.DB
+	SQLite       *SQLlite
 	Redis        *Redis
 	SessionStore *session.Store
 }
@@ -25,6 +33,8 @@ type Database struct {
 func (db *Database) Close() {
 	if db.SQLite != nil {
 		db.SQLite.Close()
+		defer os.RemoveAll(db.SQLite.tempDir)
+		defer db.SQLite.connector.Close()
 	}
 	if db.Redis.Client != nil {
 		db.Redis.Close()
@@ -64,7 +74,7 @@ func GetDB() *Database {
 }
 
 // Should be called only after NewDatabase is called, otherwise returns nil
-func GetSQLite() *sql.DB {
+func GetSQLite() *SQLlite {
 	db := GetDB()
 	if db != nil {
 		return db.SQLite
@@ -107,13 +117,26 @@ func initSQLite() error {
 		return errors.New("TURSO_AUTH_TOKEN env missing or empty")
 	}
 
-	fullURL := fmt.Sprintf("%s?authToken=%s", tursoDatabaseUrl, authToken)
+	sqliteDB := new(SQLlite)
 
-	sqliteDB, err := sql.Open("libsql", fullURL)
+	sqliteDB.dbName = "local-nff.db"
+
+	dir, err := os.MkdirTemp("", "libsql-*")
 	if err != nil {
-		return errors.New(fmt.Sprintf("Failed to open DB %s: %v\n", fullURL, err))
+		return fmt.Errorf("Error creating temporary directory: %v", err)
+	}
+	dbPath := filepath.Join(dir, sqliteDB.dbName)
+
+	sqliteDB.connector, err = libsql.NewEmbeddedReplicaConnector(dbPath, tursoDatabaseUrl,
+		libsql.WithAuthToken(authToken),
+		libsql.WithReadYourWrites(true),
+		libsql.WithSyncInterval(time.Hour*24),
+	)
+	if err != nil {
+		return fmt.Errorf("Error creating connector: %v", err)
 	}
 
+	sqliteDB.DB = sql.OpenDB(sqliteDB.connector)
 	if err := sqliteDB.Ping(); err != nil {
 		return errors.New(fmt.Sprintf("SQLite Database connection is not OK, ping failed:", err))
 	}

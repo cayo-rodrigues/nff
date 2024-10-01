@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/utils"
 )
 
@@ -24,7 +25,7 @@ func Scan(row Scanner, models ...ScannableModel) error {
 	return row.Scan(values...)
 }
 
-func WithTransaction(ctx context.Context, db *sql.DB, fn func(tx *sql.Tx) error) (err error) {
+func WithTransaction(ctx context.Context, db *database.SQLlite, fn func(tx *sql.Tx) error) (err error) {
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		log.Println("Error starting transaction: ", err)
