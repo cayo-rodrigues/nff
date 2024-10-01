@@ -10,11 +10,12 @@ RUN templ generate && go mod tidy
 
 RUN go build -o nff ./main.go
 
-RUN apk add --no-cache tzdata
+RUN apk add --no-cache tzdata ca-certificates
 
 FROM scratch
 
 COPY --from=builder /app/nff /
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 CMD [ "./nff" ]
