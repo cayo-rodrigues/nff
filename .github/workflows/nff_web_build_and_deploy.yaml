@@ -94,25 +94,12 @@ jobs:
 
             docker network create nff-network &&
 
-            # Run NFF containers
+            # Run NFF container
             docker run \
               --network nff-network \
               --rm \
               --detach \
-              --name nff-web_1 \
-              -e PORT=8080 \
-              -e START_FRESH=true \
-              -e TZ=America/Sao_Paulo \
-              -e TURSO_DATABASE_URL=$TURSO_DATABASE_URL \
-              -e TURSO_AUTH_TOKEN=$TURSO_AUTH_TOKEN \
-              -e REDIS_URL=$ELASTICACHE_URL \
-              -e SS_API_BASE_URL=$SS_API_BASE_URL \
-              $WEB_IMAGE_TAG &&
-            docker run \
-              --network nff-network \
-              --rm \
-              --detach \
-              --name nff-web_2 \
+              --name nff-web \
               -e PORT=8080 \
               -e START_FRESH=true \
               -e TZ=America/Sao_Paulo \
