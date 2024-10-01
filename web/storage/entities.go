@@ -14,14 +14,14 @@ import (
 )
 
 func ListEntities(ctx context.Context, userID int, filters *models.Filters) (entities []*models.Entity, err error) {
-	// namespace := "entities"
-	// filtersKey := filters.String() + filters.StringValues()
+	namespace := "entities"
+	filtersKey := filters.String() + filters.StringValues()
 
 	db := database.GetDB()
 
-	// if db.Redis.GetDecodedCache(ctx, userID, namespace, filtersKey, &entities); entities != nil {
-	// 	return entities, nil
-	// }
+	if db.Redis.GetDecodedCache(ctx, userID, namespace, filtersKey, &entities); entities != nil {
+		return entities, nil
+	}
 
 	query := new(strings.Builder)
 	query.WriteString("SELECT * FROM entities")
@@ -48,7 +48,7 @@ func ListEntities(ctx context.Context, userID int, filters *models.Filters) (ent
 		entities = append(entities, entity)
 	}
 
-	// db.Redis.SetEncodedCache(ctx, userID, namespace, filtersKey, entities, time.Hour)
+	db.Redis.SetEncodedCache(ctx, userID, namespace, filtersKey, entities, time.Hour)
 
 	return entities, nil
 }
