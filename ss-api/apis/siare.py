@@ -313,7 +313,7 @@ class Siare(Browser):
             xpath = XPaths.INVOICE_TRANSPORT_HIRED_SHIPPING_TYPE_RADIO_INPUT
             self.get_and_click(xpath)
             self.wait_until_document_is_ready()
-            if invoice.shipping_already_hired:
+            if not invoice.shipping_already_hired:
                 xpath = XPaths.INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE
                 self.get_and_click(xpath)
 

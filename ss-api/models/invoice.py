@@ -23,9 +23,9 @@ class Invoice(Printable):
         self.add_shipping_to_total_value: bool | None = str_to_boolean(
             data.get("add_shipping_to_total_value")
         )
-        self.shipping_type: str = normalize_text(data.get("shipping_type"))
-        self.shipping_already_hired: bool | None = str_to_boolean(data.get("shipping_already_hired"))
-        self.shipping_charge_on: str = normalize_text(data.get("shipping_charge_on"))
+        self.shipping_type: str = normalize_text(data.get("shipping_type", "hired"))
+        self.shipping_already_hired: bool | None = str_to_boolean(data.get("shipping_already_hired", "não"))
+        self.shipping_charge_on: str = normalize_text(data.get("shipping_charge_on", "sender"))
         self.extra_notes: str = normalize_text(data.get("extra_notes"))
         self.custom_file_name_prefix: str = normalize_text(
             data.get("custom_file_name"), keep_case=True, remove=["/", "\\"]
