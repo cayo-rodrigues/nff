@@ -27,4 +27,4 @@ jobs:
 
   call_build_and_deploy_workflow:
     needs: renew_certificate
-    uses: ./nff_web_build_and_deploy.yaml
+    uses: ./nff_web_build_and_deploy.yaml@develop
