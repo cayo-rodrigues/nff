@@ -1,0 +1,30 @@
+name: renew_certificate_cron
+
+on:
+  schedule:
+    # Run at midnight on the 1st day of every other month
+    - cron: '0 0 1 1,3,5,7,9,11 *'
+
+jobs:
+  renew_certificate:
+    runs-on: ubuntu-latest
+    env:
+      PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+      HOSTNAME: ${{ secrets.EC2_SSH_HOST_2 }}
+      USER_NAME: ${{ secrets.EC2_USER_NAME }}
+    steps:
+      - name: Set up SSH
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Connect to EC2 instance and renew certificate
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} "
+            docker ps -q | xargs -r docker stop &&
+            sudo certbot renew
+          "
+
+  call_build_and_deploy_workflow:
+    needs: renew_certificate
+    uses: ./nff_web_build_and_deploy.yaml

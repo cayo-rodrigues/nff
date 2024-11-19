@@ -1,6 +1,7 @@
 name: nff_web_build_and_deploy
 
 on:
+  workflow_call:
   workflow_dispatch:
   push:
     branches:
