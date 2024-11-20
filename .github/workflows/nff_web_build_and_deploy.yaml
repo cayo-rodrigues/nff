@@ -108,7 +108,6 @@ jobs:
             # Run NFF container
             docker run \
               --network nff-network \
-              --rm \
               --detach \
               --name nff-web \
               -e PORT=8080 \
