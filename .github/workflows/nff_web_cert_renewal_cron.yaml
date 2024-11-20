@@ -31,6 +31,7 @@ jobs:
             docker ps -q | xargs -r docker stop &&
             sudo certbot renew &&
             sudo kill -9 $(sudo lsof -t -i :80) 2>/dev/null || echo "No process found using port 80"
+          '
 
   call_build_and_deploy_workflow:
     needs: renew_certificate
