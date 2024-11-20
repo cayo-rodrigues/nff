@@ -1,6 +1,14 @@
 name: renew_certificate_cron
 
 on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - ".github/workflows/nff_web_cert_renewal_cron.yaml"
+
+  workflow_dispatch:
   schedule:
     # Run at midnight on the 1st day of every other month
     - cron: '0 0 1 1,3,5,7,9,11 *'
