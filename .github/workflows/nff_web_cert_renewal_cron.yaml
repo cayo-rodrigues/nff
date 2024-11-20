@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: "0 0 1 */2 *"  # Every two months
 
+permissions:
+  contents: write
+
 jobs:
   renew_certificate:
     runs-on: ubuntu-latest
