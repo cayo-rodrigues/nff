@@ -1,0 +1,46 @@
+name: nff_web_cert_renewal_cron
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - ".github/workflows/nff_web_cert_renewal_cron.yaml"
+
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 1 */2 *"  # Every two months
+
+permissions:
+  contents: write
+
+jobs:
+  renew_certificate:
+    runs-on: ubuntu-latest
+    env:
+      PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+      HOSTNAME: ${{ secrets.EC2_SSH_HOST_2 }}
+      USER_NAME: ${{ secrets.EC2_USER_NAME }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: web/nginx/
+
+      - name: Set up SSH
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Transfer Nginx Conf to EC2
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key.pem ./web/nginx/nginx.conf ${USER_NAME}@${HOSTNAME}:/home/${USER_NAME}/
+
+      - name: Connect to EC2 instance and renew certificate
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${USER_NAME}@${HOSTNAME} '
+            docker ps -q | xargs -r docker stop &&
+            sudo certbot renew &&
+            sudo kill -9 $(sudo lsof -t -i :80) 2>/dev/null || echo "No process found using port 80"
+          '

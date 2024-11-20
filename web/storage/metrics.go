@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	"strings"
@@ -10,7 +11,6 @@ import (
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 func ListMetrics(ctx context.Context, userID int, filters *models.Filters) ([]*models.Metrics, error) {
@@ -26,7 +26,7 @@ func ListMetrics(ctx context.Context, userID int, filters *models.Filters) ([]*m
 
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, query.String(), filters.Values()...)
+	rows, _ := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
 	defer rows.Close()
 
 	metricsList := []*models.Metrics{}
@@ -48,11 +48,11 @@ func ListMetrics(ctx context.Context, userID int, filters *models.Filters) ([]*m
 func CreateMetrics(ctx context.Context, metrics *models.Metrics) error {
 	db := database.GetDB()
 
-	row := db.PG.QueryRow(
+	row := db.SQLite.QueryRowContext(
 		ctx,
 		`INSERT INTO metrics_history
 			(start_date, end_date, entity_id, created_by)
-			VALUES ($1, $2, $3, $4)
+			VALUES (?, ?, ?, ?)
 		RETURNING id, req_status, req_msg, created_at, updated_at`,
 		metrics.StartDate, metrics.EndDate, metrics.Entity.ID, metrics.CreatedBy,
 	)
@@ -68,18 +68,18 @@ func CreateMetrics(ctx context.Context, metrics *models.Metrics) error {
 func RetrieveMetrics(ctx context.Context, queryId int, userID int) (*models.Metrics, error) {
 	db := database.GetDB()
 
-	row := db.PG.QueryRow(
+	row := db.SQLite.QueryRowContext(
 		ctx,
 		`SELECT *
 			FROM metrics_history
 				JOIN entities ON entities.id = metrics_history.entity_id
-		WHERE metrics_history.id = $1 AND metrics_history.created_by = $2`,
+		WHERE metrics_history.id = ? AND metrics_history.created_by = ?`,
 		queryId, userID,
 	)
 
 	metrics := models.NewMetrics()
 	err := Scan(row, metrics, metrics.Entity)
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, sql.ErrNoRows) {
 		log.Printf("Metrics query with id %v not found: %v", queryId, err)
 		return nil, utils.MetricsNotFoundErr
 	}
@@ -110,11 +110,11 @@ func RetrieveMetrics(ctx context.Context, queryId int, userID int) (*models.Metr
 func UpdateMetrics(ctx context.Context, metrics *models.Metrics) error {
 	db := database.GetDB()
 
-	result, err := db.PG.Exec(
+	result, err := db.SQLite.ExecContext(
 		ctx,
 		`UPDATE metrics_history SET
-			req_status = $1, req_msg = $2, updated_at = $3
-		WHERE id = $4 AND created_by = $5`,
+			req_status = ?, req_msg = ?, updated_at = ?
+		WHERE id = ? AND created_by = ?`,
 		metrics.ReqStatus, metrics.ReqMsg, time.Now(),
 		metrics.ID, metrics.CreatedBy,
 	)
@@ -122,7 +122,12 @@ func UpdateMetrics(ctx context.Context, metrics *models.Metrics) error {
 		log.Printf("Error when running update metrics query. Metrics id: %d. Err: %v\n", metrics.ID, err)
 		return utils.InternalServerErr
 	}
-	if result.RowsAffected() == 0 {
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("Error when getting rows affected by update metrics query. Metrics id: %d. Err: %v\n", metrics.ID, err)
+		return utils.InternalServerErr
+	}
+	if rowsAffected == 0 {
 		log.Printf("Metrics with id %v not found when running update query", metrics.ID)
 		return utils.MetricsNotFoundErr
 	}

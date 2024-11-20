@@ -6,7 +6,6 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       - PORT=8080
-      - DB_URL=postgres://nff:nff@db:5432/nff
       - REDIS_URL=redis://rdb:6379/0
       - START_FRESH=true
       - SS_API_BASE_URL=https://bmabg5gxpykclea3u3roxajlxm0kywgy.lambda-url.sa-east-1.on.aws
@@ -16,18 +15,7 @@ services:
     volumes:
       - ./:/app
     depends_on:
-      - db
       - rdb
-
-  db:
-    container_name: nff-db
-    image: postgres:latest
-    environment:
-      - POSTGRES_USER=nff
-      - POSTGRES_PASSWORD=nff
-      - POSTGRES_DB=nff
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
   rdb:
     container_name: nff-rdb
@@ -37,20 +25,6 @@ services:
     volumes:
       - redis_data:/var/lib/redis/data
 
-  migrations:
-    container_name: nff-migrations
-    build:
-      context: .
-      dockerfile: Dockerfile.goose
-    environment:
-      - DB_URL=postgres://nff:nff@db:5432/nff
-      - CMD=up
-    volumes:
-      - ./database/migrations/:/migrations
-    depends_on:
-      - db
-
 volumes:
-  postgres_data:
   redis_data:
 

@@ -24,6 +24,7 @@ class XPaths:
     # require invoice page
     INVOICE_BASIC_DATA_INTERSTATE_SELECT_INPUT = '//*[@id="tpNota"]/tbody/tr[3]/td[2]/div/input'
     INVOICE_BASIC_DATA_INTERSTATE_OPTION = '//*[@id="tpNota"]/tbody/tr[3]/td[2]/div/div[2]/span[2]'
+    INVOICE_BASE_DATA_INSTERSTATE_BOX = '//*[@id="tpNota"]/tbody/tr[3]/td[2]/div/div[2]'
     INVOICE_BASIC_DATA_OPERATION_SELECT_INPUT = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[4]/td[2]/div/div[1]"
     INVOICE_BASIC_DATA_OPERATION_BOX = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[3]/tbody/tr[4]/td[2]/div/div[2]"
     INVOICE_BASIC_DATA_CONFIRMATION_BUTTON = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[5]/tbody/tr[3]/td[2]/a[1]"
@@ -82,9 +83,19 @@ class XPaths:
     # under invoice transport tab
     INVOICE_TRANSPORT_TAB = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[11]/a"
 
+    INVOICE_TRANSPORT_OWN_SHIPPING_TYPE_RADIO_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[2]/input'
     INVOICE_TRANSPORT_HIRED_SHIPPING_TYPE_RADIO_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[4]/nobr/input'
+    INVOICE_TRANSPORT_NO_SHIPPING_TYPE_RADIO_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[2]/td[5]/input'
     INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[4]/td[4]/nobr/input'
     INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_SENDER_RADIO_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[5]/td[2]/input[2]'
+    INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_RECIPIENT_RADIO_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[5]/td[4]/nobr/input'
+    INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_OTHERS_RADIO_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[5]/td[5]/input'
+    INVOICE_TRANSPORT_SHIPPING_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[3]/tbody/tr[5]/td[7]/nobr/input' # ???????????????
+    INVOICE_TRANSPORT_DRIVER_CPF_CNPJ_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[2]/td[2]/input'
+    INVOICE_TRANSPORT_DRIVER_PLACA_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[4]/td[2]/input'
+    INVOICE_TRANSPORT_DRIVER_RENAVAM_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[4]/td[4]/input'
+    INVOICE_TRANSPORT_DRIVER_UF_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[4]/td[6]/div/input'
+    INVOICE_TRANSPORT_DRIVER_UF_BOX = '//*[@id="containerConteudoPrincipal"]/div/form/table[4]/tbody/tr[4]/td[6]/div/div[2]'
 
     # under invoice aditional data tab
     INVOICE_ADITIONAL_DATA_TAB = "/html/body/div[3]/div[2]/div/div[3]/div/form/table[2]/tbody/tr/td[14]/a"

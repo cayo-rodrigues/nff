@@ -6,27 +6,35 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 	fredis "github.com/gofiber/storage/redis/v3"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/redis/go-redis/v9"
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	"github.com/tursodatabase/go-libsql"
 )
 
 var instance *Database
 
+type SQLlite struct {
+	*sql.DB
+	dbName    string
+	tempDir   string
+	connector *libsql.Connector
+}
+
 type Database struct {
-	SQLite       *sql.DB
-	PG           *pgxpool.Pool
+	SQLite       *SQLlite
 	Redis        *Redis
 	SessionStore *session.Store
 }
 
 func (db *Database) Close() {
-	if db.PG != nil {
-		db.PG.Close()
+	if db.SQLite != nil {
+		db.SQLite.Close()
+		defer os.RemoveAll(db.SQLite.tempDir)
+		defer db.SQLite.connector.Close()
 	}
 	if db.Redis.Client != nil {
 		db.Redis.Close()
@@ -48,11 +56,6 @@ func NewDatabase() (*Database, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	err = initPG()
-	if err != nil {
-		return nil, err
-	}
 	err = initRedis()
 	if err != nil {
 		return nil, err
@@ -71,19 +74,10 @@ func GetDB() *Database {
 }
 
 // Should be called only after NewDatabase is called, otherwise returns nil
-func GetSQLite() *sql.DB {
+func GetSQLite() *SQLlite {
 	db := GetDB()
 	if db != nil {
 		return db.SQLite
-	}
-	return nil
-}
-
-// Should be called only after NewDatabase is called, otherwise returns nil
-func GetPG() *pgxpool.Pool {
-	db := GetDB()
-	if db != nil {
-		return db.PG
 	}
 	return nil
 }
@@ -123,48 +117,32 @@ func initSQLite() error {
 		return errors.New("TURSO_AUTH_TOKEN env missing or empty")
 	}
 
-	fullURL := fmt.Sprintf("%s?authToken=%s", tursoDatabaseUrl, authToken)
+	sqliteDB := new(SQLlite)
 
-	sqliteDB, err := sql.Open("libsql", fullURL)
+	sqliteDB.dbName = "local-nff.db"
+
+	dir, err := os.MkdirTemp("", "libsql-*")
 	if err != nil {
-		return errors.New(fmt.Sprintf("Failed to open DB %s: %v\n", fullURL, err))
+		return fmt.Errorf("Error creating temporary directory: %v", err)
+	}
+	dbPath := filepath.Join(dir, sqliteDB.dbName)
+
+	sqliteDB.connector, err = libsql.NewEmbeddedReplicaConnector(dbPath, tursoDatabaseUrl,
+		libsql.WithAuthToken(authToken),
+		libsql.WithReadYourWrites(true),
+		libsql.WithSyncInterval(time.Hour*24),
+	)
+	if err != nil {
+		return fmt.Errorf("Error creating connector: %v", err)
 	}
 
+	sqliteDB.DB = sql.OpenDB(sqliteDB.connector)
 	if err := sqliteDB.Ping(); err != nil {
 		return errors.New(fmt.Sprintf("SQLite Database connection is not OK, ping failed:", err))
 	}
 
 	instance.SQLite = sqliteDB
 	fmt.Println("New instance.SQLite connection OK")
-	return nil
-}
-
-func initPG() error {
-	fmt.Println("Initializing PG connection...")
-
-	if instance.PG != nil {
-		fmt.Println("Reusing existing instance.PG connection")
-		return nil
-	}
-
-	DB_URL := os.Getenv("DB_URL")
-	if DB_URL == "" {
-		return errors.New("DB_URL env missing or empty")
-	}
-
-	dbpool, err := pgxpool.New(context.Background(), DB_URL)
-	if err != nil {
-		return err
-	}
-
-	err = dbpool.Ping(context.Background())
-	if err != nil {
-		return errors.New(fmt.Sprintf("PG connection is not OK, ping failed: %v", err))
-	}
-
-	instance.PG = dbpool
-
-	fmt.Println("New instance.PG connection OK")
 	return nil
 }
 

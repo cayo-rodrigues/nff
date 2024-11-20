@@ -74,12 +74,12 @@ func (f *Filters) Or(condition ...string) *Filters {
 func (f *Filters) ILike(condition ...string) *Filters {
 	conditionsCount := len(condition)
 	if conditionsCount == 0 {
-		f.query.WriteString(" ILIKE ")
+		f.query.WriteString(" LIKE ")
 		return f
 	}
 
 	if conditionsCount == 1 {
-		f.query.WriteString(" ILIKE '%' || " + condition[0] + " || '%'")
+		f.query.WriteString(" LIKE '%' || " + condition[0] + " || '%' COLLATE NOCASE")
 		return f
 	}
 
@@ -87,17 +87,12 @@ func (f *Filters) ILike(condition ...string) *Filters {
 	for _, c := range condition {
 		cond.WriteString(c)
 	}
-	f.query.WriteString(" ILIKE '%' || " + cond.String() + " || '%'")
+	f.query.WriteString(" LIKE '%' || " + cond.String() + " || '%' COLLATE NOCASE")
 	return f
 }
 
 func (f *Filters) OrderBy(column string) *Filters {
 	f.query.WriteString(" ORDER BY " + column)
-	return f
-}
-
-func (f *Filters) Asc() *Filters {
-	f.query.WriteString(" ASC ")
 	return f
 }
 
@@ -112,13 +107,8 @@ func (f *Filters) Between(x, y any) *Filters {
 	return f
 }
 
-func (f *Filters) Cast(col, colType string) *Filters {
-	f.query.WriteString(fmt.Sprintf("CAST(%s AS %s)", col, colType))
-	return f
-}
-
-func (f *Filters) AsDate(col string) *Filters {
-	f.Cast(col, "DATE")
+func (f *Filters) Date(col string) *Filters {
+	f.query.WriteString("DATE(" + col + ")")
 	return f
 }
 
@@ -132,10 +122,6 @@ func (f *Filters) AppendValue(v any) {
 
 func (f *Filters) Values() []any {
 	return f.values
-}
-
-func (f *Filters) ValuesCount() int {
-	return len(f.values)
 }
 
 func (f *Filters) StringValues() string {
@@ -152,20 +138,15 @@ func (f *Filters) StringValues() string {
 }
 
 func (f *Filters) Placeholder(value any) *Filters {
-	position := f.ValuesCount() + 1
 	f.AppendValue(value)
-
-	f.query.WriteString(fmt.Sprintf("$%d", position))
+	f.query.WriteString("?")
 
 	return f
 }
 
 func (f *Filters) WildPlaceholder(value any) *Filters {
-	position := f.ValuesCount() + 1
 	f.AppendValue(value)
-
-	f.query.WriteString(fmt.Sprintf("%s || $%d || %s", "'%'", position, "'%'"))
-
+	f.query.WriteString("'%' || ? || '%'")
 	return f
 }
 

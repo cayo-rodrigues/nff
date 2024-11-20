@@ -292,15 +292,18 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 			otherEntitiesIes = append(otherEntitiesIes, record.InvoiceSender)
 		}
 	}
-	f := models.NewFilters().Where("ie").In(otherEntitiesIes).Or("other_ies && ").Placeholder(otherEntitiesIes)
+	f := models.NewFilters().Where("ie").In(otherEntitiesIes)
+	for _, ie := range otherEntitiesIes {
+		f.Or("json_array_contains(other_ies, ?)").AppendValue(ie)
+	}
 
 	query := new(strings.Builder)
-	query.WriteString("SELECT name, ie, other_ies FROM entities")
+	query.WriteString("SELECT name, ie, other_ies FROM entities") // TODO - falta filtrar por created_by
 	query.WriteString(f.String())
 
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, query.String(), f.Values()...)
+	rows, _ := db.SQLite.QueryContext(ctx, query.String(), f.Values()...)
 	defer rows.Close()
 
 	for rows.Next() {

@@ -2,18 +2,18 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
 	"github.com/cayo-rodrigues/nff/web/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 func CreateUser(ctx context.Context, user *models.User) error {
 	_, err := storage.RetrieveUser(ctx, user.Email)
 	userAlreadyExists := true
-	if errors.Is(err, pgx.ErrNoRows) {
+	if errors.Is(err, sql.ErrNoRows) {
 		userAlreadyExists = false
 	} else if err != nil {
 		return err
@@ -39,7 +39,7 @@ func CreateUser(ctx context.Context, user *models.User) error {
 func IsLoginDataValid(ctx context.Context, user *models.User) bool {
 	userFromDB, err := storage.RetrieveUser(ctx, user.Email)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, sql.ErrNoRows) {
 			user.SetError("Email", utils.InvalidLoginDataMsg)
 			user.SetError("Password", utils.InvalidLoginDataMsg)
 		}

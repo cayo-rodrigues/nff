@@ -11,18 +11,19 @@ import (
 )
 
 type Entity struct {
-	ID        int                `json:"-"`
-	Name      string             `json:"-"`
-	UserType  string             `json:"user_type"`
-	Ie        string             `json:"ie"`
-	OtherIes  []string           `json:"other_ies"`
-	CpfCnpj   string             `json:"cpf_cnpj"`
-	Email     string             `json:"email"`
-	Password  string             `json:"password"`
-	CreatedBy int                `json:"-"`
-	CreatedAt time.Time          `json:"-"`
-	UpdatedAt time.Time          `json:"-"`
-	Errors    safe.ErrorMessages `json:"-"`
+	ID           int                `json:"-"`
+	Name         string             `json:"-"`
+	UserType     string             `json:"user_type"`
+	Ie           string             `json:"ie"`
+	OtherIes     []string           `json:"other_ies"`
+	OtherIesJSON []byte             `json:"other_ies_json"`
+	CpfCnpj      string             `json:"cpf_cnpj"`
+	Email        string             `json:"email"`
+	Password     string             `json:"password"`
+	CreatedBy    int                `json:"-"`
+	CreatedAt    time.Time          `json:"-"`
+	UpdatedAt    time.Time          `json:"-"`
+	Errors       safe.ErrorMessages `json:"-"`
 	*Address
 }
 
@@ -49,7 +50,6 @@ func NewEntityFromForm(c *fiber.Ctx) *Entity {
 	if err != nil {
 		id = 0
 	}
-
 
 	entity := &Entity{
 		ID:       id,
@@ -152,7 +152,7 @@ func (e *Entity) Values() []any {
 	return []any{
 		&e.ID, &e.Name, &e.UserType, &e.CpfCnpj, &e.Ie, &e.Email, &e.Password,
 		&e.PostalCode, &e.Neighborhood, &e.StreetType, &e.StreetName, &e.Number,
-		&e.CreatedBy, &e.CreatedAt, &e.UpdatedAt, &e.OtherIes,
+		&e.CreatedBy, &e.CreatedAt, &e.UpdatedAt, &e.OtherIesJSON,
 	}
 }
 

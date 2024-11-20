@@ -2,18 +2,19 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 	"log"
+	"strings"
 
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 func ListInvoiceItems(ctx context.Context, invoiceID int, userID int) ([]*models.InvoiceItem, error) {
 	db := database.GetDB()
 
-	rows, _ := db.PG.Query(ctx, "SELECT * FROM invoices_items WHERE invoice_id = $1 AND created_by = $2 ORDER BY id", invoiceID, userID)
+	rows, _ := db.SQLite.QueryContext(ctx, "SELECT * FROM invoices_items WHERE invoice_id = ? AND created_by = ? ORDER BY id", invoiceID, userID)
 	defer rows.Close()
 
 	items := []*models.InvoiceItem{}
@@ -36,26 +37,36 @@ func ListInvoiceItems(ctx context.Context, invoiceID int, userID int) ([]*models
 func BulkCreateInvoiceItems(ctx context.Context, items []*models.InvoiceItem, invoiceID int, userID int) error {
 	db := database.GetDB()
 
-	rows := [][]interface{}{}
-	for _, item := range items {
-		item.InvoiceID = invoiceID
-		item.CreatedBy = userID
-		rows = append(rows, []interface{}{
-			item.Group, item.Description, item.Origin, item.UnityOfMeasurement,
-			item.Quantity, item.ValuePerUnity, item.InvoiceID, item.CreatedBy,
-			item.NCM,
-		})
-	}
-	_, err := db.PG.CopyFrom(
-		ctx,
-		pgx.Identifier{"invoices_items"},
-		[]string{"item_group", "description", "origin", "unity_of_measurement", "quantity", "value_per_unity", "invoice_id", "created_by", "ncm"},
-		pgx.CopyFromRows(rows),
-	)
-	if err != nil {
-		log.Println("Error when running bulk insert invoice items query: ", err)
-		return utils.InternalServerErr
-	}
+	return WithTransaction(ctx, db.SQLite, func(tx *sql.Tx) error {
+		query := `
+		INSERT INTO invoices_items (
+			item_group, description, origin, unity_of_measurement, quantity, value_per_unity, 
+			invoice_id, created_by, ncm
+		)
+		VALUES `
 
-	return nil
+		values := []interface{}{}
+		valuePlaceholders := []string{}
+
+		for _, item := range items {
+			item.InvoiceID = invoiceID
+			item.CreatedBy = userID
+
+			valuePlaceholders = append(valuePlaceholders, "(?, ?, ?, ?, ?, ?, ?, ?, ?)")
+			values = append(values, item.Group, item.Description, item.Origin,
+				item.UnityOfMeasurement, item.Quantity, item.ValuePerUnity,
+				item.InvoiceID, item.CreatedBy, item.NCM,
+			)
+		}
+
+		query += strings.Join(valuePlaceholders, ", ")
+
+		_, err := tx.ExecContext(ctx, query, values...)
+		if err != nil {
+			log.Println("Error executing bulk insert: ", err)
+			return utils.InternalServerErr
+		}
+
+		return nil
+	})
 }
