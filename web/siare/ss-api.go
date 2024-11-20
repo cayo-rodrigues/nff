@@ -292,25 +292,37 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 			otherEntitiesIes = append(otherEntitiesIes, record.InvoiceSender)
 		}
 	}
-	f := models.NewFilters().Where("ie").In(otherEntitiesIes)
+	f := models.NewFilters().Where("created_by = ").Placeholder(metrics.CreatedBy)
+	f.And("ie").In(otherEntitiesIes)
 	for _, ie := range otherEntitiesIes {
-		f.Or("json_array_contains(other_ies, ?)").AppendValue(ie)
+		f.Or("other_ies").ILike().WildPlaceholder(ie)
 	}
 
 	query := new(strings.Builder)
-	query.WriteString("SELECT name, ie, other_ies FROM entities") // TODO - falta filtrar por created_by
+	query.WriteString("SELECT name, ie, other_ies FROM entities")
 	query.WriteString(f.String())
 
 	db := database.GetDB()
 
-	rows, _ := db.SQLite.QueryContext(ctx, query.String(), f.Values()...)
+	rows, err := db.SQLite.QueryContext(ctx, query.String(), f.Values()...)
+	if err != nil {
+		log.Printf("Error on get metrics post request, aborting operation. Metrics with id %v will be on 'pending' state for ever. Error: %v\n", metrics.ID, err)
+		return
+	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var entityName, entityIe string
+		var entityOtherIesJSON []byte
 		var entityOtherIes []string
-		if err := rows.Scan(&entityName, &entityIe, &entityOtherIes); err != nil {
-			log.Printf("Error scanning entity rows: %v", err)
+		if err := rows.Scan(&entityName, &entityIe, &entityOtherIesJSON); err != nil {
+			log.Printf("Error scanning entity rows, skipping entity. Error: %v", err)
+			continue
+		}
+
+		err = json.Unmarshal(entityOtherIesJSON, &entityOtherIes)
+		if err != nil {
+			log.Println("Error unmarshaling entity other ies, skipping entity. Error: ", err)
 			continue
 		}
 
@@ -364,5 +376,4 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	}()
 
 	wg.Wait()
-	return
 }

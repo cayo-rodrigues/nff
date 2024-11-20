@@ -116,8 +116,9 @@ func (f *Filters) String() string {
 	return f.query.String()
 }
 
-func (f *Filters) AppendValue(v any) {
+func (f *Filters) AppendValue(v any) *Filters {
 	f.values = append(f.values, v)
+	return f
 }
 
 func (f *Filters) Values() []any {

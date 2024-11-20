@@ -138,7 +138,7 @@ func initSQLite() error {
 
 	sqliteDB.DB = sql.OpenDB(sqliteDB.connector)
 	if err := sqliteDB.Ping(); err != nil {
-		return errors.New(fmt.Sprintf("SQLite Database connection is not OK, ping failed:", err))
+		return errors.New(fmt.Sprintf("SQLite Database connection is not OK, ping failed: %v", err))
 	}
 
 	instance.SQLite = sqliteDB
