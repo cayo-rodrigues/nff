@@ -25,7 +25,7 @@ templ MetricsPage(metricsByDate []map[string][]*models.Metrics, m *models.Metric
 
 templ MetricsDetailsPage(m *models.Metrics) {
 	<div class="flex flex-col gap-3">
-		<h2 class="text-lg font-bold">Métricas de { m.Entity.Name }</h2>
+		<h2 class="text-lg font-bold">{ m.Entity.Name }</h2>
 		<div class="flex items-center gap-2 text-base font-medium">
 			<div class="rounded-lg border border-gray-300 px-2 py-1 tracking-wide">
 				{ utils.FormatDateAsBR(m.StartDate) }
