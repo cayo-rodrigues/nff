@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -28,7 +29,7 @@ func (m *Metrics) AsNotification() *Notification {
 		ID:            m.ID,
 		Status:        m.ReqStatus,
 		OperationType: "Cálculo de Métricas",
-		PageEndpoint:  "/metrics",
+		PageEndpoint:  fmt.Sprintf("/metrics/%d", m.ID),
 		CreatedAt:     m.CreatedAt,
 		UserID:        m.CreatedBy,
 	}

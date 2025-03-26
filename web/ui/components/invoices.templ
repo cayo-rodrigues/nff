@@ -111,7 +111,7 @@ templ InvoiceDetailsDialog(i *models.Invoice) {
 				</div>
 			</div>
 			if i.ReqStatus != "pending" && i.ReqMsg != "" {
-				<div class="border-b p-2 text-base">
+				<div class="border-b border-gray-200 p-2 text-base">
 					<pre class={ shared.GetTextColorByOperationStatus(i) }>{ i.ReqMsg }</pre>
 				</div>
 			}

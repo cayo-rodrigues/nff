@@ -93,7 +93,7 @@ templ PrintingDetailsDialog(p *models.InvoicePrint) {
 				</div>
 			</div>
 			if p.ReqStatus != "pending" && p.ReqMsg != "" {
-				<div class="border-b p-2 text-base">
+				<div class="border-b border-gray-200 p-2 text-base">
 					<pre class={ shared.GetTextColorByOperationStatus(p) }>{ p.ReqMsg }</pre>
 				</div>
 			}

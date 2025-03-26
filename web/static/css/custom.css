@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "tailwindcss";
+
 * {
     min-width: 0;
 }
@@ -47,10 +49,20 @@
     0% {
         opacity: 0;
     }
+
     100% {
         opacity: 1;
     }
 }
+
 .animate-fade-in {
     animation: fade-in;
+}
+
+dialog {
+    margin: auto;
+}
+
+select, button {
+    cursor: pointer;
 }

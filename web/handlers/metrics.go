@@ -44,6 +44,21 @@ func MetricsPage(c *fiber.Ctx) error {
 	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entities)))
 }
 
+func MetricsDetailsPage(c *fiber.Ctx) error {
+	metricsID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	metrics, err := services.RetrieveMetrics(c.Context(), metricsID)
+	if err != nil {
+		return err
+	}
+
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page", "notification-list-loaded")
+	return Render(c, layouts.Base(pages.MetricsDetailsPage(metrics)))
+}
+
 func GenerateMetrics(c *fiber.Ctx) error {
 	metrics := models.NewMetricsFromForm(c)
 

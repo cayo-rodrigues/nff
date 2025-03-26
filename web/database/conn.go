@@ -6,26 +6,18 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 	fredis "github.com/gofiber/storage/redis/v3"
 	"github.com/redis/go-redis/v9"
-	"github.com/tursodatabase/go-libsql"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
 var instance *Database
 
-type SQLlite struct {
-	*sql.DB
-	dbName    string
-	tempDir   string
-	connector *libsql.Connector
-}
-
 type Database struct {
-	SQLite       *SQLlite
+	SQLite       *sql.DB
 	Redis        *Redis
 	SessionStore *session.Store
 }
@@ -33,8 +25,6 @@ type Database struct {
 func (db *Database) Close() {
 	if db.SQLite != nil {
 		db.SQLite.Close()
-		defer os.RemoveAll(db.SQLite.tempDir)
-		defer db.SQLite.connector.Close()
 	}
 	if db.Redis.Client != nil {
 		db.Redis.Close()
@@ -74,7 +64,7 @@ func GetDB() *Database {
 }
 
 // Should be called only after NewDatabase is called, otherwise returns nil
-func GetSQLite() *SQLlite {
+func GetSQLite() *sql.DB {
 	db := GetDB()
 	if db != nil {
 		return db.SQLite
@@ -117,31 +107,18 @@ func initSQLite() error {
 		return errors.New("TURSO_AUTH_TOKEN env missing or empty")
 	}
 
-	sqliteDB := new(SQLlite)
+	url := fmt.Sprintf("%s?authToken=%s", tursoDatabaseUrl, authToken)
 
-	sqliteDB.dbName = "local-nff.db"
-
-	dir, err := os.MkdirTemp("", "libsql-*")
+	remoteDbConn, err := sql.Open("libsql", url)
 	if err != nil {
-		return fmt.Errorf("Error creating temporary directory: %v", err)
-	}
-	dbPath := filepath.Join(dir, sqliteDB.dbName)
-
-	sqliteDB.connector, err = libsql.NewEmbeddedReplicaConnector(dbPath, tursoDatabaseUrl,
-		libsql.WithAuthToken(authToken),
-		libsql.WithReadYourWrites(true),
-		libsql.WithSyncInterval(time.Hour*24),
-	)
-	if err != nil {
-		return fmt.Errorf("Error creating connector: %v", err)
+		return fmt.Errorf("Failed to open SQLite db %s: %s", tursoDatabaseUrl, err)
 	}
 
-	sqliteDB.DB = sql.OpenDB(sqliteDB.connector)
-	if err := sqliteDB.Ping(); err != nil {
-		return errors.New(fmt.Sprintf("SQLite Database connection is not OK, ping failed: %v", err))
+	if err := remoteDbConn.Ping(); err != nil {
+		return errors.New("SQLite Database connection is not OK, ping failed: %v")
 	}
 
-	instance.SQLite = sqliteDB
+	instance.SQLite = remoteDbConn
 	fmt.Println("New instance.SQLite connection OK")
 	return nil
 }

@@ -49,14 +49,16 @@ templ MetricsCard(m *models.Metrics) {
 			<li class="md:truncate"><span class="font-medium">Até:</span> { utils.FormatDateAsBR(m.EndDate) } </li>
 		</ul>
 		<div class="grid grid-cols-6 gap-2 p-2 sm:absolute sm:bottom-2 sm:right-2 sm:grid-cols-2 sm:p-0">
-			<div
-				onclick={ scripts.OpenDialogWithEvent(metricsDetailsDialogTarget(m), metricsResultsEventName(m)) }
-				title="Ver detalhes"
+			<a
+				href={ templ.URL(fmt.Sprintf("/metrics/%d", m.ID)) }
+				title="Conferir resultado completo"
+				target="_blank"
+				hx-boost="true"
 			>
-				@shared.WarningButton("xs") {
-					@shared.IconSm("eye")
+				@shared.DefaultButtonOutline("xs") {
+					@shared.IconSm("external-link")
 				}
-			</div>
+			</a>
 			<div
 				hx-get={ fmt.Sprintf("/metrics/%d/form", m.ID) }
 				hx-target="#metrics-form"
@@ -88,7 +90,7 @@ templ MetricsDetailsDialog(m *models.Metrics) {
 				</div>
 			</div>
 			if m.ReqStatus != "pending" && m.ReqStatus != "success" && m.ReqMsg != "" {
-				<div class="border-b p-2 text-base">
+				<div class="border-b border-gray-200 p-2 text-base">
 					<pre class={ shared.GetTextColorByOperationStatus(m) }>{ m.ReqMsg }</pre>
 				</div>
 			}
@@ -106,25 +108,23 @@ templ MetricsDetailsDialog(m *models.Metrics) {
 
 templ MetricsResultsDetails(m *models.Metrics) {
 	<div id={ metricsResultsDetailsID(m) }>
-		<div class="border-t p-2">
-			if m.Total.TotalRecords == 0 && len(m.Months) == 0 && len(m.Records) == 0 {
-				<div
-					class="mt-2"
-					hx-trigger={ fmt.Sprintf("click, %s from:document", metricsResultsEventName(m)) }
-					hx-get={ fmt.Sprintf("/metrics/%d/results-details", m.ID) }
-					hx-target={ metricsResultsDetailsTarget(m) }
-					hx-swap="outerHTML"
-					hx-indicator={ loadMetricsResultsIndicatorTarget(m) }
-				>
-					@shared.DefaultButtonOutline("xs") {
-						<span id={ loadMetricsResultsIndicatorID(m) }>
-							@shared.LoadingIconSm()
-						</span>
-						<span>Carregar resultados</span>
-					}
-				</div>
-			}
-		</div>
+		if m.Total.TotalRecords == 0 && len(m.Months) == 0 && len(m.Records) == 0 {
+			<div
+				class="mt-2"
+				hx-trigger={ fmt.Sprintf("click, %s from:document", metricsResultsEventName(m)) }
+				hx-get={ fmt.Sprintf("/metrics/%d/results-details", m.ID) }
+				hx-target={ metricsResultsDetailsTarget(m) }
+				hx-swap="outerHTML"
+				hx-indicator={ loadMetricsResultsIndicatorTarget(m) }
+			>
+				@shared.DefaultButtonOutline("xs") {
+					<span id={ loadMetricsResultsIndicatorID(m) }>
+						@shared.LoadingIconSm()
+					</span>
+					<span>Carregar resultados</span>
+				}
+			</div>
+		}
 		<div class="grid grid-cols-1 gap-2">
 			if m.Total.TotalRecords != 0 {
 				<section class="rounded border border-gray-400">
@@ -154,10 +154,15 @@ templ MetricsResultsDetails(m *models.Metrics) {
 						</div>
 					</header>
 					<div id={ metricsResultDataID(m, "month") } class="hidden">
-						for _, month := range m.Months {
-							<h4 class="px-4 pt-2 text-lg">{ month.MonthName }</h4>
-							@MetricsResultData(month)
-							<hr/>
+						for i, month := range m.Months {
+							<div
+								if i != len(m.Months)-1 {
+									class="border-b border-gray-200"
+								}
+							>
+								<h4 class="px-4 pt-2 text-lg">{ month.MonthName }</h4>
+								@MetricsResultData(month)
+							</div>
 						}
 					</div>
 				</section>
@@ -175,10 +180,9 @@ templ MetricsResultsDetails(m *models.Metrics) {
 					</header>
 					<div id={ metricsResultDataID(m, "record") } class="hidden">
 						for _, r := range m.Records {
-							<div class="relative odd:bg-sky-50">
+							<div class="relative border-b border-gray-200 odd:bg-sky-50">
 								<h4 class="px-4 py-2 text-lg">NFA-{ r.InvoiceNumber }</h4>
 								@MetricsResultData(r)
-								<hr/>
 							</div>
 						}
 					</div>

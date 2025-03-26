@@ -115,6 +115,7 @@ func main() {
 	app.Get("/metrics", handlers.MetricsPage)
 	app.Post("/metrics", handlers.GenerateMetrics)
 	app.Get("/metrics/list", handlers.ListMetrics)
+	app.Get("/metrics/:id", handlers.MetricsDetailsPage)
 	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
 	app.Get("/metrics/:id/card", handlers.RetrieveMetricsCard)
