@@ -222,6 +222,12 @@ templ DownloadInvoiceFromRecordSuccessIcon(r *models.MetricsResult) {
 	}
 }
 
+templ DownloadInvoiceFromRecordErrorIcon() {
+	<div class="text-red-600">
+		@shared.IconSm("x-circle")
+	</div>
+}
+
 templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult) {
 	<div class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3">
 		<div id={ downloadInvoiceFromRecordReqStatusID(r) }>
