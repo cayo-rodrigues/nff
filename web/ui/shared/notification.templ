@@ -5,6 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/utils"
 import "github.com/cayo-rodrigues/nff/web/models"
 import "fmt"
 import "github.com/cayo-rodrigues/nff/web/services"
+import "context"
 
 templ NotificationBell(isAuthenticated bool) {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">

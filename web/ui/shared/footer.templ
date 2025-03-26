@@ -29,13 +29,13 @@ templ Footer() {
 			</section>
 			<section class="flex justify-center xl:justify-end">
 				<ul class="flex flex-col gap-2 sm:flex-row">
-					<a href={ templ.SafeURL(githubIssueUrl("bug_report")) } target="_blank">
+					<a href={ templ.URL(githubIssueUrl("bug_report")) } target="_blank">
 						@PhantomLightButton("md") {
 							@Icon("flag")
 							<span>Reporte um bug</span>
 						}
 					</a>
-					<a href={ templ.SafeURL(githubIssueUrl("feedback")) } target="_blank">
+					<a href={ templ.URL(githubIssueUrl("feedback")) } target="_blank">
 						@PhantomLightButton("md") {
 							@Icon("smile")
 							<span>Dê um feedback</span>

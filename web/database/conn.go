@@ -202,5 +202,8 @@ func getRedisURL() string {
 	}
 
 	redisOpts := instance.Redis.Options()
+	if redisOpts.Password != "" {
+		return fmt.Sprintf("redis://:%s@%s/%d", redisOpts.Password, redisOpts.Addr, redisOpts.DB)
+	}
 	return fmt.Sprintf("redis://%s/%d", redisOpts.Addr, redisOpts.DB)
 }

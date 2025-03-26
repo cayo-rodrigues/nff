@@ -21,11 +21,13 @@ func ListEntities(ctx context.Context, filters ...map[string]string) ([]*models.
 
 	for _, filter := range filters {
 		if q, ok := filter["q"]; ok {
-			f.And("name").ILike().WildPlaceholder(q)
+			f.Raw("AND ( ")
+			f.Raw("name").ILike().WildPlaceholder(q)
 			f.Or("cpf_cnpj").ILike().WildPlaceholder(q)
 			f.Or("ie").ILike().WildPlaceholder(q)
 			f.Or("user_type").ILike().WildPlaceholder(q)
 			f.Or("email").ILike().WildPlaceholder(q)
+			f.Raw(" ) ")
 		}
 	}
 
