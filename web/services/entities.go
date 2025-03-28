@@ -2,15 +2,24 @@ package services
 
 import (
 	"context"
+	"encoding/hex"
 
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/nff/web/utils/cryptoutils"
 )
 
-func CreateEntity(ctx context.Context, entity *models.Entity) error {
+func CreateEntity(ctx context.Context, encryptionKey []byte, entity *models.Entity) error {
 	userID := utils.GetUserID(ctx)
 	entity.CreatedBy = userID
+
+	cyphertext, err := cryptoutils.Encrypt(encryptionKey, []byte(entity.Password))
+	if err != nil {
+		return err
+	}
+	entity.Password = hex.EncodeToString(cyphertext)
+
 	return storage.CreateEntity(ctx, entity)
 }
 
@@ -41,9 +50,16 @@ func RetrieveEntity(ctx context.Context, entityID int) (*models.Entity, error) {
 	return storage.RetrieveEntity(ctx, entityID, userID)
 }
 
-func UpdateEntity(ctx context.Context, entity *models.Entity) error {
+func UpdateEntity(ctx context.Context, encryptionKey []byte, entity *models.Entity) error {
 	userID := utils.GetUserID(ctx)
 	entity.CreatedBy = userID
+
+	cyphertext, err := cryptoutils.Encrypt(encryptionKey, []byte(entity.Password))
+	if err != nil {
+		return err
+	}
+	entity.Password = hex.EncodeToString(cyphertext)
+
 	return storage.UpdateEntity(ctx, entity)
 }
 

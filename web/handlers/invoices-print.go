@@ -58,7 +58,12 @@ func PrintInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.GetSSApiClient()
+	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.PrintInvoice(printing)
 
 	c.Append("HX-Trigger-After-Swap", "reload-printing-list")
@@ -80,7 +85,12 @@ func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
 
 	printing, err := services.CreatePrintingFromMetricsRecord(c.Context(), invoiceNumber, entityID)
 
-	ssapi := siare.GetSSApiClient()
+	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.PrintInvoiceFromMetricsRecord(printing, recordID, userID)
 
 	record := models.NewMetricsResult()

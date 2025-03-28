@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/a-h/templ v0.3.857
-	github.com/cayo-rodrigues/safe v0.0.0-20240812222800-0e415ad34e39
+	github.com/cayo-rodrigues/safe v1.3.0
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/storage/redis/v3 v3.1.0
 	github.com/redis/go-redis/v9 v9.3.0

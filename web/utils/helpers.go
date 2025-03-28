@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -26,18 +27,26 @@ func TrimSpaceFromBytesToFloat64(f []byte) (float64, error) {
 	return TrimSpaceFloat64(TrimSpaceBytes(f))
 }
 
-func ParseDateAsBR(date string) (time.Time, error) {
-	loc, err := time.LoadLocation("America/Sao_Paulo")
+func ParseDate(date string, tz string, layout string) (time.Time, error) {
+	loc, err := time.LoadLocation(tz)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to load location: %w", err)
 	}
 
-	parsedDate, err := time.ParseInLocation("2006-01-02", date, loc)
+	parsedDate, err := time.ParseInLocation(layout, date, loc)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to parse date: %w", err)
 	}
 
 	return parsedDate, nil
+}
+
+func ParseDateWithBRTZ(date string) (time.Time, error) {
+	return ParseDate(date, "America/Sao_Paulo", "2006-01-02")
+}
+
+func ParseDateWithBRTZAndBRLayout(date string) (time.Time, error) {
+	return ParseDate(date, "America/Sao_Paulo", "02/01/2006")
 }
 
 func FormatDate(date time.Time) string {
@@ -64,6 +73,30 @@ func FormatDatetimeAsBR(dt time.Time) string {
 func IsTodayBR(date string) bool {
 	today := FormatDateAsBR(time.Now())
 	return today == date
+}
+
+func GetWeekDay(date time.Time) string {
+	weekDays := map[time.Weekday]string{
+		time.Sunday:    "domingo",
+		time.Monday:    "segunda-feira",
+		time.Tuesday:   "terça-feira",
+		time.Wednesday: "quarta-feira",
+		time.Thursday:  "quinta-feira",
+		time.Friday:    "sexta-feira",
+		time.Saturday:  "sábado",
+	}
+
+	return weekDays[date.Weekday()]
+}
+
+func GetWeekDayFromString(date string) string {
+	dt, err := ParseDateWithBRTZAndBRLayout(date)
+	if err != nil {
+		log.Printf("[GetWeekDayFromString] Failed to parse date %s: %s\n", date, err)
+		return ""
+	}
+
+	return GetWeekDay(dt)
 }
 
 func IsYesterdayBR(date string) bool {

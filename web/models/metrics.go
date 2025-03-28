@@ -91,11 +91,11 @@ func NewMetricsResult() *MetricsResult {
 func NewMetricsFromForm(c *fiber.Ctx) *Metrics {
 	m := NewMetrics()
 
-	startDate, err := utils.ParseDateAsBR(strings.TrimSpace(c.FormValue("start_date")))
+	startDate, err := utils.ParseDateWithBRTZ(strings.TrimSpace(c.FormValue("start_date")))
 	if err != nil {
 		log.Println("Error converting input start date string to time.Time:", err)
 	}
-	endDate, err := utils.ParseDateAsBR(strings.TrimSpace(c.FormValue("end_date")))
+	endDate, err := utils.ParseDateWithBRTZ(strings.TrimSpace(c.FormValue("end_date")))
 	if err != nil {
 		log.Println("Error converting input end date string to time.Time:", err)
 	}

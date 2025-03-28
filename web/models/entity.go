@@ -1,11 +1,14 @@
 package models
 
 import (
+	"encoding/hex"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/cayo-rodrigues/nff/web/utils/cryptoutils"
 	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
 )
@@ -162,4 +165,22 @@ func (e *Entity) AllIes() []string {
 		availableIes = append(availableIes, ie)
 	}
 	return availableIes
+}
+
+func (e *Entity) GetDecryptedPassword(key []byte) (string, error)  {
+	if len(e.Password) == 0 {
+		return "", nil
+	}
+
+	pwd, err := hex.DecodeString(e.Password)
+	if err != nil {
+		log.Println("Failed to decode hexadecimal e.Password string:", err)
+		return e.Password, err
+	}
+	decryptedPwd, err := cryptoutils.Decrypt(key, pwd)
+	if err != nil {
+		log.Println("Failed to decrypt e.Password:", err)
+		return e.Password, err
+	}
+	return string(decryptedPwd), nil
 }

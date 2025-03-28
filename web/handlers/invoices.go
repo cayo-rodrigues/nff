@@ -141,7 +141,12 @@ func CreateInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.GetSSApiClient()
+	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.IssueInvoice(invoice)
 
 	c.Append("HX-Trigger-After-Settle", "reload-invoice-list", "close-invoice-form-dialog")

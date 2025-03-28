@@ -26,6 +26,7 @@ func DestroyUserSession(c *fiber.Ctx) error {
 	sessionOpts := []*storage.SessionOpts{
 		{Key: "IsAuthenticated"},
 		{Key: "UserID"},
+		{Key: "EncryptionKey"},
 	}
 
 	err := storage.DeleteSessionKeys(c, sessionOpts...)
@@ -58,4 +59,36 @@ func GetUserSession(c *fiber.Ctx) (isAuthenticated bool, userID int, err error) 
 	}
 
 	return isAuthenticated, userID, nil
+}
+
+func SaveEncryptionKeyInSession(c *fiber.Ctx, key []byte) error {
+	sessionOpts := &storage.SessionOpts{
+		Key: "EncryptionKey",
+		Val: key,
+	}
+
+	err := storage.SetSessionKVs(c, sessionOpts)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func GetEncryptionKeyFromSession(c *fiber.Ctx) ([]byte, error) {
+	sessionOpts := &storage.SessionOpts{
+		Key: "EncryptionKey",
+	}
+
+	vals, err := storage.GetSessionValsByKeys(c, sessionOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	key, ok := vals["EncryptionKey"].([]byte)
+	if !ok {
+		return nil, nil
+	}
+
+	return key, nil
 }

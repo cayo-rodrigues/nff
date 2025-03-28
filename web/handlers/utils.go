@@ -3,9 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/a-h/templ"
+	"github.com/cayo-rodrigues/nff/web/models"
+	"github.com/cayo-rodrigues/nff/web/ui/forms"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
@@ -43,6 +47,12 @@ func RetargetToForm(c *fiber.Ctx, resourceName string, form templ.Component, opt
 func RetargetToPageHandler(c *fiber.Ctx, url string, pageHandler fiber.Handler) error {
 	c.Append("HX-Location", url)
 	return pageHandler(c)
+}
+
+func RetargetToReauth(c *fiber.Ctx) error {
+	userID := utils.GetUserID(c.Context())
+	log.Printf("EncryptionKey not found for user %d, asking for reauthentication...\n", userID)
+	return RetargetResponse(c, forms.ReauthenticateForm(models.NewUser()), "#reauth-form-dialog-content", "innerHTML")
 }
 
 func handleBrowserQueryParams(c *fiber.Ctx) {

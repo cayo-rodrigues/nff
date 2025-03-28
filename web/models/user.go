@@ -4,32 +4,35 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/cayo-rodrigues/safe"
+	"github.com/gofiber/fiber/v2"
 )
 
 type User struct {
 	ID        int
 	Email     string
 	Password  string
+	Salt      []byte
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Errors    safe.ErrorMessages
 }
 
 func NewUser() *User {
-	return &User{}
+	return &User{
+		Errors: safe.ErrorMessages{},
+	}
 }
 
 func NewUserFromForm(c *fiber.Ctx) *User {
 	return &User{
 		Email:    strings.TrimSpace(c.FormValue("email")),
 		Password: strings.TrimSpace(c.FormValue("password")),
+		Errors:   safe.ErrorMessages{},
 	}
 }
 
 func (u *User) IsValid() bool {
-	
 	fields := safe.Fields{
 		{
 			Name:  "Email",
@@ -48,7 +51,7 @@ func (u *User) IsValid() bool {
 }
 
 func (u *User) Values() []any {
-	return []any{&u.ID, &u.Email, &u.Password, &u.CreatedAt, &u.UpdatedAt}
+	return []any{&u.ID, &u.Email, &u.Password, &u.CreatedAt, &u.UpdatedAt, &u.Salt}
 }
 
 func (u *User) SetError(key, val string) {

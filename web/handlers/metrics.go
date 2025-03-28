@@ -89,7 +89,12 @@ func GenerateMetrics(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.GetSSApiClient()
+	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.GetMetrics(metrics)
 
 	c.Append("HX-Trigger-After-Swap", "reload-metrics-list")

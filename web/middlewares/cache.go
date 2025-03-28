@@ -14,7 +14,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func CacheMiddleware(c *fiber.Ctx) error {
+func CacheManagementMiddleware(c *fiber.Ctx) error {
 	if (strings.HasPrefix(c.Path(), "/sse")) {
 		return c.Next()
 	}

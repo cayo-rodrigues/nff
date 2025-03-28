@@ -1,0 +1,50 @@
+package forms
+
+import "github.com/cayo-rodrigues/nff/web/ui/shared"
+import "github.com/cayo-rodrigues/nff/web/models"
+
+templ ReauthenticateForm(u *models.User) {
+	<form
+		id="reauth-form"
+		class="flex w-full flex-col gap-4 rounded p-4"
+		hx-post="/reauthenticate"
+		hx-target="this"
+		hx-swap="outerHTML"
+	>
+		<div class="flex items-center justify-between gap-6 border-b border-gray-300 py-2 outline-0">
+			<h3 class="flex items-center gap-2 text-lg font-medium">
+				Reautenticação 
+				<span class="text-yellow-600">
+					@shared.IconSm("alert-triangle")
+				</span>
+			</h3>
+			<div onclick="CloseReauthFormDialog()">
+				@shared.DefaultButtonOutline("sm") {
+					@shared.IconSm("x")
+				}
+			</div>
+		</div>
+		<div class="flex flex-1 flex-col gap-2">
+			<p class="text-base text-gray-700">
+				Antes de prosseguir com a operação, por favor insira sua senha.
+			</p>
+		</div>
+		<div class="flex flex-1 flex-col gap-2">
+			<label for="password"><strong>Senha</strong></label>
+			<input
+				class="rounded bg-gray-100 p-2 md:w-full"
+				type="password"
+				id="password"
+				name="password"
+				value={ u.Password }
+			/>
+			<sub class="min-h-3 break-words leading-3 text-red-500">{ u.Errors["Password"] }</sub>
+		</div>
+		<div class="mt-2">
+			@shared.SubmitWarningButton("md") {
+				@shared.Icon("key")
+				<span>Renovar Autenticação</span>
+			}
+		</div>
+	</form>
+}

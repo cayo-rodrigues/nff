@@ -164,8 +164,9 @@ func initSessionStore() error {
 		Storage: fredis.New(fredis.Config{
 			URL: getRedisURL(),
 		}),
+		// CookieSecure: true,
 		CookieHTTPOnly: true,
-		Expiration:     7 * (24 * time.Hour),
+		Expiration:     24 * time.Hour,
 	})
 
 	fmt.Println("New instance.SessionStore connection OK")

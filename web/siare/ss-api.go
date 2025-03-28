@@ -2,6 +2,7 @@ package siare
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -14,13 +15,15 @@ import (
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/storage"
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/nff/web/utils/cryptoutils"
 	"github.com/gofiber/fiber/v2"
 )
 
 type SSApiClient struct {
-	BaseUrl   string
-	DB        *database.Database
-	Endpoints *SSApiEndpoints
+	BaseUrl       string
+	DB            *database.Database
+	Endpoints     *SSApiEndpoints
+	DecryptionKey []byte
 }
 
 type SSApiEndpoints struct {
@@ -55,12 +58,31 @@ func GetSSApiClient() *SSApiClient {
 	return instance
 }
 
+func (c *SSApiClient) WithDecryptionKey(key []byte) *SSApiClient {
+	c.DecryptionKey = key
+	return c
+}
+
 func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
 	resourceName := "invoice-issue"
 	defer finishOperation(ctx, c.DB.Redis, resourceName, invoice.CreatedBy, invoice)
+
+	pwd, err := hex.DecodeString(invoice.Sender.Password)
+	if err != nil {
+		log.Println("Failed to decode invoice.Sender.Password hexadecimal string:", err)
+		return
+	}
+
+	decryptedPwd, err := cryptoutils.Decrypt(c.DecryptionKey, pwd)
+	if err != nil {
+		log.Println("Failed to decrypt invoice.Sender.Password:", err)
+		return
+	}
+	invoice.Sender.Password = string(decryptedPwd)
+
 
 	reqBody := SSApiInvoiceRequest{
 		Invoice:            invoice,
@@ -80,7 +102,7 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	}
 
 	var response SSApiInvoiceResponse
-	err := json.Unmarshal(body, &response)
+	err = json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.IssueInvoice, "invoice", invoice.ID, err)
 		return
@@ -107,6 +129,19 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	resourceName := "invoice-cancel"
 	defer finishOperation(ctx, c.DB.Redis, resourceName, invoiceCancel.CreatedBy, invoiceCancel)
 
+	pwd, err := hex.DecodeString(invoiceCancel.Entity.Password)
+	if err != nil {
+		log.Println("Failed to decode invoiceCancel.Entity.Password hexadecimal string:", err)
+		return err
+	}
+
+	decryptedPwd, err := cryptoutils.Decrypt(c.DecryptionKey, pwd)
+	if err != nil {
+		log.Println("Failed to decrypt invoiceCancel.Entity.Password:", err)
+		return err
+	}
+	invoiceCancel.Entity.Password = string(decryptedPwd)
+
 	reqBody := SSApiCancelingRequest{
 		InvoiceCancel: invoiceCancel,
 	}
@@ -123,7 +158,7 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	}
 
 	var response SSApiCancelingResponse
-	err := json.Unmarshal(body, &response)
+	err = json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.CancelInvoice, "canceling", invoiceCancel.ID, err)
 		return err
@@ -197,6 +232,19 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 	resourceName := "invoice-print"
 	defer finishOperation(ctx, c.DB.Redis, resourceName, invoicePrint.CreatedBy, invoicePrint)
 
+	pwd, err := hex.DecodeString(invoicePrint.Entity.Password)
+	if err != nil {
+		log.Println("Failed to decode invoicePrint.Entity.Password hexadecimal string:", err)
+		return err
+	}
+
+	decryptedPwd, err := cryptoutils.Decrypt(c.DecryptionKey, pwd)
+	if err != nil {
+		log.Println("Failed to decrypt invoicePrint.Entity.Password:", err)
+		return err
+	}
+	invoicePrint.Entity.Password = string(decryptedPwd)
+
 	reqBody := SSApiPrintingRequest{
 		InvoicePrint: invoicePrint,
 	}
@@ -213,7 +261,7 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
 	}
 
 	var response SSApiPrintingResponse
-	err := json.Unmarshal(body, &response)
+	err = json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.PrintInvoice, resourceName, invoicePrint.ID, err)
 		return err
@@ -237,6 +285,19 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 
 	resourceName := "metrics"
 	defer finishOperation(ctx, c.DB.Redis, resourceName, metrics.CreatedBy, metrics)
+
+	pwd, err := hex.DecodeString(metrics.Entity.Password)
+	if err != nil {
+		log.Println("Failed to decode metrics.Entity.Password hexadecimal string:", err)
+		return
+	}
+
+	decryptedPwd, err := cryptoutils.Decrypt(c.DecryptionKey, pwd)
+	if err != nil {
+		log.Println("Failed to decrypt metrics.Entity.Password:", err)
+		return 
+	}
+	metrics.Entity.Password = string(decryptedPwd)
 
 	reqData := SSApiMetricsRequest{
 		Body: &SSApiMetricsRequestBody{
@@ -270,7 +331,7 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	}
 
 	var response SSApiMetricsResponse
-	err := json.Unmarshal(body, &response)
+	err = json.Unmarshal(body, &response)
 	if err != nil {
 		jsonUnmarchalErrLog(c.Endpoints.Metrics, resourceName, metrics.ID, err)
 		return

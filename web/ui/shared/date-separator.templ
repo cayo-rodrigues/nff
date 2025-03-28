@@ -9,9 +9,9 @@ templ DateGroupSeparator(date string) {
 			if utils.IsTodayBR(date) {
 				Hoje <span class="text-sm font-medium">({ date })</span>
 			} else if utils.IsYesterdayBR(date) {
-				Ontem <span class="text-sm font-medium">({ date })</span>
+				Ontem <span class="text-sm font-medium">({ date }, { utils.GetWeekDayFromString(date) })</span>
 			} else {
-				{ date }
+				{ date } <span class="text-sm font-medium">({ utils.GetWeekDayFromString(date) })</span>
 			}
 		</h3>
 	</div>

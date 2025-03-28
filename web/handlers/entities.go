@@ -35,6 +35,14 @@ func EditEntityPage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	encryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+	entity.Password, err = entity.GetDecryptedPassword(encryptionKey)
+	if err != nil {
+		return err
+	}
 	return Render(c, layouts.Base(pages.EntityFormPage(entity)))
 }
 
@@ -44,7 +52,12 @@ func CreateEntity(c *fiber.Ctx) error {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err := services.CreateEntity(c.Context(), entity)
+	encryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	err = services.CreateEntity(c.Context(), encryptionKey, entity)
 	if err != nil {
 		return err
 	}
@@ -58,7 +71,12 @@ func UpdateEntity(c *fiber.Ctx) error {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
 	}
 
-	err := services.UpdateEntity(c.Context(), entity)
+	encryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	err = services.UpdateEntity(c.Context(), encryptionKey, entity)
 	if err != nil {
 		return err
 	}

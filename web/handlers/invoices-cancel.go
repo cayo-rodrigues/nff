@@ -57,7 +57,12 @@ func CancelInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.GetSSApiClient()
+	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.CancelInvoice(canceling)
 
 	c.Append("HX-Trigger-After-Swap", "reload-canceling-list")
@@ -75,7 +80,12 @@ func CancelInvoiceByID(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.GetSSApiClient()
+	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.CancelInvoice(canceling)
 
 	return nil
