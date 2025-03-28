@@ -45,6 +45,7 @@ func LoginUser(c *fiber.Ctx) error {
 
 	redis := database.GetDB().Redis
 	redis.Publish(c.Context(), "0:operation-finished", 0)
+	redis.Publish(c.Context(), fmt.Sprintf("%d:operation-finished", user.ID), 0)
 
 	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }

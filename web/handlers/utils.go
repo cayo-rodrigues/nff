@@ -46,10 +46,14 @@ func RetargetToForm(c *fiber.Ctx, resourceName string, form templ.Component, opt
 
 func RetargetToPageHandler(c *fiber.Ctx, url string, pageHandler fiber.Handler) error {
 	c.Append("HX-Location", url)
+	c.Append("HX-Push-Url", url)
 	return pageHandler(c)
 }
 
 func RetargetToReauth(c *fiber.Ctx) error {
+	c.Append("HX-Boosted", "false")
+	c.Append("HX-Trigger-After-Settle", "open-reauth-form-dialog")
+
 	userID := utils.GetUserID(c.Context())
 	log.Printf("EncryptionKey not found for user %d, asking for reauthentication...\n", userID)
 	return RetargetResponse(c, forms.ReauthenticateForm(models.NewUser()), "#reauth-form-dialog-content", "innerHTML")

@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"context"
+	"slices"
 
 	"github.com/cayo-rodrigues/nff/web/handlers"
 	"github.com/cayo-rodrigues/nff/web/services"
@@ -22,19 +23,17 @@ func AuthMiddleware(c *fiber.Ctx) error {
 			return err
 		}
 
-		switch c.Path() {
-		case "/":
-			return c.Next()
-		case "/sse/notify-operations-results":
-			return c.Next()
-		default:
-			return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
-
+		allowedPaths := []string{
+			"/", "/sse/notify-operations-results",
+			"/login",
 		}
-	}
 
-	// refresh user session
-	services.SaveUserSession(c, userID)
+		if slices.Contains(allowedPaths, c.Path()) {
+			return c.Next()
+		}
+
+		return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
+	}
 
 	// save user data to request context
 	userData := &utils.ReqUserData{
@@ -44,5 +43,12 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	ctx := context.WithValue(c.Context(), "UserData", userData)
 	adaptor.CopyContextToFiberContext(ctx, c.Context())
 
-	return c.Next()
+	err = c.Next()
+	if err != nil {
+		return err
+	}
+
+	// refresh user session
+	// sess.Save must be called last
+	return services.SaveUserSession(c, userID)
 }

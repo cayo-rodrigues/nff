@@ -31,7 +31,7 @@ templ EntityCard(e *models.Entity) {
 					@shared.IconSm("eye")
 				}
 			</div>
-			<a href={ templ.URL(fmt.Sprintf("/entities/update/%d", e.ID)) }>
+			<a hx-boost="true" href={ templ.URL(fmt.Sprintf("/entities/update/%d", e.ID)) }>
 				@shared.InfoButton("xs") {
 					@shared.IconSm("edit")
 				}
