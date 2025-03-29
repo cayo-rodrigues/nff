@@ -25,7 +25,6 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 		allowedPaths := []string{
 			"/", "/sse/notify-operations-results",
-			"/login",
 		}
 
 		if slices.Contains(allowedPaths, c.Path()) {
@@ -47,6 +46,9 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+	// TODO
+	// A cada 24h renovar o ID da sessão
 
 	// refresh user session
 	// sess.Save must be called last

@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"strconv"
-
 	"github.com/cayo-rodrigues/nff/web/models"
 	"github.com/cayo-rodrigues/nff/web/services"
 	"github.com/cayo-rodrigues/nff/web/ui/components"
@@ -27,17 +25,18 @@ func CreateEntityPage(c *fiber.Ctx) error {
 }
 
 func EditEntityPage(c *fiber.Ctx) error {
-	entityID, err := strconv.Atoi(c.Params("id"))
+	encryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
+	entityID, err := c.ParamsInt("id")
 	if err != nil {
 		return err
 	}
 	entity, err := services.RetrieveEntity(c.Context(), entityID)
 	if err != nil {
 		return err
-	}
-	encryptionKey, err := services.GetEncryptionKeyFromSession(c)
-	if err != nil {
-		return RetargetToReauth(c)
 	}
 	entity.Password, err = entity.GetDecryptedPassword(encryptionKey)
 	if err != nil {
@@ -47,14 +46,14 @@ func EditEntityPage(c *fiber.Ctx) error {
 }
 
 func CreateEntity(c *fiber.Ctx) error {
+	encryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
-	}
-
-	encryptionKey, err := services.GetEncryptionKeyFromSession(c)
-	if err != nil {
-		return RetargetToReauth(c)
 	}
 
 	err = services.CreateEntity(c.Context(), encryptionKey, entity)
@@ -66,14 +65,14 @@ func CreateEntity(c *fiber.Ctx) error {
 }
 
 func UpdateEntity(c *fiber.Ctx) error {
+	encryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
 	entity := models.NewEntityFromForm(c)
 	if !entity.IsValid() {
 		return RetargetToForm(c, "entity", forms.EntityForm(entity))
-	}
-
-	encryptionKey, err := services.GetEncryptionKeyFromSession(c)
-	if err != nil {
-		return RetargetToReauth(c)
 	}
 
 	err = services.UpdateEntity(c.Context(), encryptionKey, entity)
@@ -85,7 +84,7 @@ func UpdateEntity(c *fiber.Ctx) error {
 }
 
 func DeleteEntity(c *fiber.Ctx) error {
-	entityID, err := strconv.Atoi(c.Params("id"))
+	entityID, err := c.ParamsInt("id")
 	if err != nil {
 		return err
 	}

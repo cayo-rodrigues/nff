@@ -78,6 +78,8 @@ func main() {
 
 	app.Use(middlewares.CacheManagementMiddleware)
 
+	app.Post("/reauthenticate", handlers.ReauthUser)
+
 	app.Get("/", handlers.HomePage)
 
 	app.Get("/entities", handlers.EntitiesPage)
@@ -120,8 +122,6 @@ func main() {
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
 	app.Get("/metrics/:id/card", handlers.RetrieveMetricsCard)
 	app.Get("/metrics/:id/download-from-record-status-icon", handlers.GetDownloadFromRecordStatusIcon)
-
-	app.Post("/reauthenticate", handlers.ReauthUser)
 
 	app.Use(handlers.NotFoundPage)
 

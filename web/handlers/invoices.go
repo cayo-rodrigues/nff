@@ -111,6 +111,10 @@ func GetCfopsInput(c *fiber.Ctx) error {
 }
 
 func CreateInvoice(c *fiber.Ctx) error {
+	decryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
 
 	invoice := models.NewInvoiceFromForm(c)
 
@@ -139,11 +143,6 @@ func CreateInvoice(c *fiber.Ctx) error {
 	err = services.CreateInvoice(c.Context(), invoice)
 	if err != nil {
 		return err
-	}
-
-	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
-	if err != nil {
-		return RetargetToReauth(c)
 	}
 
 	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)

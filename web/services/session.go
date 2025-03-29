@@ -1,6 +1,10 @@
 package services
 
 import (
+	"fmt"
+	"time"
+
+	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/storage"
 	"github.com/gofiber/fiber/v2"
 )
@@ -26,7 +30,6 @@ func DestroyUserSession(c *fiber.Ctx) error {
 	sessionOpts := []*storage.SessionOpts{
 		{Key: "IsAuthenticated"},
 		{Key: "UserID"},
-		{Key: "EncryptionKey"},
 	}
 
 	err := storage.DeleteSessionKeys(c, sessionOpts...)
@@ -61,33 +64,34 @@ func GetUserSession(c *fiber.Ctx) (isAuthenticated bool, userID int, err error) 
 	return isAuthenticated, userID, nil
 }
 
-func SaveEncryptionKeyInSession(c *fiber.Ctx, key []byte) error {
-	sessionOpts := &storage.SessionOpts{
-		Key: "EncryptionKey",
-		Val: key,
-	}
+func SaveEncryptionKeySession(c *fiber.Ctx, key []byte) error {
+	db := database.GetDB()
 
-	err := storage.SetSessionKVs(c, sessionOpts)
+	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	id := sess.ID()
+	sessKey := fmt.Sprintf("key:%s", id)
+
+	return db.Redis.Set(c.Context(), sessKey, key, 1 * time.Hour).Err()
 }
 
-func GetEncryptionKeyFromSession(c *fiber.Ctx) ([]byte, error) {
-	sessionOpts := &storage.SessionOpts{
-		Key: "EncryptionKey",
-	}
+func GetEncryptionKeySession(c *fiber.Ctx) ([]byte, error) {
+	db := database.GetDB()
 
-	vals, err := storage.GetSessionValsByKeys(c, sessionOpts)
+	sess, err := db.SessionStore.Get(c)
 	if err != nil {
 		return nil, err
 	}
 
-	key, ok := vals["EncryptionKey"].([]byte)
-	if !ok {
-		return nil, nil
+	id := sess.ID()
+	sessKey := fmt.Sprintf("key:%s", id)
+
+	key, err := db.Redis.Get(c.Context(), sessKey).Bytes()
+	if err != nil {
+		return nil, err
 	}
 
 	return key, nil

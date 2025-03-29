@@ -35,6 +35,11 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 }
 
 func CancelInvoice(c *fiber.Ctx) error {
+	decryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
 	entities, err := services.ListEntities(c.Context())
 	if err != nil {
 		return err
@@ -57,11 +62,6 @@ func CancelInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
-	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
-	if err != nil {
-		return RetargetToReauth(c)
-	}
-
 	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.CancelInvoice(canceling)
 
@@ -70,6 +70,11 @@ func CancelInvoice(c *fiber.Ctx) error {
 }
 
 func CancelInvoiceByID(c *fiber.Ctx) error {
+	decryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
 	invoiceID, err := c.ParamsInt("invoice_id")
 	if err != nil {
 		return err
@@ -78,11 +83,6 @@ func CancelInvoiceByID(c *fiber.Ctx) error {
 	canceling, err := services.CreateCancelingFromInvoiceID(c.Context(), invoiceID)
 	if err != nil {
 		return err
-	}
-
-	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
-	if err != nil {
-		return RetargetToReauth(c)
 	}
 
 	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)

@@ -35,7 +35,7 @@ func LoginUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err = services.SaveEncryptionKeyInSession(c, key); err != nil {
+	if err = services.SaveEncryptionKeySession(c, key); err != nil {
 		return err
 	}
 
@@ -76,7 +76,7 @@ func ReauthUser(c *fiber.Ctx) error  {
 		return err
 	}
 
-	if err = services.SaveEncryptionKeyInSession(c, key); err != nil {
+	if err = services.SaveEncryptionKeySession(c, key); err != nil {
 		return err
 	}
 

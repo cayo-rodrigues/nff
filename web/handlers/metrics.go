@@ -60,11 +60,16 @@ func MetricsDetailsPage(c *fiber.Ctx) error {
 }
 
 func GenerateMetrics(c *fiber.Ctx) error {
+	decryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
 	metrics := models.NewMetricsFromForm(c)
 
 	var entities []*models.Entity
 
-	err := utils.Concurrent(
+	err = utils.Concurrent(
 		func() error {
 			var err error
 			metrics.Entity, err = services.RetrieveEntity(c.Context(), metrics.Entity.ID)
@@ -87,11 +92,6 @@ func GenerateMetrics(c *fiber.Ctx) error {
 	err = services.CreateMetrics(c.Context(), metrics)
 	if err != nil {
 		return err
-	}
-
-	decryptionKey, err := services.GetEncryptionKeyFromSession(c)
-	if err != nil {
-		return RetargetToReauth(c)
 	}
 
 	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
