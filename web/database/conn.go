@@ -166,7 +166,7 @@ func initSessionStore() error {
 		}),
 		// CookieSecure: true,
 		CookieHTTPOnly: true,
-		Expiration:     24 * time.Hour,
+		Expiration:     2 * 24 * time.Hour,
 	})
 
 	fmt.Println("New instance.SessionStore connection OK")

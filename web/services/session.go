@@ -75,7 +75,7 @@ func SaveEncryptionKeySession(c *fiber.Ctx, key []byte) error {
 	id := sess.ID()
 	sessKey := fmt.Sprintf("key:%s", id)
 
-	return db.Redis.Set(c.Context(), sessKey, key, 1 * time.Hour).Err()
+	return db.Redis.Set(c.Context(), sessKey, key, 4 * time.Hour).Err()
 }
 
 func GetEncryptionKeySession(c *fiber.Ctx) ([]byte, error) {
