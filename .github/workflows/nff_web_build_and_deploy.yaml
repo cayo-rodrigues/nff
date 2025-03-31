@@ -1,24 +1,24 @@
 name: nff_web_build_and_deploy
 
 on:
-  workflow_run:
-    workflows:
-      - "nff_web_cert_renewal_cron"
-    types:
-      - completed
+  # workflow_run:
+  #   workflows:
+  #     - "nff_web_cert_renewal_cron"
+  #   types:
+  #     - completed
 
-  repository_dispatch:
-    types:
-      - build_and_deploy_trigger
+  # repository_dispatch:
+  #   types:
+  #     - build_and_deploy_trigger
 
   workflow_dispatch:
 
-  push:
-    branches:
-      - main
-    paths:
-      - "web/**"
-      - ".github/workflows/nff_web_build_and_deploy.yaml"
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "web/**"
+  #     - ".github/workflows/nff_web_build_and_deploy.yaml"
 
 jobs:
   build:
