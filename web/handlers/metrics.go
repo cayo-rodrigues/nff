@@ -44,12 +44,32 @@ func MetricsPage(c *fiber.Ctx) error {
 	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entities)))
 }
 
+func MetricsDetailsPage(c *fiber.Ctx) error {
+	metricsID, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	metrics, err := services.RetrieveMetrics(c.Context(), metricsID)
+	if err != nil {
+		return err
+	}
+
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page", "notification-list-loaded")
+	return Render(c, layouts.Base(pages.MetricsDetailsPage(metrics)))
+}
+
 func GenerateMetrics(c *fiber.Ctx) error {
+	decryptionKey, err := services.GetEncryptionKeySession(c)
+	if err != nil {
+		return RetargetToReauth(c)
+	}
+
 	metrics := models.NewMetricsFromForm(c)
 
 	var entities []*models.Entity
 
-	err := utils.Concurrent(
+	err = utils.Concurrent(
 		func() error {
 			var err error
 			metrics.Entity, err = services.RetrieveEntity(c.Context(), metrics.Entity.ID)
@@ -74,7 +94,7 @@ func GenerateMetrics(c *fiber.Ctx) error {
 		return err
 	}
 
-	ssapi := siare.GetSSApiClient()
+	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.GetMetrics(metrics)
 
 	c.Append("HX-Trigger-After-Swap", "reload-metrics-list")
@@ -161,8 +181,16 @@ func GetDownloadFromRecordStatusIcon(c *fiber.Ctx) error {
 		return err
 	}
 
+	// TODO
+	// Garantir que result.ReqStatus possua um valor
+
 	if result.InvoicePDF != "" {
 		return Render(c, components.DownloadInvoiceFromRecordSuccessIcon(result))
 	}
+
+	if result.ReqStatus == "error" {
+		return Render(c, components.DownloadInvoiceFromRecordErrorIcon())
+	}
+
 	return Render(c, components.DownloadInvoiceFromRecordLoadingIcon(result))
 }

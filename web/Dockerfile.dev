@@ -1,4 +1,4 @@
-FROM golang:1.23
+FROM golang:1.24
 
 RUN apt update -y && \
     apt upgrade -y
@@ -6,7 +6,7 @@ RUN apt update -y && \
 WORKDIR /app
 
 RUN go install github.com/air-verse/air@latest && \
-    go install github.com/a-h/templ/cmd/templ@v0.2.707
+    go install github.com/a-h/templ/cmd/templ@v0.3.857
 
 COPY . .
 

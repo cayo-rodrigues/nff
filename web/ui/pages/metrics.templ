@@ -4,6 +4,7 @@ import "github.com/cayo-rodrigues/nff/web/ui/forms"
 import "github.com/cayo-rodrigues/nff/web/models"
 import "github.com/cayo-rodrigues/nff/web/ui/shared"
 import "github.com/cayo-rodrigues/nff/web/ui/components"
+import "github.com/cayo-rodrigues/nff/web/utils"
 
 templ MetricsPage(metricsByDate []map[string][]*models.Metrics, m *models.Metrics, entities []*models.Entity) {
 	<div class="flex flex-col gap-3">
@@ -20,4 +21,39 @@ templ MetricsPage(metricsByDate []map[string][]*models.Metrics, m *models.Metric
 		</div>
 		@components.MetricsList(metricsByDate)
 	</div>
+}
+
+templ MetricsDetailsPage(m *models.Metrics) {
+	<div class="flex flex-col gap-3">
+		<h2 class="text-lg font-bold">{ m.Entity.Name }</h2>
+		<div class="flex items-center gap-2 text-base font-medium">
+			<div class="rounded-lg border border-gray-300 px-2 py-1 tracking-wide">
+				{ utils.FormatDateAsBR(m.StartDate) }
+			</div>
+			<span>
+				@shared.IconSm("arrow-right")
+			</span>
+			<div class="rounded-lg border border-gray-300 px-2 py-1 tracking-wide">
+				{ utils.FormatDateAsBR(m.EndDate) }
+			</div>
+		</div>
+		<div class="rounded border border-gray-400 p-2">
+			<div class="rounded border-b border-gray-200 p-2">
+				<h3 class="flex items-center gap-2 break-words rounded text-base font-bold">
+					@shared.OperationStatus(m)
+				</h3>
+			</div>
+			if m.ReqStatus != "pending" && m.ReqMsg != "" {
+				<div class="p-2 text-base">
+					<pre class={ shared.GetTextColorByOperationStatus(m) }>{ m.ReqMsg }</pre>
+				</div>
+			}
+		</div>
+	</div>
+	if m.ReqStatus != "pending" {
+		<section class="mt-4 flex flex-col gap-3">
+			<h2 class="text-lg font-bold">Resultados</h2>
+			@components.MetricsResultsDetails(m)
+		</section>
+	}
 }

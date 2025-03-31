@@ -84,7 +84,7 @@ templ CancelingDetailsDialog(c *models.InvoiceCancel) {
 				</div>
 			</div>
 			if c.ReqStatus != "pending" && c.ReqMsg != "" {
-				<div class="border-b p-2 text-base">
+				<div class="border-b border-gray-200 p-2 text-base">
 					<pre class={ shared.GetTextColorByOperationStatus(c) }>{ c.ReqMsg }</pre>
 				</div>
 			}

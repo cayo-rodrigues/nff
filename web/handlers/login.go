@@ -10,6 +10,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
 	"github.com/cayo-rodrigues/nff/web/utils"
+	"github.com/cayo-rodrigues/nff/web/utils/cryptoutils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -29,13 +30,22 @@ func LoginUser(c *fiber.Ctx) error {
 		return RetargetToForm(c, "login", forms.LoginForm(user))
 	}
 
-	err := services.SaveUserSession(c, user.ID)
+	key, err := cryptoutils.DeriveKey([]byte(user.Password), user.Salt)
 	if err != nil {
+		return err
+	}
+
+	if err = services.SaveEncryptionKeySession(c, key); err != nil {
+		return err
+	}
+
+	if err = services.SaveUserSession(c, user.ID); err != nil {
 		return err
 	}
 
 	redis := database.GetDB().Redis
 	redis.Publish(c.Context(), "0:operation-finished", 0)
+	redis.Publish(c.Context(), fmt.Sprintf("%d:operation-finished", user.ID), 0)
 
 	return RetargetToPageHandler(c, "/entities", EntitiesPage)
 }
@@ -51,4 +61,25 @@ func LogoutUser(c *fiber.Ctx) error {
 	redis.Publish(c.Context(), fmt.Sprintf("%d:operation-finished", userID), 0)
 
 	return RetargetToPageHandler(c, "/login", LoginPage)
+}
+
+func ReauthUser(c *fiber.Ctx) error  {
+	user := models.NewUserFromForm(c)
+	user.ID = utils.GetUserID(c.Context())
+
+	if !services.IsReauthDataValid(c.Context(), user) {
+		return RetargetToForm(c, "reauth", forms.ReauthenticateForm(user))
+	}
+
+	key, err := cryptoutils.DeriveKey([]byte(user.Password), user.Salt)
+	if err != nil {
+		return err
+	}
+
+	if err = services.SaveEncryptionKeySession(c, key); err != nil {
+		return err
+	}
+
+	c.Append("HX-Trigger-After-Settle", "close-reauth-form-dialog")
+	return Render(c, forms.ReauthenticateForm(user))
 }

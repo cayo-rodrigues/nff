@@ -112,6 +112,11 @@ func (f *Filters) Date(col string) *Filters {
 	return f
 }
 
+func (f *Filters) Raw(q string) *Filters {
+	f.query.WriteString(q)
+	return f
+}
+
 func (f *Filters) String() string {
 	return f.query.String()
 }

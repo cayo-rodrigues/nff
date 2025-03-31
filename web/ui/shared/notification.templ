@@ -5,6 +5,7 @@ import "github.com/cayo-rodrigues/nff/web/utils"
 import "github.com/cayo-rodrigues/nff/web/models"
 import "fmt"
 import "github.com/cayo-rodrigues/nff/web/services"
+import "context"
 
 templ NotificationBell(isAuthenticated bool) {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
@@ -29,7 +30,7 @@ templ NotificationCounter() {
 
 templ NotificationDialog() {
 	<dialog id="notification-dialog" class="rounded shadow shadow-gray-700">
-		<div class="sticky top-0 z-40 flex items-center justify-between border-b bg-gray-100 px-4 py-2">
+		<div class="sticky top-0 z-40 flex items-center justify-between border-b border-gray-200 bg-gray-100 px-4 py-2">
 			<h2 class="text-lg font-bold">Notificações</h2>
 			<div onclick="CloseNotificationDialog()">
 				@DefaultButtonOutline("xs") {
@@ -46,7 +47,7 @@ templ NotificationDialog() {
 			hx-swap="outerHTML"
 		>
 		</div>
-		<div class="sticky bottom-0 border-t bg-white p-2">
+		<div class="sticky bottom-0 border-t border-gray-200 bg-white p-2">
 			<div
 				hx-delete="/notifications"
 				hx-trigger="click"

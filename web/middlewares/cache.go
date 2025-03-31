@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -14,8 +15,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func CacheMiddleware(c *fiber.Ctx) error {
-	if (strings.HasPrefix(c.Path(), "/sse")) {
+var editEntityPageRegex = regexp.MustCompile("^/entities/([1-9]\\d*)(/?)$")
+
+func CacheManagementMiddleware(c *fiber.Ctx) error {
+	if shouldSkip(c) {
 		return c.Next()
 	}
 
@@ -24,6 +27,11 @@ func CacheMiddleware(c *fiber.Ctx) error {
 	}
 
 	return callNextAndClearCache(c)
+}
+
+func shouldSkip(c *fiber.Ctx) bool {
+	reqPath := c.Path()
+	return strings.HasPrefix(reqPath, "/sse") || editEntityPageRegex.MatchString(reqPath)
 }
 
 func useOrSetCache(c *fiber.Ctx) error {
@@ -117,6 +125,8 @@ func getKeyFactors(c *fiber.Ctx) (int, string, string) {
 		namespace = "invoice-print"
 	case strings.HasPrefix(route, "/invoices"):
 		namespace = "invoice-issue"
+	case strings.HasPrefix(route, "/reauthenticate"):
+		namespace = "*"
 	default:
 		namespace = strings.Split(route, "/")[1]
 	}

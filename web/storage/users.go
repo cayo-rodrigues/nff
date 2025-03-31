@@ -8,13 +8,20 @@ import (
 	"github.com/cayo-rodrigues/nff/web/models"
 )
 
-func RetrieveUser(ctx context.Context, email string) (*models.User, error) {
+type RetrieveUserParams struct {
+	Ctx context.Context
+	Email string
+	ID int
+}
+
+func RetrieveUser(params *RetrieveUserParams) (*models.User, error) {
 	db := database.GetDB()
 
 	row := db.SQLite.QueryRowContext(
-		ctx,
-		"SELECT * FROM users WHERE users.email = ?",
-		email,
+		params.Ctx,
+		"SELECT * FROM users WHERE users.email = ? OR users.id = ?",
+		params.Email,
+		params.ID,
 	)
 
 	user := models.NewUser()
@@ -32,8 +39,8 @@ func CreateUser(ctx context.Context, user *models.User) error {
 
 	row := db.SQLite.QueryRowContext(
 		ctx,
-		`INSERT INTO users (email, password) VALUES (?, ?) RETURNING id`,
-		user.Email, user.Password,
+		`INSERT INTO users (email, password, salt) VALUES (?, ?, ?) RETURNING id`,
+		user.Email, user.Password, user.Salt,
 	)
 	err := row.Scan(&user.ID)
 	if err != nil {

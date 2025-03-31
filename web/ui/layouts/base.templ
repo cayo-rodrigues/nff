@@ -33,6 +33,9 @@ templ Base(page templ.Component) {
 			</main>
 			@shared.Footer()
 			@shared.GlobalIndicator()
+			<dialog id="reauth-form-dialog" class="m-auto w-full rounded bg-gray-50 shadow shadow-gray-600 md:w-1/2 lg:w-1/3">
+				<div id="reauth-form-dialog-content"></div>
+			</dialog>
 		</body>
 	</html>
 }

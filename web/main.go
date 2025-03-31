@@ -76,7 +76,9 @@ func main() {
 	app.Get("/notifications/latest", handlers.GetLatestNotification)
 	app.Delete("/notifications", handlers.ClearNotifications)
 
-	app.Use(middlewares.CacheMiddleware)
+	app.Use(middlewares.CacheManagementMiddleware)
+
+	app.Post("/reauthenticate", handlers.ReauthUser)
 
 	app.Get("/", handlers.HomePage)
 
@@ -115,6 +117,7 @@ func main() {
 	app.Get("/metrics", handlers.MetricsPage)
 	app.Post("/metrics", handlers.GenerateMetrics)
 	app.Get("/metrics/list", handlers.ListMetrics)
+	app.Get("/metrics/:id", handlers.MetricsDetailsPage)
 	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
 	app.Get("/metrics/:id/card", handlers.RetrieveMetricsCard)

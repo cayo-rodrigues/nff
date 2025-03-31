@@ -330,6 +330,14 @@ function CloseInvoiceFormDialog() {
     document.querySelector('#invoice-form-dialog')?.close()
 }
 
+function OpenReauthFormDialog() {
+    document.querySelector('#reauth-form-dialog')?.showModal()
+}
+
+function CloseReauthFormDialog() {
+    document.querySelector('#reauth-form-dialog')?.close()
+}
+
 function OnChangeEntityFilter() {
     document.dispatchEvent(new CustomEvent('entity-filter-changed'))
 }
@@ -413,6 +421,13 @@ function Init() {
     })
     document.addEventListener('close-invoice-form-dialog', () => {
         CloseInvoiceFormDialog()
+    })
+
+    document.addEventListener('open-reauth-form-dialog', () => {
+        OpenReauthFormDialog()
+    })
+    document.addEventListener('close-reauth-form-dialog', () => {
+        CloseReauthFormDialog()
     })
 
     document.addEventListener('append-query-params', (event) => {

@@ -9,6 +9,8 @@ const (
 	PrintingNotFoundMsg      = "Impressão de NFA não encontrada"
 	UserNotFoundMsg          = "Usuário não encontrado"
 	InvalidLoginDataMsg      = "Dados de login inválidos"
+	InvalidDataMsg           = "Dados inválidos"
+	WrongPassword            = "Senha incorreta"
 )
 
 const (

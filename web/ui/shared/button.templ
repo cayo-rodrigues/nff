@@ -18,6 +18,12 @@ templ SubmitInfoButton(size string) {
 	}
 }
 
+templ SubmitWarningButton(size string) {
+	@Button("warning", size, templ.Attributes{"type": "submit"}) {
+		{ children... }
+	}
+}
+
 templ SubmitErrorButton(size string) {
 	@Button("error", size, templ.Attributes{"type": "submit"}) {
 		{ children... }
@@ -85,7 +91,7 @@ templ PhantomLightButton(size string) {
 }
 
 func GetButtonClassesByTheme(theme string, size string) string {
-	classes := "flex w-full transition border items-center justify-center rounded"
+	classes := "flex w-full transition border items-center justify-center rounded cursor-pointer"
 
 	colors := ""
 	padding := ""
