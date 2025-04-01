@@ -25,10 +25,11 @@ func CancelInvoicePage(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	entitiesByType := models.NewEntitiesByType(entities)
 
-	cancelingForForm := models.NewInvoiceCancelWithSamples(entities)
+	cancelingForForm := models.NewInvoiceCancelWithSamples(entitiesByType.Senders)
 	cancelingsByDate := services.GroupListByDate(cancelingsList)
-	page := pages.InvoicesCancelingsPage(cancelingsByDate, cancelingForForm, entities)
+	page := pages.InvoicesCancelingsPage(cancelingsByDate, cancelingForForm, entitiesByType)
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
 	return Render(c, layouts.Base(page))
@@ -44,6 +45,7 @@ func CancelInvoice(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	entitiesByType := models.NewEntitiesByType(entities)
 
 	canceling := models.NewInvoiceCancelFromForm(c)
 
@@ -54,7 +56,7 @@ func CancelInvoice(c *fiber.Ctx) error {
 	canceling.Entity = entity
 
 	if !canceling.IsValid() {
-		return Render(c, forms.CancelInvoiceForm(canceling, entities))
+		return Render(c, forms.CancelInvoiceForm(canceling, entitiesByType.Senders))
 	}
 
 	err = services.CreateCanceling(c.Context(), canceling)
@@ -66,7 +68,7 @@ func CancelInvoice(c *fiber.Ctx) error {
 	go ssapi.CancelInvoice(canceling)
 
 	c.Append("HX-Trigger-After-Swap", "reload-canceling-list")
-	return Render(c, forms.CancelInvoiceForm(canceling, entities))
+	return Render(c, forms.CancelInvoiceForm(canceling, entitiesByType.Senders))
 }
 
 func CancelInvoiceByID(c *fiber.Ctx) error {
@@ -108,6 +110,7 @@ func GetCancelInvoiceForm(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	entitiesByType := models.NewEntitiesByType(entities)
 
 	baseCancelingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -120,7 +123,7 @@ func GetCancelInvoiceForm(c *fiber.Ctx) error {
 	}
 
 	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
-	return Render(c, forms.CancelInvoiceForm(baseCanceling, entities))
+	return Render(c, forms.CancelInvoiceForm(baseCanceling, entitiesByType.Senders))
 }
 
 func RetrieveInvoiceCancelCard(c *fiber.Ctx) error {

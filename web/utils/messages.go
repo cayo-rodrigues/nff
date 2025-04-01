@@ -11,6 +11,7 @@ const (
 	InvalidLoginDataMsg      = "Dados de login inválidos"
 	InvalidDataMsg           = "Dados inválidos"
 	WrongPassword            = "Senha incorreta"
+	ConflictingEntitiesMsg   = "Remetente não deve ser igual ao destinatário."
 )
 
 const (

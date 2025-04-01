@@ -36,12 +36,14 @@ func MetricsPage(c *fiber.Ctx) error {
 		return err
 	}
 
+	entitiesByType := models.NewEntitiesByType(entities)
+
 	metricsByDate := services.GroupListByDate(metricsList)
 
 	m := models.NewMetrics()
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
-	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entities)))
+	return Render(c, layouts.Base(pages.MetricsPage(metricsByDate, m, entitiesByType)))
 }
 
 func MetricsDetailsPage(c *fiber.Ctx) error {
@@ -84,9 +86,10 @@ func GenerateMetrics(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	entitiesByType := models.NewEntitiesByType(entities)
 
 	if !metrics.IsValid() {
-		return Render(c, forms.MetricsForm(metrics, entities))
+		return Render(c, forms.MetricsForm(metrics, entitiesByType.Senders))
 	}
 
 	err = services.CreateMetrics(c.Context(), metrics)
@@ -98,7 +101,7 @@ func GenerateMetrics(c *fiber.Ctx) error {
 	go ssapi.GetMetrics(metrics)
 
 	c.Append("HX-Trigger-After-Swap", "reload-metrics-list")
-	return Render(c, forms.MetricsForm(metrics, entities))
+	return Render(c, forms.MetricsForm(metrics, entitiesByType.Senders))
 }
 
 func ListMetrics(c *fiber.Ctx) error {
@@ -137,9 +140,10 @@ func GetMetricsForm(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	entitiesByType := models.NewEntitiesByType(entities)
 
 	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
-	return Render(c, forms.MetricsForm(baseMetrics, entities))
+	return Render(c, forms.MetricsForm(baseMetrics, entitiesByType.Senders))
 }
 
 func RetrieveMetricsResultsDetails(c *fiber.Ctx) error {

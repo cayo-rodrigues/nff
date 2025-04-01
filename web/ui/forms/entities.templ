@@ -92,28 +92,22 @@ templ EntityForm(e *models.Entity) {
 					})
 				</fieldset>
 			</div>
-			<div class="grid grid-cols-2 gap-6 sm:grid-cols-3">
+			<div class="mt-4 grid grid-cols-2 gap-4">
 				if e.ID != 0 {
-					<div class="col-span-2 mt-4 sm:col-span-1">
+					<div class="col-span-full sm:col-span-1">
 						@shared.SubmitInfoButton("md") {
 							@shared.Icon("edit")
 							<span>Atualizar</span>
 						}
 					</div>
-					<div class="mt-4" hx-delete={ fmt.Sprintf("/entities/delete/%d", e.ID) }>
-						@shared.DefaultButton("md") {
-							@shared.Icon("trash-2")
-							<span>Deletar</span>
-						}
-					</div>
-					<div class="mt-4" hx-post="/entities/create">
+					<div class="col-span-full sm:col-span-1" hx-post="/entities/create">
 						@shared.SuccessButton("md") {
 							@shared.Icon("user-plus")
-							<span>Registrar</span>
+							<span>Registrar nova entidade</span>
 						}
 					</div>
 				} else {
-					<div class="col-span-full mt-4">
+					<div class="col-span-full">
 						@shared.SubmitButton("md") {
 							@shared.Icon("user-plus")
 							<span>Registrar</span>

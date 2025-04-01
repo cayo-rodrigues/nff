@@ -19,6 +19,18 @@ var EntityUserTypes = SiareUserTypes{
 	"Apenas Destinatário",
 }
 
+func (t *SiareUserTypes) PRODUTOR_RURAL() string  {
+	return t[0]
+}
+
+func (t *SiareUserTypes) INSCRICAO_ESTADUAL() string  {
+	return t[1]
+}
+
+func (t *SiareUserTypes) APENAS_DESTINATARIO() string  {
+	return t[2]
+}
+
 type SiareAddressStreetTypes [3]string
 
 var EntityAddressStreetTypes = SiareAddressStreetTypes{

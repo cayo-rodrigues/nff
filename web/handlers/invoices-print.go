@@ -27,9 +27,11 @@ func PrintInvoicePage(c *fiber.Ctx) error {
 		return err
 	}
 
-	printingForForm := models.NewInvoicePrintWithSamples(entities)
+	entitiesByType := models.NewEntitiesByType(entities)
+
+	printingForForm := models.NewInvoicePrintWithSamples(entitiesByType.Senders)
 	printingsByDate := services.GroupListByDate(printingsList)
-	page := pages.InvoicesPrintPage(printingsByDate, printingForForm, entities)
+	page := pages.InvoicesPrintPage(printingsByDate, printingForForm, entitiesByType)
 
 	c.Append("HX-Trigger-After-Settle", "highlight-current-filter", "highlight-current-page", "notification-list-loaded")
 	return Render(c, layouts.Base(page))
@@ -45,6 +47,7 @@ func PrintInvoice(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	entitiesByType := models.NewEntitiesByType(entities)
 
 	printing := models.NewInvoicePrintFromForm(c)
 
@@ -54,8 +57,9 @@ func PrintInvoice(c *fiber.Ctx) error {
 	}
 	printing.Entity = entity
 
+
 	if !printing.IsValid() {
-		return Render(c, forms.PrintInvoiceForm(printing, entities))
+		return Render(c, forms.PrintInvoiceForm(printing, entitiesByType.Senders))
 	}
 
 	err = services.CreatePrinting(c.Context(), printing)
@@ -67,7 +71,7 @@ func PrintInvoice(c *fiber.Ctx) error {
 	go ssapi.PrintInvoice(printing)
 
 	c.Append("HX-Trigger-After-Swap", "reload-printing-list")
-	return Render(c, forms.PrintInvoiceForm(printing, entities))
+	return Render(c, forms.PrintInvoiceForm(printing, entitiesByType.Senders))
 }
 
 func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
@@ -116,6 +120,7 @@ func GetPrintInvoiceForm(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+	entitiesByType := models.NewEntitiesByType(entities)
 
 	basePrintingID, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -128,7 +133,7 @@ func GetPrintInvoiceForm(c *fiber.Ctx) error {
 	}
 
 	c.Append("HX-Trigger-After-Swap", "scroll-to-top")
-	return Render(c, forms.PrintInvoiceForm(basePrinting, entities))
+	return Render(c, forms.PrintInvoiceForm(basePrinting, entitiesByType.Senders))
 }
 
 func RetrieveInvoicePrintCard(c *fiber.Ctx) error {
