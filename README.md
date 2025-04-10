@@ -6,7 +6,7 @@ Este projeto tem o objetivo de automatizar processos repetitivos que funcionári
 
 ## Demonstração
 
-### [Clique aqui para ver o projeto em produção](https://notafiscalfacil.com)
+### [Clique aqui para ver o projeto em produção](https://nff-web-railway-dev.up.railway.app/)
 
 > A nota fiscal emitida no vídeo é apenas para fins demonstrativos
 
@@ -32,6 +32,7 @@ Como meu irmão trabalha nesse setor, ele deu a ideia, eu vi que era viável, e 
 - [x] Filtros por data no histórico de requerimentos
 - [x] Filtros por entidade no histórico de requerimentos
 - [x] Possibilitar o uso de modelos de nota fiscal, preenchendo automaticamente os campos
+- [x] Criptografia segura das senhas dos produtores rurais
 - [ ] Gerenciamento de modelos de nota fiscal
 - [ ] Login/Cadastro com Google
 - [x] Bom uso de cache
