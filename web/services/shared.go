@@ -24,7 +24,7 @@ func handleDateFilters(colName string, query map[string]string, f *models.Filter
 	f.And().Date(colName).Between(fromDate, toDate)
 }
 
-func handleEntityFilters(colName string, query map[string]string, f*models.Filters) {
+func handleEntityFilters(colName string, query map[string]string, f *models.Filters) {
 	entityID, ok := query["entity_filter"]
 
 	if !ok || entityID == "" {
@@ -67,3 +67,4 @@ func GroupListByDate[T CreatedAtGetter](list []T) []map[string][]T {
 
 	return groupedList
 }
+

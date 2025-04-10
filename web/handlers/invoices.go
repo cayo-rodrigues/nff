@@ -47,9 +47,11 @@ func GetInvoiceForm(c *fiber.Ctx) error {
 		return err
 	}
 
+	entitiesByType := models.NewEntitiesByType(entities)
+
 	if baseInvoiceID == 0 {
-		invoice := models.NewInvoiceWithSamples(entities)
-		return Render(c, forms.InvoiceForm(invoice, entities))
+		invoice := models.NewInvoiceWithSamples(entitiesByType)
+		return Render(c, forms.InvoiceForm(invoice, entitiesByType))
 	}
 
 	baseInvoice, err := services.RetrieveInvoice(c.Context(), baseInvoiceID)
@@ -58,7 +60,7 @@ func GetInvoiceForm(c *fiber.Ctx) error {
 	}
 
 	c.Append("HX-Trigger-After-Settle", "open-invoice-form-dialog")
-	return Render(c, forms.InvoiceForm(baseInvoice, entities))
+	return Render(c, forms.InvoiceForm(baseInvoice, entitiesByType))
 }
 
 func GetSenderIeInput(c *fiber.Ctx) error {
@@ -136,8 +138,10 @@ func CreateInvoice(c *fiber.Ctx) error {
 		return err
 	}
 
+	entitiesByType := models.NewEntitiesByType(entities)
+
 	if !invoice.IsValid() {
-		return Render(c, forms.InvoiceForm(invoice, entities))
+		return Render(c, forms.InvoiceForm(invoice, entitiesByType))
 	}
 
 	err = services.CreateInvoice(c.Context(), invoice)
@@ -149,7 +153,7 @@ func CreateInvoice(c *fiber.Ctx) error {
 	go ssapi.IssueInvoice(invoice)
 
 	c.Append("HX-Trigger-After-Settle", "reload-invoice-list", "close-invoice-form-dialog")
-	return Render(c, forms.InvoiceForm(invoice, entities))
+	return Render(c, forms.InvoiceForm(invoice, entitiesByType))
 }
 
 func RetrieveInvoiceItemsDetails(c *fiber.Ctx) error {

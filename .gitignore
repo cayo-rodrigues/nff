@@ -17,3 +17,4 @@ chromedriver-linux64*
 ss-api/tests/samples.json
 *_templ.go
 nff-web-key-pair.pem
+sefaz-api/

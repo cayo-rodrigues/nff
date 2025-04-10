@@ -72,11 +72,13 @@ func NewInvoice() *Invoice {
 	}
 }
 
-func NewInvoiceWithSamples(entities []*Entity) *Invoice {
+func NewInvoiceWithSamples(entitiesByType *EntitiesByType) *Invoice {
 	invoice := NewInvoice()
-	if len(entities) > 0 {
-		invoice.Sender = entities[0]
-		invoice.Recipient = entities[0]
+	if len(entitiesByType.Senders) > 0 {
+		invoice.Sender = entitiesByType.Senders[0]
+	}
+	if len(entitiesByType.All) > 0 {
+		invoice.Recipient = entitiesByType.All[0]
 	}
 	if len(invoice.Items) == 0 {
 		invoice.Items = append(invoice.Items, NewInvoiceItem())
@@ -198,12 +200,12 @@ func (i *Invoice) IsValid() bool {
 		{
 			Name:  "Sender",
 			Value: i.Sender.ID,
-			Rules: safe.Rules{safe.Required()},
+			Rules: safe.Rules{safe.Required(), safe.NotEqualTo(i.Recipient.ID).WithMessage(utils.ConflictingEntitiesMsg)},
 		},
 		{
 			Name:  "Recipient",
 			Value: i.Recipient.ID,
-			Rules: safe.Rules{safe.Required()},
+			Rules: safe.Rules{safe.Required(), safe.NotEqualTo(i.Sender.ID).WithMessage(utils.ConflictingEntitiesMsg)},
 		},
 	}
 	errors, ok := safe.Validate(fields)

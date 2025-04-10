@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
+templ InvoiceForm(i *models.Invoice, entitiesByType *models.EntitiesByType) {
 	<form id="invoice-form" hx-post="/invoices" hx-target="this" hx-swap="outerHTML">
 		<div class="flex items-center justify-between gap-6 border-b border-gray-300 py-2 outline-0">
 			<div class="flex-1 lg:w-fit lg:flex-initial">
@@ -30,7 +30,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				ID:      "sender",
 				Label:   "Remetente",
 				Value:   strconv.Itoa(i.Sender.ID),
-				Options: &shared.InputOptions{EntityOptions: entities},
+				Options: &shared.InputOptions{EntityOptions: entitiesByType.Senders},
 				ErrMsg:  i.Errors["Sender"],
 				Attrs: templ.Attributes{
 					"hx-get":       "/invoices/form/get-sender-ie-input",
@@ -53,7 +53,7 @@ templ InvoiceForm(i *models.Invoice, entities []*models.Entity) {
 				ID:      "recipient",
 				Label:   "Destinatário",
 				Value:   strconv.Itoa(i.Recipient.ID),
-				Options: &shared.InputOptions{EntityOptions: entities},
+				Options: &shared.InputOptions{EntityOptions: entitiesByType.All},
 				ErrMsg:  i.Errors["Recipient"],
 				Attrs: templ.Attributes{
 					"hx-get":       "/invoices/form/get-recipient-ie-input",
