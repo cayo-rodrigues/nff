@@ -68,7 +68,7 @@ func PrintInvoice(c *fiber.Ctx) error {
 	}
 
 	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
-	go ssapi.PrintInvoice(printing)
+	go ssapi.PrintInvoice(printing, nil)
 
 	c.Append("HX-Trigger-After-Swap", "reload-printing-list")
 	return Render(c, forms.PrintInvoiceForm(printing, entitiesByType.Senders))

@@ -194,6 +194,14 @@ templ MetricsResultsDetails(m *models.Metrics) {
 	</div>
 }
 
+func downloadInvoiceFromMetricsRecordButtonID(r *models.MetricsResult) string {
+	return fmt.Sprintf("download-invoice-from-record-button-%d", r.ID)
+}
+
+func downloadInvoiceFromMetricsRecordButtonTarget(r *models.MetricsResult) string {
+	return fmt.Sprintf("#download-invoice-from-record-button-%d", r.ID)
+}
+
 func downloadInvoiceFromRecordReqStatusID(r *models.MetricsResult) string {
 	return fmt.Sprintf("download-invoice-from-record-status-icon-%d", r.ID)
 }
@@ -205,10 +213,10 @@ func downloadInvoiceFromRecordReqStatusTarget(r *models.MetricsResult) string {
 templ DownloadInvoiceFromRecordLoadingIcon(r *models.MetricsResult) {
 	<div
 		class="text-sky-600"
-		hx-get={ fmt.Sprintf("/metrics/%d/download-from-record-status-icon", r.ID) }
+		hx-get={ fmt.Sprintf("/metrics/results/%d/download-from-record-status-icon", r.ID) }
 		hx-trigger={ shared.NotificationEventName(ctx) }
-		hx-swap="innerHTML"
-		hx-target={ downloadInvoiceFromRecordReqStatusTarget(r) }
+		hx-swap="outerHTML"
+		hx-target={ downloadInvoiceFromMetricsRecordButtonTarget(r) }
 	>
 		@shared.SpinningIcon("loader")
 	</div>
@@ -223,15 +231,27 @@ templ DownloadInvoiceFromRecordSuccessIcon(r *models.MetricsResult) {
 }
 
 templ DownloadInvoiceFromRecordErrorIcon() {
-	<div class="text-red-600">
+	<a href="/invoices/print" target="_blank" class="text-red-600">
 		@shared.IconSm("x-circle")
-	</div>
+	</a>
 }
 
-templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult) {
-	<div class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3">
+templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult, p *models.InvoicePrint) {
+	<div
+		id={ downloadInvoiceFromMetricsRecordButtonID(r) }
+		class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3"
+	>
 		<div id={ downloadInvoiceFromRecordReqStatusID(r) }>
-			@DownloadInvoiceFromRecordSuccessIcon(r)
+			if r.InvoicePDF != "" {
+				@DownloadInvoiceFromRecordSuccessIcon(r)
+			} else if p != nil {
+				if p.ReqStatus == "error" {
+					@DownloadInvoiceFromRecordErrorIcon()
+				}
+				if p.ReqStatus == "pending" {
+					@DownloadInvoiceFromRecordLoadingIcon(r)
+				}
+			}
 		</div>
 		<a
 			if r.InvoicePDF != "" {
@@ -268,7 +288,7 @@ templ MetricsResultData(r *models.MetricsResult) {
 			<li class="col-span-full">
 				<strong>Remetente</strong>: <span>{ r.InvoiceSender }</span>
 			</li>
-			@DownloadInvoiceFromMetricsRecordButton(r)
+			@DownloadInvoiceFromMetricsRecordButton(r, nil)
 		} else {
 			<li>
 				<strong>Lucro total</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>

@@ -39,8 +39,8 @@ func CreateUser(ctx context.Context, user *models.User) error {
 
 	row := db.SQLite.QueryRowContext(
 		ctx,
-		`INSERT INTO users (email, password, salt) VALUES (?, ?, ?) RETURNING id`,
-		user.Email, user.Password, user.Salt,
+		`INSERT INTO users (email, password, salt, is_blocked) VALUES (?, ?, ?, ?) RETURNING id`,
+		user.Email, user.Password, user.Salt, user.IsBlocked,
 	)
 	err := row.Scan(&user.ID)
 	if err != nil {

@@ -80,10 +80,18 @@ func enqueueNotification(ctx context.Context, redisClient *database.Redis, userI
 	}
 }
 
-func finishOperation(ctx context.Context, redisClient *database.Redis, resourceName string, userID int, n models.Notifiable) {
+func finishOperation(ctx context.Context, redisClient *database.Redis, userID int, n models.Notifiable, operationOpts *SSApiCallOpts) {
 	notification := n.AsNotification()
 
-	enqueueNotification(ctx, redisClient, userID, notification)
-	redisClient.ClearCache(ctx, userID, resourceName)
-	notifyOperationResult(ctx, redisClient, userID, notification.ID)
+	if operationOpts.EnqueueNotification {
+		enqueueNotification(ctx, redisClient, userID, notification)
+	}
+	if operationOpts.ClearCache {
+		for _, namespace := range operationOpts.CacheNamespacesToClear {
+			redisClient.ClearCache(ctx, userID, namespace)
+		}
+	}
+	if operationOpts.NotifyOperationResult {
+		notifyOperationResult(ctx, redisClient, userID, notification.ID)
+	}
 }

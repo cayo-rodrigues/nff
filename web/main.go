@@ -121,7 +121,9 @@ func main() {
 	app.Get("/metrics/:id/form", handlers.GetMetricsForm)
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
 	app.Get("/metrics/:id/card", handlers.RetrieveMetricsCard)
-	app.Get("/metrics/:id/download-from-record-status-icon", handlers.GetDownloadFromRecordStatusIcon)
+	app.Get("/metrics/results/:id/download-from-record-status-icon", handlers.GetDownloadFromRecordStatusIcon)
+
+	app.Get("/prices", handlers.PricesPage)
 
 	app.Use(handlers.NotFoundPage)
 

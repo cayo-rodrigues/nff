@@ -6,18 +6,21 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/handlers"
 	"github.com/cayo-rodrigues/nff/web/services"
-	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
-	isAuthenticated, userID, err := services.GetUserSession(c)
+	userData, err := services.GetUserSession(c)
 	if err != nil {
 		return err
 	}
 
-	if !isAuthenticated || userID == 0 {
+	// save user data to request context
+	ctx := context.WithValue(c.Context(), "UserData", userData)
+	adaptor.CopyContextToFiberContext(ctx, c.Context())
+
+	if !userData.IsAuthenticated || userData.ID == 0 {
 		err := services.DestroyUserSession(c)
 		if err != nil {
 			return err
@@ -34,13 +37,15 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
 	}
 
-	// save user data to request context
-	userData := &utils.ReqUserData{
-		ID:              userID,
-		IsAuthenticated: isAuthenticated,
+	if userData.IsBlocked || !userData.HasChosenPaymentPlan {
+		pathsToSkip := []string{
+			"/", "/prices", "/sse/notify-operations-results", "/logout",
+		}
+
+		if !slices.Contains(pathsToSkip, c.Path()) {
+			return handlers.RetargetToPageHandler(c, "/prices", handlers.PricesPage)
+		}
 	}
-	ctx := context.WithValue(c.Context(), "UserData", userData)
-	adaptor.CopyContextToFiberContext(ctx, c.Context())
 
 	err = c.Next()
 	if err != nil {
@@ -52,5 +57,5 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 	// refresh user session
 	// sess.Save must be called last
-	return services.SaveUserSession(c, userID)
+	return services.SaveUserSession(c, userData)
 }
