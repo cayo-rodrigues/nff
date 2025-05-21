@@ -4,36 +4,51 @@ import "github.com/cayo-rodrigues/nff/web/ui/shared"
 
 templ PricesPage() {
 	<h1 class="pb-4 text-center text-2xl font-bold">Escolha seu plano</h1>
-	<h2 class="pb-8 text-center text-xl font-medium text-gray-600">Ambos possuem grandes vantagens, porém depende da forma e da frequência que você vai usar o NFF</h2>
-	<div class="flex flex-col gap-8 md:flex-row">
+	<h2 class="pb-2 text-center text-xl font-medium text-gray-600">Ambos possuem grandes vantagens, porém depende da forma e da frequência que você vai usar o NFF</h2>
+	<h3 class="pb-8 text-center text-lg font-medium italic text-gray-600">Você pode mudar de plano ou cancelar sua assinatura a qualquer momento</h3>
+	<div class="flex flex-col justify-between gap-8 xl:flex-row">
 		@PlanCardGroup() {
-			@PlanCardTitle("bar-chart-2", "cyan", "Por uso")
-			@PlanCardSubtitle("Use o NFF livremente, acompanhe seu uso e pague a fatura no final do mês.")
-			@BenefitsListGroup("Pague apenas pelo que você usar:") {
-				<li>Emissão de Nota Fiscal: <b>R$ 1,00</b></li>
-				<li>Cancelamento e impressão de Notas Fiscais: <b>R$ 0,05</b></li>
-				<li>Cálculo de Métricas: <b>R$ 0,10</b> por cada registro</li>
-			}
-			@BenefitsListGroup("Quanto maior o uso, maior o desconto!") {
-				<li>A partir de <b>50 operações</b> no mês: <b>desconto de 15%</b> no valor total</li>
-				<li>A partir de <b>100 operações</b> no mês: <b>desconto de 20%</b> no valor total</li>
-				<li>A partir de <b>200 operações</b> no mês: <b>desconto de 30%</b> no valor total</li>
-			}
+			<div class="flex flex-col">
+				@PlanCardTitle("bar-chart-2", "cyan", "Por uso")
+				@PlanCardSubtitle("Use o NFF livremente, acompanhe seu uso e pague a fatura no final do mês.")
+				@BenefitsListGroup("Pague apenas pelo que você usar:") {
+					<li>Emissão de Nota Fiscal: <b class="text-cyan-400">R$ 1,00</b></li>
+					<li>Cancelamento e impressão de Notas Fiscais: <b class="text-cyan-400">R$ 0,05</b></li>
+					<li>Cálculo de Métricas: <b class="text-cyan-400">R$ 0,10</b> por cada registro</li>
+				}
+				@BenefitsListGroup("Quanto maior o uso, maior o desconto!") {
+					<li>A partir de <b>50 operações</b> no mês: <b>desconto de 20%</b> no valor total</li>
+					<li>A partir de <b>100 operações</b> no mês: <b>desconto de 25%</b> no valor total</li>
+					<li>A partir de <b>200 operações</b> no mês: <b>desconto de 30%</b> no valor total</li>
+				}
+				@shared.InfoButton("md") {
+					<span class="text-base font-bold">Assinar</span>
+					@shared.IconSm("check-square")
+				}
+			</div>
 		}
 		@PlanCardGroup() {
-			@PlanCardTitle("dollar-sign", "pink", "Pré-pago")
-			@PlanCardSubtitle("Compre créditos e use-os para realizar operações. Créditos nunca expiram.")
-			@BenefitsListGroup("") {
-				<li>Emissão de Nota Fiscal: <b>25 CR</b></li>
-				<li>Cancelamento e impressão de Notas Fiscais: <b>1 CR</b></li>
-				<li>Cálculo de Métricas: <b>2 CR</b> por cada registro</li>
-			}
-			@BenefitsListGroup("Quanto mais créditos, mais desconto!") {
-				<li>500 CR: <b>R$ 20,00</b></li>
-				<li>1500 CR: <b>R$ 40,00</b> <i>(500 CR grátis)</i></li>
-				<li>3000 CR: <b>R$ 80,00</b> <i>(1000 CR grátis)</i></li>
-				<li>6000 CR: <b>R$ 160,00</b> <i>(2000 CR grátis)</i></li>
-			}
+			<div class="flex h-full flex-col justify-between">
+				<div>
+					@PlanCardTitle("dollar-sign", "pink", "Pré-pago")
+					@PlanCardSubtitle("Compre créditos e use-os para realizar operações. Créditos nunca expiram.")
+					@BenefitsListGroup("Pague apenas pelo que você usar:") {
+						<li>Emissão de Nota Fiscal: <b class="text-pink-400">25 CR</b></li>
+						<li>Cancelamento e impressão de Notas Fiscais: <b class="text-pink-400">1 CR</b></li>
+						<li>Cálculo de Métricas: <b class="text-pink-400">2 CR</b> por cada registro</li>
+					}
+					@BenefitsListGroup("Quanto mais créditos, mais desconto!") {
+						<li>500 CR: <b>R$ 20,00</b></li>
+						<li>1500 CR: <b>R$ 40,00</b> <i>(500 CR grátis!)</i></li>
+						<li>3000 CR: <b>R$ 80,00</b> <i>(1000 CR grátis!)</i></li>
+						<li>6000 CR: <b>R$ 160,00</b> <i>(2000 CR grátis!)</i></li>
+					}
+				</div>
+				@shared.PinkButton("md") {
+					<span class="text-base font-bold">Assinar</span>
+					@shared.IconSm("check-square")
+				}
+			</div>
 		}
 	</div>
 }
@@ -73,7 +88,7 @@ templ PlanCardSubtitle(subtitle string) {
 }
 
 templ PlanCardGroup() {
-	<div class="w-full rounded bg-gradient-to-r from-gray-800 to-gray-600 p-4 text-gray-50 shadow shadow-gray-500 md:content-stretch">
+	<div class="w-full rounded bg-gradient-to-r from-gray-800 to-gray-600 p-4 text-gray-50 shadow shadow-gray-500 xl:content-stretch">
 		{ children... }
 	</div>
 }
