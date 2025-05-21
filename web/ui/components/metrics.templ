@@ -132,7 +132,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				<section class="rounded border border-gray-400">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "total"), metricsResultChevronIconTarget(m, "total")) }
-						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+						class="sticky top-12 z-10 flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Geral</h3>
 						<div id={ metricsResultChevronIconID(m, "total") }>
@@ -148,7 +148,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				<section class="rounded border border-gray-400">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "month"), metricsResultChevronIconTarget(m, "month")) }
-						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+						class="sticky top-12 z-10 flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Mensal</h3>
 						<div id={ metricsResultChevronIconID(m, "month") }>
@@ -173,7 +173,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				<section class="rounded border border-gray-400">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "record"), metricsResultChevronIconTarget(m, "record")) }
-						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+						class="sticky top-12 z-10 flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Individual</h3>
 						<div id={ metricsResultChevronIconID(m, "record") }>
@@ -183,7 +183,10 @@ templ MetricsResultsDetails(m *models.Metrics) {
 					<div id={ metricsResultDataID(m, "record") } class="hidden">
 						for _, r := range m.Records {
 							<div class="relative border-b border-gray-200 odd:bg-sky-50">
-								<h4 class="px-4 py-2 text-lg">NFA-{ r.InvoiceNumber }</h4>
+								<h4 class="flex items-center gap-2 px-4 py-2 text-lg">
+									@shared.IconSm("file-text")
+									NFA-{ r.InvoiceNumber }
+								</h4>
 								@MetricsResultData(r)
 							</div>
 						}
