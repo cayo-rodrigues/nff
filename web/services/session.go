@@ -6,13 +6,14 @@ import (
 
 	"github.com/cayo-rodrigues/nff/web/database"
 	"github.com/cayo-rodrigues/nff/web/storage"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
-func SaveUserSession(c *fiber.Ctx, userID int) error {
+func SaveUserSession(c *fiber.Ctx, userData *utils.UserCtxData) error {
+	userData.IsAuthenticated = true
 	sessionOpts := []*storage.SessionOpts{
-		{Key: "IsAuthenticated", Val: true},
-		{Key: "UserID", Val: userID},
+		{Key: "UserData", Val: userData},
 	}
 
 	err := storage.SetSessionKVs(c, sessionOpts...)
@@ -20,16 +21,12 @@ func SaveUserSession(c *fiber.Ctx, userID int) error {
 		return err
 	}
 
-	c.Locals("IsAuthenticated", true)
-	c.Locals("UserID", userID)
-
 	return nil
 }
 
 func DestroyUserSession(c *fiber.Ctx) error {
 	sessionOpts := []*storage.SessionOpts{
-		{Key: "IsAuthenticated"},
-		{Key: "UserID"},
+		{Key: "UserData"},
 	}
 
 	err := storage.DeleteSessionKeys(c, sessionOpts...)
@@ -37,31 +34,25 @@ func DestroyUserSession(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Locals("IsAuthenticated", false)
-	c.Locals("UserID", 0)
-
 	return nil
 }
 
-func GetUserSession(c *fiber.Ctx) (isAuthenticated bool, userID int, err error) {
+func GetUserSession(c *fiber.Ctx) (*utils.UserCtxData, error) {
 	sessionOpts := []*storage.SessionOpts{
-		{Key: "IsAuthenticated"},
-		{Key: "UserID"},
+		{Key: "UserData"},
 	}
 
 	vals, err := storage.GetSessionValsByKeys(c, sessionOpts...)
 	if err != nil {
-		return false, 0, err
+		return nil, err
 	}
 
-	isAuthenticated, authOk := vals["IsAuthenticated"].(bool)
-	userID, idOK := vals["UserID"].(int)
-
-	if !authOk || !idOK {
-		return false, 0, nil
+	userData, ok := vals["UserData"].(*utils.UserCtxData)
+	if !ok {
+		return &utils.UserCtxData{}, nil
 	}
 
-	return isAuthenticated, userID, nil
+	return userData, nil
 }
 
 func SaveEncryptionKeySession(c *fiber.Ctx, key []byte) error {
@@ -75,7 +66,7 @@ func SaveEncryptionKeySession(c *fiber.Ctx, key []byte) error {
 	id := sess.ID()
 	sessKey := fmt.Sprintf("key:%s", id)
 
-	return db.Redis.Set(c.Context(), sessKey, key, 4 * time.Hour).Err()
+	return db.Redis.Set(c.Context(), sessKey, key, 4*time.Hour).Err()
 }
 
 func GetEncryptionKeySession(c *fiber.Ctx) ([]byte, error) {

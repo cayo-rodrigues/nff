@@ -39,7 +39,13 @@ func LoginUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err = services.SaveUserSession(c, user.ID); err != nil {
+	userData := &utils.UserCtxData{
+		ID:                   user.ID,
+		IsBlocked:            user.IsBlocked,
+		HasChosenPaymentPlan: user.HasChosenPaymentPlan,
+	}
+
+	if err = services.SaveUserSession(c, userData); err != nil {
 		return err
 	}
 
@@ -63,7 +69,7 @@ func LogoutUser(c *fiber.Ctx) error {
 	return RetargetToPageHandler(c, "/login", LoginPage)
 }
 
-func ReauthUser(c *fiber.Ctx) error  {
+func ReauthUser(c *fiber.Ctx) error {
 	user := models.NewUserFromForm(c)
 	user.ID = utils.GetUserID(c.Context())
 

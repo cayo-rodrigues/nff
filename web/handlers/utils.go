@@ -47,6 +47,8 @@ func RetargetToForm(c *fiber.Ctx, resourceName string, form templ.Component, opt
 func RetargetToPageHandler(c *fiber.Ctx, url string, pageHandler fiber.Handler) error {
 	c.Append("HX-Location", url)
 	c.Append("HX-Push-Url", url)
+	c.Append("HX-Replace-Url", url)
+	c.Append("HX-Trigger-After-Settle", "highlight-current-page")
 	return pageHandler(c)
 }
 

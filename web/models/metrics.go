@@ -67,6 +67,7 @@ type MetricsResult struct {
 	Total           *MetricsResult   `json:"total"`
 	MetricsID       int              `json:"-"`
 	EntityID        int              `json:"-"`
+	PrintingID      int              `json:"-"`
 	CreatedBy       int              `json:"-"`
 	CreatedAt       time.Time        `json:"-"`
 }
@@ -144,6 +145,6 @@ func (r *MetricsResult) Values() []any {
 		&r.TotalRecords, &r.PositiveRecords, &r.NegativeRecords,
 		&r.MetricsID, &r.CreatedBy, &r.CreatedAt,
 		&r.IssueDate, &r.InvoiceNumber, &r.EntityID,
-		&r.InvoicePDF, &r.InvoiceSender,
+		&r.InvoicePDF, &r.InvoiceSender, &r.PrintingID,
 	}
 }

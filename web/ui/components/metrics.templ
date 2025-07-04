@@ -132,7 +132,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				<section class="rounded border border-gray-400">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "total"), metricsResultChevronIconTarget(m, "total")) }
-						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+						class="sticky top-12 z-10 flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Geral</h3>
 						<div id={ metricsResultChevronIconID(m, "total") }>
@@ -148,7 +148,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				<section class="rounded border border-gray-400">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "month"), metricsResultChevronIconTarget(m, "month")) }
-						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+						class="sticky top-12 z-10 flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Mensal</h3>
 						<div id={ metricsResultChevronIconID(m, "month") }>
@@ -173,7 +173,7 @@ templ MetricsResultsDetails(m *models.Metrics) {
 				<section class="rounded border border-gray-400">
 					<header
 						onclick={ scripts.ToggleAccordion(metricsResultDataTarget(m, "record"), metricsResultChevronIconTarget(m, "record")) }
-						class="flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
+						class="sticky top-12 z-10 flex cursor-pointer items-center justify-between rounded border-b border-gray-200 bg-gray-50 px-4 py-2 transition-colors hover:bg-gray-100 active:bg-gray-200"
 					>
 						<h3 class="text-lg">Individual</h3>
 						<div id={ metricsResultChevronIconID(m, "record") }>
@@ -183,7 +183,10 @@ templ MetricsResultsDetails(m *models.Metrics) {
 					<div id={ metricsResultDataID(m, "record") } class="hidden">
 						for _, r := range m.Records {
 							<div class="relative border-b border-gray-200 odd:bg-sky-50">
-								<h4 class="px-4 py-2 text-lg">NFA-{ r.InvoiceNumber }</h4>
+								<h4 class="flex items-center gap-2 px-4 py-2 text-lg">
+									@shared.IconSm("file-text")
+									NFA-{ r.InvoiceNumber }
+								</h4>
 								@MetricsResultData(r)
 							</div>
 						}
@@ -192,6 +195,14 @@ templ MetricsResultsDetails(m *models.Metrics) {
 			}
 		</div>
 	</div>
+}
+
+func downloadInvoiceFromMetricsRecordButtonID(r *models.MetricsResult) string {
+	return fmt.Sprintf("download-invoice-from-record-button-%d", r.ID)
+}
+
+func downloadInvoiceFromMetricsRecordButtonTarget(r *models.MetricsResult) string {
+	return fmt.Sprintf("#download-invoice-from-record-button-%d", r.ID)
 }
 
 func downloadInvoiceFromRecordReqStatusID(r *models.MetricsResult) string {
@@ -205,10 +216,10 @@ func downloadInvoiceFromRecordReqStatusTarget(r *models.MetricsResult) string {
 templ DownloadInvoiceFromRecordLoadingIcon(r *models.MetricsResult) {
 	<div
 		class="text-sky-600"
-		hx-get={ fmt.Sprintf("/metrics/%d/download-from-record-status-icon", r.ID) }
+		hx-get={ fmt.Sprintf("/metrics/results/%d/download-from-record-status-icon", r.ID) }
 		hx-trigger={ shared.NotificationEventName(ctx) }
-		hx-swap="innerHTML"
-		hx-target={ downloadInvoiceFromRecordReqStatusTarget(r) }
+		hx-swap="outerHTML"
+		hx-target={ downloadInvoiceFromMetricsRecordButtonTarget(r) }
 	>
 		@shared.SpinningIcon("loader")
 	</div>
@@ -223,15 +234,27 @@ templ DownloadInvoiceFromRecordSuccessIcon(r *models.MetricsResult) {
 }
 
 templ DownloadInvoiceFromRecordErrorIcon() {
-	<div class="text-red-600">
+	<a href="/invoices/print" target="_blank" class="text-red-600">
 		@shared.IconSm("x-circle")
-	</div>
+	</a>
 }
 
-templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult) {
-	<div class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3">
+templ DownloadInvoiceFromMetricsRecordButton(r *models.MetricsResult, p *models.InvoicePrint) {
+	<div
+		id={ downloadInvoiceFromMetricsRecordButtonID(r) }
+		class="absolute right-4 top-2 grid grid-cols-2 items-center gap-2 sm:col-span-2 lg:col-span-3"
+	>
 		<div id={ downloadInvoiceFromRecordReqStatusID(r) }>
-			@DownloadInvoiceFromRecordSuccessIcon(r)
+			if r.InvoicePDF != "" {
+				@DownloadInvoiceFromRecordSuccessIcon(r)
+			} else if p != nil {
+				if p.ReqStatus == "error" {
+					@DownloadInvoiceFromRecordErrorIcon()
+				}
+				if p.ReqStatus == "pending" {
+					@DownloadInvoiceFromRecordLoadingIcon(r)
+				}
+			}
 		</div>
 		<a
 			if r.InvoicePDF != "" {
@@ -268,7 +291,7 @@ templ MetricsResultData(r *models.MetricsResult) {
 			<li class="col-span-full">
 				<strong>Remetente</strong>: <span>{ r.InvoiceSender }</span>
 			</li>
-			@DownloadInvoiceFromMetricsRecordButton(r)
+			@DownloadInvoiceFromMetricsRecordButton(r, nil)
 		} else {
 			<li>
 				<strong>Lucro total</strong>: <span class="text-green-600">R$ { r.TotalIncome }</span>

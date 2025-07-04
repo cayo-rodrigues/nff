@@ -1,22 +1,24 @@
 package shared
 
-templ Nav(isAuthenticated bool) {
+import "github.com/cayo-rodrigues/nff/web/utils"
+
+templ Nav(userData *utils.UserCtxData) {
 	<nav hx-boost="true" class="flex w-full items-center justify-between bg-sky-700 px-4 py-1 text-white xl:pl-8">
 		<h1 class="text-lg">
 			<a href="/" hx-indicator="#global-indicator" class="flex items-center gap-2">
-				<img src="/static/icons/logo.png" alt="finger snap" width="40px"> 
+				<img src="/static/icons/logo.png" alt="finger snap" width="40px"/>
 				<span>Nota Fiscal Fácil</span>
 			</a>
 		</h1>
 		<div class="flex items-center gap-6 sm:gap-8">
-			@ListMenu(isAuthenticated)
-			@NotificationBell(isAuthenticated)
-			@BurgerMenu(isAuthenticated)
+			@ListMenu(userData)
+			@NotificationBell(userData)
+			@BurgerMenu(userData)
 		</div>
 	</nav>
 }
 
-templ BurgerMenu(isAuthenticated bool) {
+templ BurgerMenu(userData *utils.UserCtxData) {
 	<div id="burger-menu-container" class="relative">
 		<button id="burger-menu-btn" class="translate-y-0.5 transform xl:hidden" onclick="OpenBurgerMenu()">
 			@Icon("menu")
@@ -26,26 +28,33 @@ templ BurgerMenu(isAuthenticated bool) {
 			hx-boost="true"
 			class="absolute -right-4 top-8 z-30 hidden w-36 gap-2 rounded-s bg-sky-800 p-1 shadow shadow-black"
 		>
-			if isAuthenticated {
-				@MenuItem("/entities") {
-					@IconSm("users")
-					<span>Entidades</span>
-				}
-				@MenuItem("/invoices") {
-					@IconSm("file-plus")
-					<span>Emitir NF</span>
-				}
-				@MenuItem("/invoices/cancel") {
-					@IconSm("slash")
-					<span>Cancelar NF</span>
-				}
-				@MenuItem("/invoices/print") {
-					@IconSm("printer")
-					<span>Imprimir NF</span>
-				}
-				@MenuItem("/metrics") {
-					@IconSm("activity")
-					<span>Métricas</span>
+			if userData.IsAuthenticated {
+				if !userData.IsBlocked || userData.IsBlocked {
+					@MenuItem("/entities") {
+						@IconSm("users")
+						<span>Entidades</span>
+					}
+					@MenuItem("/invoices") {
+						@IconSm("file-plus")
+						<span>Emitir NF</span>
+					}
+					@MenuItem("/invoices/cancel") {
+						@IconSm("slash")
+						<span>Cancelar NF</span>
+					}
+					@MenuItem("/invoices/print") {
+						@IconSm("printer")
+						<span>Imprimir NF</span>
+					}
+					@MenuItem("/metrics") {
+						@IconSm("activity")
+						<span>Métricas</span>
+					}
+				} else {
+					@MenuItem("/prices") {
+						@IconSm("credit-card")
+						<span>Preços</span>
+					}
 				}
 				@MenuItem("/logout") {
 					@IconSm("log-out")
@@ -65,30 +74,37 @@ templ BurgerMenu(isAuthenticated bool) {
 	</div>
 }
 
-templ ListMenu(isAuthenticated bool) {
+templ ListMenu(userData *utils.UserCtxData) {
 	<ul hx-boost="true" class="hidden gap-2 xl:flex">
-		if isAuthenticated {
-			@MenuItem("/entities") {
-				@IconSm("users")
-				<span>Entidades</span>
-			}
-			@SubMenu("invoices-submenu", "file-text", "Notas Fiscais") {
-				@SubMenuItem("/invoices") {
-					@IconSm("plus-circle")
-					<span>Emitir</span>
+		if userData.IsAuthenticated {
+			if !userData.IsBlocked || userData.IsBlocked {
+				@MenuItem("/entities") {
+					@IconSm("users")
+					<span>Entidades</span>
 				}
-				@SubMenuItem("/invoices/cancel") {
-					@IconSm("slash")
-					<span>Cancelar</span>
+				@SubMenu("invoices-submenu", "file-text", "Notas Fiscais") {
+					@SubMenuItem("/invoices") {
+						@IconSm("plus-circle")
+						<span>Emitir</span>
+					}
+					@SubMenuItem("/invoices/cancel") {
+						@IconSm("slash")
+						<span>Cancelar</span>
+					}
+					@SubMenuItem("/invoices/print") {
+						@IconSm("printer")
+						<span>Imprimir</span>
+					}
 				}
-				@SubMenuItem("/invoices/print") {
-					@IconSm("printer")
-					<span>Imprimir</span>
+				@MenuItem("/metrics") {
+					@IconSm("activity")
+					<span>Métricas</span>
 				}
-			}
-			@MenuItem("/metrics") {
-				@IconSm("activity")
-				<span>Métricas</span>
+			} else {
+				@MenuItem("/prices") {
+					@IconSm("credit-card")
+					<span>Preços</span>
+				}
 			}
 			@MenuItem("/logout") {
 				@IconSm("log-out")

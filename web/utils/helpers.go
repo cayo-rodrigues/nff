@@ -116,16 +116,18 @@ func Float64ToString(f float64) string {
 	return strconv.FormatFloat(f, 'f', 2, 64)
 }
 
-type ReqUserData struct {
-	ID              int
-	IsAuthenticated bool
+type UserCtxData struct {
+	ID                   int
+	IsAuthenticated      bool
+	IsBlocked            bool
+	HasChosenPaymentPlan bool
 }
 
-func GetUserData(ctx context.Context) *ReqUserData {
-	if userData, ok := ctx.Value("UserData").(*ReqUserData); ok {
+func GetUserData(ctx context.Context) *UserCtxData {
+	if userData, ok := ctx.Value("UserData").(*UserCtxData); ok {
 		return userData
 	}
-	return new(ReqUserData)
+	return new(UserCtxData)
 }
 
 func GetUserID(ctx context.Context) int {

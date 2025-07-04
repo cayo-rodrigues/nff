@@ -123,9 +123,9 @@ func UpdateMetricsResultRecord(ctx context.Context, result *models.MetricsResult
 	cmd, err := db.SQLite.ExecContext(
 		ctx,
 		`UPDATE metrics_results
-			SET invoice_pdf = ?
+			SET invoice_pdf = ?, printing_id = ?
 		WHERE id = ? AND created_by = ? AND type = 'record'`,
-		result.InvoicePDF,
+		result.InvoicePDF, result.PrintingID,
 		result.ID, result.CreatedBy,
 	)
 	if err != nil {

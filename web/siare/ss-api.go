@@ -67,8 +67,7 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
-	resourceName := "invoice-issue"
-	defer finishOperation(ctx, c.DB.Redis, resourceName, invoice.CreatedBy, invoice)
+	defer finishOperation(ctx, c.DB.Redis, invoice.CreatedBy, invoice, InvoiceIssueOperationDefaultOpts())
 
 	pwd, err := hex.DecodeString(invoice.Sender.Password)
 	if err != nil {
@@ -82,7 +81,6 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 		return
 	}
 	invoice.Sender.Password = string(decryptedPwd)
-
 
 	reqBody := SSApiInvoiceRequest{
 		Invoice:            invoice,
@@ -126,8 +124,7 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
-	resourceName := "invoice-cancel"
-	defer finishOperation(ctx, c.DB.Redis, resourceName, invoiceCancel.CreatedBy, invoiceCancel)
+	defer finishOperation(ctx, c.DB.Redis, invoiceCancel.CreatedBy, invoiceCancel, InvoiceCancelOperationDefaultOpts())
 
 	pwd, err := hex.DecodeString(invoiceCancel.Entity.Password)
 	if err != nil {
@@ -208,11 +205,15 @@ func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, reco
 	// TODO
 	// pode melhorar?
 	ctx := context.Background()
-	defer c.DB.Redis.ClearCache(ctx, userID, "invoice-print")
-	defer c.DB.Redis.ClearCache(ctx, userID, "metrics")
-	defer notifyOperationResult(ctx, c.DB.Redis, userID, p.ID)
+	defer func() {
+		c.DB.Redis.ClearCache(ctx, userID, "metrics")
+		notifyOperationResult(ctx, c.DB.Redis, userID, p.ID)
+	}()
 
-	err := c.PrintInvoice(p)
+	opts := InvoicePrintOperationDefaultOpts()
+	opts.NotifyOperationResult = false
+
+	err := c.PrintInvoice(p, opts)
 	if err != nil {
 		return err
 	}
@@ -221,16 +222,21 @@ func (c *SSApiClient) PrintInvoiceFromMetricsRecord(p *models.InvoicePrint, reco
 	record.InvoicePDF = p.InvoicePDF
 	record.ID = recordID
 	record.CreatedBy = userID
+	record.PrintingID = p.ID
 
 	return storage.UpdateMetricsResultRecord(context.Background(), record)
 }
 
-func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint) error {
-	ctx, print := context.WithTimeout(context.Background(), time.Minute*5)
-	defer print()
+func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint, opts *SSApiCallOpts) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
+	defer cancel()
 
-	resourceName := "invoice-print"
-	defer finishOperation(ctx, c.DB.Redis, resourceName, invoicePrint.CreatedBy, invoicePrint)
+	if opts == nil {
+		opts = InvoicePrintOperationDefaultOpts()
+	}
+
+	resourceName := opts.ResourceName
+	defer finishOperation(ctx, c.DB.Redis, invoicePrint.CreatedBy, invoicePrint, opts)
 
 	pwd, err := hex.DecodeString(invoicePrint.Entity.Password)
 	if err != nil {
@@ -284,7 +290,7 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	defer cancel()
 
 	resourceName := "metrics"
-	defer finishOperation(ctx, c.DB.Redis, resourceName, metrics.CreatedBy, metrics)
+	defer finishOperation(ctx, c.DB.Redis, metrics.CreatedBy, metrics, MetricsOperationDefaultOpts())
 
 	pwd, err := hex.DecodeString(metrics.Entity.Password)
 	if err != nil {
@@ -295,7 +301,7 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	decryptedPwd, err := cryptoutils.Decrypt(c.DecryptionKey, pwd)
 	if err != nil {
 		log.Println("Failed to decrypt metrics.Entity.Password:", err)
-		return 
+		return
 	}
 	metrics.Entity.Password = string(decryptedPwd)
 
