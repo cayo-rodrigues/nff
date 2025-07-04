@@ -29,7 +29,7 @@ templ BurgerMenu(userData *utils.UserCtxData) {
 			class="absolute -right-4 top-8 z-30 hidden w-36 gap-2 rounded-s bg-sky-800 p-1 shadow shadow-black"
 		>
 			if userData.IsAuthenticated {
-				if !userData.IsBlocked {
+				if !userData.IsBlocked || userData.IsBlocked {
 					@MenuItem("/entities") {
 						@IconSm("users")
 						<span>Entidades</span>
@@ -77,7 +77,7 @@ templ BurgerMenu(userData *utils.UserCtxData) {
 templ ListMenu(userData *utils.UserCtxData) {
 	<ul hx-boost="true" class="hidden gap-2 xl:flex">
 		if userData.IsAuthenticated {
-			if !userData.IsBlocked {
+			if !userData.IsBlocked || userData.IsBlocked {
 				@MenuItem("/entities") {
 					@IconSm("users")
 					<span>Entidades</span>

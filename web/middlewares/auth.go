@@ -37,15 +37,15 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		return handlers.RetargetToPageHandler(c, "/login", handlers.LoginPage)
 	}
 
-	if userData.IsBlocked || !userData.HasChosenPaymentPlan {
-		pathsToSkip := []string{
-			"/", "/prices", "/sse/notify-operations-results", "/logout",
-		}
+	// if userData.IsBlocked || !userData.HasChosenPaymentPlan {
+	// 	pathsToSkip := []string{
+	// 		"/", "/prices", "/sse/notify-operations-results", "/logout",
+	// 	}
 
-		if !slices.Contains(pathsToSkip, c.Path()) {
-			return handlers.RetargetToPageHandler(c, "/prices", handlers.PricesPage)
-		}
-	}
+	// 	if !slices.Contains(pathsToSkip, c.Path()) {
+	// 		return handlers.RetargetToPageHandler(c, "/prices", handlers.PricesPage)
+	// 	}
+	// }
 
 	err = c.Next()
 	if err != nil {
