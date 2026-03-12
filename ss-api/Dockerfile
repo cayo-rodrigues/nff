@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python@sha256:5f59359f025e159ac53ba7bc94d2d724b4d8fc0d5d17375b4b27fb70ae4fa15d as build
+FROM public.ecr.aws/lambda/python@sha256:5f59359f025e159ac53ba7bc94d2d724b4d8fc0d5d17375b4b27fb70ae4fa15d AS build
 
 RUN dnf install -y unzip && \
     curl -Lo "/tmp/chromedriver-linux64.zip" "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.109/linux64/chromedriver-linux64.zip" && \
@@ -6,7 +6,7 @@ RUN dnf install -y unzip && \
     unzip /tmp/chromedriver-linux64.zip -d /opt/ && \
     unzip /tmp/chrome-linux64.zip -d /opt/
 
-FROM public.ecr.aws/lambda/python@sha256:5f59359f025e159ac53ba7bc94d2d724b4d8fc0d5d17375b4b27fb70ae4fa15d as prod
+FROM public.ecr.aws/lambda/python@sha256:5f59359f025e159ac53ba7bc94d2d724b4d8fc0d5d17375b4b27fb70ae4fa15d AS prod
 
 RUN dnf install -y atk cups-libs gtk3 libXcomposite alsa-lib \
     libXcursor libXdamage libXext libXi libXrandr libXScrnSaver \
@@ -17,8 +17,8 @@ RUN dnf install -y atk cups-libs gtk3 libXcomposite alsa-lib \
 RUN dnf -y install glibc-locale-source && dnf clean all
 
 RUN localedef -i pt_BR -f UTF-8 pt_BR.UTF-8
-ENV LC_ALL pt_BR.UTF-8
-ENV LANG pt_BR.UTF-8
+ENV LC_ALL=pt_BR.UTF-8
+ENV LANG=pt_BR.UTF-8
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
