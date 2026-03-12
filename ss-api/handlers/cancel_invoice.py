@@ -11,13 +11,11 @@ def cancel_invoice_handler(data):
         response = cancel_invoice(canceling_data=data)
         status_code = 200
 
-    except exceptions.InvalidCancelingDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.InvalidLoginDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.CouldNotFinishCancelingError as e:
+    except (
+        exceptions.InvalidCancelingDataError,
+        exceptions.InvalidLoginDataError,
+        exceptions.CouldNotFinishCancelingError,
+    ) as e:
         response, status_code = error_response(e)
 
     except exceptions.WebdriverTimeoutError as e:

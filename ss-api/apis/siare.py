@@ -317,13 +317,20 @@ class Siare(Browser):
                 xpath = XPaths.INVOICE_TRANSPORT_ALREADY_HIRED_RADIO_INPUT_FALSE
                 self.get_and_click(xpath)
 
-
         if invoice.shipping_charge_on == "sender":
-            self.get_and_click(XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_SENDER_RADIO_INPUT)
+            self.get_and_click(
+                XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_SENDER_RADIO_INPUT
+            )
         elif invoice.shipping_charge_on == "recipient":
-            self.get_and_click(XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_RECIPIENT_RADIO_INPUT)
-        elif invoice.shipping_charge_on == "others" and invoice.shipping_type == "hired":
-            self.get_and_click(XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_OTHERS_RADIO_INPUT)
+            self.get_and_click(
+                XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_RECIPIENT_RADIO_INPUT
+            )
+        elif (
+            invoice.shipping_charge_on == "others" and invoice.shipping_type == "hired"
+        ):
+            self.get_and_click(
+                XPaths.INVOICE_TRANSPORT_SHIPPING_CHARGE_ON_OTHERS_RADIO_INPUT
+            )
 
         if invoice.shipping_already_hired:
             # preencher dados do transportador
@@ -475,12 +482,26 @@ class Siare(Browser):
         xpath = XPaths.QUERY_INVOICE_FINAL_DATE_INPUT
         self.type_into_element(xpath, query.end_date)
 
+        option_value = ""
+        if query.entity.user_type == "Produtor Rural":
+            option_value = "4"  # Produtor Rural Pessoa Física
+        if query.entity.user_type == "Inscrição Estadual":
+            option_value = "3"  # Inscrição Estadual
+        if option_value != "":
+            xpath = XPaths.QUERY_INVOICE_ISSUER_ID_TYPE_SELECT_INPUT
+            Select(self.get_element(xpath)).select_by_value(option_value)
+
     def submit_query_invoice_form(self):
         xpath = XPaths.QUERY_INVOICE_SUBMIT_BUTTON
         self.get_and_click(xpath)
 
     def get_invoice_query_error_feedback(self) -> str | None:
         xpath = XPaths.QUERY_INVOICE_NO_RESULTS_FOUND_MSG
+        error_feedback = self.get_attr_if_exists(xpath, "innerText")
+        if error_feedback:
+            return error_feedback
+
+        xpath = XPaths.QUERY_INVOICE_FORM_ERROR_MSG
         error_feedback = self.get_attr_if_exists(xpath, "innerText")
         if error_feedback:
             return error_feedback
