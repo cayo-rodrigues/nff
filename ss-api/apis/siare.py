@@ -483,13 +483,17 @@ class Siare(Browser):
         self.type_into_element(xpath, query.end_date)
 
         option_value = ""
-        if query.entity.user_type == "Produtor Rural":
+        if query.entity.user_type == normalize_text("Produtor Rural"):
             option_value = "4"  # Produtor Rural Pessoa Física
-        if query.entity.user_type == "Inscrição Estadual":
+        if query.entity.user_type == normalize_text("Inscrição Estadual"):
             option_value = "3"  # Inscrição Estadual
         if option_value != "":
             xpath = XPaths.QUERY_INVOICE_ISSUER_ID_TYPE_SELECT_INPUT
             Select(self.get_element(xpath)).select_by_value(option_value)
+
+            xpath = XPaths.QUERY_INVOICE_ISSUER_ID_INPUT
+            self.type_into_element(xpath, query.entity.ie)
+        
 
     def submit_query_invoice_form(self):
         xpath = XPaths.QUERY_INVOICE_SUBMIT_BUTTON
