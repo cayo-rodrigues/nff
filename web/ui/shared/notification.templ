@@ -10,11 +10,11 @@ import "context"
 templ NotificationBell(userData *utils.UserCtxData) {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
 		@IconSm("bell")
-		if userData.IsAuthenticated && userData.HasChosenPaymentPlan {
+		if userData.IsAuthenticated {
 			@NotificationCounter()
 		}
 	</button>
-	if userData.IsAuthenticated && userData.HasChosenPaymentPlan {
+	if userData.IsAuthenticated {
 		@NotificationDialog()
 	}
 }
