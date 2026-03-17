@@ -3,11 +3,13 @@ package database
 import (
 	"context"
 	"database/sql"
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"os"
 	"time"
 
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	fredis "github.com/gofiber/storage/redis/v3"
 	"github.com/redis/go-redis/v9"
@@ -168,6 +170,8 @@ func initSessionStore() error {
 		CookieHTTPOnly: true,
 		Expiration:     2 * 24 * time.Hour,
 	})
+
+	gob.Register(&utils.UserCtxData{})
 
 	fmt.Println("New instance.SessionStore connection OK")
 

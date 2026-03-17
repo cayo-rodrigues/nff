@@ -7,14 +7,14 @@ import "fmt"
 import "github.com/cayo-rodrigues/nff/web/services"
 import "context"
 
-templ NotificationBell(isAuthenticated bool) {
+templ NotificationBell(userData *utils.UserCtxData) {
 	<button onclick="ShowNotificationDialog()" class="relative transform rounded-full transition hover:bg-sky-800 active:scale-90 xl:p-2">
 		@IconSm("bell")
-		if isAuthenticated {
+		if userData.IsAuthenticated {
 			@NotificationCounter()
 		}
 	</button>
-	if isAuthenticated {
+	if userData.IsAuthenticated {
 		@NotificationDialog()
 	}
 }

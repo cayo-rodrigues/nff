@@ -14,6 +14,7 @@ tmp
 secrets.txt
 .serverless
 chromedriver-linux64*
+chrome-linux64*
 ss-api/tests/samples.json
 *_templ.go
 nff-web-key-pair.pem

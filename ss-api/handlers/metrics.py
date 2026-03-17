@@ -11,13 +11,11 @@ def metrics_handler(data):
         response = get_metrics(data=data)
         status_code = 200
 
-    except exceptions.InvalidQueryDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.InvalidLoginDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.CouldNotFinishQueryError as e:
+    except (
+        exceptions.InvalidQueryDataError,
+        exceptions.InvalidLoginDataError,
+        exceptions.CouldNotFinishQueryError,
+    ) as e:
         response, status_code = error_response(e)
 
     except exceptions.WebdriverTimeoutError as e:

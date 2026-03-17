@@ -7,6 +7,7 @@ import (
 	"github.com/cayo-rodrigues/nff/web/ui/forms"
 	"github.com/cayo-rodrigues/nff/web/ui/layouts"
 	"github.com/cayo-rodrigues/nff/web/ui/pages"
+	"github.com/cayo-rodrigues/nff/web/utils"
 	"github.com/cayo-rodrigues/nff/web/utils/cryptoutils"
 	"github.com/cayo-rodrigues/safe"
 	"github.com/gofiber/fiber/v2"
@@ -41,8 +42,11 @@ func RegisterUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	
-	if err = services.SaveUserSession(c, user.ID); err != nil {
+	userData := &utils.UserCtxData{
+		ID:        user.ID,
+		IsBlocked: true,
+	}
+	if err = services.SaveUserSession(c, userData); err != nil {
 		return err
 	}
 

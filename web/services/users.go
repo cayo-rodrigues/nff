@@ -37,6 +37,7 @@ func CreateUser(ctx context.Context, user *models.User) error {
 		return err
 	}
 
+	user.IsBlocked = true
 	err = storage.CreateUser(ctx, user)
 	if err != nil {
 		return err
@@ -66,6 +67,8 @@ func IsLoginDataValid(ctx context.Context, user *models.User) bool {
 	}
 
 	user.ID = userFromDB.ID
+	user.IsBlocked = userFromDB.IsBlocked
+	user.HasChosenPaymentPlan = userFromDB.HasChosenPaymentPlan
 
 	return true
 }

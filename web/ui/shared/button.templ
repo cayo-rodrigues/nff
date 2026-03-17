@@ -90,6 +90,12 @@ templ PhantomLightButton(size string) {
 	}
 }
 
+templ PinkButton(size string) {
+	@Button("pink", size, templ.Attributes{"type": "button"}) {
+		{ children... }
+	}
+}
+
 func GetButtonClassesByTheme(theme string, size string) string {
 	classes := "flex w-full transition border items-center justify-center rounded cursor-pointer"
 
@@ -118,6 +124,8 @@ func GetButtonClassesByTheme(theme string, size string) string {
 		colors = "bg-gray-200 border-gray-400 hover:bg-gray-200 active:bg-gray-300 font-medium highlighted"
 	case "phantom-light":
 		colors = "border-transparent hover:border-gray-300 active:border-gray-200"
+	case "pink":
+		colors = "bg-pink-400 border-pink-500 hover:bg-pink-500 active:bg-pink-600"
 	}
 
 	switch size {

@@ -104,6 +104,12 @@ func RetrieveEntity(ctx context.Context, entityID int, userID int) (*models.Enti
 		return nil, err
 	}
 
+	err = json.Unmarshal(entity.OtherIesJSON, &entity.OtherIes)
+	if err != nil {
+		log.Println("Error unmarshaling entity other ies: ", err)
+		return nil, err
+	}
+
 	return entity, nil
 }
 

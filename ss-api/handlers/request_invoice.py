@@ -11,16 +11,12 @@ def request_invoice_handler(data: dict):
         response = request_invoice(invoice_data=data)
         status_code = 201
 
-    except exceptions.InvalidInvoiceDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.InvalidLoginDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.CouldNotFinishInvoiceError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.DownloadTimeoutError as e:
+    except (
+        exceptions.InvalidInvoiceDataError,
+        exceptions.InvalidInvoiceDataError,
+        exceptions.CouldNotFinishInvoiceError,
+        exceptions.DownloadTimeoutError,
+    ) as e:
         response, status_code = error_response(e)
 
     except exceptions.WebdriverTimeoutError as e:

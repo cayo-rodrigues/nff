@@ -185,16 +185,10 @@ func GetDownloadFromRecordStatusIcon(c *fiber.Ctx) error {
 		return err
 	}
 
-	// TODO
-	// Garantir que result.ReqStatus possua um valor
-
-	if result.InvoicePDF != "" {
-		return Render(c, components.DownloadInvoiceFromRecordSuccessIcon(result))
+	printing, err := services.RetrievePrinting(c.Context(), result.PrintingID)
+	if err != nil {
+		return err
 	}
 
-	if result.ReqStatus == "error" {
-		return Render(c, components.DownloadInvoiceFromRecordErrorIcon())
-	}
-
-	return Render(c, components.DownloadInvoiceFromRecordLoadingIcon(result))
+	return Render(c, components.DownloadInvoiceFromMetricsRecordButton(result, printing))
 }

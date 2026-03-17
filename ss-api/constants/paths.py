@@ -15,7 +15,7 @@ class Urls:
 
 class XPaths:
     # login page
-    LOGIN_USER_TYPE_SELECT_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[1]/div/div[1]/select"
+    LOGIN_USER_TYPE_SELECT_INPUT = '//*[@id="login"]/div[1]/div/div[1]/select'
     LOGIN_IE_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[2]/div[2]/div[1]/input"
     LOGIN_CPF_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[3]/div/div[1]/input"
     LOGIN_PASSWORD_INPUT = "/html/body/div[5]/div[2]/div/div[2]/form/div/div/div/div[1]/div[1]/div[5]/div/div[1]/input"
@@ -152,9 +152,12 @@ class XPaths:
     QUERY_INVOICE_FINAL_DATE_INPUT = '/html/body/div[3]/div[2]/div/div[2]/div/form/div[2]/div[2]/div[6]/div[2]/div[1]/input'
     QUERY_INVOICE_OPERATION_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[4]/div[1]/div[1]/select'
     QUERY_INVOICE_NFA_STATUS_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[4]/div[2]/div[1]/select'
+    QUERY_INVOICE_ISSUER_ID_TYPE_SELECT_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[7]/div[2]/div[1]/div[1]/select'
+    QUERY_INVOICE_ISSUER_ID_INPUT = '//*[@id="containerConteudoPrincipal"]/div/form/div[2]/div[2]/div[7]/div[2]/div[2]/div[1]/input'
     QUERY_INVOICE_SUBMIT_BUTTON = '//*[@id="containerConteudoPrincipal"]/div/form/div[3]/input'
 
     QUERY_INVOICE_NO_RESULTS_FOUND_MSG = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/table/tbody/tr/td/p'
+    QUERY_INVOICE_FORM_ERROR_MSG = '//*[@id="message"]'
 
     QUERY_INVOICE_RESULTS_TBODY = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/table/tbody'
     QUERY_INVOICE_RESULTS_NEXT_PAGE = '//*[@id="containerConteudoPrincipal"]/div/form/div[4]/div[2]/div/div[2]/a[1]'

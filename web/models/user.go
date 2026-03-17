@@ -9,13 +9,15 @@ import (
 )
 
 type User struct {
-	ID        int
-	Email     string
-	Password  string
-	Salt      []byte
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Errors    safe.ErrorMessages
+	ID                   int
+	Email                string
+	Password             string
+	Salt                 []byte
+	IsBlocked            bool
+	HasChosenPaymentPlan bool
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+	Errors               safe.ErrorMessages
 }
 
 func NewUser() *User {
@@ -51,7 +53,10 @@ func (u *User) IsValid() bool {
 }
 
 func (u *User) Values() []any {
-	return []any{&u.ID, &u.Email, &u.Password, &u.CreatedAt, &u.UpdatedAt, &u.Salt}
+	return []any{
+		&u.ID, &u.Email, &u.Password, &u.CreatedAt, &u.UpdatedAt, &u.Salt,
+		&u.IsBlocked, &u.HasChosenPaymentPlan,
+	}
 }
 
 func (u *User) SetError(key, val string) {

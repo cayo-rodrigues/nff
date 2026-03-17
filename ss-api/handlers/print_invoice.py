@@ -11,16 +11,12 @@ def print_invoice_handler(data):
         response = print_invoice(data=data)
         status_code = 200
 
-    except exceptions.InvalidPrintingDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.InvalidLoginDataError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.CouldNotFinishPrintingError as e:
-        response, status_code = error_response(e)
-
-    except exceptions.DownloadTimeoutError as e:
+    except (
+        exceptions.InvalidPrintingDataError,
+        exceptions.InvalidLoginDataError,
+        exceptions.CouldNotFinishPrintingError,
+        exceptions.DownloadTimeoutError,
+    ) as e:
         response, status_code = error_response(e)
 
     except exceptions.WebdriverTimeoutError as e:
