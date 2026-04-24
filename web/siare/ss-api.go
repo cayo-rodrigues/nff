@@ -421,33 +421,51 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	}
 
 	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var firstErr error
+
+	captureErr := func(err error) {
+		if err == nil {
+			return
+		}
+		mu.Lock()
+		defer mu.Unlock()
+		if firstErr == nil {
+			firstErr = err
+		}
+	}
+
 	wg.Add(4)
 
 	go func() {
 		defer wg.Done()
-		storage.UpdateMetrics(dbCtx, metrics)
+		captureErr(storage.UpdateMetrics(dbCtx, metrics))
 	}()
 	go func() {
 		defer wg.Done()
 		if metrics.MetricsResult.Total == nil {
 			return
 		}
-		storage.CreateMetricsResult(dbCtx, metrics.MetricsResult.Total, "total", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+		captureErr(storage.CreateMetricsResult(dbCtx, metrics.MetricsResult.Total, "total", metrics.ID, metrics.CreatedBy, metrics.Entity.ID))
 	}()
 	go func() {
 		defer wg.Done()
 		if metrics.MetricsResult.Months == nil {
 			return
 		}
-		storage.BulkCreateMetricsResults(dbCtx, metrics.MetricsResult.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+		captureErr(storage.BulkCreateMetricsResults(dbCtx, metrics.MetricsResult.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID))
 	}()
 	go func() {
 		defer wg.Done()
 		if metrics.MetricsResult.Records == nil {
 			return
 		}
-		storage.BulkCreateMetricsResults(dbCtx, metrics.MetricsResult.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+		captureErr(storage.BulkCreateMetricsResults(dbCtx, metrics.MetricsResult.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID))
 	}()
 
 	wg.Wait()
+
+	if firstErr != nil {
+		log.Printf("Error persisting metrics results for metrics id %v: %v", metrics.ID, firstErr)
+	}
 }
