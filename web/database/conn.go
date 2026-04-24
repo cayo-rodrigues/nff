@@ -166,7 +166,7 @@ func initSessionStore() error {
 		Storage: fredis.New(fredis.Config{
 			URL: getRedisURL(),
 		}),
-		// CookieSecure: true,
+		CookieSecure:   os.Getenv("ENV") == "production",
 		CookieHTTPOnly: true,
 		Expiration:     2 * 24 * time.Hour,
 	})
