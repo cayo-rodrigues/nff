@@ -26,20 +26,28 @@ func ListInvoicePrintings(ctx context.Context, userID int, filters *models.Filte
 
 	db := database.GetDB()
 
-	rows, _ := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	rows, err := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	if err != nil {
+		log.Println("Error running list invoice printings query:", err)
+		return nil, utils.InternalServerErr
+	}
 	defer rows.Close()
 
 	printings := []*models.InvoicePrint{}
 
 	for rows.Next() {
 		printing := models.NewInvoicePrint()
-		err := Scan(rows, printing, printing.Entity)
-		if err != nil {
+		if err := Scan(rows, printing, printing.Entity); err != nil {
 			log.Println("Error scaning invoice printing rows: ", err)
 			return nil, utils.InternalServerErr
 		}
 
 		printings = append(printings, printing)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println("Error iterating invoice printings rows:", err)
+		return nil, utils.InternalServerErr
 	}
 
 	return printings, nil

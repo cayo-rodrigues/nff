@@ -26,20 +26,28 @@ func ListMetrics(ctx context.Context, userID int, filters *models.Filters) ([]*m
 
 	db := database.GetDB()
 
-	rows, _ := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	rows, err := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	if err != nil {
+		log.Println("Error running list metrics query:", err)
+		return nil, utils.InternalServerErr
+	}
 	defer rows.Close()
 
 	metricsList := []*models.Metrics{}
 
 	for rows.Next() {
 		metrics := models.NewMetrics()
-		err := Scan(rows, metrics, metrics.Entity)
-		if err != nil {
+		if err := Scan(rows, metrics, metrics.Entity); err != nil {
 			log.Println("Error scaning metrics query rows: ", err)
 			return nil, utils.InternalServerErr
 		}
 
 		metricsList = append(metricsList, metrics)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println("Error iterating metrics rows:", err)
+		return nil, utils.InternalServerErr
 	}
 
 	return metricsList, nil

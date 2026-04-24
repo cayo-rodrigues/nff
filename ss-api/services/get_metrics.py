@@ -28,6 +28,7 @@ def get_metrics(data: dict):
 
     # Query invoices by month to avoid Siare slowliness
     months_without_results_count = 0
+    had_any_error = False
 
     start_date = datetime.strptime(query.start_date, "%d/%m/%Y")
     end_date = datetime.strptime(query.end_date, "%d/%m/%Y")
@@ -68,6 +69,7 @@ def get_metrics(data: dict):
         error_feedback = siare.get_invoice_query_error_feedback()
         if error_feedback:
             months_without_results_count += 1
+            had_any_error = True
         else:
             siare.wait_until_document_is_ready()
             siare.aggregate_invoice_query_results(month_results, query.entity)
@@ -87,7 +89,7 @@ def get_metrics(data: dict):
         current_date = next_month_start
 
     absolutely_no_results = (
-        months_without_results_count == len(query.results.months) and error_feedback
+        months_without_results_count == len(query.results.months) and had_any_error
     )
     if absolutely_no_results:
         raise exceptions.CouldNotFinishQueryError(

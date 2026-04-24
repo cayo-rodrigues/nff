@@ -28,20 +28,28 @@ func ListInvoices(ctx context.Context, userID int, filters *models.Filters) ([]*
 
 	db := database.GetDB()
 
-	rows, _ := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	rows, err := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	if err != nil {
+		log.Println("Error running list invoices query:", err)
+		return nil, utils.InternalServerErr
+	}
 	defer rows.Close()
 
 	invoices := []*models.Invoice{}
 
 	for rows.Next() {
 		invoice := models.NewInvoice()
-		err := Scan(rows, invoice, invoice.Sender, invoice.Recipient)
-		if err != nil {
+		if err := Scan(rows, invoice, invoice.Sender, invoice.Recipient); err != nil {
 			log.Println("Error scaning invoice rows: ", err)
 			return nil, utils.InternalServerErr
 		}
 
 		invoices = append(invoices, invoice)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println("Error iterating invoices rows:", err)
+		return nil, utils.InternalServerErr
 	}
 
 	return invoices, nil

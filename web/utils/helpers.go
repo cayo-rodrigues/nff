@@ -70,8 +70,18 @@ func FormatDatetimeAsBR(dt time.Time) string {
 	return dt.Format("02/01/2006 às 15:04:05")
 }
 
+var BrazilTZ, _ = time.LoadLocation("America/Sao_Paulo")
+
+func NowBR() time.Time {
+	return time.Now().In(BrazilTZ)
+}
+
+func InBrazilTZ(t time.Time) time.Time {
+	return t.In(BrazilTZ)
+}
+
 func IsTodayBR(date string) bool {
-	today := FormatDateAsBR(time.Now())
+	today := FormatDateAsBR(NowBR())
 	return today == date
 }
 
@@ -100,7 +110,7 @@ func GetWeekDayFromString(date string) string {
 }
 
 func IsYesterdayBR(date string) bool {
-	yesterday := time.Now().AddDate(0, 0, -1)
+	yesterday := NowBR().AddDate(0, 0, -1)
 	return date == FormatDateAsBR(yesterday)
 }
 
