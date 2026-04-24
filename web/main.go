@@ -122,6 +122,7 @@ func main() {
 	app.Get("/metrics/:id/results-details", handlers.RetrieveMetricsResultsDetails)
 	app.Get("/metrics/:id/card", handlers.RetrieveMetricsCard)
 	app.Get("/metrics/results/:id/download-from-record-status-icon", handlers.GetDownloadFromRecordStatusIcon)
+	app.Post("/metrics/:id/records/download-zip", handlers.DownloadMetricsRecordsZip)
 
 	app.Get("/prices", handlers.PricesPage)
 

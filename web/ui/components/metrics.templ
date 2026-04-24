@@ -180,10 +180,26 @@ templ MetricsResultsDetails(m *models.Metrics) {
 							@shared.IconSm("chevron-down")
 						</div>
 					</header>
+					<button
+						id={ metricsZipBtnID(m) }
+						class="hidden fixed bottom-4 right-4 z-50 rounded border border-gray-400 bg-white px-3 py-2 text-sm shadow-lg transition hover:bg-gray-100 active:bg-gray-200"
+						onclick={ scripts.DownloadSelectedRecords(m.ID) }
+					>
+						ZIP (0)
+					</button>
 					<div id={ metricsResultDataID(m, "record") } class="hidden">
 						for _, r := range m.Records {
 							<div class="relative border-b border-gray-200 odd:bg-sky-50">
 								<h4 class="flex items-center gap-2 px-4 py-2 text-lg">
+									if r.InvoicePDF != "" {
+										<input
+											type="checkbox"
+											class="record-select h-4 w-4 cursor-pointer"
+											data-record-id={ strconv.Itoa(r.ID) }
+											data-metrics-id={ strconv.Itoa(m.ID) }
+											onchange={ scripts.OnRecordCheckboxChange(m.ID) }
+										/>
+									}
 									@shared.IconSm("file-text")
 									NFA-{ r.InvoiceNumber }
 								</h4>
@@ -380,6 +396,10 @@ func metricsResultChevronIconID(m *models.Metrics, resultType string) string {
 
 func metricsResultChevronIconTarget(m *models.Metrics, resultType string) string {
 	return fmt.Sprintf("#chevron-%s-%d", resultType, m.ID)
+}
+
+func metricsZipBtnID(m *models.Metrics) string {
+	return fmt.Sprintf("download-zip-btn-%d", m.ID)
 }
 
 func getActionButtonsContainerMetricsCardClass(m *models.Metrics) string {
