@@ -49,21 +49,21 @@ func CreateMetricsResult(ctx context.Context, result *models.MetricsResult, resu
 				avg_income, avg_expenses, diff, is_positive,
 				total_records, positive_records, negative_records,
 				metrics_id, created_by,
-				issue_date, invoice_id, entity_id
+				issue_date, invoice_id, entity_id, invoice_sender
 			)
 			VALUES (
 				?, ?, ?, ?,
 				?, ?, ?, ?,
 				?, ?, ?,
 				?, ?,
-				?, ?, ?
+				?, ?, ?, ?
 			)
 		RETURNING *`,
 		result.Type, result.MonthName, result.TotalIncome, result.TotalExpenses,
 		result.AvgIncome, result.AvgExpenses, result.Diff, result.IsPositive,
 		result.TotalRecords, result.PositiveRecords, result.NegativeRecords,
 		result.MetricsID, result.CreatedBy,
-		result.IssueDate, result.InvoiceNumber, result.EntityID,
+		result.IssueDate, result.InvoiceNumber, result.EntityID, result.InvoiceSender,
 	)
 	err := Scan(row, result)
 	if err != nil {
@@ -152,14 +152,13 @@ func RetrieveMetricsResult(ctx context.Context, resultID int, userID int) (*mode
 
 	result := models.NewMetricsResult()
 	err := Scan(row, result)
-	if err != nil {
-		log.Println("Error scaning metrics result row: ", err)
-		return nil, utils.InternalServerErr
-	}
-
 	if errors.Is(err, sql.ErrNoRows) {
 		log.Printf("Metrics result with id %v not found: %v", resultID, err)
 		return nil, utils.MetricsResultNotFoundErr
+	}
+	if err != nil {
+		log.Println("Error scaning metrics result row: ", err)
+		return nil, utils.InternalServerErr
 	}
 
 	return result, nil
