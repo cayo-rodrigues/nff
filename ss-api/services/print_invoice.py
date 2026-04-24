@@ -11,44 +11,44 @@ def print_invoice(data: dict):
         raise exceptions.InvalidPrintingDataError(errors=invoice_printing.errors)
 
     siare = Siare()
+    try:
+        siare.open_website()
+        siare.login(invoice_printing.entity)
 
-    siare.open_website()
-    siare.login(invoice_printing.entity)
+        error_feedback = siare.get_login_error_feedback()
+        if error_feedback:
+            raise exceptions.InvalidLoginDataError(msg=f"{ErrorMessages.LOGIN_FAILED} {error_feedback}")
 
-    error_feedback = siare.get_login_error_feedback()
-    if error_feedback:
-        raise exceptions.InvalidLoginDataError(msg=f"{ErrorMessages.LOGIN_FAILED} {error_feedback}")
+        siare.wait_until_document_is_ready()
 
-    siare.wait_until_document_is_ready()
+        siare.open_print_invoice_page()
+        siare.fill_printing_data(invoice_printing)
 
-    siare.open_print_invoice_page()
-    siare.fill_printing_data(invoice_printing)
+        error_feedback = siare.get_print_invoice_search_error_feedback()
+        if error_feedback:
+            req_status = "error"
+            if error_feedback == SiareFeedbackMessages.PRINTING_UNAVAILABLE:
+                req_status = "warning"
+            raise exceptions.CouldNotFinishPrintingError(msg=error_feedback, req_status=req_status)
 
-    error_feedback = siare.get_print_invoice_search_error_feedback()
-    if error_feedback:
-        req_status = "error"
-        if error_feedback == SiareFeedbackMessages.PRINTING_UNAVAILABLE:
-            req_status = "warning"
-        raise exceptions.CouldNotFinishPrintingError(msg=error_feedback, req_status=req_status)
+        siare.finish_print_invoice()
+        siare.close_unfocused_windows()
 
-    siare.finish_print_invoice()
-    siare.close_unfocused_windows()
+        invoice_id = invoice_printing.get_id_from_filename()
+        invoice_file_path = invoice_printing.get_file_path()
+        invoice_file_name = invoice_printing.get_file_name()
+        if invoice_printing.custom_file_name_prefix:
+            invoice_file_name = invoice_printing.use_custom_file_name()
+        pdf_url = upload_to_s3(file_path=invoice_file_path, s3_file_name=invoice_file_name)
 
-    invoice_id = invoice_printing.get_id_from_filename()
-    invoice_file_path = invoice_printing.get_file_path()
-    invoice_file_name = invoice_printing.get_file_name()
-    if invoice_printing.custom_file_name_prefix:
-        invoice_file_name = invoice_printing.use_custom_file_name()
-    pdf_url = upload_to_s3(file_path=invoice_file_path, s3_file_name=invoice_file_name)
+        invoice_printing.erase_file()
 
-    invoice_printing.erase_file()
-
-    siare.close()
-
-    return {
-        "msg": SuccessMessages.INVOICE_PRINTING,
-        "invoice_id": invoice_id,
-        "invoice_pdf": pdf_url,
-        "file_name": invoice_file_name,
-        "status": "success",
-    }
+        return {
+            "msg": SuccessMessages.INVOICE_PRINTING,
+            "invoice_id": invoice_id,
+            "invoice_pdf": pdf_url,
+            "file_name": invoice_file_name,
+            "status": "success",
+        }
+    finally:
+        siare.close()
