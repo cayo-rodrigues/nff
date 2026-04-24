@@ -93,6 +93,9 @@ func PrintInvoiceFromMetricsRecord(c *fiber.Ctx) error {
 	}
 
 	printing, err := services.CreatePrintingFromMetricsRecord(c.Context(), invoiceNumber, entityID)
+	if err != nil {
+		return err
+	}
 
 	ssapi := siare.GetSSApiClient().WithDecryptionKey(decryptionKey)
 	go ssapi.PrintInvoiceFromMetricsRecord(printing, recordID, userID)
