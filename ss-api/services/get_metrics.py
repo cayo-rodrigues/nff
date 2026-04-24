@@ -35,7 +35,7 @@ def get_metrics(data: dict):
     current_date = start_date
     while current_date <= end_date:
         # Determine the start of the current month
-        current_month_start = current_date.replace(day=current_date.day)
+        current_month_start = current_date.replace(day=1)
 
         # Determine the start of the next month
         next_month_start = (current_date.replace(day=28) + timedelta(days=4)).replace(
