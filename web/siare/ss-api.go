@@ -288,6 +288,10 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint, opts *SSAp
 func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
+	// dbCtx is created after the HTTP call so storage writes always get a fresh timeout,
+	// independent of how long the ss-api request took.
+	var dbCtx context.Context
+	var dbCancel context.CancelFunc
 
 	resourceName := "metrics"
 	defer finishOperation(ctx, c.DB.Redis, metrics.CreatedBy, metrics, MetricsOperationDefaultOpts())
@@ -351,6 +355,9 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 	metrics.ReqStatus = response.ReqStatus
 	metrics.ReqMsg = response.ReqMsg
 
+	dbCtx, dbCancel = context.WithTimeout(context.Background(), time.Second*30)
+	defer dbCancel()
+
 	otherEntitiesIes := []any{}
 	for _, record := range metrics.MetricsResult.Records {
 		if record.IsPositive {
@@ -371,7 +378,7 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 
 	db := database.GetDB()
 
-	rows, err := db.SQLite.QueryContext(ctx, query.String(), f.Values()...)
+	rows, err := db.SQLite.QueryContext(dbCtx, query.String(), f.Values()...)
 	if err != nil {
 		log.Printf("Error on get metrics post request, aborting operation. Metrics with id %v will be on 'pending' state for ever. Error: %v\n", metrics.ID, err)
 		return
@@ -418,28 +425,28 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 
 	go func() {
 		defer wg.Done()
-		storage.UpdateMetrics(ctx, metrics)
+		storage.UpdateMetrics(dbCtx, metrics)
 	}()
 	go func() {
 		defer wg.Done()
 		if metrics.MetricsResult.Total == nil {
 			return
 		}
-		storage.CreateMetricsResult(ctx, metrics.MetricsResult.Total, "total", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+		storage.CreateMetricsResult(dbCtx, metrics.MetricsResult.Total, "total", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
 	}()
 	go func() {
 		defer wg.Done()
 		if metrics.MetricsResult.Months == nil {
 			return
 		}
-		storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+		storage.BulkCreateMetricsResults(dbCtx, metrics.MetricsResult.Months, "month", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
 	}()
 	go func() {
 		defer wg.Done()
 		if metrics.MetricsResult.Records == nil {
 			return
 		}
-		storage.BulkCreateMetricsResults(ctx, metrics.MetricsResult.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
+		storage.BulkCreateMetricsResults(dbCtx, metrics.MetricsResult.Records, "record", metrics.ID, metrics.CreatedBy, metrics.Entity.ID)
 	}()
 
 	wg.Wait()
