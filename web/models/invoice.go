@@ -212,7 +212,9 @@ func (i *Invoice) IsValid() bool {
 	i.Errors = errors
 
 	for _, item := range i.Items {
-		ok = item.IsValid()
+		if !item.IsValid() {
+			ok = false
+		}
 	}
 
 	return ok

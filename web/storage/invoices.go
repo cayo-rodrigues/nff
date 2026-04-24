@@ -141,12 +141,11 @@ func UpdateInvoice(ctx context.Context, invoice *models.Invoice) error {
 		log.Printf("Error when running update invoice query. Invoice id: %d. Err: %v\n", invoice.ID, err)
 		return utils.InternalServerErr
 	}
-	rowsAffected, _ := result.RowsAffected()
-	if rowsAffected == 0 {
-		log.Printf("Error when getting rows affected by update invoice query. Invoice id: %d. Err: %v\n", invoice.ID, err)
-		return err
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("Error getting rows affected. Invoice id: %d. Err: %v\n", invoice.ID, err)
+		return utils.InternalServerErr
 	}
-
 	if rowsAffected == 0 {
 		log.Printf("Invoice with id %v not found when running update query", invoice.ID)
 		return utils.InvoiceNotFoundErr
