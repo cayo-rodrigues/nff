@@ -13,7 +13,7 @@ func handleDateFilters(colName string, query map[string]string, f *models.Filter
 	toDate, toDateOk := query["to_date"]
 
 	if !fromDateOk && !toDateOk {
-		now := time.Now()
+		now := utils.NowBR()
 		fromDate = utils.FormatedNDaysBefore(now, utils.DefaultFiltersDaysRange)
 		toDate = utils.FormatDate(now)
 	}
@@ -50,11 +50,11 @@ func GroupListByDate[T CreatedAtGetter](list []T) []map[string][]T {
 		return groupedList
 	}
 
-	lastSeenDate := utils.FormatDateAsBR(list[0].GetCreatedAt())
+	lastSeenDate := utils.FormatDateAsBR(utils.InBrazilTZ(list[0].GetCreatedAt()))
 	dailyList := map[string][]T{}
 
 	for _, item := range list {
-		key := utils.FormatDateAsBR(item.GetCreatedAt())
+		key := utils.FormatDateAsBR(utils.InBrazilTZ(item.GetCreatedAt()))
 		if key != lastSeenDate {
 			lastSeenDate = key
 			groupedList = append(groupedList, dailyList)
