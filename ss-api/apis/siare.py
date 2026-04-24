@@ -449,7 +449,7 @@ class Siare(Browser):
     def get_print_invoice_search_error_feedback(self) -> str | None:
         self.wait_until_document_is_ready()
         xpath = XPaths.PRINT_INVOICE_SEARCH_ERROR_FEEDBACK
-        feedback = self.get_element_attr(xpath, "innerText")
+        feedback = self.get_attr_if_exists(xpath, "innerText")
         return feedback
 
     def finish_print_invoice(self):
