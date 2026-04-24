@@ -185,6 +185,11 @@ func GetDownloadFromRecordStatusIcon(c *fiber.Ctx) error {
 		return err
 	}
 
+	if result.InvoicePDF != "" {
+		c.Set("HX-Redirect", result.InvoicePDF)
+		return c.SendStatus(fiber.StatusOK)
+	}
+
 	printing, err := services.RetrievePrinting(c.Context(), result.PrintingID)
 	if err != nil {
 		return err
