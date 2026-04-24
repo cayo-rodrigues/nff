@@ -1,0 +1,32 @@
+package scripts
+
+script OnRecordCheckboxChange(metricsID int) {
+	const checked = document.querySelectorAll(
+		'.record-select[data-metrics-id="' + metricsID + '"]:checked'
+	);
+	const btn = document.getElementById('download-zip-btn-' + metricsID);
+	btn.classList.toggle('hidden', checked.length === 0);
+	btn.textContent = 'ZIP (' + checked.length + ')';
+}
+
+script DownloadSelectedRecords(metricsID int) {
+	const checked = document.querySelectorAll(
+		'.record-select[data-metrics-id="' + metricsID + '"]:checked'
+	);
+	const ids = Array.from(checked).map(el => parseInt(el.dataset.recordId));
+
+	fetch('/metrics/' + metricsID + '/records/download-zip', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ record_ids: ids })
+	})
+	.then(r => r.blob())
+	.then(blob => {
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'metricas-' + metricsID + '.zip';
+		a.click();
+		URL.revokeObjectURL(url);
+	});
+}
