@@ -15,20 +15,28 @@ import (
 func ListMetricsResults(ctx context.Context, metricsID int, userID int) ([]*models.MetricsResult, error) {
 	db := database.GetDB()
 
-	rows, _ := db.SQLite.QueryContext(ctx, "SELECT * FROM metrics_results WHERE metrics_id = ? AND created_by = ? ORDER BY issue_date, id", metricsID, userID)
+	rows, err := db.SQLite.QueryContext(ctx, "SELECT * FROM metrics_results WHERE metrics_id = ? AND created_by = ? ORDER BY issue_date, id", metricsID, userID)
+	if err != nil {
+		log.Println("Error running list metrics results query:", err)
+		return nil, utils.InternalServerErr
+	}
 	defer rows.Close()
 
 	results := []*models.MetricsResult{}
 
 	for rows.Next() {
 		result := &models.MetricsResult{}
-		err := Scan(rows, result)
-		if err != nil {
+		if err := Scan(rows, result); err != nil {
 			log.Println("Error scaning metrics result rows: ", err)
 			return nil, utils.InternalServerErr
 		}
 
 		results = append(results, result)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println("Error iterating metrics results rows:", err)
+		return nil, utils.InternalServerErr
 	}
 
 	return results, nil

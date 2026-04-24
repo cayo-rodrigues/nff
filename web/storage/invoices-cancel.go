@@ -27,20 +27,28 @@ func ListInvoiceCancelings(ctx context.Context, userID int, filters *models.Filt
 
 	db := database.GetDB()
 
-	rows, _ := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	rows, err := db.SQLite.QueryContext(ctx, query.String(), filters.Values()...)
+	if err != nil {
+		log.Println("Error running list invoice cancelings query:", err)
+		return nil, utils.InternalServerErr
+	}
 	defer rows.Close()
 
 	cancelings := []*models.InvoiceCancel{}
 
 	for rows.Next() {
 		canceling := models.NewInvoiceCancel()
-		err := Scan(rows, canceling, canceling.Entity)
-		if err != nil {
+		if err := Scan(rows, canceling, canceling.Entity); err != nil {
 			log.Println("Error scaning invoice canceling rows: ", err)
 			return nil, utils.InternalServerErr
 		}
 
 		cancelings = append(cancelings, canceling)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println("Error iterating invoice cancelings rows:", err)
+		return nil, utils.InternalServerErr
 	}
 
 	return cancelings, nil
