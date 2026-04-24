@@ -13,7 +13,6 @@ def request_invoice_handler(data: dict):
 
     except (
         exceptions.InvalidInvoiceDataError,
-        exceptions.InvalidInvoiceDataError,
         exceptions.CouldNotFinishInvoiceError,
         exceptions.DownloadTimeoutError,
     ) as e:

@@ -89,8 +89,9 @@ func (c *SSApiClient) IssueInvoice(invoice *models.Invoice) {
 	}
 
 	agent := fiber.Post(c.BaseUrl + c.Endpoints.IssueInvoice)
-	// TEMP!
-	agent.InsecureSkipVerify()
+	if os.Getenv("ENV") != "production" {
+		agent.InsecureSkipVerify()
+	}
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
@@ -144,8 +145,9 @@ func (c *SSApiClient) CancelInvoice(invoiceCancel *models.InvoiceCancel) error {
 	}
 
 	agent := fiber.Post(c.BaseUrl + c.Endpoints.CancelInvoice)
-	// TEMP!
-	agent.InsecureSkipVerify()
+	if os.Getenv("ENV") != "production" {
+		agent.InsecureSkipVerify()
+	}
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
@@ -256,8 +258,9 @@ func (c *SSApiClient) PrintInvoice(invoicePrint *models.InvoicePrint, opts *SSAp
 	}
 
 	agent := fiber.Post(c.BaseUrl + c.Endpoints.PrintInvoice)
-	// TEMP!
-	agent.InsecureSkipVerify()
+	if os.Getenv("ENV") != "production" {
+		agent.InsecureSkipVerify()
+	}
 	_, body, errs := agent.JSON(reqBody).Bytes()
 
 	for _, err := range errs {
@@ -331,7 +334,9 @@ func (c *SSApiClient) GetMetrics(metrics *models.Metrics) {
 
 	agent := fiber.Get(c.BaseUrl + c.Endpoints.Metrics)
 	agent.QueryString(queryString)
-	agent.InsecureSkipVerify() // TEMP!
+	if os.Getenv("ENV") != "production" {
+		agent.InsecureSkipVerify()
+	}
 	_, body, errs := agent.JSON(reqData.Body).Bytes()
 
 	for _, err := range errs {

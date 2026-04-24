@@ -130,10 +130,6 @@ func (p *InvoicePrint) InvoiceIDFormatIsValid() bool {
 }
 
 func (p *InvoicePrint) Values() []any {
-	// TODO
-	// TROCAR CUSTOM_FILE_NAME PARA CUSTOM_FILE_NAME_PREFIX
-	// ADICIONAR COLUNA FILE_NAME
-	// AJUSTAR SS-API DE ACORDO
 	return []any{
 		&p.ID, &p.InvoiceID, &p.InvoiceIDType, &p.InvoicePDF,
 		&p.ReqStatus, &p.ReqMsg, &p.Entity.ID,
